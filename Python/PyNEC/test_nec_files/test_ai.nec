@@ -1,0 +1,8 @@
+CMEXAMPLE 2. MODIFIE  
+CE
+GW 0 8 0. 0. -.25 0. 0. .25 .00001 
+GE
+FR 0 1 0 0 200. 50. 
+EX 5 0 5 1 1. 0. 0. 
+XQ 
+EN

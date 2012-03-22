@@ -1,0 +1,20 @@
+CM NEC Input File Bi-Quad for 2440 MHz, Trevor Marshall, 9/1/2001
+CM All data in wavelengths,will scale to 300MHz
+CM Square copper reflector,w/w choke,modelled as 0.05 lamda mesh
+CE
+GW 0 1 0. -0.45 -0.45 0. -0.45 -0.40 0.0082
+GW 0 1 0. -0.45 -0.45 0. -0.40 -0.45 0.0082
+GM 0 17 0. 0. 0. 0. 0. 0.05
+GW 0 1 0. -0.45 0.45 0 -0.40 0.45 0.0082
+GM 0 17 0. 0. 0. 0. 0.05 0.
+GW 0 18 0. 0.45 0.45 0. 0.45 -0.45 0.0082
+GM 0 0 90. 90. 0. 0.  .0307 
+GM 0 6 0. 0. 0. 0.  .0 -.0307 
+GH 1 520 0.032 3.190 0.02 0.02 0.02 0.02 0.002 
+GE -1
+FR 0 1 0 0 2442.  0
+EX 0 1 1 0000 1.0 0
+RP 0 73 73 1001 -90. 90. 5. 5. 10000.
+XQ
+EN
+

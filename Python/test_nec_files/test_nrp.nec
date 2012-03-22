@@ -1,0 +1,11 @@
+CMEXAMPLE 3. modified
+CE  
+GW 0 9 0. 0. 2. 0. 0. 7. .3 
+GE 1 
+EK 
+FR 0 1 0 0 30.
+GN 0 0 0 0 6. 1.000E-03 
+EX 1 10 3 0 0. 0. 0. 10. 20. 
+PT 2 0 5 5 
+XQ 
+EN

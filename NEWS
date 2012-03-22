@@ -1,0 +1,26 @@
+Version 1.4
+
+New Ruby module.
+C library interface cleanup.
+
+
+Version 1.3
+
+Switched to Lapack as the main method for doing LU decomposition.
+Many many bug fixes.
+
+Version 1.2.9
+
+Some improvements with the configure.in file. Now detects the atlas libraries for LAPACK and uses them. Still more to be done in this area.
+
+Version 1.2.8
+
+Much faster! We're now using LAPACK for the LU decomposition. On my laptop,
+nec2++ -b produces 1.3 normally. 1.45 with basic blas, and 1.
+
+Version 1.0.4
+
+* Moved to AutoConf (Using KDevelop -- an excellent development environment)
+* Nec++ is now available as a library (libnecpp.a) and can be called from within
+other programs. See the example directory in the source distribution.
+* Doxygen is being used for code documentation.

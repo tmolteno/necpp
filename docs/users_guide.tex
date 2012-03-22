@@ -1,0 +1,1418 @@
+\documentclass[a4paper]{book}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\title{NEC2++: Numerical Electromagnetics Code}
+\author{Tim Molteno}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\chapter{Introduction}
+
+NEC is software for analysing the electromagnetic response of an arbitrary structure consisting of wires and surfaces in free space or over a ground plane. The analysis is accomplished by the numerical solution of integral equations for induced currents.
+
+NEC stands for Numerical Electromagnetics Code.  This FORTRAN code was written by Lawrence Livermore National Lab\footnote{The developers of the hydrogen bomb and the inspiration for Dr Strangelove!}, under the sponsorship of the Naval Ocean Systems Center and the Air Force Weapons Laboratory. It is officially called NEC-2, and has been superseded by NEC-4 which remains classified. NEC-2 is the standard system for modelling antennae - it is rather like SPICE.
+
+This document describes nec2++ -- a method-of-moments solver that is compatible with NEC2 input files, but is written in a modern language C++. 
+
+\section{Citing nec2++}
+
+You may cite nec2++ in the following form (BibTeX format) 
+\begin{verbatim}
+@preamble("\usepackage{url}")
+
+@manual{NECPP,
+	author = "{Molteno, T.C.A.}",
+	title  = "{nec2++, version {\tt 1.2.3}}",
+	year   = 2005,
+	address = "Dunedin, New Zealand",
+	note = "available from \url{http://www.physics.otago.ac.nz/research/electronics/nec}"
+}
+\end{verbatim}
+
+\section{Method of Moments}
+
+The integral equation approach used by NEC-2, is best suited to structures with dimensions up to several wavelengths. Although there is no theoretical size limit, the numerical solution requires a matrix equation of increasing order as the structure size is increased relative to wavelength. Hence, modelling very large structures may require more computer time and file storage than is practical on a particular machine. In such cases standard high-frequency approximations such as geometrical optics, physical optics, or geometrical theory of diffraction may be more suitable than the integral equation approach used in NEC-2.
+
+
+\section{Using nec2++}
+
+There are two ways to use nec2++. You can use it as a command-line program to analyze a traditional NEC-2 geometry description. This usage is identical to the original FORTRAN version. 
+
+The other way to use nec2++ is to incorporate it into your own code. Nec2++ is written in C++ and can be called from C as a library (the C-Style interface), from Python (the Python binding) or incorporated as source code directly into your own systems. Nec2++ is licenced under the GNU Public License (see Section~!\ref{Licensing} for more details).
+
+\begin{verbatim}
+Usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]
+       -g: print maximum gain to stdout.
+       -b: Perform NEC++ Benchmark.
+       -s: print results to standard output.
+       -c: print results in comma-separated-value (CSV) format,
+           this options is used in conjunction with (-s) above.
+       -h: print this usage information and exit.
+       -v: print nec2++ version number and exit.
+
+Example:
+        nec2++ -i yagi.nec -o yagi.out
+\end{verbatim}
+
+The input file for NEC-2 consists of a series of 'cards', these used to correspond to punch cards, and they are exactly like the members of a SPICE deck. Each card specifies either an antenna description, or an analysis step.
+
+\section{Design Flow}
+
+The analysis of an antenna can be broken down into several steps. These are;
+\begin{enumerate}
+\item Break design into Straight wires. 
+\item For each wire, generate a list of segments roughly 0.05 wavelengths long. This is done using the GW command (see Section~\ref{wire_segments}).
+\item Add excitation specification - things like frequency and voltage (see Section~\ref{excitation}).
+\item Specify which analysis to perform. For example, Radiation Pattern.
+\item Execute nec2c and interpret the horrible unreadable mess that results.
+\end{enumerate}
+
+There are front-ends to NEC-2, rather like SPICE front ends, that plot the output of NEC in a nice way. We will not use these here.
+
+\section{Licensing}
+\label{Licensing}
+
+Nec++ is copyrighted free software. It is licensed under the GNU Public License Version 2.0 (GPL). This essentially allows you to incorporate nec2++ into any other software covered by a compatable free software license.
+
+\chapter{NEC Reference}
+
+\section{Antenna Geometry Syntax}
+
+The antenna geometry specification consists of one or more commands followed by a GE command. There are two kinds of geometric object that can be specified, wires and patches. Wires are composed of segments, and grouped according to a {\em tag}.
+
+\subsection{'GE': End Geometry}
+
+The end of the antenna geometry specification is signalled by a GE card. This card also specifies what kind of ground plane to include in the geometry.
+
+\begin{verbatim}
+GE (integer gpflag)
+\end{verbatim}
+
+gpflag - Geometry ground plain flag. 
+\begin{itemize}
+\item 0 - no ground plane is present. 
+\item 1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero) 
+\item -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
+\end{itemize}
+
+\subsection{Linear Wire Segments}
+\label{wire_segments}
+
+\begin{verbatim}
+GW tag_number num_segments x0 y0 z0 x1 y1 z1 wire_radius)
+\end{verbatim}
+
+\subsection{Example: Single horizontal wire}
+
+An antenna consisting of an horizontal 10 meter length of 0.002 meter radius wire (the same as number-8 wire) 3 meters above the ground:
+
+\begin{verbatim}
+GW 1  10  0.    0.  3.   10.  0.  3.  .002
+GE
+\end{verbatim}
+
+
+
+\subsection{Example: Rhombic Antenna}
+
+This antenna has four straight wires, each broken into ten segments. This is an
+horizontal rhombic, elevated 15 meters above the ground -- therefore the $z$
+co-ordinates are all $15$. The geometry is:
+
+\begin{verbatim}
+GW 1  10  35.    0.  15.   0.  15.  15.  .1
+GW 2  10   0.   15.  15.  35.   0.  15.  .1
+GW 3  10 -35.    0.  15.   0.  15.  15.  .1
+GW 4  10   0.  -15.  15.  35.   0.  15.  .1
+GE
+\end{verbatim}
+
+\subsection{Helix}
+
+\begin{verbatim}
+GH(integer tag_number, 
+        integer num_segments, 
+        double turn_spacing,
+        double total_length, /* Negative for left-handed helix */
+        double radius_x0,
+        double radius_y0,
+        double radius_x_end,    
+        double radius_y_end
+        double wire_radius);
+\end{verbatim}
+
+\subsection{Comments}
+
+A comment consists of zero or more CM cards, followed be a CE card that signifies the end of the comment.
+
+\begin{verbatim}
+(CM <comment>)*
+CE <comment>
+\end{verbatim}
+
+Here is an example:
+\begin{verbatim}
+CM This is the description of an antenna.
+CM Comments can have several lines, the last
+CM of which must be a CE card.
+CE This is the last line of the comment.
+\end{verbatim}
+
+\subsection{Transmission Line}
+
+To join two segments of an antenna with a transmission line, we can use the TL card. This
+The shunt admittance is Ys
+
+\begin{verbatim}
+TL      tag_0, segment_0, 
+        tag_1, segment_1, 
+        z0, length
+	Re[Ys0], Im[Ys0]
+	Re[Ys1], Im[ys1]
+\end{verbatim}
+
+
+\section{Source Specification}
+\label{excitation}
+
+NEC allows antennae to be driven by a voltage source, a current source, or an applied electromagnetic field. For the moment we will only consider the voltage sources, this is the type of source that would be used for a transmitter antenna. The frequency of the applied electric field is specified separately.
+
+\subsection{Voltage Source}
+
+To specify an applied-E-field source, use the EX card. The wire to be driven is specified with the {\tt source\_tag} -- this is the tag number that was chosen in the antenna geometry (probably with a {\tt GW}) card. The {\tt source\_segment} is the segment number of the wire that is to be driven. This parameter lets you drive a wire in the middle, or at some other point. The element number starts at 1.
+
+\begin{verbatim}
+EX 0 source_tag  source_segment 0 Re(Voltage) Im(Voltage)
+\end{verbatim}
+
+\subsubsection{Example}
+
+Drive the 10th segment of the wire with the tag 2 with an amplitude of 11.3 Volts.
+\begin{verbatim}
+EX 0 2 10 0 11.3
+\end{verbatim}
+\subsection{Frequency}
+
+Specify the frequency (frequencies) in MHz. A linear scan over a range of frequencies is specified by:
+\begin{verbatim}
+FR 0  n_freq  0  0  frequency  step_size 
+\end{verbatim}
+A single frequency is specified by setting the {\tt n\_freq} parameter to 1. For example, a 2.4 GHz excitation would be specified by {\tt FR 0 1 0 0 2400}.
+
+
+
+\section{Specifying Wire Conductivity}
+
+The 'LD' card can be used to specify arbitraty loads on segments of an antenna. Here is how to use it to specify a conductivity for all the wires with a certain tag, $t$, where $t \neq 0$.
+\begin{verbatim}
+LD 5 t 0 c
+\end{verbatim}
+where $c$ is the conductivity in siemens. If the wires were Titanium we would use a thermal conductivity of $1.798E+06$ siemens. A table of electrical properties of various materials is shown in Table~\ref{table_conductivity}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+Material & Electrical Conductivity \\
+\hline
+Aluminium 99.99\% & 3.767E+07 \\
+Aluminium 6061 T4 & 2.265E+07 \\
+Copper (Pure annealed) & 5.800E+07 \\
+Gold & 4.257E+07 \\
+Graphite & 1.276E+05 \\
+Iron & 9.048E+06 \\
+Magnesium (Cast Alloy) & 5.220E+06 \\
+Seawater & 4-5 \\
+Silver & 6.090E+07 \\
+Solder Antimonial Tin & 6.902E+06 \\
+Solder (Silver) & 9.628E+06 \\
+Stainless Steel (304) & 1.450E+06 \\
+Stainless Stell (316) & 1.334E+06 \\
+Titanium & 1.798E+06 \\
+\hline
+\end{tabular}
+\caption{Electrical Properties of various elements commonly used in Antenna Construction}
+\label{table_conductivity}
+\end{center}
+\end{table}
+
+
+\section{Analysis Commands}
+
+\subsection{Ground Specification}
+
+If you want to specify a ground, use the {\tt GN} card. This tells NEC what kind of ground to simulate.
+
+\subsection{Extended Thin Wire Kernel}
+
+NEC-2 has an option to use a more accurate thin-wire model that works for larger diameter wires. This is called the extended thin-wire kernel. You can specify this by including an EK card in the NEC-2 file. 
+
+The normal kernel should be used if the segment length, $Delta$, is much greater than the wire radius $a$, i.e.,  $Delta / a > 10$. The extended kernel should be used if $10 > Delta / a > 3$. 
+
+\subsection{Radiation Pattern Request}
+
+In normal mode, space-wave fields are computed. The polar co-ordinates are used where $\Theta$ is the angle from the $z$-axis, and $\phi$ is the angle from the $x$ axis. 
+
+\begin{verbatim}
+RP 0 <n_theta>  <n_phi>  0000, 
+        theta_0  phi_0  
+        theta_step  phi_step 
+        distance
+\end{verbatim}
+
+The distance parameter does not have to be specified.
+
+\subsubsection{Example}
+
+Calculate a radiation pattern for one azimuth angle, and 90 different elevation angles starting at zero (vertical) and in steps of one degree, ending at horizontal (90 degrees).
+\begin{verbatim}
+RP 0 90 1 0000 0 90 1 0
+\end{verbatim}
+\subsection{Execute}
+
+This is an optional card that forces generation of a radiation pattern.
+
+\begin{verbatim}
+XQ 1 /* generate 2D XZ radiation pattern */
+XQ 2 /* Generate 2D YZ radiation pattern */
+XQ 3 /* Generate both */
+\end{verbatim}
+
+\section{End Card}
+
+The last card is the EN card that signifies the end of the simulation.
+
+\section{Example: Vertical Half Wave Antenna}
+
+This is a model of a 5 meter vertical antenna, two meters above the ground. The wire antenna is 0.1 meter in radius. To keep each segment approximately 0.05 wavelengths long, we divide the half wavelength into 9 segments with a GW card.
+
+The frequency is then specified as 30 MHz with {\tt FR 0 1 0 0 30.}, and the voltage as 1 Volt with {\tt EX 0 0 5 0 1.}
+\begin{verbatim}
+CM VERTICAL HALF WAVELENGTH ANTENNA OVER GROUND
+CE WITH PERFECT GROUND (GN 1), 1 VOLT, 30 MHZ
+GW 0 9 0. 0. 2. 0. 0. 7 .1
+GE 1
+FR 0 1 0 0 30.
+EX 0 0 5 0 1.
+GN 1
+RP 0 90 1 0000 0 90 1 0
+EN
+\end{verbatim}
+
+The output is shown below (with the preamble removed).
+
+\begin{verbatim}
+ ---- ANGLES -----     ----- POWER GAINS ----- 
+  THETA      PHI       MAJOR    MINOR    TOTAL 
+ DEGREES   DEGREES        DB       DB       DB
+    0.00      0.00   -999.99  -999.99  -999.99
+    1.00      0.00    -29.68  -999.99   -29.68 
+    2.00      0.00    -23.66  -999.99   -23.66
+    3.00      0.00    -20.15  -999.99   -20.15
+    4.00      0.00    -17.65  -999.99   -17.65
+    5.00      0.00    -15.72  -999.99   -15.72
+    6.00      0.00    -14.15  -999.99   -14.15
+    7.00      0.00    -12.82  -999.99   -12.82
+    8.00      0.00    -11.68  -999.99   -11.68
+    9.00      0.00    -10.67  -999.99   -10.67
+   10.00      0.00     -9.77  -999.99    -9.77
+   11.00      0.00     -8.97  -999.99    -8.97
+   ...
+   87.00      0.00      8.31  -999.99     8.31
+   88.00      0.00      8.37  -999.99     8.37
+   89.00      0.00      8.41  -999.99     8.41
+\end{verbatim}
+
+We can plot this radiation pattern data using xnecview. This is shown in Figure~\ref{radiation_pattern_figure}.
+
+\begin{figure}
+\begin{center}
+%\includegraphics{figures/radiation_pattern.eps}
+\caption{Radiation Pattern for a vertical half-wave wire.}
+\label{radiation_pattern_figure}
+\end{center}
+\end{figure}
+
+\subsection{Yagi}
+
+\begin{verbatim}
+CM NEC Input File of a 16 element Yagi
+CE
+GW 15  7   0.00000  -0.34000   0.00000   0.00000   0.34000   0.00000  0.00250
+GW 16  7   0.27300  -0.31750   0.00000   0.27300   0.31750   0.00000  0.00250
+GW  1  7   0.69300  -0.30500   0.00000   0.69300   0.30500   0.00000  0.00250
+GW  2  7   1.11300  -0.30500   0.00000   1.11300   0.30500   0.00000  0.00250
+GW  3  7   1.53300  -0.30500   0.00000   1.53300   0.30500   0.00000  0.00250
+GW  4  7   1.95300  -0.30500   0.00000   1.95300   0.30500   0.00000  0.00250
+GW  5  7   2.37300  -0.30500   0.00000   2.37300   0.30500   0.00000  0.00250
+GW  6  7   2.79300  -0.30500   0.00000   2.79300   0.30500   0.00000  0.00250
+GW  7  7   3.21300  -0.30500   0.00000   3.21300   0.30500   0.00000  0.00250
+GW  8  7   3.63300  -0.30500   0.00000   3.63300   0.30500   0.00000  0.00250
+GW  9  7   4.05300  -0.30500   0.00000   4.05300   0.30500   0.00000  0.00250
+GW 10  7   4.47300  -0.30500   0.00000   4.47300   0.30500   0.00000  0.00250
+GW 11  7   4.89300  -0.30500   0.00000   4.89300   0.30500   0.00000  0.00250
+GW 12  7   5.31300  -0.30500   0.00000   5.31300   0.30500   0.00000  0.00250
+GW 13  7   5.73300  -0.30500   0.00000   5.73300   0.30500   0.00000  0.00250
+GE  0
+FR  0  1    0    0  2.20E+02  0.00E+00  0.00E+00  0.00E+00  0.00E+00  0.00E+00
+EX  0 16    4    0  1.00E+00  0.00E+00  0.00E+00  0.00E+00  0.00E+00  0.00E+00
+RP  0 31   73 1001  0.00E+00  0.00E+00  3.00E+00  5.00E+00  1.00E+04  0.00E+00
+EN
+\end{verbatim}
+
+
+\subsection{Example: Bi-Quad 2.4GHz with back reflector}
+
+From http://www.nec2.org/wlan.htm.
+
+\begin{verbatim}
+CM NEC Input File Bi-Quad for 2440 MHz, Trevor Marshall, 9/1/2001
+CM All data in wavelengths,will scale to 300MHz
+CM Square copper reflector,w/w choke,modelled as 0.05 lambda mesh
+CE
+GW 0 1 0. -0.45 -0.45 0. -0.45 -0.40 0.0082
+GW 0 1 0. -0.45 -0.45 0. -0.40 -0.45 0.0082
+GM 0 17 0. 0. 0. 0. 0. 0.05
+GW 0 1 0. -0.45 0.45 0 -0.40 0.45 0.0082
+GM 0 17 0. 0. 0. 0. 0.05 0.
+GW 0 18 0. 0.45 0.45 0. 0.45 -0.45 0.0082
+GW 0 18 0.05 -0.45 -0.45 0.05 -0.45 0.45 0.0082
+GW 0 18 0.10 -0.45 -0.45 0.10 -0.45 0.45 0.0082
+GW 0 18 0.15 -0.45 -0.45 0.15 -0.45 0.45 0.0082
+GW 0 18 0.20 -0.45 -0.45 0.20 -0.45 0.45 0.0082
+GW 0 18 0.25 -0.45 -0.45 0.25 -0.45 0.45 0.0082
+GW 0 18 0.05 0.45 -0.45 0.05 0.45 0.45 0.0082
+GW 0 18 0.10 0.45 -0.45 0.10 0.45 0.45 0.0082
+GW 0 18 0.15 0.45 -0.45 0.15 0.45 0.45 0.0082
+GW 0 18 0.20 0.45 -0.45 0.20 0.45 0.45 0.0082
+GW 0 18 0.25 0.45 -0.45 0.25 0.45 0.45 0.0082
+GW 0 5 0.0 -0.45 -0.45 0.25 -0.45 -0.45 0.0082
+GW 0 5 0.0 -0.45 -0.40 0.25 -0.45 -0.40 0.0082
+GW 0 5 0.0 -0.45 -0.35 0.25 -0.45 -0.35 0.0082
+GW 0 5 0.0 -0.45 -0.30 0.25 -0.45 -0.30 0.0082
+GW 0 5 0.0 -0.45 -0.25 0.25 -0.45 -0.25 0.0082
+GW 0 5 0.0 -0.45 -0.20 0.25 -0.45 -0.20 0.0082
+GW 0 5 0.0 -0.45 -0.15 0.25 -0.45 -0.15 0.0082
+GW 0 5 0.0 -0.45 -0.10 0.25 -0.45 -0.10 0.0082
+GW 0 5 0.0 -0.45 -0.05 0.25 -0.45 -0.05 0.0082
+GW 0 5 0.0 -0.45 0.00 0.25 -0.45 0.00 0.0082
+GW 0 5 0.0 -0.45 0.05 0.25 -0.45 0.05 0.0082
+GW 0 5 0.0 -0.45 0.10 0.25 -0.45 0.10 0.0082
+GW 0 5 0.0 -0.45 0.15 0.25 -0.45 0.15 0.0082
+GW 0 5 0.0 -0.45 0.20 0.25 -0.45 0.20 0.0082
+GW 0 5 0.0 -0.45 0.25 0.25 -0.45 0.25 0.0082
+GW 0 5 0.0 -0.45 0.30 0.25 -0.45 0.30 0.0082
+GW 0 5 0.0 -0.45 0.35 0.25 -0.45 0.35 0.0082
+GW 0 5 0.0 -0.45 0.40 0.25 -0.45 0.40 0.0082
+GW 0 5 0.0 -0.45 0.45 0.25 -0.45 0.45 0.0082
+GW 0 5 0.0 0.45 -0.45 0.25 0.45 -0.45 0.0082
+GW 0 5 0.0 0.45 -0.40 0.25 0.45 -0.40 0.0082
+GW 0 5 0.0 0.45 -0.35 0.25 0.45 -0.35 0.0082
+GW 0 5 0.0 0.45 -0.30 0.25 0.45 -0.30 0.0082
+GW 0 5 0.0 0.45 -0.25 0.25 0.45 -0.25 0.0082
+GW 0 5 0.0 0.45 -0.20 0.25 0.45 -0.20 0.0082
+GW 0 5 0.0 0.45 -0.15 0.25 0.45 -0.15 0.0082
+GW 0 5 0.0 0.45 -0.10 0.25 0.45 -0.10 0.0082
+GW 0 5 0.0 0.45 -0.05 0.25 0.45 -0.05 0.0082
+GW 0 5 0.0 0.45 0.00 0.25 0.45 0.00 0.0082
+GW 0 5 0.0 0.45 0.05 0.25 0.45 0.05 0.0082
+GW 0 5 0.0 0.45 0.10 0.25 0.45 0.10 0.0082
+GW 0 5 0.0 0.45 0.15 0.25 0.45 0.15 0.0082
+GW 0 5 0.0 0.45 0.20 0.25 0.45 0.20 0.0082
+GW 0 5 0.0 0.45 0.25 0.25 0.45 0.25 0.0082
+GW 0 5 0.0 0.45 0.30 0.25 0.45 0.30 0.0082
+GW 0 5 0.0 0.45 0.35 0.25 0.45 0.35 0.0082
+GW 0 5 0.0 0.45 0.40 0.25 0.45 0.40 0.0082
+GW 0 5 0.0 0.45 0.45 0.25 0.45 0.45 0.0082
+GW 1 11 0.1221 +0.0050 0.0 0.1221 .182 .182 0.0048
+GW 2 11 0.1221 .182 .182 0.1221 0 .364 0.0048
+GW 3 11 0.1221 0 .364 0.1221 -.182 .182 0.0048
+GW 4 11 0.1221 -.182 .182 0.1221 -0.0050 0.0 0.0048
+GW 5 11 0.1221 -0.0050 0.0 0.1221 -.182 -.182 0.0048
+GW 6 11 0.1221 -.182 -.182 0.1221 0.0 -.364 0.0048
+GW 7 11 0.1221 0.0 -.364 0.1221 .182 -.182 0.0048
+GW 8 11 0.1221 .182 -.182 0.1221 +0.0050 0.0 0.0048
+GW 9 1 0.1221 -0.0050 0.0 0.1221 +0.0050 0.0 0.0048
+GE 0
+FR 0 1 0 0 300.  0
+EX 0 9 1 0000 1.0 0
+RP 0 73 73 1001 -90. 90. 5. 5. 10000.
+XQ
+EN
+\end{verbatim}
+
+\section{NEC-2 Reference}
+
+\subsection{Overview: umerical Electromagnetic Code for Antenna Analysis By the Method of Moments and similar problems}
+
+R. P. Haviland, W4MB
+
+\subsubsection{BACKGROUND ON MOMENT METHODS}
+
+	The basic equations of antennas were well worked out nearly
+100 years ago, not too long after the invention of the dipole and
+the  loop antennas by Hertz. However, the equations were complex
+and "mathematically intractable", and the early solutions were
+for limited conditions and special cases. The theories of very
+short dipoles and very small loops were the first developed.
+However, it took until the 1930s to get a good solution for
+dipoles  with sinusoidal current distribution at resonance. The
+theory of arrays of antennas based on the assumption that they
+could be regarded as point sources came very early, and further
+advances were made in the 1930s. However, there was still a gap
+between calculations and measurements for most antenna types. 
+
+	In the 1960s, a new method of obtaining solutions to the
+equations was developed. Instead of demanding that results were
+correct at all points on the antenna, exactly  correct values
+were demanded only at selected points, the ends of the antenna
+and some specific intermediate points. It was recognized that the
+values away from these points could be in error, but the amount
+of error could be controlled by selection of the number of
+points, and by making some assumptions as to the nature of
+variation between selected points. Following mathmetical
+nomenclature, the importance of the accumulated error is called
+its moment (as in the phrase, a momentous occasion).
+Consequently, the method of analysis came to be called the Method
+of Moments.
+
+	It should be remembered that the "exact" used above is a
+mathmetical fiction. The starting equations are exact, but
+difficult to solve. Approximations must be used to get numerical
+results. The accuracy of these must be watched. This use of
+approximations is found in all of the antenna solution methods. A
+goal of the originators of the programs has been to make the
+programs "exact" in the practical sense© hopefully, they are as
+accurate as the measurement which can be made under conditions
+outside the laboratory. 
+
+	For many years these techniques were exclusively used by
+specialists, often under limits of military security. Two factors
+made the techniques available to Amateurs. One was the development
+of the small powerful computer, at a price within the
+Amateur pocketbook. The second was the development and release of
+a simplified version of the Method of Moments as applied to wire
+antennas, specifically intended for these computers. The pair
+made analysis relatively painless. It was possible to think of
+the antenna in terms of dimensions and connections, common
+Amateur practice. And the computer did all of the drudgery. Even
+the time needed became negligible, going from minutes and hours
+to seconds and even fractional seconds today.
+
+	This first program to be generally available was called
+MININEC, standing for Miniature Numerical Electromagnetic Code.
+While the first version was used by a small number of amateurs, 
+use did not become common until the third version became
+available, first as developed, then with  modifications intended
+for simplest possible use. The extent of use can be judged from
+the number of articles based on MININEC results which have
+appeared in Amateur publications.
+
+	 Users of MININEC will recall will recall that it is:
+  
+		©Limited to thin wires
+		©Limited to straight wire segments
+		©Uses constant current distribution on segments
+		©Allows near and/or far field calculations 
+		©Allows reactance or resistance at segment junctions
+		©Provides for single or multiple voltage excitation.
+And calculates:
+		©Drive point resistance and reactance
+		©Current distribution on elements
+		©Power at specified voltage input
+		©Far field pattern and gain at specified angles
+		©Near field intensities along a line.
+
+	These may be calculated for free space, or with a ground
+present. However the ground directly under the antenna is always
+a perfectly reflecting ideal earth. This means that drive
+impedance errors are appreciable for antennas lower than about
+1/4 wavelength above ground. This also affects the far field
+pattern, in particular the depth of the nulls in the pattern.
+Errors are acceptably small for higher antennas.
+
+	Since MININEC is a "minature" code, it follows that there
+was a full-featured code. This was the earlier NEC.
+
+
+
+
+\subsubsection{SUMMARY OF NEC FEATURES}
+
+	NEC stands for Numerical Electromagnetic Code. The first
+version of the program (7) was constructed in the late 1970s,
+although it derives from an antenna analysis program developed a
+few years earlier. The program is now in its fourth revision,
+which is being validation tested. However, the last two revisions
+are restricted to military use, so only the first two revisions
+are available to Amateurs. (The third revision may be released
+for general use "any day now"). The following is based on NEC2,
+with a few indications of changes reported for later revisions.
+
+	One difference between NEC and MININEC is the handling of
+assumed segment current variation. Instead of a single form, NEC
+uses a three term relation, of the form, constant + sine term +
+cosine term. This means that NEC will give good results with
+fewer segments than needed for MININEC. This also means that
+large problems can run faster. Additionally, because NEC provides
+automatic storage of data on tape when problems are too large for
+available memory. NEC can handle far more complex antennas.  
+
+	Another difference is that there is an alternate special
+routine to calculate current on the surface of a wire, rather
+than assuming that it is concentrated at the wire center. This
+means that NEC can be more accurate for fat wires.
+
+	NEC has three methods of exciting an antenna by direct
+connection. One is a current source, and two are different
+methods of modelling voltage sources. Antennas may be excited by
+incoming fields, rather than only by direct connection. There are
+three possible modes for incident wave excitation, linear and the
+two senses of circular polarization. There are some restrictions
+on use of sources, for example, no mixing of the three basic
+types, voltage, current or incident wave.
+
+	Other than these points, there is little difference between
+MININEC and NEC on a lot of Amateur antenna problems. Results are
+essentially identical for, say, a four element Yagi located well
+above earth. There is no reason to abandon MININEC for a lot of
+work. A few tries with NEC will show that the simpler program is
+best for simple problems.
+
+	Where NEC really shows its value is in going beyond the
+limits of MININEC or other programs. For example, NEC will accept
+input describing wires bent in an arc, or even into helices.
+Internally, it handles these by simulation with straight
+segments, which can be done with MININEC. But the process is
+automatic in NEC. Also,because of its handling of memory,  NEC
+can solve large elements or even arrays of this type. (The spiral
+antenna use in printed circuit antennas is a helix of zero
+height: NEC4 can handle logarithmic spirals.)
+
+	Another NEC extension is ability to handle surfaces. These
+must be sections of a flat surface, joining other surfaces at the
+edge. Three or four sided surfaces are possible, singly or as
+divisions of a large plane surface. Wire--surface junctions can be
+made, for good analysis of, say, a 2 meter antenna mounted on an
+auto. This can be simulated with the other programs by wire grid
+models, but only crudely, due to problem size restrictions. Dish
+and horn antennas can be modeled as surfaces. NEC can handle very
+complex surfaces, either directly as solid sheets or as wire
+grids.
+
+Probably the most important feature of NEC for Amateur use
+is the possibilities for solutions involving the presence of the
+earth. Free space or ideal ground are two possibilities. Another
+is reflection coefficient approximation to ground, which, in
+essence, multiplies the radiation from the underground or image
+antenna by a factor to account for ground loss. The last
+possibility is a relatively exact solution based on the work of
+Sommerfield. This involves table lookup of data prepared
+separately (and slowly). Any one table applies only to the ground
+condition and frequency specified, so studies of antenna--ground
+interactions at different frequencies and ground types is time
+consuming.
+
+	The calculation method selected applies to ground directly
+under the antenna as well as at the point of ground reflection.
+In addition, more ground conditions can be specified, but apply
+only to the far field. These may be in circular or linear zones,
+of different elevations, to simulate hills and valleys. The
+equations are valid for antennas close to the edge of a cliff.
+Ground screens can be specified. The near and far fields can be
+calculated.
+
+	NEC includes a number of routines to simplify setting up
+antennas and structures. Symmetry can be used to specify these:
+for example a rhombic can be specified by one wire and double
+symmetry. Quasi©circular structures are specified by one face and
+the number of faces. Arrays are easy, since any antenna or
+structure can be duplicated at one or more other locations. There
+are a few other time savers, such as use of interaction range
+approximations for well separated elements.
+
+	Loads can be introduced into elements as series or parallel
+RCL circuits, as impedances, and/or as wire resistance.
+Transmission lines may connect point pairs on elements or
+structures, and two©terminal networks any pair of points. True
+transmission line relations are used, much more accurate than can
+be obtained with parallel wires in other programs. NEC3 and NEC4
+include routines for insulated wires. NEC4 can handle sagging
+wires directly, and includes detection of error producing
+overlapping and intersecting wires. 
+
+	The range of output data in NEC is large. The charge on a
+wire is available as well as the current. Coupling between
+elements can be output. Far field patterns can use an internally
+generated format, or one specified. Fixed frequency or stepped
+operation can be selected, with linear or constant percentage
+steps. Some intermediate results can be saved to shorten run time
+on other but similar problems. 
+
+	The paper output of NEC can only be called verbose. It is
+divided into sections, with the input instructions printed first,
+then the pertinent conditions, followed by the actual output. The
+run time of each section is shown, and usually is surprising
+small.
+
+
+
+\subsubsection{THE PURPOSE OF NECCARDS}
+
+	NEC is written in Fortran, the first language developed
+which did not use machine language for programming. It is still a
+powerful tool, preferred for large complex scientific and
+engineering problems. However, is not as easy to use as BASIC.
+The NEC program is large: a printout of the source code of
+programs and subroutines by pages is well over an inch thick.
+Also, as required by techniques of the time, NEC is structured
+for input by punched cards, and temporary recording by tape. 
+Some 36 card types are needed to cover all features, each have at
+least one input and some up to four integer and up to seven
+decimal values. Setting up a problem is not easy. While there is
+more freedom in card order than found in many Fortran programs,
+there are many complex order and format requirements.
+
+	Rather than an extensive rewrite to allow full direct input
+from the keyboard and use of disk for input and records, the
+approach here is to retain the card technique, and modify only
+direct input and output for disk operations. For initial input,
+the card program encompasses the full range of NEC analysis
+possibilities, simplifying these by calling for inputs in a
+logical order acceptable to the program. The program output is
+written to disk as a simulated tape, in the style that is
+generated by cards. These "card images" are then used for input
+to the NEC program itself.
+
+	The public domain NEC program packagae includes a number of
+specialized programs, for input and output. A few of these are
+included here. One is CHECKER, which checks an input file for
+duplication. The second is GRAPS, a graphical plotting package.
+The final one is SOMNEC, which generates the special files called
+TAPE21 used for description of Sommerfield ground analysis.
+
+	Additionally, input and output files are compatable with
+many common programs. For example, a text or line editor can be
+used to read, check and modify the card images use for input.
+These plus a spreadsheet can be used to read most of the output
+files. Full feaured spreadsheets include analysis and plotting
+programs, useful for presenting data.
+
+\subsubsection{OBTAINING PROGRAMS AND PROGRAM DATA}
+
+	The basic source for NEC (and for MININEC) is the Applied
+Computational Electromagnetic Society, ACES. This may be as
+NEEDS, a package of antenna programs, or as individual programs,
+all in source and compiled code form. It is necessary to become a
+member to obtain the programs from this source. This also brings
+a Newsletter, a Journal, makes many other programs available, and
+guarantees that the latest released version can be obtained.
+Although much of the Newsletter/ Journal material is based on
+complex mathematical techniques, there is a wealth of practical
+material. This includes such items as hints on accurate
+modelling, design of small antenna ranges, graphs of earth
+characteristics, and reports of bugs and corrections to programs.
+The material is almost a necessity for any serious worker on
+antennas. For information, write Dr. Richard Adler, Secretary,
+ACES, Naval Postgraduate School Code EC/AB, Monterey, CA 93943
+
+	The second source for NEC is the report, Numerical
+Electromagnetics Code (NEC) - Method of Moments, G. J. Burke and
+A. J. Poggio, available from the National Technical Information
+Service, Springfield, VA 22161 as AD-AO75 460. This three part
+report includes theory, code description and fortran code. It is
+available in microfiche at a very reasonable cost, or in paper at
+greater cost. This report is an enormous aid in  full use of the
+capabilities of NEC, and is a necessity if program modifications
+are to be attempted. 
+
+	Versions of NEC are also available from other commercial
+sources. The announcing ads do not specify the source version.
+They also imply but do not state that some features of the
+original code have been eliminated, so check the detail
+capabilities if you have a difficult problem. Check also the InterNet
+files if you have access to that system. 
+
+	See the ads and announcements in QST, other amateur
+magazines and in the technical journals and newsletters for
+future changes in availability. This computational field is still
+developing.
+
+
+\subsection{Summary}
+
+\begin{verbatim}
+NEC CARD FORMATS
+
+	Cards for NEC input must be in the correct format for input
+to be correct. The following shows the format for each card, in
+abbreviated form. See the ASCII version of NECCARD for complete
+information, or the referenced documents.
+
+	The format is two letters designating card type, then data
+fields separated by commas. The fields present are designated as
+A=ASCII, B=blank, I=Integer, F=Floating point. The floating point
+fields must include a decimal point. 
+
+		DATA CARDS						
+GA,I,I,D,D,D,D			WIRE ARC
+GC,B,B,D,D,D			WIRE, D7 OF GW=0
+GF,I					READ NGF FILE
+GE,I					END GEOMETRY
+GH,I,I,D,D,D,D,D,D,D	HELIX
+GM,I,I,D,D,D,D,D,D,D	COORDINATE TRANSFORM
+GP					SUPPRESS GEOMETRY PRINT
+GR,I,I				GENERATE CYLINDER
+GS					SCALE STRUCTURE
+GW,I,I,D,D,D,D,D,D,D	WIRE (IF D7=0, SEE GC)
+GX,I,I				SYMMETRY
+SP,B,I,D,D,D,D,D,D		SURFACE PATCH, (+ SC IF I1=1,2 OR 3) 
+SC,B,I,D,D,D,D,D,D	     PATCH CONTINUE, I2 OF SP=1,2 OR 3
+SM,I,I,D,D,D,D,D,D		MULTIPLE PATCHES, ALWAYS + SC
+SC,B,B,D,D,D			PATCH CONTINUE
+
+		PROGRAM CONTROL CARDS
+CP,I,I,I,I			MAX COUPLING
+EK,I					EXTENDED KERNEL
+EN					END RUN
+EX,I,I,I,I,D,D,D,D,D,D   EXCITATION
+FR,I,I,B,B,D,D			FREQUENCY
+GD,B,B,B,B,D,D,D,D		FAR GROUND
+GN,I,I,B,B,D,D			NEAR GROUND
+KH,B,B,B,B,D			INTERACT RANGE
+LD,I,I,I,I,D,D,D		LOADING
+NE,I,I,I,I,D,D,D,D,D,D   NEAR ELECTRIC FIELD
+NH,I,I,I,I,D,D,D,D,D,D   NEAR MAGNETIC FIELD
+NT,I,I,I,I,D,D,D,D,D,D   NEWORK
+NX					NEXT STRUCTURE
+PL,I,I,I,I			STORE PLOT DATA
+PQ,I,I,I,I			PRINT CHARGE
+PT,I,I,I,I			PRINT CURRENT
+RP,I,I,I,I,D,D,D,D,D,D	SET PATTERN
+TL,I,I,I,I,D,D,D,D,D,D	TRANSMISSION LINE
+WG					WRITE NGF FILE
+EQ,I					EXECUTE
+
+\end{verbatim}
+
+
+\begin{verbatim}
+CHECKLIST FOR NEC INPUT CARDS
+
+CM Comments, up to 78 characters including blanks
+CE End of comments, blank
+
+   Following cards have up to 2 integers, up to 7 FP numbers
+
+GA Tag#,#segs,Arc Rad,Start Angle,End Angle,Wire Rad (wire curve)
+GE Ground Present (ends geometry input)
+GH Tag#,#segs,Spacing,Length,XStart Rad,YStart Rad,XEnd rad,YEnd 
+   Rad,Wire Rad (helix)
+GF Print/no Print (read NGF file)
+GM TagInc,#new,RotX,RotY,RotZ,MovX,MovY,MovZ,Tag (dupstructure)
+GR TagInc,#new (generate cylinder from a face)
+GS ,,Times Factor (Scale by factor) 
+GW Tag#,#segs,X1,Y1,Z1,X2,Y2,Z2,Rad (straight wire)
+GC ,,RatioLength,Rad1,Rad2 (Taper if GW Rad=0)
+GX TagInc,Planes (Reflect structure per planes)
+SP ,Shape,X,Y,Z,eaXY,aaX,Area (surface patch)
+SC ,NewShape,X3,Y3,Z3,X4,Y4,Z4 (shape if SP>0)
+SM X#,Y#,X1,Y1,Z1,X2,Y2,Z2 (Multipe Patches in X,Y)
+SC ,,X3,Y3,Z3 (Required after SM)
+
+    Following cards have up to 4 integers, up to 6 FP numbers
+
+CP Tag1,Seg1,Tag2,Seg2 (max coupling named segs, up to 5)
+EK Cancel (Extended TW kernel, ©1=cancel)
+EN    (ends run)
+EX Type, (voltage,current,external, place or angle)
+FR TypeStep,#step,,Freq,Step (frequency, Mhz)
+GD ,,,,K,Cond,DistTo2,Elev2 (additional ground zone)
+GN Type,#Radials,,,K,Cond (first ground type)
+KH ,,,,Dist  (interaction approx range)
+LD Type,Tag,TagStaet,TagEnd,R,L,C (loads at segments)
+NE Coord,N1,N2,N3,X,Y,Z,dX,dY,dZ (near field (or angle))
+NH                 (same)
+NT Tag1,Seg1,Tag2,Seg2,Real11,Imag11,R12,I12,R22,I22 (network)
+NX     (new structure starts)
+PQ Flag,SegsTag,Flag,Flag  (print wire charge)
+PL File,Flag,Flag,Flag    (data Storage for plots)
+PT Flag,SegsTag,Flag,Flag  (print currents)
+RP Mode,#th,#ph,Th1,Ph1,dTh,dPh,Dist,Normal (Pattern out)
+TL Tag1,Seg1,Tag2,Seg2,Zo,Len,Radm1,I1,R2,I2 (trans line)
+WG     (write NGF file)
+XQ Options
+\end{verbatim}
+
+
+
+\subsection{More Detail}
+
+\begin{verbatim}
+STRUCTURE OF NEC CARD IMAGES, ONE CARD = ONE LINE IN IMAGE
+
+NAME		CARD CONTENTS
+	I= INTEGER, NO DECIMAL POINT ALLOWED
+	F= FLOATING POINT VALUE, DECIMAL POINT REQUIRED
+
+	****   STRUCTURE GEOMETRY CARDS   ****
+
+CM CE   	 COMMENTS
+	MAX 78 CHARACTERS PER CARD (LINE)
+
+GA		WIRE ARC
+	I1- TAG NO.
+	I2- NO. SEGMENTS IN ARC
+	F1- ARC RADIUS
+	F2- START ANGLE, DEG.
+	F3- END ANGLE
+	F4- WIRE RADIUS
+
+GE		GEOMETRY END
+	I1- O=NO GND, +/-=GND, +BASE CHARGE=0, -BASE CURRENT=0
+
+GH		HELIX/SPIRAL
+	I1- TAG NO.
+	I2- NO SEGMENTS
+	F1- TURN SPACING, 0=SPIRAL
+	F2- LENGTH, - FOR LEFT HAND
+	F3- X RADIUS AT START
+	F4- Y RADIUS AT START
+	F5- X RADIUS AT END
+	F6- Y RADIUS AT END
+	F7- WIRE RADIUS
+
+GF		READ SAVED NGF FILE
+	I1- <XX>0 TO PRINT TABLE OF SEGMENT ENDS
+
+GM		RELOCATE/REORIENT
+	I1- TAG INCREMENT FOR NEW STRUCTURE
+	I2- NO. NEW STRUCTURES
+	F1- ROTATE ABOUT X, DEG., +=RIGHT HAND
+	F2- ROTATE ABOUT Y, DEG. (SEPARATE CARDS TO CHANGE ORDER)
+	F3- ROTATE ABOUT Z, DEG.
+	F4- X TRANSLATE
+	F5- Y TRANSLATE
+	F6- Z TRANSLATE
+	F7- TAG TO MOVE, 0=ALL TAGS
+
+GR		GENERATE CYLINDER, Z>0
+	I1- TAG INCREMENT
+	I2- NO. FACES APPROXIMATING CYLINDER
+
+GS		SCALE DIMENSIONS
+	I1- 0=TIMES F1, 1=FT. TO M., 2=IN TO M.
+	I2- BLANK
+	F1- SCALING FACTOR (I1=0), OR BLANK
+
+GW		STRAIGHT WIRE, ENDS 1,2
+	I1- TAG NO.
+	I2- NO. SEGMENTS
+	F1- X1
+	F2- Y1
+	F3- Z1
+	F4- X2
+	F5- Y2
+	F6- Z2
+	F7- WIRE RAD., 0=USE GC FOR TAPERED WIRE
+
+GC		TAPERED WIRE CONTINUE
+	I1- BLANK
+	I2- BLANK
+	F1- RATIO OF RADII ADJACENT SEGMENTS
+	F2- RADIUS FIRST SEGMENT
+	F3- RADIUS LAST SEGMENT
+
+GX		REFLECT IN COORDINATE PLANE
+	I1- TAG NO. INCREMENT
+	I2- 1XX FOR REFLECT IN X, 0XX= NO REFLECT IN X
+	    X1X FOR REFLECT IN Y, X0X= NO REFLECT IN Y
+	    XX1 FOR REFLECT IN Z, XX0= NO REFLECT IN Z
+
+SP		SURFACE PATCH, SC FOLLOWS IF NOT ARBITRARY
+	I1- BLANK
+	I2- SHAPE, 0-ARBIT.,OR 1=RECT., 2=TRIAN., 3=QUADLAT. (SEE SC)
+	F1- ARB., CENTER X, ELSE CORNER 1 X
+	F2- ARB., CENTER Y, ELSE CORNER 1 Y
+	F3- ARB., CENTER Z, ELSE CORNER 1 Z
+	F4- ARB., ANGLE ABOVE XY, ELSE CORNER 2 X
+	F5- ARB., ANGLE FROM X, ELSE CORNER 2 Y
+	F6- ARB., PATCH AREA, ELSE CORNER 2 Z
+
+SC		SM PATCH CONTINUE, NOT ARBITRARY
+	I1- BLANK
+	I2- BLANK
+	F1- CORNER 3 X
+	F2- CORNER 3 Y
+	F3- CORNER 3 Z
+	F4- QUAD ONLY, CORNER 4 X
+	F5- QUAD ONLY, CORNER 4 Y
+	F6- QUAD ONLY, CORNER 4 Z
+
+SM		PATCHES IN RECTANGULAR AREA, SC MUST FOLLOW
+	I1- NUMBER OF PATCHES IN X DIRECTION
+	I2- NUMBER OF PATCHES IN Y DIRECTION
+	F1- CORNER 1 X
+	F2- CORNER 1 Y
+	F3- CORNER 1 Z
+	F4- CORNER 2 X
+	F5- CORNER 2 Y
+	F6- CORNER 2 Z
+
+
+SC		SM PATCH CONTINUE
+	I1- BLANK
+	I2- BLANK
+	F1- CORNER 3 X
+	F2- CORNER 3 Y
+	F3- CORNER 3 Z
+
+	****   PROGRAM CONTROL CARDS   ****
+
+CP		MAXIMUM SEGMENT COUPLING CALCULATION, 2 1/2 CARDS. MAX
+	I1- TAG #1 (EXCITE WITH EX CARD, TYPE I1=0)
+	I2- SEGMENT # IN TAG 1 TO BE EXCITED
+	I3- TAG #2 (CALCULATE WITH XQ, RP, NE, NH CARD)
+	I3- SEGMENT # IN TAG 2
+
+EK		USE EXTENDED THIN-WIRE KERNEL
+	I1- BLANK OR 0= USE EXT KERNEL, -1 RESET TO USE NORMAL
+
+EN		INDICATES END OF RUN
+
+EX		EXCITE STRUCTURE, LAST ENCOUNTERED=USED
+	I1- 0=E VOLTAGE (A), 1=LINEAR WAVE (B), 2= R CIRC WAVE (B)
+	    3=L CIRC WAVE (B), 4= CURRENT (C), 5= VOLTAGE DISC. (A)
+	I2- (A) SOURCE TAG#, (B) # TH ANGLS, (C) BLANK
+	I3- (A) SOURCE SEG#, (B) # PH ANGLS, (C) BLANK
+	I4- (A) XX= ADMIT.,IMPED. PRINT, X=0 NO/1 DO, (BC), 1= ADM. PRINT
+	F1- (A) EREAL, (B) TH ANGL, (C) X OF SOURCE
+	F2- (A) EIMAG, (B) PH ANGL, (C) Y OF SOURCE
+	F3- (A) NORM FOR I4, (B) ET ANGL, Z OF SOURCE
+	F4- (A) BLANK, (B) TH INC, (C) ALPHA ANGLE FROM XY
+	F5- (A) BLANK, (B) PH INC, (C) BETA ANGLE FROM X
+	F6- (A) BLANK, (B) MIN/MAJ AXIS, PRODUCT AMPS X LENGTH
+
+FR		FREQUENCY
+	I1- O= LINEAR STEP, 1=MULTIPLICATIVE
+	I2- NO. STEPS, BLANK=1
+	I3- BLANK
+	I4- BLANK
+	F1- FREQUENCY OR START FREQUENCY
+	F2- FREQ INCREMENT, ADD OR MULTIPLY
+
+GD		FAR GROUND, (NEAR GROUND BY GN), (SET FLAG ON RP)
+	I1- BLANK
+	I2- BLANK
+	I3- BLANK
+	I4- BLANK
+	F1- DIELECTRIC OF FAR GROUND
+	F2- CONDUCTIVITY, FAR GROUND
+	F3- DISTANCE TO START OF FAR GROUND
+	F4- HEIGHT FAR GROUND, 0=SAME AS NEAR, >0= BELOW NEAR GROUND
+
+GN		NEAR GROUND, GROUND SCREEN, ADDED GROUND
+	I1- -1=SET FREE SPACE (A), 0=REFL COEFF, 1=IDEAL (B), 2-SOMMERFIELD
+	I2- (A) BLANK), NO WIRES IN GND SCREEN (C), 0= NO WIRES (D)
+	I3- BLANK
+	I4- BLANK
+	F1- (A,B) BLANK, DIELECTRIC OF NEAR GROUND
+	F2- (A,B) BLANK, CONDUCTIVITY OF NEAR GROUND
+	F3- (A,B) BLANK, (C) RADIUS OF SCREEN, (D) DIELECTRIC 2ND MEDIUM
+	F4- (A,B) BLANK, (C) RADII SCREEN WIRES, (D) CONDUCT. 2ND MEDIUM
+	F5- (A,B) BLANK, (C) BLANK, (D) DIST TO 2ND MEDIUM, SEE RP
+	F6- (A,B) BLANK, (C) BLANK, (D) HEIGHT 2ND MEDIUM (AS IN GD)
+
+KH		INTERACTION AP[PROXIMATION RANGE
+	I1- BLANK
+	I2- BLANK
+	I3- BLANK
+	I4- BLANK
+	F1- DISTANCE TO START APPROXIMATION, WAVELENGTHS
+
+LD		LOADING
+	I1- -1 CANCEL LOADS, 0=SERIES RLC LUMP, 1=PARALLEL RLC LUMP,
+	    2=SERIES DIST., 3=PARALLEL DIST. (A), 4=Z (B), 5=WIRE COND. (C)
+	I2- TAG# TO BE LOADED, BLANK/0= USE ABSOLUTE #s	
+	I3- SEG# OF TAG # TO START LOADS, OR ABSOLUTE SEG#
+	I4- SEG# OF TAG# TO END LOADS, OR OR ABSOLUTE SEG#
+	F1- RES., OHMS, OR (A) OHMS/UNIT LENGTH, OR (B) RES. OR (C) OHMS/METER
+	F2- IND., HENRY, OR (A) HY/LENGTH OR (B) REACT. OR (C) BLANK
+	F3- CAP,. FARAD, OR (A,B) BLANK
+
+NE NH		NEAR ELECTRIC, NEAR MAGNETIC FIELD
+	I1- O=RECT. COORD. (A), 1=SPHERICAL (B)
+	I2- NO. POINTS IN (A) X, (B) R (CHANGES MOST RAPIDLY)
+	I3- NO. POINTS IN (A) Y, (B) PHI
+	I4- NO. POINTS IN (A) X, (B) TH
+	F1- COORDINATE (A) X, (B) R
+	F2- COORDINATE (A) Y, (B) PHI
+	F3- COORDINATE (A) Z, (B) TH
+	F4- INCREMENT (A) X, (B) R
+	F5- INCREMENT (A) Y, (B) PHI
+	F6- INCREMENT (A) Z, (B) TH
+
+NT		NETWORKS
+	I1- PORT 1 TAG #, BLANK/0, USE I2 AS ABSOLUTE
+	I2- SEGMENT#, OR ABSOLUTE END 1 SEGMENT, -1=CANCEL NETS/LINES
+	I3- AS I1 FOR PORT 2
+	I4- AS I2 FOR PORT 2
+	F1- REAL OF Y(11), MHOS
+	F2- IMAG OF Y(11)
+	F3- REAL OF Y(12)
+	F4- IMAG OF Y(12)
+	F5- REAL OF Y(22)
+	F6- IMAG OF Y(22)
+
+NX		NEXT STRUCTURE
+
+PQ		PRINT WIRE CHARGE
+	I1- -1 NO CHARGE PRINT (DEFAULT), 0 OR BLANK, PRINT CHARGE
+	I2- TAG# TO PRINT, 0=I3/I4 IS ABSOLUTE
+	I3- START SEGMENT # OF TAG, OR ABSOLUTE SEGMENT#, 0 OR BLANK, ALL SEGS
+	I4- END SEG. # OF TAG, OR ABSOLUTE SEG.#, OR BLANK= I3 ONLY
+
+PL		PLOT DATA STORAGE
+	I1- 0=NO STORE, 1=CURRENTS, 2=NEAR FIELD, 3=PATTERNS
+	I2(1,2)- 0=NO, 1=REAL,IMAG, 3=MAG, PHASE
+	I2(3)- 1=TH, 2=PHI, 3=RHO ANGLES
+	I3(1)- 0=N0, 1=IX, 2=IY, 3=IZ, 4=IX IY IZ
+	I3(2)- 0-N0, 1=X, 2=Y, 3=Z, 4=X Y Z, 5=TOTAL  COMPONENT
+	I3(3)- 0=NO, 1=TH, 2=PHI, 3=RHO E-FIELD COMPOMENT
+ 	I4(1)- BLANK
+	I4(2)- 1=X, 2=Y, 3=Z CORDINATE VALUES
+	I4(3)- 1=V, 2=H, 3=TOTAL, 4=V H T     GAINS DB
+
+PT		CURRENT PRINT CONTROL
+	I1- -2=ALL, -1=SUPR. PRNT., 0=SEGS BELOW, 1=REC. FMT., 2=NORMAL(1)
+	I2- TAG# OF SEGMENT, 0=ABSOLUTE LOCATION
+	I3- START SEG OR ABS SEG
+	I4- END SEG OR ABS SEG
+		(1,1,1,1=SUPPRESS CURRENT PRINT)
+
+RP		RADIATION PATTERN SET
+	I1- SEE GN; 0=SPACE WAVE, 1=SPACE+GND WAVE, 2=LIN CLIFF, 3=CIR CLIFF,
+	     4=GND SCREEN, 5=SCRN+LIN CLIFF, 6=SCRN+CIR CLIFF
+	I2- # VALUES OF TH, BLANK=1
+	I3- # VALUES OF PHI, BLANK=1
+	I4- BLANK IF I1=1, ELSE abcd
+	 a- 0=MAJ0R, MINOR, TOT, 1=V, H, TOT   AXIS GAIN
+	 b- 0=NONE, 1=MAJ, 2=MIN, 3=V, 4=H, 5=T NORMALIZED AXIX GAIN
+	 c- 0=POWER GAIN, 1=DIRECTIVE GAIN
+	 d- 0= NO AVERAGE, 1=AVERAGE, 2= AVERAGE SOME SUPPRESSED
+	F1- INITIAL TH, OR I1=1, INITIAL Z
+	F2- INITIAL PHI
+	F3- INCREMENT TH OR I1=1, INCREMENT Z
+	F4- INCREMENT PHI
+	F5- RADIAL DIST. OF FIELD POINT OR 0=OMIT EXP, 1- CYLIND. CORD.
+	F6- NORMALIZE FACTOR FOR I4, BLANK/0= TO MAX GAIN.
+NOTE: A BLANK RP CAN BE USED TO SEPARATE DATA BLOCKS
+
+TL		TRANSMISSION LINE 
+	I1- PORT 1 TAG #, BLANK/0, USE I2 AS ABSOLUTE
+	I2- SEGMENT#, OR ABSOLUTE END 1 SEGMENT, -1=CANCEL NETS/LINES
+	I3- AS I1 FOR PORT 2
+	I4- AS I2 FOR PORT 2
+	F1- LINE Zo, -=CROSSED LINE
+	F2- LINE LENGTH METERS, BLANK=STRAIGHT LINE P1 TO P2
+	F3- REAL SHUNT ADM., END 1 MHOS
+	F4- IMAG SHUNT ADM., END 1
+	F5- REAL SHUNT ADM., END 2
+	F6- IMAG SHUNT ADM., END 2
+
+WG		WRITE NUMERICAL GREENS FUNCTION FOR LATER USE
+
+XQ		EXECUTE ACCUMULATED CARD DECK
+	I1- 0=NO PATTERN, 1=XY PATTERN, 2= YZ PATTERN, 3=BOTH
+	   (DO NOT USE FOR RADIAL GND SCREEN OR 2ND GND MEDIUM)
+
+NOTES: FOR A SINGLE FREQUENCY, XQ, NE, NH, RP CAUSE IMMEDIATE EXECUTION
+       FOR MULTIPLE FREQS, ONLY XQ, RP CAUSE EXECUTION
+\end{verbatim}
+
+
+
+\section{Examples}
+
+This section includes some examples showing how to use NEC to perform antenna simulations.
+
+\subsection{Long-wavelength transmission from a buoy}
+
+We are designing an antenna for buoy floating in the ocean. A radio frequency band of 13.75000 MHz with a bandwidth of 2kHz has been allocated.  The buoy has a two meter vertical antenna with a radius of 2cm, the antenna is 10cm above the ocean! The transmitter can generate 10 Volts, The simplest NEC description is
+
+\begin{verbatim}
+GW 1 10 0 0 0.1 0 0 2 0.02
+GE 1
+EK
+FR 0 1 0 0 13.75
+EX 0 1 10 0 10 0
+XQ
+EN
+\end{verbatim}
+
+We can use a more sophisticated analysis by specifying an imperfect ground using the GN card. We use some common values for seawater, a conductivity of 4 siemens and a dielectric constant of 80. 
+
+We can also experiment with loading the antenna at its top. To compare two possible antennae, we run two simulations in the same NEC file. Each is started by the XQ card. The second includes a top-loading {\tt LD 0 1 10 10 1 6E-5 1E-7} of $R = 1 \Omega$, $L = 60 \mu H$, $C = 0.1 \mu F$. These values were obtained by trial and error (maximizing the radiated power).
+
+\begin{verbatim}
+CM 2m Vertical antenna excited at 13.75 MHz [15m]
+CM floating in the ocean. We assume properties
+CM conductivity 4 mhos/meter, dielectric constant  80.
+CM We use sommerfeld ground under two conditions.
+CM     1) With no loading
+CM     2) With RLC loading at end.
+CE  
+GW 1 10 0 0 0.1 0 0 2 0.02
+GE 1
+EK
+FR 0 1 0 0 13.75
+EX 0 1 10 0 10 0
+GN 2 0 0 0 80.0 4.0 
+RP 0 10 2 1301 0. 0. 10. 90. 
+XQ
+LD 0 1 10 10 1 6E-5 1E-7
+XQ
+EN
+\end{verbatim}
+
+The results of this simulation are interesting.
+
+\appendix
+
+
+
+\chapter{Error Messages}
+   
+\subsection{CHECK DATA, PARAMETER SPECIFYING SEGMENT POSITION IN A GROUP OF EQUAL TAGS CANNOT BE ZERO.}
+
+Routine: ISEGNO
+
+This error results from an input data error and may occur at any point
+where a tag number is used to identify a segment. Execution terminated.
+
+Data on the NT, TL, EX, and PT cards should be checked.
+
+\subsection{CONNECT - SEGMENT CONNECTION ERROR FOR SEGMENT <XX>}
+
+Routine: CONNECT
+
+Possible causes: number of segments at a junction exceeds limit; segment lengths are zero; array overflow.
+
+\subsection{DATA FAULT ON LOADING CARD NO. =<XX>  ITAG STEP1 =<XX>  IS GREATER THAN ITAG STEP2 = <XX>}
+
+        Routine: MAIN
+
+        When several segments are loaded, the number of the second segment
+
+        specified must be greater than the number of the first segment.
+
+        Execution terminated.
+
+\subsection{ERROR - ARC ANGLE EXCEEDS 360. DEGREES}
+
+        Routine: ARC
+
+        Error on GA card.
+
+\subsection{ERROR - B LESS THAN A IN ROM2}
+
+        Routine: ROM2
+
+        Program malfunction.
+
+\subsection{ERROR - CORNERS OF QUADRILATERAL PATCH DO NOT LIE IN A PLANE}
+
+        Routine: Patch
+
+        The four corners of a quadrilateral patch (SP card) must lie in a plane.
+
+\subsection{ERROR - COUPLING IS NOT BETWEEN 0 AND 1}
+
+        Routine: Couple
+
+        Inaccuracy in solution or error in data.
+
+\subsection{ERROR - GF MUST BE FIRST GEOMETRY DATA CARD}
+
+Routine: {\tt c\_geometry::parse\_geometry}
+
+See section III-5.
+
+\subsection{FAULTY DATA CARD LABEL AFTER GEOMETRY SECTION}
+
+Routine: {\tt nec\_main}
+
+A card with an unrecognizable mnemonic has been encountered in the program control cards following the geometry cards.  Execution terminated.
+
+\subsection{GEOMETRY DATA CARD ERROR}
+
+Routine: {\tt c\_geometry::parse\_geometry}
+
+A geometry data card was expected, but the card mnemonic is not that of a geometry card.  Execution terminated.  After the GE card in a data deck, the possible geometry mnemonics are GE, GM, GR, GS, GW, GX, SP, and SS. The GE card must be used to terminate the geometry cards.
+
+\subsection{GEOMETRY DATA ERROR -- PATCH <XX> LIES IN PLANE OF SYMMETRY}
+
+Routine: {\tt c\_geometry::reflect}
+
+\subsection{GEOMETRY DATA ERROR -- SEGMENT <XX> EXTENDS BELOW GROUND}
+
+Routine: {\tt c\_geometry::connect\_segments}
+
+When ground is specified on the GE card, no segment may extend below the XY plane.  Execution terminated.
+
+\subsection{GEOMETRY DATA ERROR - - SEGMENT <XX> LIES IN GROUND PLANE}
+
+Routine: {\tt c\_geometry::connect\_segments}
+
+When ground is specified on the GE card, no segment should lie in the XY plane.  Execution terminated.
+
+\subsection{GEOMETRY DATA ERROR - - SEGMENT <XX> LIES IN PLANE OF SYMMETRY}
+
+Routine: {\tt c\_geometry::reflect}
+
+A segment may not lie in or cross a plane of symmetry about which the
+structure is reflected since the segment and its image will coincide or
+cross.  Execution terminated.
+
+\subsection{IMPROPER LOAD TYPE CHOSEN, REQUESTED TYPE IS <XX>}
+
+        Routine: LOAD
+
+        Valid load types (LDTYP on the LD card) are from 0 through 5.
+
+        Execution terminated.
+
+\subsection{INCORRECT LABEL FOR A COMMENT CARD}
+
+        Routine: MAIN
+
+        The program expected a comment card, with mnemonic CM or CE, but
+
+        encountered a different mnemonic.  Execution terminated.  Comment cards
+
+        must be the first cards in a data set, and the comments must be
+
+        terminated by the CE mnemonic.
+
+\subsection{LOADING DATA CARD ERROR, NO SEGMENT HAS AN ITAG=<XX>}
+
+        Routine: LOAD
+
+        ITAG specified on an LD card could not be found as a segment tag.
+
+        Execution terminated.
+
+\subsection{NO SEGMENT HAS AN ITAG OF <XX>}
+
+        Routine: ISEGNO
+
+        This error results from faulty input data and can occur at any point
+
+        where a tag number is used to identify a segment.  Execution terminated.
+
+        Tag numbers on the NT, TL, EX, CP, PQ, and PT cards should be checked.
+
+\subsection{NOTE, SOME OF THE ABOVE SEGMENTS HAVE BEEN LOADED TWICE, IMPEDANCES ADDED}
+
+        Routine: LOAD
+
+        A segment or segments have been loaded by two or more LD cards.  The
+
+        impedances of the loads have been added in series.  This is only an
+
+        informative message.  Execution continues.
+
+\subsection{PATCH DATA ERROR}
+
+        Routine: {\tt c\_geometry::parse\_geometry}
+
+        Invalid data on SP, SM, or SC card; or SC card not found where required.
+
+\subsection{PIVOT(<XX>) = <XX>}
+
+        Routine: FACTR (in-core) or LFACTR  (out-of-core)
+
+        This will be printed during the Gauss Doolittle factoring of the
+
+        interaction matrix or the network matrix when a pivot element less than
+
+        10E-10 is encountered, and indicates that the matrix is nearly singular.
+
+        The number in parentheses shows on which pass through the matrix the
+
+        condition occurred.  This is usually an abnormal condition although
+
+        execution will continue.  It may result from coinciding segments or a
+
+        segment of zero length.
+
+\subsection{RADIAL WIRE G.S. APPROXIMATION MAY NOT BE USED WITH SOMMERFELD GROUND OPTION}
+
+        Routine: MAIN
+
+\subsection{ROM2 - - STEP SIZE LIMITED AT Z = <XX>}
+
+        Routine: ROM2
+
+        Probably caused by a wire too close to the ground in the Somerfeld/
+
+        Norton ground method.  Execution continues but results may be inaccurate.
+
+  
+
+\subsection{SBF - SEGMENT CONNECTION ERROR FOR SEGMENT <XX>}
+\label{error_39}
+Routine: SBF
+
+The number of segments at a junction exceeds dimension limit (30), or the connection numbers are not self-consistant.
+
+\subsection{SEGMENT DATA ERROR}
+
+Routine: {\tt c\_geometry::geometry\_complete}
+
+A segment with zero length or zero radius was found.  Execution terminated.
+
+  
+
+\subsection{STEP SIZE LIMTED AT Z=<XX>}
+
+Routine: INTX, HFX
+
+The numerical integration to compute interaction matrix elements, using the Romberg variable interval width method, was limited by the minimum allowed  step size. Execution will continue. An inaccuracy may occur but is usually not serious.  May result from thin wire or wire close to the ground.
+
+\subsection{SYMMETRY ERROR - NROW, NCOL = <XX>}
+
+Routine: FBLOCK
+
+Array overflow or program malfunction.
+
+\subsection{TBF - SEGMENT CONNECTION ERROR FOR SEGMENT <XX>}
+
+Routine: TBF
+
+Same as error \ref{error_39}.
+
+  
+
+\subsection{TRIO - SEGMENT CONNECTION ERROR FOR SEGMENT <XX>}
+
+Routine: TRIO
+
+Same as error \ref{error_39}.
+
+  
+
+\subsection{WHEN MULTIPLE FREQUENCIES ARE REQUESTED, ONLY ONE NEAR FIELD CARD CAN BE USED - LAST CARD READ IS USED}
+
+Routine: MAIN
+
+Execution continues.
+
+\end{document}
+

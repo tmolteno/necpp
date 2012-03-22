@@ -1,0 +1,11 @@
+CM Simple dipole, with calculation of currents, charges and near field.
+CE
+GW  1   21         0      -0.25      0.0         0       0.25       0.0     0.001
+GE
+EX  0   1   11   00         1         0
+PQ  0,  0
+NE  0,  1,20,20,  0,0.05,0.05,  0,0.05,0.05
+NH  0,  1,20,20,  0,0.05,0.05,  0,0.05,0.05
+RP  0, 19, 36, 1000, 0, 0, 10, 10
+EN
+

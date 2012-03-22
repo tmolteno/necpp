@@ -1,0 +1,9 @@
+CM Center feed Horizontal Half-Wave Dipole over excellent ground
+CE
+GW 1,299,-139.,0, 6.,+139.,0, 6., .001,
+GE 0,
+GN 1,
+FR 0,0,0,0, 0.54,
+EX 0, 1,150,0,1., 0.,
+RP 1, 1, 1,0000, 1.5, 0., 0., 0., 1000.,
+EN

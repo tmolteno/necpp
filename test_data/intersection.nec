@@ -1,0 +1,12 @@
+CM Test intersection
+CM SHOULD FAIL with nec_exception about intersecting wires
+CE
+GW 0 7 0.0 0.0 0.0 1.0 1.0 0.0 .005
+GW 1 7 0.3 0.0 0.0 0.3 1.0 0.0 .005
+GE
+EX 0 0 4 0 1.
+XQ
+LD 0 0 4 4 10. 3.000E-09 5.300E-11
+PQ
+NE 0 1 1 15 .001 0 0 0. 0. .01786
+EN

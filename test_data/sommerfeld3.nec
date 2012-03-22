@@ -1,0 +1,16 @@
+CMCentre Fed IV Dipole (20m EDZ)
+CM
+CMExtended thin wire kernel used
+CM
+CEPATTERN CALCULATIONS
+GW 1 15 0 -12.6 6 0 -0.1 10 0.001
+GW 2 1 0 -0.1 10 0 0.1 10 0.001
+GW 3 15 0 0.1 10 0 12.6 6 0.001
+GE 0
+EK
+LD 5 0 0 0 5.8E+07
+FR 0 1 0 0 2.4 0
+GN 2 0 0 0 13. 50.000E-03
+EX 0 2 1 0 1.
+XQ
+EN 

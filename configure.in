@@ -1,0 +1,37 @@
+AC_INIT(configure.in)
+
+AC_CONFIG_MACRO_DIR([m4])
+AM_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE(necpp, 1.5.1)
+
+LT_INIT
+
+dnl ************************************************
+dnl *** Check for Lapack library
+dnl ************************************************
+
+
+AC_ARG_WITH([lapack],
+	[AS_HELP_STRING([--without-lapack],
+	[disable support for lapack])],
+	[],
+	[with_lapack=yes])
+
+LIBLAPACK=
+	AS_IF([test "x$with_lapack" != xno],
+	[
+		LDFLAGS="$LDFLAGS -L/usr/lib/atlas-base/atlas"
+		AC_CHECK_LIB(
+		[lapack], [clapack_zgetrf], 
+		[AC_SUBST([LIBLAPACK], ["-L/usr/lib/atlas-base/atlas -llapack -lblas -lpthread"]) AC_DEFINE([LAPACK], [1], [Define if you have liblapack])],
+		[AC_MSG_FAILURE([lapack library test failed (--without-lapack to disable)])],
+		[])
+	])
+
+AC_CHECK_LIB([m],[pow])
+
+AC_LANG_CPLUSPLUS
+AC_PROG_CXX
+AM_PROG_LIBTOOL
+AC_OUTPUT(Makefile src/Makefile)
+

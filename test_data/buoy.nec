@@ -1,0 +1,17 @@
+CM 2m Vertical antenna excited at 13.75 MHz [21.8 m]
+CM floating in the ocean (conductivity 4 mhos/meter, dielectric 80). Sommerfeld ground
+CM     1) With no loading
+CM     2) With RLC loading at end.
+CE  
+GW 1 10 0 0 0.2 0 0 2.2 0.02
+GE 1
+EK
+FR 0 2 0 0 13.75 0.001
+EX 0 1 10 0 10 0
+GN 2 0 0 0 80.0 4.0 
+RP 0 30 30 1301 0. 0. 3. 12. 
+XQ
+LD 0 1 10 10 0.1 6E-5 1E-7
+LD 2 1 1 9 0.001 0 0
+XQ
+EN

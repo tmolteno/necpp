@@ -1,0 +1,145 @@
+\documentclass{report}
+%\documentclass[letterpaper, 12pt]{article}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{url}
+
+\title{NEC2++: An NEC-2 compatible Numerical Electromagnetics Code}
+\author{T.C.A. Molteno\thanks{Department of Physics. University of Otago. Box 56. Dunedin. New Zealand. tim@physics.otago.ac.nz}, N. Kyriazis\thanks{neoklisk@cytanet.com.cy}}
+
+\begin{document}
+\lstset{language=C}
+\lstset{tabsize=4}
+\lstset{breaklines=true}
+\lstset{showspaces=false}
+\lstset{basicstyle={\footnotesize\ttfamily}}
+
+\maketitle
+
+\begin{abstract}
+We present NEC2++ -- an open-source numerical electromagnetics code, compatible with 
+NEC-2. This code, based on the original FORTRAN, has been rewritten as C++ and provides a readable, modular foundation for investigations into numerical electromagnetism
+and antenna simulation. In addition the NEC2++ code has a C API and can be compiled into a library for inclusion into other software, for example automatic antenna design optimisation systems, plugins for other languages, and graphical front-ends.
+\end{abstract}
+
+\section{Introduction}
+
+Numerical Electromagnetics Code (NEC-2) is a widely used standard method-of-moments code for the analysis of antennas~\cite{Burke81}. The code is written in FORTRAN and there have been many modifications of the original FORTRAN released, for example versions have been optimised for parallel processor architectures~\cite{Excell95, Nitch94, Rubinstein2003}. These re-implementations have not addressed some difficulties associated with the NEC-2 source code, including lack of modularity, the unreadability of the original FORTRAN source and the interweaving of analysis code with output code. These difficulties combine to present a formidable hurdle for investigators wishing to add new features or understand how the code operates.
+
+Translations of NEC-2 to an object oriented paradigm have also been described~\cite{NitchOOP94}, however this work is not in the public domain, and is not available as a resource for investigations into numerical electromagnetism.
+
+The NEC2++ code we describe in this article addresses these difficulties. The code~\cite{NEC_HOMEPAGE} released under the GNU General Public License (GPL)~\cite{GPL} is written in C++ and derived from the original NEC-2 FORTRAN source and the nec2c~\cite{NEC2C} C translation. Extensive changes have been made to the code including:
+\begin{itemize}
+\item All vectors and matrices are represented as C++ objects. 
+\item Number precision has been abstracted by use of a standard template complex number class. The code can be altered to use single precision, double precision or long double precision by changing a single line.
+\item Elimination of all global variables.
+\item Replacement of the more obscure variable names by more explicit names.
+\item File output code has been largely separated from the analysis code. This allows the incorporation of the NEC2++ code as a library within other applications.
+\end{itemize}
+
+To facilitate further development, a testharness (nec2diff) has been written that compares NEC-2 output files. This testharness allows rapid development of NEC-compatible code because the results of a suite of test geometries and analysis can be compared to the original FORTRAN results and any differences are immediately reported. This testharness is not described here, however source-code and details are available from the NEC2++ homepage~\cite{NEC_HOMEPAGE}.
+
+This paper describes the aims of the NEC2++ project, the current architecture of the codebase and shows a simple example that incorporates an NEC-2 simulation into a C program. NEC2++ is under constant development and we conclude with plans for future development of the codebase.
+
+\section{Overall code structure}
+
+The NEC2++ codebase is written using the C++ language. This language has powerful object-oriented features that we invoke to simplify and clarify the original FORTRAN. An example is the use of objects to represent vectors and matrices. This dramatically streamlines the allocation and handling of memory. As a consequence, all memory is allocated dynamically -- there are no limits imposed in the source code to the size of the structures that can be simulated.
+
+The central object in the NEC2++ simulation code is the {\tt nec\_context} object, this object contains information about the state of the simulation as well as storing output information. A new {\tt nec\_context} object is created for each simulation. 
+
+After creation, a geometry is associated with the {\tt nec\_context} through a {\tt c\_geometry} object. This object contains details of the physical structure to be simulated. Analyses are then be triggered by calling methods on the {\tt nec\_context} object. These methods correspond to the analysis cards of a traditional NEC-2 input file.
+
+\section{Modularisation}
+
+The separation of the input file parsing, the computation and the output into separate code modules is one of the primary aims of the NEC2++ project. Aside from improvements in code readability, modularisation provides some important benefits. Some of these are described below. 
+
+The separation of input file parsing into a separate module allows the addition of new front-ends to the NEC code. For example an XML geometry description could be used, or a binary interface added to allow efficient execution of multiple simulations -- as might be used in an automatic antenna design optimisation system (see for example Jones et.al ~\cite{Jones97}).
+
+The separation of the structure simulation code from the output code allows simulation without the generation of an output file. The parsing of this output file to access appropriate information is often inefficient. In addition, moving simulation and output into separate modules improves the readability and understandability of both. The initial separation of output code and analysis code was accomplished by creating a proxy output function that could be turned off globally. Currently work is underway to design objects that represent each kind of simulation output, e.g. radiation patterns. These objects are created by the simulation code, and can be queried for specific output information, for example the maximum gain. This feature is already available for some kind outputs, for example, the following excerpt from the code shown in Section~\ref{sec_example};
+\begin{lstlisting}
+	...
+	nec_rp_card(nec, 0, 1, ...);
+	gain = nec_get_maximum_gain(nec);
+\end{lstlisting}
+will trigger a radiation pattern simulation -- just like an RP card in NEC-2 but with no output. The  {\tt nec\_get\_maximum\_gain()} function return the maximum gain in the radiation pattern. The modularisation of the output code is under active development.
+
+\subsection{Error handling}
+
+Output from NEC-2 simulations consists of error information and results. In NEC2++ error information is  handled using C++ exceptions. This allows a client program using the libnecpp library from C++ to trap and manage errors that occur during geometry construction and during simulation. 
+
+All the methods on the {\tt nec\_context} object now throw exceptions under error conditions however the C-style API does not allow exceptions. Work is underway to wrap each C API function with exception handling codes and provide a mechanism for C programs to access any relevant error information.
+
+Additional work is under way to generate warnings under known situations where simulations become inaccurate, for example when the ratio of the segment length to the wire radius is less than 4.0 and the extended thin wire kernel is not employed.
+
+\subsection{Geometry parsing}
+
+A class {\tt c\_geometry} is defined that contains the geometry of the structure to be simulated. This geometry object can be constructed in two ways, either from a standard NEC-2 description file, or directly from a C or C++ API.
+
+The geometry object is then passed to an {\tt nec\_context} object, that manages the simulation of the antenna. The following code snippet shows the construction of a geometry object in C++:
+\begin{lstlisting}
+	nec_context nec;
+	nec.initialise();
+	
+	c_geometry& geo = nec.get_geometry();
+	geo.wire(0, 8, 0, 0, -0.25,
+		0, 0, 0.25,
+		0.00001, 
+		1.0, 1.0);
+	nec.geometry_complete(0,0);
+\end{lstlisting}
+This geometry consists of a single wire with eight segments, and is equivalent to an NEC-2 `GW' card.
+
+\section{Use of NEC2++ as a library}
+\label{sec_example}
+
+The re-factoring of the NEC2++ code to eliminate the interweaving of output and analysis code allows NEC2++ to be efficiently used without any input or output files. 
+
+The following listing shows an NEC input file that requests a radiation pattern from a vertical antenna excited at 30 MHz.
+\begin{lstlisting}
+	GW 0 9 0. 0. 2. 0. 0. 7 .1
+	GE 1
+	FR 0 1 0 0 30.
+	EX 0 0 5 0 1.
+	GN 1
+	RP 0 90 1 0500 0 90 1 0
+	EN
+\end{lstlisting}
+Using the C API of libnecpp, the following code performs the same simulation and returns the maximum gain without requiring any analysis of the NEC-2 output files.
+\begin{lstlisting}
+#include <libnecpp.h>
+int main(int argc, char **argv)
+{
+	nec_context* nec;	
+	nec = nec_create();
+	
+	nec_wire(nec, 0, 9, 0, 0, 2, 0, 0, 7, 0.1, 1, 1);
+	nec_geometry_complete(nec, 1, 0);	
+	nec_fr_card(nec, 0, 1, 30, 0);
+	nec_ex_card(nec, 0, 0, 5, 0, 1, 0, 0, 0, 0, 0);
+	nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
+	nec_rp_card(nec, 0, 90, 1, 0500, 0, 90, 1, 0, 0, 0);
+	
+	printf("%f",nec_get_maximum_gain(nec));
+	
+	nec_delete(nec);
+	return 0;
+}
+\end{lstlisting}
+
+\section{Conclusions}
+
+The NEC2++ codebase provides a platform for the development of systems for analysing and optimising the electromagnetic response of structures. The source-code is freely available, and binary files are available for Microsoft Windows, Unix (Linux) and Mac OS X.
+
+The first stage of this project -- the features described in this article -- are complete, and active development of new features is underway. In particular we plan to:
+\begin{itemize}
+\item Add an XML specification for antenna geometry and analysis. This will further simplify integration of NEC2++ libraries with existing applications.
+\item Add a physical-sensitivity analysis front-end that estimates the sensitivity of electromagnetic properties to changes in structure geometry. This is intended to provide a measure of how practical an antenna design is in a non-ideal environment, or to determine appropriate manufacturing tolerances.
+\item Explore performance enhancements through optimised libraries such as ATLAS~\cite{Whaley2001}, or distributed memory parallel codes such as the Scalable Linear Algebra Package (ScaLAPACK)~\cite{SCALAPACK}. Both these libraries provide dramatically faster LU decomposition routines that would accelerate one of the critical steps in the NEC-2 simulation process.
+\end{itemize}
+This list is only indicative, and investigators are invited to download the source, use it,  modify it and add features\footnote{The code is released under the GNU General Public License~\cite{GPL} -- this license allows unlimited modification and redistribution, provided the code remains under this license.}.
+
+
+\bibliographystyle{ieeetr}
+\bibliography{nec}
+ 
+\end{document}

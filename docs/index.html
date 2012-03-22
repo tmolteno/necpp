@@ -1,0 +1,83 @@
+<p>The Numerical Electromagnetics Code (NEC-2) is a comprehensive package for the analysis of the electromagnetic properties of structures. It can analyse radiating properties i.e. antenna gain, as well as  scattering properties (radar cross section) of structures. NEC-2 was originally written in FORTRAN.</p>
+
+<p>NEC2++ is an extensive rewrite of NEC-2 in C++ by Tim Molteno. This work was helped tremendously by the work of N. Kyriazis who ported NEC-2 to C. The new portions of code are licensed under the GNU Public License (GPL).</p>
+
+<h2>Latest version is 1.2.9 [31 July 2008]</h2>
+
+<h2>Check out the <a href='http://www.physics.otago.ac.nz/nec_forum/'>NEC Forum</a> for release notes and more</h2>
+
+<ul>
+<li>Download Linux executable for <a href='nec2++.tar.gz'>the latest version</a> 31 July 2008 [500 kB tar.bz2]</li>
+<li>Download source code for <a href='necpp_latest.tar.bz2'>the latest version</a> 31 July 2008 [116 kB tar.bz2]</li>
+<li>Download a <a href='nec2++.zip'>Windows executable</a> [312 kB zip], created with MinGW</li>
+<li>Download a <a href='necpp_31 July 2008_short.zip'>Windows Code Distribution</a> [260 kB zip], including a Visual Studio Project file.</li>
+<li>A very basic attempt at a users guide will be available soon.</li>
+</ul>
+
+<h3>Usage</h3>
+<p>To use nec2++, after installation</p>
+<pre>
+usage: nec2++ [-i input-file-name] [-o output-file-name]
+       -g: print maximum gain to stdout.
+       -b: Perform NEC++ Benchmark.
+       -s: print results to standard output.
+       -c: print results in comma-separated-value (CSV) format,
+           this options is used in conjunction with (-s) above.
+       -h: print this usage information and exit.
+       -v: print nec2++ version number and exit.
+</pre>
+
+<p>The output file name is optional. If it is not specified, a file will be created in the same directory as the input file
+and with an extension .out.</p>
+
+<h3>Compilation on Linux/Unix</h3>
+<p>Decompress the source-code archive, and issue the following commands. This should work on systems with a C++ compiler (almost all systems)</p>
+<pre>
+tar -jxf necpp_latest.tar.bz2
+cd necpp_31 July 2008_short
+make -f makefile.dist
+make -f makefile.dist install
+</pre>
+
+
+<h3>Compilation on Windows</h3>
+<p>Decompress the <a href='necpp_31 July 2008_short.zip'>Windows Code Distribution</a>, and build the Visual Studio project inside the win32 subdirectory</p>
+
+
+<h3>Links</h3>
+
+<ul>
+<li>The <a href='http://www.si-list.org/swindex2.html'>NEC Archives</a>.</li>
+<li>Hints for <a href='http://www.scispot.org/archives/lab_technique/compiling_nec2_on_mac_os_x.html'>Compiling Nec2++ on Mac OS X</a>
+<li><a href='http://www.cebik.com/amod/modeling.html'>AMOD</a>: An excellent introduction to using NEC.</li>
+<li><a href='http://www.nec2.org/part_3/secviii.html'>NEC error messages</a></li>
+</ul>
+
+
+<h3>Building using Autoconf</h3>
+<p>To build libnecpp, and use NEC from a C API, you need to use autoconf and friends -- to install these on <a href='http://www.debian.org'>Debian</a> linux, simply type</p>
+<pre>
+apt-get install automake libtool
+</pre>
+<p>To build the library, download the <a href='necpp-1.1.1.tar.gz'>autoconf distribution [1 MB]</a> and issue the following commands:</p>
+<pre>
+tar -zxf necpp-1.2.9.tar.gz
+cd necpp-1.2.9
+./configure
+make
+make install
+</pre>
+");
+?>
+
+<h3>Release Notes are available from the <a href='http://www.physics.otago.ac.nz/nec_forum/'>NEC Forum</a></h3>
+
+<h3>Notes</h3>
+
+<p>In the very near future, nec2++ will depend on the ATLAS. To install this use the following commands
+under DEBIAN linux (http://www.debian.org).</p>
+<pre>
+	apt-get install atlas3-base atlas3-headers atlas3-base-dev
+	apt-get install refblas3-dev lapack3-dev lapack3-doc
+</pre>
+<p>For installation on other operating systems, you should look at <a href='http://math-atlas.sourceforge.net'>the ATLAS page</a>.</p>

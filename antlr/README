@@ -1,0 +1,10 @@
+This is a parser for NEC antenna geometry files written for the ANTLR parser
+generator. At the moment it is rudimentary.
+
+Requires ANTLR
+
+	aptitude install libantlr-dev
+
+Also requires lapack libraries.
+
+	aptitude install math-atlas-dev
