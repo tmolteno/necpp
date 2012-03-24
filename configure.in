@@ -6,6 +6,17 @@ AM_INIT_AUTOMAKE(necpp, 1.5.1)
 
 LT_INIT
 
+AC_PATH_PROG(DATE,date)
+if test -z "$ac_cv_path_DATE" ; then
+    AC_MSG_ERROR(** \"date\" not found. Can't determine build-date.)
+    AC_SUBST(BUILD_DATE, unknown)
+    AC_DEFINE(BUILD_DATE, "unknown", [The build date])
+else
+    AC_SUBST(BUILD_DATE, `date +"%d-%m-%y [%H:%M:%S %Z]"`)
+    AC_MSG_NOTICE(Build date: $BUILD_DATE)
+    AC_DEFINE_UNQUOTED(BUILD_DATE, "$BUILD_DATE", [The build date])
+fi
+
 dnl ************************************************
 dnl *** Check for Lapack library
 dnl ************************************************

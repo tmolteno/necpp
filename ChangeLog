@@ -1,5 +1,7 @@
 Version 1.5.1
 * Improved error messages on intersection. Now reports tag_id as well as wire number.
+* Moved source to github
+* Added automatic build date (removed their manual definition in common.h)
 
 Version 1.5 - 2010-10-02
 * Added a test for segment midpoint intersections. If two wires are joined at acute angles to each other, this

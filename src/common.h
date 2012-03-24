@@ -31,18 +31,16 @@ typedef double nec_float;
 typedef std::complex<nec_float> nec_complex;
 
 /* Version information */
-#define	nec_version_major "1"
-#define	nec_version_minor "5"
-#define	nec_version_build "0"
-
 #ifndef nec_build_date
-	#define nec_build_date "2010-10-02"
+        #define nec_build_date BUILD_DATE
 #endif
 
+#include "config.h"
+
 #ifndef build_version
-	#define	nec_version nec_version_major "." nec_version_minor "." nec_version_build " [" nec_build_date "]"
+        #define nec_version VERSION " [" nec_build_date "]"
 #else
-	#define nec_version build_version " [" nec_build_date "]"
+        #define nec_version build_version " [" nec_build_date "]"
 #endif
 
 /*
