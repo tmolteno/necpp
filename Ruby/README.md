@@ -14,6 +14,7 @@ Tim Molteno. tim@physics.otago.ac.nz
 To use this library, you must have the necpp library installed on your system:
 
 On Debian based systems:
+
 	aptitude install ruby-dev swig
 
 You should have built the nec2++ distribution and installed it.

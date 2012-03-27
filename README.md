@@ -7,10 +7,11 @@ This is a free (GPL) NEC-2 compatable electromagnetic code. It can both read nec
 !NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 See the INSTALL file. But here is the short version
-    make -f Makefile.cvs
-    ./configure
-    make
-    sudo make install
+
+	make -f Makefile.cvs
+	./configure
+	make
+	sudo make install
 
 ##Instructions for Compiling on Windows
 
@@ -22,5 +23,5 @@ NEC2++ has been tested with Microsoft Visual Studio 7. A project file for VC++ 7
 
 Step-by-step instructions
 
-*Unzip the Windows source code distribution.
-*Build the project inside the win32 subdirectory with Visual Studio 7.
+* Unzip the Windows source code distribution.
+* Build the project inside the win32 subdirectory with Visual Studio 7.
