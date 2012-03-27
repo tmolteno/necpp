@@ -47,7 +47,7 @@ NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 CPP_SRC  = test_cpp.cpp
 CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
-CXXFLAGS=-I ../src/ -O3
+CXXFLAGS=-I ../src/ -I .. -O3
 
 test_cpp: ${CPP_OBJS} ${NECPP_OBJS}
 	gcc -o test_cpp ${CPP_OBJS} ${NECPP_OBJS} -lstdc++ -lm
