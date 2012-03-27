@@ -6,6 +6,30 @@ AM_INIT_AUTOMAKE(necpp, 1.5.1)
 
 LT_INIT
 
+##########################################################################
+# debug compilation support
+##########################################################################
+
+AC_MSG_CHECKING([whether to build with debug information])
+AC_ARG_ENABLE([debug],
+    [AS_HELP_STRING([--enable-debug],
+        [enable debug data generation (def=no)])],
+    [debugit="$enableval"],
+    [debugit=no])
+AC_MSG_RESULT([$debugit])
+
+if test x"$debugit" = x"yes"; then
+    AC_DEFINE([DEBUG],[],[Debug Mode])
+    AM_CXXFLAGS="$AM_CXXFLAGS -g -Wall -Werror -Wno-uninitialized -O0"
+else
+    AC_DEFINE([NDEBUG],[],[No-debug Mode])
+    AM_CXXFLAGS="$AM_CXXFLAGS -O3"
+fi
+AC_SUBST([AM_CXXFLAGS])
+
+dnl ************************************************
+dnl *** Add an automatic build date
+dnl ************************************************
 AC_PATH_PROG(DATE,date)
 if test -z "$ac_cv_path_DATE" ; then
     AC_MSG_ERROR(** \"date\" not found. Can't determine build-date.)
