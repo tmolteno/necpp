@@ -25,9 +25,9 @@
 
 all:	check_build test python
 
-BUILD=.
-TARGET = ${BUILD}/src/nec2++
-NEC2DIFF = ${BUILD}/src/nec2diff
+BUILD=debug/bin
+TARGET = ${BUILD}/nec2++
+NEC2DIFF = ${BUILD}/nec2diff
 
 
 NEC2C = c_src/nec2c
@@ -37,7 +37,7 @@ NECF = FORTRAN/nec2
 #	Please note that the testharness assumes that you have built the debug
 #	version of nec2++ using kdevelop.
 #
-check_build: ${NEC2C} ${NECF} ${TARGET}
+check_build: ${NEC2C} ${TARGET}
 
 
 test_fast:	
@@ -92,12 +92,14 @@ test:
 	rm -f $(DO_TESTS:.nec=.outf)
 	make -f Makefile.test test_aux
 
+test_f: ${NECF} $(DO_TESTS:.nec=.outf)
+	echo "Fortran test complete"
 
 # 	Change the following line to
 #	test_aux:	${NEC2DIFF} nec2cpp $(NEC_TESTS:.nec=.outcpp) $(NEC_TESTS:.nec=.outc) $(NEC_TESTS:.nec=.diff) $(NEC_TESTS:.nec=.dif)
 #	in order to include the FORTRAN code in the test suite.
 
-test_aux: $(DO_TESTS:.nec=.outcpp) $(DO_TESTS:.nec=.outc) $(DO_TESTS:.nec=.outf) $(DO_TESTS:.nec=.diff)
+test_aux: $(DO_TESTS:.nec=.outcpp) $(DO_TESTS:.nec=.outc) $(DO_TESTS:.nec=.diff)
 	echo "Test Complete"
 
 ############################################################################
