@@ -1,0 +1,57 @@
+Source: necpp
+Section: science
+Priority: optional
+Maintainer: Emmanuel QUEMENER <emmanuel.quemener@free.fr>
+Build-Depends: debhelper (>= 5), autoconf, libtool, automake1.9, autotools-dev, python-all-dev, python-numpy, python-support, texlive, swig, libatlas-base-dev, liblapack-dev
+Standards-Version: 3.9.1
+
+Package: necpp
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: NEC2++ Antenna Modelling System
+ NEC2++ (Numerical Electromagnetics Code) is software for modelling antennas 
+ using the Method of Moments.  It is a complete rewrite of the original NEC2
+ FORTRAN software developed by Lawrence Livermore Laboratories (available as
+ the nec package).
+
+Package: libnecpp0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: library to use NEC2++
+ NEC2++ (Numerical Electromagnetics Code) is software for modelling antennas 
+ using the Method of Moments.  It is a complete rewrite of the original NEC2
+ FORTRAN software developed by Lawrence Livermore Laboratories (available as
+ the nec package).
+ .
+ This package contains a shared library, usable to build and run your own
+ program directly using NEC2 techniques without calling nec2++ binary program.
+
+Package: python-necpp
+Section: python
+Architecture: any
+Depends: ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}, python-numpy
+Provides: ${python:Provides}
+XB-Python-Version: ${python:Versions}
+Description: Python module for using NEC2++
+ NEC2++ (Numerical Electromagnetics Code) is software for modelling antennas 
+ using the Method of Moments.  It is a complete rewrite of the original NEC2
+ FORTRAN software developed by Lawrence Livermore Laboratories (available as
+ the nec package).
+ .
+ With this Python module, it is possible to use NEC2 techniques directly from
+ Python.
+
+Package: libnecpp-dev
+Section: libdevel
+Architecture: any
+Depends: libnecpp0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: development files for libnecpp
+ NEC2++ (Numerical Electromagnetics Code) is software for modelling antennas 
+ using the Method of Moments.  It is a complete rewrite of the original NEC2
+ FORTRAN software developed by Lawrence Livermore Laboratories (available as
+ the nec package).
+ .
+ This package contains the header files and static library needed to
+ compile applications that use libnecpp.
+

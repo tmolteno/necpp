@@ -1,0 +1,150 @@
+necpp (1.5.0+cvs20101003-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Python/PyNEC/setup.py
+    - fix a FTBFS with python2.7 updating location of libnumarray.h; patches
+      from ubuntu; Closes: #625135
+  * debian/control
+    - added python-numpy to Depends of python-necpp
+
+ -- Sandro Tosi <morph@debian.org>  Sun, 05 Jun 2011 12:51:28 +0200
+
+necpp (1.5.0+cvs20101003-2) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ]
+  * Fix compiling Python on various architectures as changed in 1.4.0
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Mon, 25 Oct 2010 20:58:19 +0200
+
+necpp (1.5.0+cvs20101003-1) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ] 
+  * CVS snapshot of the new release
+  * Fix missing dependencies on Python (closes: #580812) 
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Sun, 03 Oct 2010 21:12:42 +0100
+
+necpp (1.4.0+cvs20091005-2) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ] 
+  * Add user manual for nec2++ and nec2diff commands
+  * Change compatibility version
+  * Fix build with gcc-4.4 (closes: #552297, #560507)
+  * Fix platform detection (closes: #533818)
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Wed, 04 Nov 2009 07:57:42 +0100
+
+necpp (1.4.0+cvs20091005-1) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ]
+  * CVS snapshot based on new release
+  * Change NumArray references to NumPy in order to match next release
+  * Check for successful test-data/examples1.nec execution (closes: #531533)
+  * Correct source example in order to compile (closes: #545267)
+  * Change Automake build from 1.4 to 1.9 version (closes: #549135)
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Mon, 26 Oct 2009 10:04:00 +0200
+
+necpp (1.3.0+cvs20090101-1) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ]
+  * CVS snapshot based on new release.
+  * Add Lapack and Atlas librairies dependencies
+  * Change dependencies to TexLive
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Thu, 04 Jan 2009 06:00:28 +0100
+
+necpp (1.2.6+cvs20070816-1.3) unstable; urgency=low
+
+  [ Peter Eisentraut ]
+  * Non-maintainer upload.
+  * Fixed bashism in debian/rules (patch by Chris Lamb) (closes: #484415)
+  * Don't ignore errors from make distclean, per lintian
+  * Fixed sections, per lintian
+  * Updated standards version
+  
+ -- Peter Eisentraut <petere@debian.org>  Tue, 08 Jul 2008 18:13:58 +0200
+
+necpp (1.2.6+cvs20070816-1.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Add includes needed by gcc-4.3, closes: 474838
+    Thanks: peter green <plugwash p10link.net>
+
+ -- Riku Voipio <riku.voipio@iki.fi>  Tue, 03 Jun 2008 17:35:42 +0300
+
+necpp (1.2.6+cvs20070816-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix FTBFS with GCC 4.3 (Closes: #455186).
+
+ -- Luk Claes <luk@debian.org>  Sat, 22 Mar 2008 08:18:08 +0000
+
+necpp (1.2.6+cvs20070816-1) unstable; urgency=low
+
+  * New release.
+  * Correct 4.3 compilation errors (Closes: bug#417442)
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Thu, 16 Aug 2007 16:17:35 +0200
+
+necpp (1.2.4+cvs20060601-1) unstable; urgency=low
+
+  * Initial release (Closes: bug#379410).
+
+ -- Emmanuel QUEMENER <quemener@cri.ens-cachan.fr>  Thu,  1 Jun 2006 14:25:22 +0200
+necpp (1.3.0+cvs20090101-2) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ]
+  * Check for successful test-data/examples1.nec execution (closes: #531533)
+  * Correct source example in order to compile (closes: #545267)
+  * Change Automake build from 1.4 to 1.9 version (closes: #549135)
+
+ -- Emmanuel QUEMENER <Emmanuel.Quemener@free.fr>  Thu, 01 Oct 2009 12:18:53 +0200
+
+necpp (1.3.0+cvs20090101-1) unstable; urgency=low
+
+  [ Emmanuel QUEMENER ]
+  * CVS snapshot based on new release.
+  * Add Lapack and Atlas librairies dependencies
+  * Change dependencies to TexLive
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Thu, 04 Jan 2009 06:00:28 +0100
+
+necpp (1.2.6+cvs20070816-1.3) unstable; urgency=low
+
+  [ Peter Eisentraut ]
+  * Non-maintainer upload.
+  * Fixed bashism in debian/rules (patch by Chris Lamb) (closes: #484415)
+  * Don't ignore errors from make distclean, per lintian
+  * Fixed sections, per lintian
+  * Updated standards version
+  
+ -- Peter Eisentraut <petere@debian.org>  Tue, 08 Jul 2008 18:13:58 +0200
+
+necpp (1.2.6+cvs20070816-1.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Add includes needed by gcc-4.3, closes: 474838
+    Thanks: peter green <plugwash p10link.net>
+
+ -- Riku Voipio <riku.voipio@iki.fi>  Tue, 03 Jun 2008 17:35:42 +0300
+
+necpp (1.2.6+cvs20070816-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Fix FTBFS with GCC 4.3 (Closes: #455186).
+
+ -- Luk Claes <luk@debian.org>  Sat, 22 Mar 2008 08:18:08 +0000
+
+necpp (1.2.6+cvs20070816-1) unstable; urgency=low
+
+  * New release.
+  * Correct 4.3 compilation errors (Closes: bug#417442)
+
+ -- Emmanuel QUEMENER <emmanuel.quemener@free.fr>  Thu, 16 Aug 2007 16:17:35 +0200
+
+necpp (1.2.4+cvs20060601-1) unstable; urgency=low
+
+  * Initial release (Closes: bug#379410).
+
+ -- Emmanuel QUEMENER <quemener@cri.ens-cachan.fr>  Thu,  1 Jun 2006 14:25:22 +0200
