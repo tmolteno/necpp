@@ -51,9 +51,9 @@ test_fast:
 #	This tests the output of the C++ port against the nec2c, C 
 #	port as well as the original FORTRAN
 #
-NEC_TESTS := $(shell find test_data/ -name "example*.nec")
-SOM_TESTS := $(shell find test_data/ -name "sommer*.nec")
-ALL_TESTS := $(shell find test_data/ -name "*.nec")
+NEC_TESTS := $(shell find data/ -name "example*.nec")
+SOM_TESTS := $(shell find data/ -name "sommer*.nec")
+ALL_TESTS := $(shell find data/ -name "*.nec")
 
 DO_TESTS = ${NEC_TESTS} ${SOM_TESTS}
 #DO_TESTS = ${ALL_TESTS}
