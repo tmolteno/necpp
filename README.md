@@ -4,6 +4,13 @@ This is a free (GPL) NEC-2 compatable electromagnetic code. It can both read nec
 
 ##Instructions for Linux
 
+nec2++ is available precompiled as part of most modern linux distributions, including Debian, Ubuntu and Fedora.
+
+        sudo aptitude install necpp
+
+
+##Compiling on Linux
+
 !NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 See the INSTALL file. But here is the short version

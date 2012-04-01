@@ -25,7 +25,7 @@
 
 all:	check_build test python
 
-BUILD=debug/bin
+BUILD=bin
 TARGET = ${BUILD}/nec2++
 NEC2DIFF = ${BUILD}/nec2diff
 
