@@ -4,7 +4,7 @@
 /*
 	Various Useful Math Utilities for nec2++
 	
-	Copyright (C) 2004-2005  Timothy C.A. Molteno
+	Copyright (C) 2004-2012  Timothy C.A. Molteno
 	tim@molteno.net 
 	
 	This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,9 @@
 typedef safe_array<int>  int_array;
 typedef safe_array<nec_float>  real_array;
 
+/*! \brief      Use the Eigen package for arrays 
+    \todo Work through how this should be done.
+*/
 #define USING_EIGEN_ARRAY 0
 #define USING_EIGEN_3VECT 0
 
