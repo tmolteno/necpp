@@ -15,7 +15,7 @@
  }
  catch (nec_exception* e) {
  static VALUE cpperror = rb_define_class("CPPError", rb_eStandardError);
- rb_raise(cpperror, e->get_message().c_str());
+ rb_raise(cpperror, "%s", e->get_message().c_str());
  }
 }
 
