@@ -13,5 +13,5 @@ EXTRA_DIST = \
 	Makefile.test
 
 dist-hook:
-	rm -rf `find $(distdir)/test_data -name *.out*`
-	rm -rf `find $(distdir)/test_data -name *.diff*`
+	rm -rf `find $(distdir)testharness/data -name *.out*`
+	rm -rf `find $(distdir)testharness/data -name *.diff*`
