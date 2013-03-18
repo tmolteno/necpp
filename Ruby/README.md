@@ -21,7 +21,7 @@ You should have built the nec2++ distribution and installed it.
 
 ###Use ATLAS for LAPACK###
 
-        sudo update-alternaltives liblapack.so
+        sudo update-alternaltives --config liblapack.so.3
 
 Make sure you choose the atlas-base one.
 
