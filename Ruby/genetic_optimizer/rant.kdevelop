@@ -1,0 +1,125 @@
+<?xml version = '1.0'?>
+<kdevelop>
+  <general>
+    <author>Tim Molteno</author>
+    <email>tim@physics.otago.ac.nz</email>
+    <version>1</version>
+    <projectmanagement>KDevScriptProject</projectmanagement>
+    <primarylanguage>Ruby</primarylanguage>
+    <keywords>
+      <keyword>Ruby</keyword>
+    </keywords>
+    <ignoreparts>
+      <part>kdevfilelist</part>
+      <part>kdevsnippet</part>
+      <part>kdevvalgrind</part>
+      <part>kdevastyle</part>
+      <part>kdevctags2</part>
+      <part>kdevsecurity</part>
+      <part>kdevregexptest</part>
+    </ignoreparts>
+    <projectname>rant</projectname>
+    <projectdirectory>.</projectdirectory>
+    <absoluteprojectpath>false</absoluteprojectpath>
+    <description/>
+    <defaultencoding/>
+  </general>
+  <kdevscriptproject>
+    <general>
+      <activedir>src</activedir>
+      <includepatterns>*.rb</includepatterns>
+      <excludepatterns>*~</excludepatterns>
+    </general>
+    <run>
+      <directoryradio>executable</directoryradio>
+      <globalcwd/>
+    </run>
+  </kdevscriptproject>
+  <kdevfileview>
+    <groups>
+      <group pattern="*.rb" name="Scripts" />
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+      <hidenonlocation>false</hidenonlocation>
+    </groups>
+    <tree>
+      <hidepatterns>*.o,*.lo,CVS</hidepatterns>
+      <hidenonprojectfiles>false</hidenonprojectfiles>
+    </tree>
+  </kdevfileview>
+  <kdevdoctreeview>
+    <ignoretocs>
+      <toc>bash</toc>
+      <toc>bash_bugs</toc>
+      <toc>c++_bugs_gcc</toc>
+      <toc>clanlib</toc>
+      <toc>w3c-dom-level2-html</toc>
+      <toc>fortran_bugs_gcc</toc>
+      <toc>gnome1</toc>
+      <toc>gnustep</toc>
+      <toc>gtk</toc>
+      <toc>gtk_bugs</toc>
+      <toc>haskell</toc>
+      <toc>haskell_bugs_ghc</toc>
+      <toc>java_bugs_gcc</toc>
+      <toc>java_bugs_sun</toc>
+      <toc>kde2book</toc>
+      <toc>libc</toc>
+      <toc>libstdc++</toc>
+      <toc>opengl</toc>
+      <toc>pascal_bugs_fp</toc>
+      <toc>php</toc>
+      <toc>php_bugs</toc>
+      <toc>perl</toc>
+      <toc>perl_bugs</toc>
+      <toc>python</toc>
+      <toc>python_bugs</toc>
+      <toc>qt-kdev3</toc>
+      <toc>sdl</toc>
+      <toc>stl</toc>
+      <toc>w3c-svg</toc>
+      <toc>sw</toc>
+      <toc>w3c-uaag10</toc>
+      <toc>wxwidgets_bugs</toc>
+    </ignoretocs>
+    <ignoreqt_xml>
+      <toc>Guide to the Qt Translation Tools</toc>
+      <toc>Qt Assistant Manual</toc>
+      <toc>Qt Designer Manual</toc>
+      <toc>Qt Reference Documentation</toc>
+      <toc>qmake User Guide</toc>
+    </ignoreqt_xml>
+    <ignoredoxygen>
+      <toc>KDE Libraries (Doxygen)</toc>
+    </ignoredoxygen>
+  </kdevdoctreeview>
+  <kdevfilecreate>
+    <useglobaltypes>
+      <type ext="rb" />
+    </useglobaltypes>
+  </kdevfilecreate>
+  <kdevrubysupport>
+    <run>
+      <interpreter>ruby</interpreter>
+      <shell>irb</shell>
+      <mainprogram>TestSuite.rb</mainprogram>
+      <programargs/>
+      <runmainprogram>0</runmainprogram>
+      <terminal>false</terminal>
+      <charactercoding>0</charactercoding>
+    </run>
+  </kdevrubysupport>
+  <kdevrbdebugger>
+    <general>
+      <floatingtoolbar>false</floatingtoolbar>
+      <showconstants>false</showconstants>
+      <traceintoruby>false</traceintoruby>
+    </general>
+  </kdevrbdebugger>
+  <kdevdocumentation>
+    <projectdoc>
+      <docsystem/>
+      <docurl/>
+      <usermanualurl/>
+    </projectdoc>
+  </kdevdocumentation>
+</kdevelop>
