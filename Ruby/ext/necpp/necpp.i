@@ -4,8 +4,8 @@
   Released under the GPL v3.
 */
 %{
-#include "../src/libnecpp.h"
-#include "../src/nec_exception.h"
+#include "libnecpp.h"
+#include "nec_exception.h"
 %}
 
 /* Handle exceptions thrown by nec2++ */

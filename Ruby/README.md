@@ -19,6 +19,12 @@ On Debian based systems:
 
 You should have built the nec2++ distribution and installed it.
 
+###Use ATLAS for LAPACK###
+
+        sudo update-alternaltives liblapack.so
+
+Make sure you choose the atlas-base one.
+
 ###To generate this module
 
 You should install SWIG (on Debian 'aptitude install swig ruby-dev'), and then
