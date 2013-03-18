@@ -6,5 +6,5 @@ RUBY=ruby1.9.1
 #RUBY=ruby
 swig -v -I../src -c++ -ruby necpp.i
 ${RUBY} extconf.rb
-make
+make V=1
 sudo make install
