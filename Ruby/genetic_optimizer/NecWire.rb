@@ -35,7 +35,7 @@ class NecWire
 
 	def nec_wire(nec,tag, wavelength)
 		d = length
-		oddseg = ((10.0*d/wavelength).round)*2 + 1
+		oddseg = (((SEGMENTS_PER_WAVELENGTH / 2.0)*d/wavelength).round)*2 + 1
 		segments = [3,oddseg].max
 		Necpp.nec_wire(nec, tag, segments, sf4(@x0.x), sf4(@x0.y), sf4(@x0.z), sf4(@x1.x), sf4(@x1.y), sf4(@x1.z), @radius, 1.0, 1.0)
 #		print "Necpp.nec_wire(nec, #{tag}, #{segments}, #{@x0.x}, #{@x0.y}, #{@x0.z}, #{@x1.x}, #{@x1.y}, #{@x1.z}, #{@radius}, 1.0, 1.0)\n"

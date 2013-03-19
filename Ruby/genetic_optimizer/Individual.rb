@@ -48,8 +48,8 @@ class Individual
 		ret.init_nodelist
 		ret.function_tree = @function_tree.deep_copy(ret)
 		ret.my_fitness = @my_fitness
-# 		ret.my_stats = @my_stats
-# 		ret.my_antenna = @my_antenna
+		#ret.my_stats = nil #@my_stats
+		#ret.my_antenna = nil #@my_antenna
 		return ret
 	end
 
@@ -96,7 +96,9 @@ class Individual
 		fitness_refresh
 		self.fitness_calc
 		ant = self.get_antenna
-		ant.add_comment(fitness_from_stats(true))
+		ret = fitness_from_stats(true)
+		ant.add_comment(ret)
+		return ret
 	end
 
 	def Individual::get_stats(ant)
@@ -168,7 +170,7 @@ class Individual
 		fc = @my_antenna.function_count
 		ret -= fc / 30
 		
-		return "Fit=#{sf(ret,0.001)} #{ret_stats}\n" if display
+		return "Fit=#{sf(ret,0.001)} #{ret_stats}" if display
 		return ret
 	end
 
