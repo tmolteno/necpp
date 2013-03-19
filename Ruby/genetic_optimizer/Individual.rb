@@ -47,7 +47,7 @@ class Individual
 		ret = self.clone
 		ret.init_nodelist
 		ret.function_tree = @function_tree.deep_copy(ret)
-		ret.my_fitness = @my_fitness
+		ret.fitness_refresh # my_fitness = @my_fitness
 		#ret.my_stats = nil #@my_stats
 		#ret.my_antenna = nil #@my_antenna
 		return ret
@@ -73,6 +73,8 @@ class Individual
 		pos = Vector3.new(0,0,ANT_HEIGHT) # starting position
 		@function_tree.evaluate_children(pos, 0.0, ant)
 		@my_antenna = ant
+		@my_antenna.cleanup
+		return @my_antenna
 	end
 
 	def set_stats(s)
