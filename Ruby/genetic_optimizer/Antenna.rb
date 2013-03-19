@@ -135,8 +135,8 @@ LDTAGT (14) - Equal to n specifies the nth segment of the set of segments whose 
 	def rp_parameters
 		theta_resolution = 5.0
 		phi_resolution = 15.0
-		theta_min = 0.0
-		theta_max = 45.0
+		theta_min = THETA_MIN
+		theta_max = THETA_MAX
 		phi_min = 0.0
 		phi_max = 360.0
 		n_theta = ((theta_max - theta_min) / theta_resolution).round + 1

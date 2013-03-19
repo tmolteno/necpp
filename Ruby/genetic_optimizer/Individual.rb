@@ -102,8 +102,8 @@ class Individual
 	def Individual::get_stats(ant)
 		ret = Array.new
 		ret.push(ant.get_statistics(FREQUENCY))
-		#ret.push(ant.get_statistics(FREQUENCY - BANDWIDTH/2))
-		#ret.push(ant.get_statistics(FREQUENCY + BANDWIDTH/2))
+		ret.push(ant.get_statistics(FREQUENCY - BANDWIDTH/2))
+		ret.push(ant.get_statistics(FREQUENCY + BANDWIDTH/2))
 		return ret
 	end
 	
@@ -134,6 +134,7 @@ class Individual
 			glmax = s.gain_max
 			gsd = s.gain_sd
 
+			return -99.0 if s.gain_mean > GAIN_MEAN_LIMIT # 
 			return -99.0 if vswr == nil
 			return -99.0 if gain_min == nil
 			return -99.0 if gain_min < -999.0
