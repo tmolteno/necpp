@@ -102,7 +102,7 @@ class Wire < FunctionNode
 
 	def set_dr(dr)
 		@dr = dr
-		@dr.z = 0.00 # do not allow changes in height
+	#	@dr.z = 0.00 # do not allow changes in height
 	end
 
 	def to_s
