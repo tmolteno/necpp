@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004-2008  Timothy C.A. Molteno
+	Copyright (C) 2004-2013  Timothy C.A. Molteno
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -232,9 +232,11 @@ public:
 		 \param start_index The index of the first element
 		 \param end_index If -1, then finish at the end of the array
 	*/
-	safe_array<T> segment(long start_index)
+	safe_array<T> segment(long start_index, long end_index)
 	{
-		return eigen_segment(start_index, size() - start_index);
+		if (-1 == end_index)
+			throw "foo";
+		return eigen_segment(start_index, end_index);
 /*		if (-1 == end_index)
 			end_index = len_;
 			

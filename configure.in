@@ -1,10 +1,32 @@
 AC_INIT(configure.in)
-
 AC_CONFIG_MACRO_DIR([m4])
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE(necpp, 1.5.1)
 
 LT_INIT
+
+dnl ************************************************
+dnl *** Check for Array Bounds
+dnl ************************************************
+
+
+AC_ARG_WITH([bounds],
+	[AS_HELP_STRING([--without-bounds],
+	[disable support for bounds-checking])],
+	[],
+	[with_bounds=no])
+
+AS_IF([test "x$with_bounds" != xno],
+[
+		AC_SUBST([AM_CPPFLAGS], ["-DNEC_ERROR_CHECK=1"])
+		AC_SUBST([CXXFLAGS], ["-g3 -O0"])
+])
+AS_IF([test "x$with_bounds" == xno],
+[
+		AC_SUBST([AM_CPPFLAGS], ["-DEIGEN_NO_DEBUG"])
+]
+)
+
 
 dnl ************************************************
 dnl *** Add an automatic build date
@@ -42,10 +64,34 @@ LIBLAPACK=
 		[])
 	])
 
-AC_CHECK_LIB([m],[pow])
+dnl ************************************************
+dnl *** Check for Eigen library
+dnl ************************************************
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
 AM_PROG_LIBTOOL
-AC_OUTPUT(Makefile src/Makefile)
 
+
+AC_ARG_WITH([eigen],
+	[AS_HELP_STRING([--without-eigen],
+	[disable support for eigen])],
+	[],
+	[with_eigen=no])
+
+LIBEIGEN=
+	AS_IF([test "x$with_eigen" != xno],
+	[
+		CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+		AC_CHECK_HEADER(
+		[Eigen/Core],
+		[AC_DEFINE([USING_EIGEN_ARRAY], [1], [Define if you have eigen])],
+		[AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
+		[])
+	])
+
+
+
+
+AC_CHECK_LIB([m],[pow])
+AC_OUTPUT(Makefile src/Makefile)

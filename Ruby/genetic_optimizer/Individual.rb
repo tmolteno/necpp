@@ -47,7 +47,7 @@ class Individual
 		ret = self.clone
 		ret.init_nodelist
 		ret.function_tree = @function_tree.deep_copy(ret)
-		ret.fitness_refresh # my_fitness = @my_fitness
+		ret.my_fitness = @my_fitness
 		#ret.my_stats = nil #@my_stats
 		#ret.my_antenna = nil #@my_antenna
 		return ret

@@ -646,8 +646,8 @@ void factrs(nec_output_file& s_output,  int np, int nrow, complex_array& a, int_
 	{
 		int mode_offset = mode * np;
 		
-		complex_array a_temp = a.segment(mode_offset);
-		int_array ip_temp = ip.segment(mode_offset);
+		complex_array a_temp = a.segment(mode_offset, a.size()-mode_offset);
+		int_array ip_temp = ip.segment(mode_offset, ip.size()-mode_offset);
 		
 		lu_decompose(s_output,  np, a_temp, ip_temp, nrow );
 	}
@@ -761,9 +761,9 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int neq,
 		for (int ic = 0; ic < nrh; ic++ )
 		{
 			int column_offset = ic*neq;
-			complex_array a_sub = a.segment(ia);
-			complex_array b_sub = b.segment(ia+column_offset);
-			int_array ip_sub = ip.segment(ia);
+			complex_array a_sub = a.segment(ia, a.size()-ia);
+			complex_array b_sub = b.segment(ia+column_offset, b.size() - (ia+column_offset) );
+			int_array ip_sub = ip.segment(ia, ip.size()-ia);
 			solve( npeq, a_sub, ip_sub, b_sub, nrow );
 		}
 	

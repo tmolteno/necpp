@@ -2347,7 +2347,7 @@ void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
 	iout=2* npblk* nrow;
 	it= nlast;
 			
-	in_cm.fill(0,it*nrow,cplx_00());
+	vector_fill(in_cm,0,it*nrow,cplx_00());
 	
 	i1= 1;
 	i2= it;
@@ -2384,7 +2384,7 @@ void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
 	
 		if ( im1 <= im2)
 		{
-			complex_array temp = in_cm.segment((ist-1)*nrow);
+			complex_array temp = in_cm.segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
 			cmws( j, im1, im2, temp, nrow, in_cm, 1);
 		}
 		/* matrix elements modified by loading */
@@ -2423,13 +2423,15 @@ void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
 		
 			if ( i1 <= in2)
 			{
-				complex_array temp = in_cm.segment((jst-1));
+				int tmp_n = (jst-1);
+				complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
 				cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
 			}
 		
 			if ( im1 <= im2)
 			{
-				complex_array temp = in_cm.segment((jst-1)+(ist-1)*nrow);
+				int tmp_n = (jst-1)+(ist-1)*nrow;
+				complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
 				compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
 			}
 		}
@@ -2455,7 +2457,7 @@ void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
 				scm[k] = in_cm[row_offset + ka];
 			}
 		
-			in_cm[row_offset + j] = scm.sum(0,nop);
+			in_cm[row_offset + j] = scm.segment(0,nop).sum(); //scm.sum(0,nop);
 			
 			for( k = 1; k < nop; k++ )
 			{
@@ -3603,7 +3605,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 	/* applied field of voltage sources for transmitting case */
 	if ( (excite_type == EXCITATION_VOLTAGE) || (excite_type == EXCITATION_VOLTAGE_DISC) )
 	{
-		e.fill(0,neq,cplx_00());
+		vector_fill(e,0,neq,cplx_00());
 	
 		for (int i = 0; i < voltage_source_count; i++ )
 		{
@@ -4969,7 +4971,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 					isc1 = ipnt[i]-1;
 					asmx= m_geometry->segment_length[isc1];
 				
-					rhs.fill(0,neqt,cplx_00());
+					vector_fill(rhs,0,neqt,cplx_00());
 				
 					rhs[isc1] = cplx_10();
 					solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
@@ -5196,7 +5198,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 				elements to network equation matrix */
 			for( i = 0; i < nteq; i++ )
 			{
-				rhs.fill(0,neqt,cplx_00());
+				vector_fill(rhs, 0, neqt, cplx_00());
 				
 				irow1= nteqa[i]-1;
 				rhs[irow1]=cplx_10();
@@ -6145,7 +6147,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 	/*! upper limit */
 	const nec_float zend = ze - ep;
 	
-	sum.fill(0,n,cplx_00());
+	vector_fill(sum,0,n,cplx_00());
 	
 	int ns = nx;
 	/*! counter to control increasing subinterval size */
@@ -6398,7 +6400,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 	/*! upper limit */
 	const nec_float zend = ze - ep;
 	
-	sum.fill(0,n,cplx_00());
+	vector_fill(sum,0,n,cplx_00());
 	
 	int ns = nx;
 
@@ -7415,7 +7417,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 	roz= rozs;
 	{
 		// without ground 
-		complex_array temp = current_vector.segment(m_geometry->n);
+		complex_array temp = current_vector.segment(m_geometry->n, current_vector.size()-m_geometry->n);
 		m_geometry->fflds(rox, roy, roz, temp, &ex, &ey, &ez);
 	}
 	if (ground.present())
@@ -7423,7 +7425,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 		// with ground
 		nec_complex tempx, tempy, tempz;
 		
-		complex_array temp = current_vector.segment(m_geometry->n);
+		complex_array temp = current_vector.segment(m_geometry->n, current_vector.size()-m_geometry->n);
 		m_geometry->fflds(rox, roy, -roz, temp, &tempx, &tempy, &tempz);
 	
 		if (ground.type_perfect())

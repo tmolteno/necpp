@@ -28,33 +28,37 @@
 
 #include "common.h"
 
-#include "safe_array.h"
-typedef safe_array<int>  int_array;
-typedef safe_array<nec_float>  real_array;
 
 /*! \brief      Use the Eigen package for arrays 
     \todo Work through how this should be done.
 */
-#define USING_EIGEN_ARRAY 0
 #define USING_EIGEN_3VECT 0
 
 #if USING_EIGEN_ARRAY
-	#include <Eigen/Core>
-	#include <Eigen/Array>
-	// import most common Eigen types 
-	USING_PART_OF_NAMESPACE_EIGEN
+	#include <Eigen/Dense>
+	using namespace Eigen;
 
-//	typedef Matrix<int, Eigen::Dynamic, 1>  int_array;
-//	typedef Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
+	typedef Matrix<int, Eigen::Dynamic, 1>  int_array;
+	typedef Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
 	typedef Matrix<nec_complex, Eigen::Dynamic, 1>  complex_array;
-//	typedef Matrix<nec_float, Eigen::Dynamic, Eigen::Dynamic>  real_matrix;
 
 #else
-
+	// Use our own types rather than Eigen
+	#include "safe_array.h"
+	typedef safe_array<int>  int_array;
+	typedef safe_array<nec_float>  real_array;
 	typedef safe_array<nec_complex>  complex_array;
 #endif
 
 
+inline	void vector_fill(complex_array& x, long start, long N, const nec_complex& y)
+{
+	long stop = start + N;
+	for (long i = start; i < stop; i++ )
+	{
+		x[i] = y;
+	}
+}
 
 
 inline nec_complex cplx_00()

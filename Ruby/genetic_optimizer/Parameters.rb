@@ -18,4 +18,4 @@ WIRE_CONDUCTIVITY = 3.72e7 # Copper
 
 # Properties of the animal tissue http://niremf.ifac.cnr.it/tissprop/
 GROUND_DIELECTRIC_CONSTANT = 39.27 # relative dielectric constant (dry skin)
-GROUND_CONDUCTIVITY = 1.09 # conductivity (mhos per meter) (dry skin)
+GROUND_CONDUCTIVITY = 1.0e-2 # conductivity (mhos per meter) (dry skin)

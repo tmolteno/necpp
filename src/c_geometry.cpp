@@ -1885,7 +1885,7 @@ void c_geometry::connect_segments( int ignd )
 		for (int i = 0; i < ic; i++ )
 		{
 			ix= jco[i];
-			if ( ix <= 0)
+			if ( ix <= 0) 
 			{
 				ix=- ix;
 				int ixx = ix-1;

@@ -20,6 +20,10 @@ See the INSTALL file. But here is the short version
 	make
 	sudo make install
 
+To build a debugging version use
+
+       ./configure --prefix=dbg CPPFLAGS=-DDEBUG CXXFLAGS="-g -O0" 
+
 ##Instructions for Compiling on Windows
 
 Versions of nec2++ since 1.2.3 now compile fine with the MinGW (http://www.mingw.org/) free compiler tools. Just download the source distribution, and follow the unix installation guide (./configure and make).

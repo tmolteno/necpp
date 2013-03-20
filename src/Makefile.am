@@ -24,6 +24,5 @@ libnecpp_la_SOURCES = c_evlcom.cpp c_geometry.cpp c_ggrid.cpp c_plot_card.cpp \
 	nec_structure_currents.h electromag.cpp
 
 libnecpp_la_LDFLAGS = @LIBLAPACK@ -lm -lstdc++
-libnecpp_la_CXXFLAGS = 
 nec2___LDFLAGS = -all-static
 
