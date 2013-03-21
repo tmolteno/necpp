@@ -2,7 +2,7 @@ RUBY=ruby
 OPTS=-I.
 REXEC=${RUBY} ${OPTS}
 
-SERVER=localhost:8787
+SERVER=`hostname`.`dnsdomainname`:8787
 #cyberiad.electron.otago.ac.nz:8787
 
 .PHONY: test100 test500 test5000 test10000
@@ -26,7 +26,7 @@ test5000:
 test10000:
 	rm -rf test10000
 	mkdir -p test10000
-	${REXEC} Gp.rb --clone 0.1 --mutate 0.2 --gen 500 --pop 5000 --file test10000/Gp --server ${SERVER}
+	${REXEC} Gp.rb --clone 0.1 --mutate 0.2 --gen 500 --pop 50000 --file test10000/Gp --server ${SERVER}
 
 
 client:
@@ -35,11 +35,6 @@ client:
 clean:
 	- killall -9 ${RUBY}
 	
-test10000:
-	rm -rf test10000
-	mkdir -p test10000
-	${REXEC} Gp.rb --clone 0.2 --mutate 0.2 --gen 500 --pop 5000 --file test10000/Gp --server ${SERVER} 
-
 rdoc:
 	rm -rf doc
 	rdoc --all --diagram --title 'RANT: Ruby Antenna Optimiser' README.md *.rb
