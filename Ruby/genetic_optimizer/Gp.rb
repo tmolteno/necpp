@@ -1,6 +1,7 @@
 require "Parameters"
 require "Population"
 require 'drb/drb'
+require 'drb/acl'
 
 # The methods that need to be overridden are
 # Antenna.get_statistics(freq)
@@ -111,8 +112,13 @@ if __FILE__ == $0
 	
 	eval_queue = EvalQueue.new
 
+
 	if server != nil
 		URI="druby://#{server}"
+  		acl = ACL.new(%w{deny all
+                  allow localhost
+                  allow 172.16.1.*})
+  		DRb.install_acl(acl)
 		print "Running as a compute server at #{URI}\n"
 		print "Run compute clients as follows:\n"
 		print "  ruby SimulationClient.rb --server #{server}\n"
