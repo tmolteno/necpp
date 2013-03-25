@@ -2,8 +2,9 @@ RUBY=ruby
 OPTS=-I.
 REXEC=${RUBY} ${OPTS}
 
-SERVER=`hostname`.`dnsdomainname`:8787
-#cyberiad.electron.otago.ac.nz:8787
+#SERVER=localhost:8787
+#SERVER=`hostname`.`dnsdomainname`:8787
+SERVER=pugg.electron.otago.ac.nz:8787
 
 .PHONY: test100 test500 test5000 test10000
 

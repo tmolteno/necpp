@@ -115,10 +115,10 @@ if __FILE__ == $0
 
 	if server != nil
 		URI="druby://#{server}"
-  		acl = ACL.new(%w{deny all
-                  allow localhost
-                  allow 172.16.1.*})
-  		DRb.install_acl(acl)
+#   		acl = ACL.new(%w{deny all
+#                   allow localhost
+#                   allow 172.16.1.*})
+#  		DRb.install_acl(acl)
 		print "Running as a compute server at #{URI}\n"
 		print "Run compute clients as follows:\n"
 		print "  ruby SimulationClient.rb --server #{server}\n"
