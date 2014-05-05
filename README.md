@@ -1,21 +1,29 @@
 #NEC2++ Numerical Electromagnetic Code in C++
 
-This is a free (GPL) NEC-2 compatable electromagnetic code. It can both read nec2 antenna description files (like the original) and also be incorporated into other projects like GUI tools and automatic antenna optimization systems. Nec2++ is developed on debian linux, but will work on a variety of other operating systems.
+This is a free (GPL) electromagnetic simulation software compatable with NEC-2. It has been rewritten from the ground up.
 
-##Instructions for Linux
+Nec2++ consists of a library that can be called from C++, C, python and Ruby, and so it can incorporated into other projects like GUI tools and automatic antenna optimization systems.
+
+There is also an executable necpp that can read antenna description files (like the original). Nec2++ is developed on Debian linux, but will work on a variety of other operating systems.
+
+## Citations
+
+If you use nec2++, please cite it.
+
+## Instructions for Linux
 
 nec2++ is available precompiled as part of most modern linux distributions, including Debian, Ubuntu and Fedora.
 
         sudo aptitude install necpp
 
-
-##Compiling on Linux
+## Compiling on Linux
 
 !NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 See the INSTALL file. But here is the short version
 
-	make -f Makefile.cvs
+	sudo aptitude install libatlas-base-dev
+        make -f Makefile.git
 	./configure
 	make
 	sudo make install

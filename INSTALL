@@ -20,7 +20,7 @@ install these with the following command.
      on other systems you will have to find the appropriate way to do this.
 
   2. Cenerate the ./configure script. To do this, type
-       `make -f Makefile.cvs'
+       `make -f Makefile.git'
 
   3. Then do the usual thing 
        ./configure --without-lapack
