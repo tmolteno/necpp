@@ -39,7 +39,7 @@ del types
 
 
 
-import numarray
+import numpy
 import math
 import exceptions
 
@@ -113,7 +113,7 @@ def _reshape(arg0,arg1):
 	"""
 	n_theta=_get_n_theta(arg1)
     	n_phi=_get_n_phi(arg1)
-    	return numarray.reshape(arg0,(n_phi,n_theta))
+    	return numpy.reshape(arg0,(n_phi,n_theta))
 
 
 
@@ -275,7 +275,7 @@ class nec_radiation_pattern(_object):
 		for i in range(n_phi) :
 			for j in range(n_theta) :
 				l.append((rho, phi_start+i*delta_phi,theta_start+j*delta_theta))
-		ar = numarray.array(l);
+		ar = numpy.array(l);
 		ar = numarray.reshape(ar, (n_phi,n_theta,3))
 	
 	else :
@@ -283,8 +283,8 @@ class nec_radiation_pattern(_object):
 		for i in range(n_phi) :
 			for j in range(n_theta) :
 				l.append((r, theta_start+j*delta_theta, phi_start+i*delta_phi))
-		ar = numarray.array(l);
-		ar = numarray.reshape(ar, (n_phi,n_theta,3))
+		ar = numpy.array(l);
+		ar = numpy.reshape(ar, (n_phi,n_theta,3))
 	
 	return ar  
 		

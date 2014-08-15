@@ -11,7 +11,7 @@ platform = sys.platform
 
 print('\nNumarray installation check...')
 try:
-	from numarray import *
+	from numpy import numarray
 except:
 	print('FAILURE - PyNEC requires Numarray to be installed. Please install Numarrray first.')
 	print('Installation aborted')

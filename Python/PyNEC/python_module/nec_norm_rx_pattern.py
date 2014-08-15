@@ -39,8 +39,7 @@ del types
 
 
 
-import numarray
-import numarray.ma
+from numpy.numarray import *
 
 #some utility functions
 
