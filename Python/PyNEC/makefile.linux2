@@ -1,0 +1,52 @@
+# MAKEFILE FOR THE PYTHON WRAPPING OF NEC-2
+
+PYMOD=python_module/_PyNEC.so
+
+HDRS 	= wrap/src/misc.h wrap/src/c_ggrid.h wrap/src/c_evlcom.h wrap/src/c_plot_card.h \
+	wrap/src/matrix_algebra.h wrap/src/nec_output.h wrap/src/c_geometry.h wrap/src/math_util.h \
+	wrap/src/common.h wrap/src/nec_results.h 
+
+SRC 	= wrap/src/misc.cpp wrap/src/c_ggrid.cpp wrap/src/c_evlcom.cpp wrap/src/c_plot_card.cpp \
+	wrap/src/matrix_algebra.cpp wrap/src/nec_output.cpp wrap/src/c_geometry.cpp wrap/src/nec_context.cpp \
+	wrap/src/nec_ground.cpp wrap/src/nec_radiation_pattern.cpp wrap/src/nec_exception.cpp wrap/src/nec_structure_currents.cpp 
+
+OBJS 	= $(SRC:.cpp=.o)
+
+CXX=g++
+
+LDFLAGS=-shared -lstdc++
+
+CXXFLAGS=-Wall
+
+SWIGCXXFLAGS=-c -I/home/pi/Projects/math/venv/include/python2.7 -I/home/pi/Projects/math/venv/include/python2.7/numpy -I/home/pi/Projects/math/venv/lib/python2.7 -DHAVE_CONFIG_H
+
+SWIGFLAGS=-python -c++
+
+
+
+all: $(PYMOD)
+
+python_module/_PyNEC.so: $(OBJS) wrap/PyNEC_wrap.o
+	cd ..
+	$(CXX) $(LDFLAGS) $^ -o $@
+	@echo
+	@echo To install the module on your python system, type make -f makefile.linux2 install - root privileges may be required
+wrap/PyNEC_wrap.o: wrap/PyNEC_wrap.cxx
+	$(CXX) $(SWIGCXXFLAGS) $< wrap/src/nec_context.cpp
+	@mv PyNEC_wrap.o wrap/
+	@rm -rf nec_context.o
+
+wrap/PyNEC_wrap.cxx: wrap/PyNEC.i
+	swig $(SWIGFLAGS) $<
+	@rm -rf wrap/PyNEC.py
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+install:
+	@rm -fr /home/pi/Projects/math/venv/lib/python2.7/site-packages/PyNEC
+	@mkdir /home/pi/Projects/math/venv/lib/python2.7/site-packages/PyNEC
+	cp python_module/*.* /home/pi/Projects/math/venv/lib/python2.7/site-packages/PyNEC/
+
+clean:
+	rm -rf wrap/src/*.o wrap/PyNEC_wrap.cxx wrap/PyNEC_wrap.o python_module/*.pyc python_module/_PyNEC.so

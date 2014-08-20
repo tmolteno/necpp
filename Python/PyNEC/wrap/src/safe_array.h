@@ -21,6 +21,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <cstring>
 
 #ifdef NEC_ERROR_CHECK
 
