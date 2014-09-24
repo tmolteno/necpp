@@ -2,6 +2,7 @@ require 'mkmf'
 
 NECPP_SRC = "/home/tim/github/necpp/src"
 $CFLAGS << " -I#{NECPP_SRC}"
+$CPPFLAGS << " -I#{NECPP_SRC}"
 
 dir_config("lapack", "/usr/include/atlas", "/usr/lib/atlas-base/atlas")
 #unless have_header("clapack.h") and have_library("lapack", "clapack_zgetrf", %w(clapack.h))
