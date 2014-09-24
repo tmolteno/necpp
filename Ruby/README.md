@@ -35,6 +35,11 @@ issue the following commands
 	make
 	sudo make install
 
+Alternatively use the build.sh script.
+	
+	cd ext/necpp
+	./build.sh
+	
 Then test with 
 
 	ruby test.rb

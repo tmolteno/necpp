@@ -8,7 +8,8 @@ include_HEADERS = libnecpp.h
 noinst_HEADERS = nec_debug.h nec_exception.h nec_wire.h
 
 # set the include path found by configure
-INCLUDES = $(all_includes)
+#INCLUDES = $(all_includes)
+AM_CPPFLAGS = $(all_includes)
 
 # the library search path.
 nec2___LDADD = $(top_builddir)/src/libnecpp.la
