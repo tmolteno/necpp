@@ -2353,7 +2353,7 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
 			(line_buf[  line_idx] >  '9')) &&
 			(line_buf[  line_idx] != '+')  &&
 			(line_buf[  line_idx] != '-') )
-		if ( (line_buf[line_idx] == '\0') )
+		if ( line_buf[line_idx] == '\0' )
 		{
 			*in_i1= integer_params[0];
 			*in_i2= integer_params[1];
@@ -2415,7 +2415,7 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
 			(line_buf[  line_idx] != '+')  &&
 			(line_buf[  line_idx] != '-')  &&
 			(line_buf[  line_idx] != '.') )
-		if ( (line_buf[line_idx] == '\0') )
+		if ( line_buf[line_idx] == '\0' )
 		{
 			*in_i1= integer_params[0];
 			*in_i2= integer_params[1];
