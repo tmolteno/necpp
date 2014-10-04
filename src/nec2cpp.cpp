@@ -651,7 +651,7 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			(line_buf[  line_idx] >  '9')) &&
 			(line_buf[  line_idx] != '+')  &&
 			(line_buf[  line_idx] != '-') )
-		if ( (line_buf[line_idx] == '\0') )
+		if ( line_buf[line_idx] == '\0' )
 		{
 			*i1= integer_array[0];
 			*i2= integer_array[1];
@@ -716,7 +716,7 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			(line_buf[  line_idx] != '+')  &&
 			(line_buf[  line_idx] != '-')  &&
 			(line_buf[  line_idx] != '.') )
-		if ( (line_buf[line_idx] == '\0') )
+		if ( line_buf[line_idx] == '\0' )
 		{
 			*i1= integer_array[0];
 			*i2= integer_array[1];
