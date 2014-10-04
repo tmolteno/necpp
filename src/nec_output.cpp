@@ -46,9 +46,9 @@ void nec_output_file::do_output(const char* str)
 	if (NULL == m_output_fp)
 		return;
 	
-	fprintf(m_output_fp, str);
+	fprintf(m_output_fp, "%s", str);
 	if (m_error_mode)
-		fprintf(stderr,str);
+		fprintf(stderr, "%s", str);
 }
 
 void nec_output_file::endl(int n_lines)
@@ -160,7 +160,7 @@ void nec_output_file::nec_printf(const char* fmt, ...)
 		if (j)
 		{
 			format[j] = '\0';
-			count += fprintf(m_output_fp, format.data());    /* log it verbatim              */
+			count += fprintf(m_output_fp, "%s", format.data());    /* log it verbatim              */
 			fmt += j;
 		} 
 		else
