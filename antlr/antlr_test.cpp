@@ -10,6 +10,7 @@ using namespace std;
 #include "NECParser.hpp"
 #include <antlr/ANTLRException.hpp>
 #include <antlr/TokenStreamException.hpp>
+#include <antlr/TokenStreamRecognitionException.hpp>
 #include <antlr/CharStreamException.hpp>
 
 #include "XGetopt.h"
@@ -131,20 +132,15 @@ int option;
 		parser.startRule();
 		return 0;
 	}
-        catch(antlr::RecognitionException e)
+//         catch(antlr::RecognitionException e)
+//         {
+//                 cout << "NEC++ Parse Error: Line:" << e.getLine() << endl;
+//                 cout << " Error: " << e.toString() << endl;
+//                 exit(1);
+//         }
+        catch(antlr::TokenStreamRecognitionException e)
         {
-                cout << "NEC++ Parse Error: Line:" << e.getLine() << endl;
-                cout << " Error: " << e.toString() << endl;
-                exit(1);
-        }
-        catch(antlr::TokenStreamException e)
-        {
-                cout << "NEC++ Token Error: Line:" << e.toString() << endl;
-                exit(1);
-        }
-        catch(antlr::CharStreamException e)
-        {
-                cout << "NEC++ Char Error: Line:" << e.toString() << endl;
+                cout << e.toString() << endl;
                 exit(1);
         }
         catch(antlr::ANTLRException e)
