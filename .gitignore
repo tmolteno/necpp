@@ -36,3 +36,10 @@
 *.outcpp
 *.outf
 *.diff
+
+config.*
+Makefile
+Makefile.in
+depcomp
+aclocal.m4
+m4
