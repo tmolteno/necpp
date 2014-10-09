@@ -9,6 +9,8 @@ using namespace std;
 #include "NECLexer.hpp"
 #include "NECParser.hpp"
 #include <antlr/ANTLRException.hpp>
+#include <antlr/TokenStreamException.hpp>
+#include <antlr/CharStreamException.hpp>
 
 #include "XGetopt.h"
 
