@@ -129,11 +129,27 @@ int option;
 		parser.startRule();
 		return 0;
 	}
-	catch(antlr::ANTLRException e)
-	{
-		cout << "NEC++ Parse Error: " << e.toString() << endl;
-		exit(1);
-	}
+        catch(antlr::RecognitionException e)
+        {
+                cout << "NEC++ Parse Error: Line:" << e.getLine() << endl;
+                cout << " Error: " << e.toString() << endl;
+                exit(1);
+        }
+        catch(antlr::TokenStreamException e)
+        {
+                cout << "NEC++ Token Error: Line:" << e.toString() << endl;
+                exit(1);
+        }
+        catch(antlr::CharStreamException e)
+        {
+                cout << "NEC++ Char Error: Line:" << e.toString() << endl;
+                exit(1);
+        }
+        catch(antlr::ANTLRException e)
+        {
+                cout << "NEC++ Parse Error: " << e.toString() << endl;
+                exit(1);
+        }
 	catch (const char* message)
 	{
 		nec_error_mode nem(s_output);
