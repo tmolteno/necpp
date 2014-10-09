@@ -39,11 +39,11 @@ CXXFLAGS = -I ../ -I ../src/ -g3 -O0
 
 test: ${ANTLR_OBJ} ${ANTLR_SRC} ${NECPP_OBJ} ${NECPP_SRC}
 	g++ -o antlr_test ${ANTLR_OBJ} ${NECPP_OBJ} ${LDFLAGS}
-	- ./antlr_test -i ../test_data/example2.nec -o example2.out
+	- ./antlr_test -i ../testharness/data/example2.nec -o example2.out
 #	- ./antlr_test -i ../test_data/example3.nec
 #	- ./antlr_test -i example_fail.nec
 
-TEST_FILES := $(shell find ../test_data/ -name "*.nec")
+TEST_FILES := $(shell find ../testharness/data/ -name "*.nec")
 TEST_OUT	= $(TEST_FILES:.nec=.antlr)
 
 %.nec %.antlr:
