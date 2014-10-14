@@ -1,10 +1,10 @@
-#RANT: Ruby Wire Antenna Optimiser
+# RANT: Ruby Wire Antenna Optimiser
 
 Author:: Tim Molteno (tim@physics.otago.ac.nz)
 Copyright:: Copyright (C) Tim Molteno 2008-2013.
 License:: Licensed under the GNU GPL v3
 
-##Overview
+## Overview
 
 This software uses genetic programming to optimize wire antenna structures. The genetic
 programming component of the software is written in the Ruby programming language, and
@@ -16,10 +16,12 @@ antenna fitness evaluations.
 
 The main GP algorithm is described by the Gp object
 that places Individual members of the Population into an EvalQueue. The EvalQueue is serviced
-by 
+by a computation client. This architecture allows multiple clients running on different
+servers to evaluate antennas from the host running the EvalQueue software.  Speeds exceeding
+several thousand evaluations per second are possible on quite small clusters.
 
 
-##Howto
+## Howto
 
 To modify for a different fitness, The methods that need to be overridden are:
 * Antenna.get_statistics(freq)
@@ -31,6 +33,26 @@ The computation client (there can be hundreds of them) are essentially grid comp
 antenna using nec2++.
 
 
-##ChangeLog
+## Client-Server Architecture
+
+The client-server is simple to use.
+antenna using nec2++.
+
+
+### Main machine
+
+This sets up an EvalQueue.
+
+    make test10000
+    
+### Compute machines
+
+The computation client (there can be hundreds of them) are essentially grid compute engines that simulate antennas
+
+    make client
+
+This uses every core on each compute client.
+
+## ChangeLog
 
 * 2013/03/19: Cleaned up code to re-segment wires.
