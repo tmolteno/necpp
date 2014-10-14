@@ -8,9 +8,13 @@ into other projects like GUI tools and automatic antenna optimization systems.
 There is also an executable necpp that can read antenna description files (like the original). 
 Nec2++ is developed on Debian linux, but will work on a variety of other operating systems.
 
-## Citations
+## Citing NEC2++
 
-If you use nec2++, please cite it.
+If you use nec2++, please cite it as follows:
+
+Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics Code'', Electronics Technical Reports No. 2014-3, ISSN 1172-496X, October
+2014.
+
 
 ## Instructions for Linux
 
