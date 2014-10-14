@@ -1,4 +1,15 @@
-Version 1.5.1
+Version 1.5.3 [October 2014]
+* Compatability with gcc4.9
+* Improved ANTLR parser.
+* Updated PyNEC directory to use numpy instead of numarray. Fixed wrap/*.cpp files [Thanks to James David]
+* Moved to using Makefile.git, and updated configure.in to configure.ac
+* Include the necpp headers in both CFLAGS and CPPFLAGS
+
+Version 1.5.2 [May 2013]
+* Changed the autoconf system to allow building with the eigen3 package
+* Added a genetic optimzer written in Ruby
+
+Version 1.5.1 [March 2012]
 * Improved error messages on intersection. Now reports tag_id as well as wire number.
 * Moved source to github
 * Added automatic build date (removed their manual definition in common.h)
