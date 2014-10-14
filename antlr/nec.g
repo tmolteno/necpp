@@ -47,6 +47,18 @@ options
 }
 {
 public:
+  void reportError(const std::string& s) {
+      cout << "reportError" << s << endl;
+  }
+  void reportWarning(const std::string& s) {
+      cout << "reportWarning" << s << endl;
+  }
+
+  void reportError(const RecognitionException& ex) {
+      cout << "Parse Error: " << ex.toString() << endl;
+  }
+  
+  public:
 	nec_context nec;
 	nec_output_file s_output;
 }
@@ -237,7 +249,7 @@ exCard
 	}
 	:	EX extype=intNum	{ std::cout << "EX: "  << extype << endl; }
 	(
-		{extype == 0}? tag=intNum m=intNum exflag=intNum f1=realNum (f2=realNum f3=realNum)?
+		{extype == 0}? tag=intNum m=intNum exflag=intNum f1=realNum (f2=realNum (f3=realNum)?)?
 		{ t = EXCITATION_VOLTAGE; }
 	|	{extype == 1}? INT INT INT f1=realNum f2=realNum f3=realNum f4=realNum f5=realNum f6=realNum
 		{ t = EXCITATION_LINEAR; }
@@ -396,6 +408,7 @@ options
 	caseSensitive=false;
 	k=2;
 	charVocabulary = '\3'..'\377';
+	defaultErrorHandler=false;
 }
 
 /*
@@ -419,11 +432,13 @@ EX	:	"ex"	;
 FR	:	"fr"	;
 GN	:	"gn"	;
 LD	:	"ld"	;
+NE	:	"ne"	;
 NT	:	"nt"	;
 RP	:	"rp"	;
 PT	:	"pt"	;
 TL	:	"tl"	;
 XQ	:	"xq"	;
+PQ	:	"pq"	;
 EN	:	"en"	;
 
 WS  :   (	 '\003'..'\010' 

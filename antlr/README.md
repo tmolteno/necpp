@@ -12,7 +12,7 @@ at parse time.
 
 Requires ANTLR
 
-	aptitude install libantlr-dev
+	aptitude install libantlr-dev libantlr-java
 
 Also requires lapack libraries.
 
