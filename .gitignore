@@ -43,3 +43,6 @@ Makefile.in
 depcomp
 aclocal.m4
 m4
+
+html/*
+xml/*
