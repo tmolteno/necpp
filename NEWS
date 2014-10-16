@@ -1,3 +1,12 @@
+Version 2.0
+
+Introducing a new NEC parser. This uses ANTLR and now is fairly complete. It will have two modes, one is the compatability mode,
+the other is a human readable format that is MUCH more explicit.
+
+Version 1.5
+
+Ruby improvements. New genetic algorithm for optimization.
+
 Version 1.4
 
 New Ruby module.
