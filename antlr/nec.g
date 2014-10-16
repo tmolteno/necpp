@@ -59,7 +59,7 @@ public:
   }
   
   public:
-	nec_context nec;
+	nec_context* nec;
 	nec_output_file s_output;
 }
 
@@ -73,18 +73,14 @@ startRule
 necFile
 	:
 		{
-//			nec_output_flags s_output_flags;
-//			nec.set_output(s_output, s_output_flags);
-//			nec.set_results_stdout(true);
-//			s_output.set_file(fopen("test.out", "w"));
-			nec.initialize();
+                        nec->initialize();
 		}
 		commentSection
 		geometrySection
 		analysisSection
 		{
-			nec.all_jobs_completed();
-			cout << "Max Gain: " << nec.get_gain_max() << endl;
+			nec->all_jobs_completed();
+			cout << "Max Gain: " << nec->get_gain_max() << endl;
 		}
 	;
 
@@ -138,9 +134,9 @@ geometryEnd
 	{	int gpflag = 0;	}
 	:	GE (gpflag=intNum)? NEWLINE
 		{
-			c_geometry* geo = nec.get_geometry();
-			geo->geometry_complete(&nec, gpflag, 0);
-			nec.calc_prepare();
+			c_geometry* geo = nec->get_geometry();
+			geo->geometry_complete(nec, gpflag, 0);
+			nec->calc_prepare();
 			cout << "Geometry Complete" << endl;
 		}
 	;
@@ -169,7 +165,12 @@ wire
 				}
 			)
 		{
-			c_geometry* geo = nec.get_geometry();
+			c_geometry* geo = nec->get_geometry();
+                        cout << "Wire " << tag << "," << ns 
+                            << ": (" << xw1 << "," << yw1 << "," << zw1 << ")"
+                            << " (" << xw2 << "," << yw2 << "," << zw2 << ")" 
+                            << ", r=" << rad 
+                            << endl;
 			geo->wire(tag, ns, xw1, yw1, zw1, xw2, yw2, zw2, rad, rDel, rad1);
 		}
 	;	
@@ -222,11 +223,11 @@ frCard
 			double fmhz = 0.0;
 			double delfrq = 0.0;
 		}
-		FR ifrq=intNum 
-		(	nfrq=intNum fmhz=realNum  (delfrq=realNum)*
+		FR ifrq=intNum nfrq=intNum (intNum intNum)?
+		(	fmhz=realNum  (delfrq=realNum)*
 		|	fmhz=realNum
 		) NEWLINE
-		{	nec.fr_card(ifrq, nfrq, fmhz, delfrq);	}
+		{	nec->fr_card(ifrq, nfrq, fmhz, delfrq);	}
 	;
 
 
@@ -237,7 +238,7 @@ ekCard
 	:	{	int ekflg=0;	}
 		EK (ekflg=intNum)? NEWLINE
 		{
-			nec.set_extended_thin_wire_kernel(-1 != ekflg);
+			nec->set_extended_thin_wire_kernel(-1 != ekflg);
 		}
 	;
 	
@@ -251,7 +252,7 @@ exCard
 	(
 		{extype == 0}? tag=intNum m=intNum exflag=intNum f1=realNum (f2=realNum (f3=realNum)?)?
 		{ t = EXCITATION_VOLTAGE; }
-	|	{extype == 1}? INT INT INT f1=realNum f2=realNum f3=realNum f4=realNum f5=realNum f6=realNum
+	|	{extype == 1}? INT INT INT f1=realNum f2=realNum f3=realNum f4=realNum (f5=realNum f6=realNum)?
 		{ t = EXCITATION_LINEAR; }
 	|	{extype == 2}? INT INT INT f1=realNum f2=realNum f3=realNum f4=realNum f5=realNum f6=realNum
 		{ t = EXCITATION_CIRC_RIGHT; }
@@ -263,7 +264,7 @@ exCard
 		{ t = EXCITATION_VOLTAGE_DISC; }
 	) NEWLINE
 	{
-		nec.ex_card(t, tag, m, exflag, f1, f2, f3, f4, f5, f6 );
+		nec->ex_card(t, tag, m, exflag, f1, f2, f3, f4, f5, f6 );
 	}
 	;
 
@@ -279,7 +280,7 @@ gnCard
 	|	{ground_type == 2 }? rad_wire_count=intNum INT INT epse=realNum sig=realNum (f3=realNum f4=realNum f5=realNum f6=realNum)?		// Sommerfeld Norton ground
 	) NEWLINE
 	{
-		nec.gn_card(ground_type, rad_wire_count, epse, sig, f3, f4, f5, f6 );
+		nec->gn_card(ground_type, rad_wire_count, epse, sig, f3, f4, f5, f6 );
 	}
 	;
 
@@ -302,7 +303,7 @@ grCard
 				"\n  STRUCTURE ROTATED ABOUT Z-AXIS %d TIMES"
 				" - LABELS INCREMENTED BY %d\n", n_times, tag_increment );
 		
-		c_geometry* geo = nec.get_geometry();
+		c_geometry* geo = nec->get_geometry();
 		geo->reflect( -1, 0, 0, tag_increment, n_times);
 	}
 	;
@@ -313,7 +314,7 @@ ldCard
 	}
 	:	LD ldtyp=intNum tag=intNum m=intNum n=intNum zlr=realNum (zli=realNum zlc=realNum)? NEWLINE
 	{
-		nec.ld_card(ldtyp, tag, m, n, zlr, zli, zlc );
+		nec->ld_card(ldtyp, tag, m, n, zlr, zli, zlc );
 	}
 	;
 
@@ -328,7 +329,7 @@ rpCard
 		int N = (xnda / 100) % 10;
 		int D = (xnda / 10) % 10;
 		int A = xnda % 10;
-		nec.rp_card(rpflg, ntheta, nphi, X,N,D,A, thets, phis, dth, dph, rfld, gnor);
+		nec->rp_card(rpflg, ntheta, nphi, X,N,D,A, thets, phis, dth, dph, rfld, gnor);
 	}
 	;
 
@@ -345,7 +346,7 @@ ntCard
 	:	NT tag1=intNum m1=intNum tag2=intNum m2=intNum
 			y11r=realNum y11i=realNum y12r=realNum y12i=realNum y22r=realNum y22i=realNum NEWLINE
 	{
-		nec.nt_card(tag1, m1, tag2, m2, y11r, y11i, y12r, y12i, y22r, y22i);
+		nec->nt_card(tag1, m1, tag2, m2, y11r, y11i, y12r, y12i, y22r, y22i);
 	}
 	;
 
@@ -357,7 +358,7 @@ tlCard
 	:	TL tag1=intNum m1=intNum tag2=intNum m2=intNum
 			y11r=realNum y11i=realNum y12r=realNum y12i=realNum y22r=realNum y22i=realNum NEWLINE
 	{
-		nec.tl_card(tag1, m1, tag2, m2, y11r, y11i, y12r, y12i, y22r, y22i);
+		nec->tl_card(tag1, m1, tag2, m2, y11r, y11i, y12r, y12i, y22r, y22i);
 	}
 	;
 
@@ -365,15 +366,15 @@ xqCard
 	{	int xqflag = 0;	}
 	:	XQ	(xqflag=intNum)? NEWLINE
 	{
-		nec.xq_card(xqflag);
-		nec.simulate(false);
+		nec->xq_card(xqflag);
+		nec->simulate(false);
 	}
 	;
 
 enCard
 	:	EN	(NEWLINE | EOF)
 	{
-		nec.simulate(false);
+		nec->simulate(false);
 	}
 	;
 

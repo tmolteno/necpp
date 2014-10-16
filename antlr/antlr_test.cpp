@@ -120,14 +120,12 @@ int option;
 
 //	secnds( &ex_timer );
 
-	s_context.set_output(s_output, s_output_flags);
-	s_context.initialize();
-
 	try
 	{
 		NECLexer lexer(infs);
 		NECParser parser(lexer);
-		parser.nec.set_output(s_output, s_output_flags);
+                parser.nec = &s_context;
+ 		parser.nec->set_output(s_output, s_output_flags);
 
 		parser.startRule();
 		return 0;
