@@ -5,7 +5,7 @@
 	and when run through the antlr parser generator
 	will create a parser for nec2++ files.
 	
-	Copyright (C) 2005-2008  Timothy C.A. Molteno (tim@physics.otago.ac.nz)
+	Copyright (C) 2005-2014  Timothy C.A. Molteno (tim@physics.otago.ac.nz)
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by

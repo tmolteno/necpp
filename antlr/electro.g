@@ -1,49 +1,68 @@
 /*
-	ANTLR Grammar for nec2++
-	
-	This file describes the NEC-2 file as a grammar,
-	and when run through the antlr parser generator
-	will create a parser for nec2++ files.
-	
-	Copyright (C) 2005-2008  Timothy C.A. Molteno (tim@physics.otago.ac.nz)
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 3 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  ANTLR Grammar for nec2++
+  
+  This file describes a grammar for a new language for antenna modeling.
+  The language is more explicit than the NEC2 card-based language.
+  
+  Copyright (C) 2014  Timothy C.A. Molteno (tim@physics.otago.ac.nz)
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 3 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
+/*
+ 
+ The inspiration for this language is OpenSCAD.
+  
+    g = geometry();
+    w0 = g.wire(start=[1,2,3], end=[2,3,4], r=0.01, n=5);
+    w1 = g.wire(start=w0.end,  end=[2,3,5], r=0.01, n=5);
+    g.arc(origin=[0,1,2], arc_radius=1.0, r=0.01 );
+    g.helix();
+    g.patch();
+    g.scale(3.0);
+    
+    e = excitation(type=VOLTAGE, wire=w0, segment=3, f=range(start=1.575GHz, end=1.675GHz, n=5));
+    e.startf=1.575GHz;
+    e.endf=1.575GHz;
+    e.nfreq=1; /* default */
+    e.set_extended_thin_wire_kernel = false; /* default */
+*/
+
 
 header 
 {
-	// The statements in this block appear in all header files
-	#include <iostream>
-	ANTLR_USING_NAMESPACE(std)
-	ANTLR_USING_NAMESPACE(antlr)
-	
-	#include "from_string.h"
-	#include "nec_context.h"
-	#include "c_geometry.h"
-	#include "nec_exception.h"
+  // The statements in this block appear in all header files
+  #include <iostream>
+  ANTLR_USING_NAMESPACE(std)
+  ANTLR_USING_NAMESPACE(antlr)
+  
+  #include "from_string.h"
+  #include "nec_context.h"
+  #include "c_geometry.h"
+  #include "nec_exception.h"
 }
 
 options
 {
-	language="Cpp";
+  language="Cpp";
 }
 
-class NECParser extends Parser;
+class AntennaParser extends Parser;
 options
 {
-	k=4;
+  k=4;
 }
 {
 public:
@@ -58,61 +77,31 @@ public:
       cout << "Parse Error: " << ex.toString() << endl;
   }
   
-  public:
-	nec_context* nec;
-	nec_output_file s_output;
+public:
+  nec_context* nec;
+  nec_output_file s_output;
 }
 
 startRule
-	:	( necFile
-		| /* nothing */
-		)
-		EOF
-	;
+  :	( necFile
+          | /* nothing */
+          )
+          EOF
+  ;
 
 necFile
-	:
-		{
-                        nec->initialize();
-		}
-		commentSection
-		geometrySection
-		analysisSection
-		{
-			nec->all_jobs_completed();
-			cout << "Max Gain: " << nec->get_gain_max() << endl;
-		}
-	;
+  :
+    {
+      nec->initialize();
+    }
+    geometrySection
+    analysisSection
+    {
+      nec->all_jobs_completed();
+      cout << "Max Gain: " << nec->get_gain_max() << endl;
+    }
+  ;
 
-/////////////////////////////////////////////////////////////
-//
-//	Comment Section
-//
-
-commentSection
-	:	
-		{
-			s_output.end_section();
-			s_output.set_indent(31);
-			s_output.line("---------------- COMMENTS ----------------");
-		}
-		(cmLine)*
-		ceLine
-	;
-	
-cmLine
-	:	comment:CM
-		{	string cm = comment->getText().substr(2);
-			s_output.line(cm.c_str());
-		}
-	;
-
-ceLine
-	:	comment:CE
-		{	string cm = comment->getText().substr(2);
-			s_output.line(cm.c_str());
-		}
-	;
 
 /////////////////////////////////////////////////////////////
 //
@@ -403,7 +392,7 @@ intNum returns [int val]
 //
 //
 
-class NECLexer extends Lexer;
+class AntennaLexer extends Lexer;
 options
 {
 	caseSensitive=false;
