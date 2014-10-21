@@ -1,7 +1,15 @@
+
+LIBTOOLIZE=libtoolize
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	LIBTOOLIZE=glibtoolize
+endif
+
 default: all
 
 all:
-	libtoolize --force --copy
+	$(LIBTOOLIZE) --force --copy
 	aclocal
 	autoheader
 	automake --add-missing
