@@ -18,15 +18,25 @@ Also requires lapack libraries.
 
 	aptitude install math-atlas-dev
 
+### Testing
+
+Just build in the current directory
+
+    make 
+    make test_clean
+    make test_all
+
 ## New parser for NEC cards
 
-The grammar is in the file nec.g
+The grammar is in the file nec.g. This is an ANTLR grammar for the existing NEC2 card deck for describing
+antennas.
 
 
 ## New Language
 
 The new language for nec++ will be more explicit and easy to read. It will also allow comments anywhere 
-inside the code.
+inside the code. In addition it will not depend on whitespace to skip over missing parameters, and therefore
+will be far more robust.
 
     /* This is a comment */
     geometry {

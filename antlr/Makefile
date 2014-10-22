@@ -49,7 +49,7 @@ TEST_OUT	= $(TEST_FILES:.nec=.antlr)
 	- ./antlr_test -i $*.nec -o $@
 
 test_clean:
-	rm ${TEST_OUT}
+	rm -f ${TEST_OUT}
 	
 test_all: ${TEST_OUT}
 	echo "DONE"

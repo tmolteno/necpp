@@ -196,6 +196,8 @@ analysisLine
 	|	tlCard
 	|	xqCard
 	|	enCard
+        |       pqCard
+        |       gsCard
 	;
 	
 	
@@ -377,6 +379,29 @@ enCard
 		nec->simulate(false);
 	}
 	;
+
+pqCard
+        {       int iptflq = 0; 
+                int iptaq, iptaqf, iptaqt;
+        }
+        :       PQ   (iptflq=intNum)?  
+        (       {     nec->pq_card(iptflq, 0, 0, 0);
+                }
+        |       iptaq=intNum iptaqf=intNum iptaqt=intNum
+                {     nec->pq_card(iptflq, iptaq, iptaqf, iptaqt);
+                }
+        ) NEWLINE
+        ;
+
+gsCard
+        {       float f1 = 0.0; }
+        :       GS      (f1=realNum)? NEWLINE
+        {
+                c_geometry* geo = nec->get_geometry();
+                geo->scale(f1);
+        }
+        ;
+
 
 protected
 realNum returns [double val]
