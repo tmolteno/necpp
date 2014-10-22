@@ -25,25 +25,35 @@
  
  The inspiration for this language is OpenSCAD.
   
-    g = geometry();
-    w0 = g.wire(start=[1,2,3], end=[2,3,4], r=0.01, n=5);
-    w1 = g.wire(start=w0.end,  end=[2,3,5], r=0.01, n=5);
-    g.arc(origin=[0,1,2], arc_radius=1.0, r=0.01 );
-    g.helix();
-    g.patch();
-    g.scale(3.0);
-    g.ground();
-    
-    e = excitation(type=VOLTAGE, wire=w0, segment=3, freq=range(start=1.575GHz, end=1.675GHz, n=5));
-    e.extended_thin_wire_kernel = false; /* default */
+    /* This is a comment */
+    geometry {
+      w0 = wire(start=[1,2,3], end=[2,3,4], r=0.01, n=5);
+      w1 = wire(start=w0.end,  end=[2,3,5], r=0.01, n=5);
+      arc(origin=[0,1,2], arc_radius=1.0, r=0.01 );
+      helix();
+      patch();
+      scale(3.0);
+    }
+
+    ground {
+      type=PERFECT;
+    }
+
+    excitation {
+      type=VOLTAGE;
+      wire=w0;
+      segment=3;
+      freq=range(start=1.575GHz, end=1.675GHz, n=5);
+      extended_thin_wire_kernel = false; /* default */
+    }
         
+    radiation_pattern {
+      mode = "normal";
+      theta = range(start=0.0, end=180, n=30);
+      phi = range(start=0.0, end=90, n=30);
+    }
+
     execute();
-    
-    theta = range(start=0.0, end=180, n=30);
-    phi = range(start=0.0, end=90, n=30);
-    
-    /* Returns an array of radiation patterns */
-    radiation_pattern(mode="normal", theta=th, phi=ph);
 */
 
 
