@@ -1,4 +1,9 @@
+Version 1.5.4 
+* Changed default compiler options to remove debugging symbols
+ 
+	
 Version 1.5.3 [October 2014]
+* Compatability with gcc4.9
 * Compatability with gcc4.9
 * Improved ANTLR parser.
 * Updated PyNEC directory to use numpy instead of numarray. Fixed wrap/*.cpp files [Thanks to James David]

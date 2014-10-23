@@ -5,6 +5,8 @@ AM_INIT_AUTOMAKE
 
 LT_INIT
 
+CXXFLAGS="-O2 -Wall -Wextra"
+
 dnl ************************************************
 dnl *** Check for Array Bounds
 dnl ************************************************
