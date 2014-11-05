@@ -391,16 +391,19 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 				nec_float gnh = db10( gcon* ephm2);
 				nec_float gtot= db10( gcon*(ethm2+ ephm2) );
 			
-				if (m_rp_normalization > 0)
 				{
 					nec_float temp_gain;
 					
 					switch(m_rp_normalization )
 					{
-					case 1:
-						temp_gain = gnmj;
-						break;
-				
+          case 0:
+            temp_gain = gtot;
+            break;
+
+          case 1:
+            temp_gain = gnmj;
+            break;
+
 					case 2:
 						temp_gain = gnmn;
 						break;
@@ -516,7 +519,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 		_average_power_solid_angle = solid_angle / pi(); // We display it as a multiple of pi()
 	}
 
-	_maximum_gain = _gain.maxCoeff();
+  _maximum_gain = _gain.maxCoeff();
 	m_analysis_done = true;
 }
 
