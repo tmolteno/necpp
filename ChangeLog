@@ -1,5 +1,6 @@
 Version 1.5.4 
 * Changed default compiler options to remove debugging symbols
+* Fixed bug printing maximum gain on the command line.
  
 	
 Version 1.5.3 [October 2014]

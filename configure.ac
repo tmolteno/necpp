@@ -13,21 +13,16 @@ dnl ************************************************
 
 
 AC_ARG_WITH([bounds],
-	[AS_HELP_STRING([--without-bounds],
-	[disable support for bounds-checking])],
+	[AS_HELP_STRING([--with-bounds],
+	[Enable support for bounds-checking])],
 	[],
 	[with_bounds=no])
 
-AS_IF([test "x$with_bounds" != xno],
+AS_IF([test "x$with_bounds" = xyes],
 [
 		AC_SUBST([AM_CPPFLAGS], ["-DNEC_ERROR_CHECK=1"])
-		AC_SUBST([CXXFLAGS], ["-g3 -O0"])
+		AC_SUBST([CXXFLAGS], ["-g3 -O0 -DNEC_ERROR_CHECK=1"])
 ])
-AS_IF([test "x$with_bounds" == xno],
-[
-		AC_SUBST([AM_CPPFLAGS], ["-DEIGEN_NO_DEBUG"])
-]
-)
 
 
 dnl ************************************************

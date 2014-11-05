@@ -36,7 +36,7 @@ See the INSTALL file. But here is the short version
 
 To build a debugging version use
 
-    ./configure --prefix=`pwd`/dbg CPPFLAGS="-DDEBUG -DNEC_ERROR_CHECK" CXXFLAGS="-g -O0" 
+    ./configure --with-bounds
 
 ## Instructions for Compiling on Windows
 
