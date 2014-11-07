@@ -1531,418 +1531,457 @@ void c_geometry::scale( nec_float xw1 )
 /* icon2 by searching for segment ends that are in contact. */
 void c_geometry::connect_segments( int ignd )
 {
-	nscon= -1;
-	maxcon = 1;
-	
-	if (n <= 1)
-	{
-		throw new nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS. Please send bug report. This causes an error that we're trying to fix.");
-	}
-	
-	if ( ignd != 0)
-	{
-		m_output->nec_printf( "\n\n     GROUND PLANE SPECIFIED." );
-	
-		if ( ignd > 0)
-			m_output->nec_printf(
-				"\n     WHERE WIRE ENDS TOUCH GROUND, CURRENT WILL"
-				" BE INTERPOLATED TO IMAGE IN GROUND PLANE.\n" );
-	
-		if ( m_ipsym == 2)
-		{
-			np=2* np;
-			mp=2* mp;
-		}
-	
-		if ( abs( m_ipsym) > 2 )
-		{
-			np= n;
-			mp= m;
-		}
-	
-		if ( np > n)
-		{
-			throw new nec_exception("ERROR: NP > N IN c_geometry::connect_segments()" );
-		}
-	
-		if ( (np == n) && (mp == m) )
-			m_ipsym=0;
-	} /* if ( ignd != 0) */
-	
-	if ( n != 0)
-	{
-		/* Allocate memory to connections */
-		icon1.resize((n+m));
-		icon2.resize((n+m));
-	
-		for (int i = 0; i < n; i++ )
-		{
-			int iz = i+1;
-		
-			nec_float zi1 = z[i];
-			nec_float zi2 = z2[i];
-			
-			nec_3vector v1(x[i], y[i], z[i]);
-			nec_3vector v2(x2[i], y2[i], z2[i]);
-			nec_float slen = norm(v2 - v1) * SMIN;		
-			
-			/* determine connection data for end 1 of segment. */
-			bool segment_on_ground = false;
-			if ( ignd > 0)
-			{
-				if ( zi1 <= -slen)
-				{
-					nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-					nex->append(iz);
-					nex->append("EXTENDS BELOW GROUND");
-					throw nex;
-				}
-			
-				if ( zi1 <= slen)
-				{
-					icon1[i]= iz;
-					z[i]=0.;
-					segment_on_ground = true;	
-				} /* if ( zi1 <= slen) */
-			} /* if ( ignd > 0) */
-		
-			if ( false == segment_on_ground )
-			{
-				int ic= i;
-				nec_float sep=0.0;
-				for (int j = 1; j < n; j++)
-				{
-					ic++;
-					if ( ic >= n)
-						ic=0;
-				
-					nec_3vector vic(x[ic], y[ic], z[ic]);
-					sep = normL1(v1 - vic);
-					if ( sep <= slen)
-					{
-						icon1[i]= -(ic+1);
-						break;
-					}
-				
-					nec_3vector v2ic(x2[ic], y2[ic], z2[ic]);
-					sep = normL1(v1 - v2ic);
-					if ( sep <= slen)
-					{
-						icon1[i]= (ic+1);
-						break;
-					}
-				
-				} /* for( j = 1; j < n; j++) */
-			
-				if ( ((iz > 0) || (icon1[i] <= PCHCON)) && (sep > slen) )
-					icon1[i]=0;
-			
-			} /* if ( ! jump ) */
-		
-			/* determine connection data for end 2 of segment. */
-			if ( (ignd > 0) || segment_on_ground )
-			{
-				if ( zi2 <= -slen)
-				{
-					nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-					nex->append(iz);
-					nex->append("EXTENDS BELOW GROUND");
-					throw nex;
-				}
-			
-				if ( zi2 <= slen)
-				{
-					if ( icon1[i] == iz )
-					{
-						nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-						nex->append(iz);
-						nex->append("LIES IN GROUND PLANE");
-						throw nex;
-					}
-				
-					icon2[i]= iz;
-					z2[i]=0.;
-					continue;
-				} /* if ( zi2 <= slen) */	
-			} /* if ( ignd > 0) */
-		
-			// re-initialize these vectors!
-			v1 = nec_3vector(x[i], y[i], z[i]);
-			v2 = nec_3vector(x2[i], y2[i], z2[i]);
-			int ic= i;
-			nec_float sep=0.0;
-			for (int j = 1; j < n; j++ )
-			{
-				ic++;
-				if ( ic >= n)
-					ic=0;
-			
-				nec_3vector vic(x[ic], y[ic], z[ic]);
-				sep = normL1(v2 - vic);
-				if (sep <= slen)
-				{
-					icon2[i]= (ic+1);
-					break;
-				}
-			
-				nec_3vector v2ic(x2[ic], y2[ic], z2[ic]);
-				sep = normL1(v2 - v2ic);
-				if (sep <= slen)
-				{
-					icon2[i]= -(ic+1);
-					break;
-				}
-			} /* for( j = 1; j < n; j++ ) */
-		
-			if ( ((iz > 0) || (icon2[i] <= PCHCON)) && (sep > slen) )
-				icon2[i]=0;
-		
-		} /* for( i = 0; i < n; i++ ) */
-		
+  nscon= -1;
+  maxcon = 1;
+  
+  if (n <= 1) {
+    throw new nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS. Please send bug report. This causes an error that we're trying to fix.");
+  }
+  
+  if ( ignd != 0) {
+    m_output->nec_printf( "\n\n     GROUND PLANE SPECIFIED." );
+  
+    if ( ignd > 0)
+      m_output->nec_printf(
+        "\n     WHERE WIRE ENDS TOUCH GROUND, CURRENT WILL"
+        " BE INTERPOLATED TO IMAGE IN GROUND PLANE.\n" );
+  
+    if ( m_ipsym == 2) {
+      np=2* np;
+      mp=2* mp;
+    }
+  
+    if ( abs( m_ipsym) > 2 ) {
+      np= n;
+      mp= m;
+    }
+  
+    if ( np > n) {
+      throw new nec_exception("ERROR: NP > N IN c_geometry::connect_segments()" );
+    }
+  
+    if ( (np == n) && (mp == m) )
+      m_ipsym=0;
+  } /* if ( ignd != 0) */
+  
+  if ( n != 0) {
+    /* Allocate memory to connections */
+    icon1.resize((n+m));
+    icon2.resize((n+m));
+  
+    for (int i = 0; i < n; i++ ) {
+      int iz = i+1;
+    
+      nec_float zi1 = z[i];
+      nec_float zi2 = z2[i];
+      
+      nec_3vector v1(x[i], y[i], z[i]);
+      nec_3vector v2(x2[i], y2[i], z2[i]);
+      nec_float slen = norm(v2 - v1) * SMIN;		
+      
+      /* determine connection data for end 1 of segment. */
+      bool segment_on_ground = false;
+      if ( ignd > 0) {
+        if ( zi1 <= -slen) {
+          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
+          nex->append(iz);
+          nex->append("EXTENDS BELOW GROUND");
+          throw nex;
+        }
+      
+        if ( zi1 <= slen) {
+          icon1[i]= iz;
+          z[i]=0.;
+          segment_on_ground = true;	
+        } /* if ( zi1 <= slen) */
+      } /* if ( ignd > 0) */
+    
+      if ( false == segment_on_ground ) {
+        int ic= i;
+        nec_float sep=0.0;
+        for (int j = 1; j < n; j++) {
+          ic++;
+          if ( ic >= n)
+            ic=0;
+        
+          nec_3vector vic(x[ic], y[ic], z[ic]);
+          sep = normL1(v1 - vic);
+          if ( sep <= slen) {
+            icon1[i]= -(ic+1);
+            break;
+          }
+        
+          nec_3vector v2ic(x2[ic], y2[ic], z2[ic]);
+          sep = normL1(v1 - v2ic);
+          if ( sep <= slen) {
+            icon1[i]= (ic+1);
+            break;
+          }
+        
+        } /* for( j = 1; j < n; j++) */
+      
+        if ( ((iz > 0) || (icon1[i] <= PCHCON)) && (sep > slen) )
+          icon1[i]=0;
+      
+      } /* if ( ! jump ) */
+    
+      /* determine connection data for end 2 of segment. */
+      if ( (ignd > 0) || segment_on_ground ) {
+        if ( zi2 <= -slen) {
+          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
+          nex->append(iz);
+          nex->append("EXTENDS BELOW GROUND");
+          throw nex;
+        }
+      
+        if ( zi2 <= slen) {
+          if ( icon1[i] == iz ) {
+            nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
+            nex->append(iz);
+            nex->append("LIES IN GROUND PLANE");
+            throw nex;
+          }
+        
+          icon2[i]= iz;
+          z2[i]=0.;
+          continue;
+        } /* if ( zi2 <= slen) */	
+      } /* if ( ignd > 0) */
+    
+      // re-initialize these vectors!
+      v1 = nec_3vector(x[i], y[i], z[i]);
+      v2 = nec_3vector(x2[i], y2[i], z2[i]);
+      int ic= i;
+      nec_float sep=0.0;
+      for (int j = 1; j < n; j++ ) {
+        ic++;
+        if ( ic >= n)
+          ic=0;
+      
+        nec_3vector vic(x[ic], y[ic], z[ic]);
+        sep = normL1(v2 - vic);
+        if (sep <= slen) {
+          icon2[i]= (ic+1);
+          break;
+        }
+      
+        nec_3vector v2ic(x2[ic], y2[ic], z2[ic]);
+        sep = normL1(v2 - v2ic);
+        if (sep <= slen) {
+          icon2[i]= -(ic+1);
+          break;
+        }
+      } /* for( j = 1; j < n; j++ ) */
+    
+      if ( ((iz > 0) || (icon2[i] <= PCHCON)) && (sep > slen) )
+        icon2[i]=0;
+    
+    } /* for( i = 0; i < n; i++ ) */
+    
 
-		/* find wire-surface connections for new patches */
-		for (int ix=0; ix <m; ix++)
-		{
+    /* find wire-surface connections for new patches */
+    for (int ix=0; ix <m; ix++) {
 //			DEBUG_TRACE("i: " << ix+1 << " ix: " << ix << " m: " << m);		
-			nec_3vector vs(px[ix], py[ix], pz[ix]);
-		
-			for (int iseg = 0; iseg < n; iseg++ )
-			{
-				nec_3vector v1(x[iseg], y[iseg], z[iseg]);
-				nec_3vector v2(x2[iseg], y2[iseg], z2[iseg]);
-			
-				/* for first end of segment */
-				nec_float slen = normL1(v2 - v1) * SMIN;
-				
-				nec_float sep = normL1(v1 - vs);
-				/* connection - divide patch into 4 patches at present array loc. */
-				if ( sep <= slen)
-				{
-					icon1[iseg]=PCHCON + ix + 1;
-					divide_patch(ix + 1);
-					break;
-				}
-			
-				sep = normL1(v2 - vs);
-				
-				if ( sep <= slen)
-				{
-					icon2[iseg]=PCHCON+ ix + 1;
-					divide_patch(ix + 1);
-					break;
-				}
-			}
-		}	
-	} /* if ( n != 0) */
-	
-	m_output->nec_printf( "\n\n"
-		"     TOTAL SEGMENTS USED: %d   SEGMENTS IN A"
-		" SYMMETRIC CELL: %d   SYMMETRY FLAG: %d",
-		n, np, m_ipsym );
-	
-	if ( m > 0)
-		m_output->nec_printf(	"\n"
-		"       TOTAL PATCHES USED: %d   PATCHES"
-		" IN A SYMMETRIC CELL: %d",  m, mp );
-	
-	
-	if (0 == np + mp)
-		throw new nec_exception("connect_segments Geometry has zero wires and zero patches.");
-	
-	int symmetry = (n+m)/(np+mp); /* was iseg */
-	if ( symmetry != 1)
-	{
-		/*** may be error condition?? ***/
-		if ( m_ipsym == 0 )
-		{
-			nec_error_mode nem(*m_output);
-			m_output->endl();
-			m_output->line("ERROR: IPSYM=0 IN connect_segments()" );
-			throw new nec_exception("ERROR: IPSYM=0 IN connect_segments()");
-		}
-	
-		if ( m_ipsym < 0 )
-			m_output->nec_printf(
-				"\n  STRUCTURE HAS %d FOLD ROTATIONAL SYMMETRY\n", symmetry );
-		else
-		{
-			int sym_planes = symmetry/2;
-			if ( symmetry == 8)
-				sym_planes=3;
-			m_output->nec_printf(
-				"\n  STRUCTURE HAS %d PLANES OF SYMMETRY\n", sym_planes );
-		} /* if ( m_ipsym < 0 ) */
-	
-	} /* if ( symmetry == 1) */
-	
-	if ( n == 0)
-		return;
-	
-	/* Allocate to connection buffers */
-	jco.resize(maxcon);
-	
-	/*
-		Adjust connected seg. ends to exactly coincide.  print junctions
-		of 3 or more seg.  also find old seg. connecting to new seg.
-	*/
-	int junction_counter = 0; // used just to print the junction number out if there are 3 or more segments
-	bool header_printed = false; // Have we printed the header
-	for (int j = 0; j < n; j++ )
-	{
-		int jx = j+1;
-		int iend = -1;
-		int jend = -1;
-		int ix= icon1[j];
-		int ic=1;
-		jco[0]= -jx;
-		nec_float xa = x[j];
-		nec_float ya = y[j];
-		nec_float za = z[j];
-	
-		while( true )
-		{
-		if ( (ix != 0) && (ix != (j+1)) && (ix <= PCHCON) )
-		{
-		int nsflg=0;
-	
-		bool jump = false;
-		
-		do
-		{
-			if ( ix == 0 )
-			{
-				nec_exception* nex = new nec_exception("CONNECT - SEGMENT CONNECTION ERROR FOR SEGMENT: ");
-				nex->append(ix);
-				throw nex;
-			}
-		
-			if ( ix < 0 )
-				ix= -ix;
-			else
-				jend= -jend;
-		
-			jump = false;
-		
-			if ( ix == jx )
-				break;
-		
-			if ( ix < jx )
-			{
-				jump = true;
-				break;
-			}
-		
-			/* Record max. no. of connections */
-			ic++;
-			if ( ic >= maxcon )
-			{
-				maxcon = ic+1;
-				jco.resize(maxcon);
-			}
-			jco[ic-1]= ix* jend;
-		
-			if ( ix > 0)
-				nsflg=1;
-		
-			int ixx = ix-1;
-			if ( jend != 1)
-			{
-				xa= xa+ x[ixx]; // dies here if n == 1. ix is totally fried.
-				ya= ya+ y[ixx];
-				za= za+ z[ixx];
-				ix= icon1[ixx];
-				continue;
-			}
-		
-			xa= xa+ x2[ixx];
-			ya= ya+ y2[ixx];
-			za= za+ z2[ixx];
-			ix= icon2[ixx];
-		} /* do */
-		while( ix != 0 );
-	
-		if ( jump && (iend == 1) )
-			break;
-		else
-			if ( jump )
-			{
-				iend=1;
-				jend=1;
-				ix= icon2[j];
-				ic=1;
-				jco[0]= jx;
-				xa= x2[j];
-				ya= y2[j];
-				za= z2[j];
-				continue;
-			}
-	
-		nec_float ic_f = (nec_float)ic;
-		xa = xa / ic_f;
-		ya = ya / ic_f;
-		za = za / ic_f;
-	
-		for (int i = 0; i < ic; i++ )
-		{
-			ix= jco[i];
-			if ( ix <= 0) 
-			{
-				ix=- ix;
-				int ixx = ix-1;
-				x[ixx]= xa;
-				y[ixx]= ya;
-				z[ixx]= za;
-				continue;
-			}
-		
-			int ixx = ix-1;
-			x2[ixx]= xa;
-			y2[ixx]= ya;
-			z2[ixx]= za;	
-		} /* for( i = 0; i < ic; i++ ) */
-	
-		if ( ic >= 3)
-		{
-			if ( false == header_printed )
-			{
-				m_output->nec_printf( "\n\n"
-					"    ---------- MULTIPLE WIRE JUNCTIONS ----------\n"
-					"    JUNCTION  SEGMENTS (- FOR END 1, + FOR END 2)" );
-				header_printed = true;
-			}
-		
-			junction_counter++;
-			m_output->nec_printf( "\n   %5d      ", junction_counter );
-		
-			for (int i = 1; i <= ic; i++ )
-			{
-				m_output->nec_printf( "%5d", jco[i-1] );
-				if ( !(i % 20) )
-					m_output->nec_printf( "\n              " );
-			}
-		} /* if ( ic >= 3) */
-	
-		} /*if ( (ix != 0) && (ix != j) && (ix <= PCHCON) ) */
-	
-		if ( iend == 1)
-			break;
-	
-		iend=1;
-		jend=1;
-		ix= icon2[j];
-		ic=1;
-		jco[0]= jx;
-		xa= x2[j];
-		ya= y2[j];
-		za= z2[j];
-	
-		} /* while( true ) */
-	
-	} /* for( j = 0; j < n; j++ ) */
-	
-	ax.resize(maxcon);
-	bx.resize(maxcon);
-	cx.resize(maxcon);
+      nec_3vector vs(px[ix], py[ix], pz[ix]);
+    
+      for (int iseg = 0; iseg < n; iseg++ ) {
+        nec_3vector v1(x[iseg], y[iseg], z[iseg]);
+        nec_3vector v2(x2[iseg], y2[iseg], z2[iseg]);
+      
+        /* for first end of segment */
+        nec_float slen = normL1(v2 - v1) * SMIN;
+        
+        nec_float sep = normL1(v1 - vs);
+        /* connection - divide patch into 4 patches at present array loc. */
+        if ( sep <= slen) {
+          icon1[iseg]=PCHCON + ix + 1;
+          divide_patch(ix + 1);
+          break;
+        }
+      
+        sep = normL1(v2 - vs);
+        
+        if ( sep <= slen) {
+          icon2[iseg]=PCHCON+ ix + 1;
+          divide_patch(ix + 1);
+          break;
+        }
+      }
+    }	
+  } /* if ( n != 0) */
+  
+  m_output->nec_printf( "\n\n"
+    "     TOTAL SEGMENTS USED: %d   SEGMENTS IN A"
+    " SYMMETRIC CELL: %d   SYMMETRY FLAG: %d",
+    n, np, m_ipsym );
+  
+  if ( m > 0)
+    m_output->nec_printf(	"\n"
+    "       TOTAL PATCHES USED: %d   PATCHES"
+    " IN A SYMMETRIC CELL: %d",  m, mp );
+  
+  
+  if (0 == np + mp)
+    throw new nec_exception("connect_segments Geometry has zero wires and zero patches.");
+  
+  int symmetry = (n+m)/(np+mp); /* was iseg */
+  if ( symmetry != 1)	{
+    /*** may be error condition?? ***/
+    if ( m_ipsym == 0 )	{
+      nec_error_mode nem(*m_output);
+      m_output->endl();
+      m_output->line("ERROR: IPSYM=0 IN connect_segments()" );
+      throw new nec_exception("ERROR: IPSYM=0 IN connect_segments()");
+    }
+  
+    if ( m_ipsym < 0 )
+      m_output->nec_printf(
+        "\n  STRUCTURE HAS %d FOLD ROTATIONAL SYMMETRY\n", symmetry );
+    else {
+      int sym_planes = symmetry/2;
+      if ( symmetry == 8)
+        sym_planes=3;
+      m_output->nec_printf(
+        "\n  STRUCTURE HAS %d PLANES OF SYMMETRY\n", sym_planes );
+    } /* if ( m_ipsym < 0 ) */
+  
+  } /* if ( symmetry == 1) */
+    
+  if ( n == 0)
+    return;
+  
+  /* Allocate to connection buffers */
+  jco.resize(maxcon);
+  
+  /*
+    Adjust connected seg. ends to exactly coincide.  print junctions
+    of 3 or more seg.  also find old seg. connecting to new seg.
+    
+    
+C     ADJUST CONNECTED SEG. ENDS TO EXACTLY COINCIDE.  PRINT JUNCTIONS
+C     OF 3 OR MORE SEG.  ALSO FIND OLD SEG. CONNECTING TO NEW SEG.
+      DO 44 J=1,N
+      IEND=-1
+      JEND=-1
+      IX=ICON1(J)
+      IC=1
+      JCO(1)=-J
+      XA=X(J)
+      YA=Y(J)
+      ZA=Z(J)
+31    IF (IX.EQ.0) GO TO 43
+      IF (IX.EQ.J) GO TO 43
+      IF (IX.GT.10000) GO TO 43
+      NSFLG=0
+32    IF (IX) 33,49,34
+33    IX=-IX
+      GO TO 35
+34    JEND=-JEND
+35    IF (IX.EQ.J) GO TO 37
+      IF (IX.LT.J) GO TO 43
+      IC=IC+1
+      IF (IC.GT.JMAX) GO TO 49
+      JCO(IC)=IX*JEND
+      IF (IX.GT.N1) NSFLG=1
+      IF (JEND.EQ.1) GO TO 36
+      XA=XA+X(IX)
+      YA=YA+Y(IX)
+      ZA=ZA+Z(IX)
+      IX=ICON1(IX)
+      GO TO 32
+36    XA=XA+X2(IX)
+      YA=YA+Y2(IX)
+      ZA=ZA+Z2(IX)
+      IX=ICON2(IX)
+      GO TO 32
+37    SEP=IC
+      XA=XA/SEP
+      YA=YA/SEP
+      ZA=ZA/SEP
+      DO 39 I=1,IC
+      IX=JCO(I)
+      IF (IX.GT.0) GO TO 38
+      IX=-IX
+      X(IX)=XA
+      Y(IX)=YA
+      Z(IX)=ZA
+      GO TO 39
+38    X2(IX)=XA
+      Y2(IX)=YA
+      Z2(IX)=ZA
+39    CONTINUE
+      IF (N1.EQ.0) GO TO 42
+      IF (NSFLG.EQ.0) GO TO 42
+      DO 41 I=1,IC
+      IX=IABS(JCO(I))
+      IF (IX.GT.N1) GO TO 41
+      IF (ICONX(IX).NE.0) GO TO 41
+      NSCON=NSCON+1
+      IF (NSCON.LE.NSMAX) GO TO 40
+      WRITE(3,62)  NSMAX
+      STOP
+40    ISCON(NSCON)=IX
+      ICONX(IX)=NSCON
+41    CONTINUE
+42    IF (IC.LT.3) GO TO 43
+      ISEG=ISEG+1
+      WRITE(3,51) ISEG,(JCO(I),I=1,IC)
+43    IF (IEND.EQ.1) GO TO 44
+      IEND=1
+      JEND=1
+      IX=ICON2(J)
+      IC=1
+      JCO(1)=J
+      XA=X2(J)
+      YA=Y2(J)
+      ZA=Z2(J)
+      GO TO 31
+44    CONTINUE
+      IF (ISEG.EQ.0) WRITE(3,52)
+      IF (N1.EQ.0.OR.M1.EQ.M) GO TO 48
+
+  */
+  int junction_counter = 0; // used just to print the junction number out if there are 3 or more segments
+  bool header_printed = false; // Have we printed the header
+  for (int j = 0; j < n; j++ ) {
+    int jx = j+1;
+    int iend = -1;
+    int jend = -1;
+    int ix= icon1[j];
+    int ic=1;
+    jco[0]= -jx;
+    nec_float xa = x[j];
+    nec_float ya = y[j];
+    nec_float za = z[j];
+  
+    while( true )	{
+      if ( (ix != 0) && (ix != (j+1)) && (ix <= PCHCON) )	{
+        bool jump = false;
+        int nsflg = 0; 
+        // NOTE nsflg appears to be used for controlling output in the original, but isn't used here");
+        do {
+          
+          if ( ix == 0 ) {
+            nec_exception* nex = new nec_exception("CONNECT - SEGMENT CONNECTION ERROR FOR SEGMENT: ");
+            nex->append(ix);
+            throw nex;
+          }
+        
+          if ( ix < 0 )
+            ix= -ix;
+          else
+            jend= -jend;
+        
+          jump = false;
+        
+          if ( ix == jx )
+            break;
+        
+          if ( ix < jx ) {
+            jump = true;
+            break;
+          }
+        
+          /* Record max. no. of connections */
+          ic++;
+          if ( ic >= maxcon ) {
+            maxcon = ic+1;
+            jco.resize(maxcon);
+          }
+          jco[ic-1]= ix* jend;
+        
+          if ( ix > 0)
+            nsflg=1;
+        
+          int ixx = ix-1;
+          if ( jend != 1) {
+            xa= xa+ x[ixx]; // dies here if n == 1. ix is totally fried.
+            ya= ya+ y[ixx];
+            za= za+ z[ixx];
+            ix= icon1[ixx];
+          } else {
+            xa= xa+ x2[ixx];
+            ya= ya+ y2[ixx];
+            za= za+ z2[ixx];
+            ix= icon2[ixx];
+          }
+        }
+        while( ix != 0 );
+      
+        if ( jump && (iend == 1) )
+          break;
+        else
+          if ( jump ) {
+            iend=1;
+            jend=1;
+            ix= icon2[j];
+            ic=1;
+            jco[0]= jx;
+            xa= x2[j];
+            ya= y2[j];
+            za= z2[j];
+            continue;
+          }
+      
+        nec_float sep = (nec_float)ic;
+        xa = xa / sep;
+        ya = ya / sep;
+        za = za / sep;
+      
+        for (int i = 0; i < ic; i++ ) {
+          ix= jco[i];
+          if ( ix <= 0) {
+            ix=- ix;
+            int ixx = ix-1;
+            x[ixx]= xa;
+            y[ixx]= ya;
+            z[ixx]= za;
+            continue;
+          }
+        
+          int ixx = ix-1;
+          x2[ixx]= xa;
+          y2[ixx]= ya;
+          z2[ixx]= za;	
+        } /* for( i = 0; i < ic; i++ ) */
+      
+        if ( ic >= 3) {
+          if ( false == header_printed ) {
+            m_output->nec_printf( "\n\n"
+              "    ---------- MULTIPLE WIRE JUNCTIONS ----------\n"
+              "    JUNCTION  SEGMENTS (- FOR END 1, + FOR END 2)" );
+            header_printed = true;
+          }
+        
+          junction_counter++;
+          m_output->nec_printf( "\n   %5d      ", junction_counter );
+        
+          for (int i = 1; i <= ic; i++ ) {
+            m_output->nec_printf( "%5d", jco[i-1] );
+            if ( !(i % 20) )
+              m_output->nec_printf( "\n              " );
+          }
+        } /* if ( ic >= 3) */
+      
+        } /*if ( (ix != 0) && (ix != j) && (ix <= PCHCON) ) */
+      
+      if ( iend == 1)
+        break;
+    
+      iend=1;
+      jend=1;
+      ix= icon2[j];
+      ic=1;
+      jco[0]= jx;
+      xa= x2[j];
+      ya= y2[j];
+      za= z2[j];
+    } /* while( true ) */
+  } /* for( j = 0; j < n; j++ ) */
+  
+  ax.resize(maxcon);
+  bx.resize(maxcon);
+  cx.resize(maxcon);
 }
 
 /* arc generates segment geometry data for an arc of segment_count segments */
