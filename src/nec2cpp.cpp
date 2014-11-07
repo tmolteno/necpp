@@ -81,28 +81,7 @@ int main( int argc, char **argv )
 	
 	
 	try
-	{
-		if (true)// This is an nec_3vector testharness
-		{
-			nec_3vector x(1,2,3);
-			nec_3vector y(3,5,1);
-			
-			nec_3vector a = x + y;
-			ASSERT(a == nec_3vector(4,7,4));
-		
-/*			a = x.cwise() * y;
-			ASSERT(a == nec_3vector(-13,8,-1));
-			a = y.cwise() * x;
-			ASSERT(a == nec_3vector(13,-8,1));
-			
-			a = x.cwise() + 3.0;
-			ASSERT(a == nec_3vector(4,5,6));*/
-			
-			nec_float ip = x.dot(y);
-			
-			ASSERT(ip == 16);
-		}
-	
+	{	
 		nec_main(argc, argv, s_output);
 	}
 	catch (const char* message)
