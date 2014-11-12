@@ -1,2 +1,8 @@
 *.antlr
 *.out
+libtool
+stamp-h1
+bin/*
+include/*
+src/*
+lib/*

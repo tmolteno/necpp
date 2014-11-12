@@ -1,5 +1,5 @@
 #!/bin/sh
-../configure --prefix=`pwd` CPPFLAGS="-DDEBUG -DNEC_ERROR_CHECK" CXXFLAGS="-g -O0"
+../configure --prefix=`pwd` --with-bounds
 make
 make install
 
