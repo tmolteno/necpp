@@ -22,7 +22,7 @@
 
 int nec_structure_currents::get_n()
 {
-	return m_geometry->n;
+	return m_geometry->n_segments;
 }
 
 int nec_structure_currents::get_m()
@@ -94,14 +94,14 @@ void nec_structure_currents::analyze()
 	nec_float fr;
 	nec_complex eth, eph, ex, ey, ez;
 	
-	if (m_geometry->n != 0)
+	if (m_geometry->n_segments != 0)
 	{
 		if (iptflg!= -1)
 		{
 			int itmp1=0;
 			jump= iptflg+1;
 	
-			for (int i = 0; i < m_geometry->n; i++ )
+			for (int i = 0; i < m_geometry->n_segments; i++ )
 			{
 				nec_complex curi= m_context->current_vector[i]* wavelength;
 				cmag= abs(curi);
@@ -208,7 +208,7 @@ void nec_structure_currents::analyze()
 			int itmp1 = 0;
 			fr = 1.e-6/(freq_mhz);
 
-			for(int i = 0; i < m_geometry->n; i++ )
+			for(int i = 0; i < m_geometry->n_segments; i++ )
 			{
 				if ( iptflq != -2 )
 				{
@@ -238,14 +238,14 @@ void nec_structure_currents::analyze()
 				_q_density_segment_length.push_back(m_geometry->segment_length[i]);
 				_q_density.push_back(curi);
 						
-			} /* for(int i = 0; i < m_geometry->n; i++ ) */
+			} /* for(int i = 0; i < m_geometry->n_segments; i++ ) */
 	
 		} /* if (iptflq != -1) */	
-	} /* if (m_geometry->n != 0) */
+	} /* if (m_geometry->n_segments != 0) */
 	
 	if (m_geometry->m != 0)
 	{
-		int j = m_geometry->n-3;
+		int j = m_geometry->n_segments-3;
 		int itmp1 = -1;
 
 		for(int i = 0; i < m_geometry->m; i++ )
@@ -290,7 +290,7 @@ void nec_structure_currents::write_to_file_aux(ostream& os)
 	
 	output_helper oh(os,_result_format);
 
-	if ( m_geometry->n != 0)
+	if ( m_geometry->n_segments != 0)
 	{
 		if ( iptflg != -1)
 		{
@@ -375,7 +375,7 @@ void nec_structure_currents::write_to_file_aux(ostream& os)
 			}
 			q_density_last_printed = q_density_nb_elements;
 		}
-	} /*if ( m_geometry->n != 0) */
+	} /*if ( m_geometry->n_segments != 0) */
 	
 	if ( m_geometry->m != 0)
 	{

@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004-2008  Timothy C.A. Molteno
+	Copyright (C) 2004-20014  Timothy C.A. Molteno
 	tim@molteno.net
 	
 	This program is free software; you can redistribute it and/or modify
@@ -1235,7 +1235,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 	nec_float etha, ethm, ephm, epha;
 	nec_complex eth, eph, ex, ey, ez;
 
-	if ( m_geometry->n != 0)
+	if ( m_geometry->n_segments != 0)
 	{
 		if ( iptflg != -1)
 		{
@@ -1266,7 +1266,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 		int itmp1=0;
 		jump= iptflg+1;
 
-		for (int i = 0; i < m_geometry->n; i++ )
+		for (int i = 0; i < m_geometry->n_segments; i++ )
 		{
 			curi= current_vector[i]* wavelength;
 			cmag= abs( curi);
@@ -1361,7 +1361,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 			itmp1 = 0;
 			fr = 1.e-6/freq_mhz;
 
-			for(int i = 0; i < m_geometry->n; i++ )
+			for(int i = 0; i < m_geometry->n_segments; i++ )
 			{
 				if ( iptflq != -2 )
 				{
@@ -1412,7 +1412,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 		    "PHASE     MAG.       PHASE    REAL   IMAGINARY    REAL  "
 		    " IMAGINARY    REAL   IMAGINARY" );
 
-		int j = m_geometry->n-3;
+		int j = m_geometry->n_segments-3;
 		int itmp1 = -1;
 
 		for(int i = 0; i < m_geometry->m; i++ )
@@ -2110,7 +2110,7 @@ void nec_context::load()
 	bool iwarn = false;
 	nec_complex zt, tpcj;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	int np = m_geometry->np;
 	
 	tpcj = nec_complex(0.0,1.883698955e+9);
@@ -2367,7 +2367,7 @@ void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
 		ist= np- i1+2;
 	
 	/* wire source loop */
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 		
 	for( j = 1; j <= n; j++ )
 	{
@@ -3592,7 +3592,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 	nec_float wy, wz, qx, qy, qz, ds, dsh, rs, r;
 	nec_complex er, et, ezh, erh, rrv, rrh, tt1, tt2;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	int m = m_geometry->m;
 	
 //	int neq= n+2*m;
@@ -4687,7 +4687,7 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 	*ez=cplx_00();
 	ax=0.0;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	for( i = 0; i < n; i++ )
 	{
 		xj= xob- m_geometry->x[i];
@@ -4974,7 +4974,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 					vector_fill(rhs,0,neqt,cplx_00());
 				
 					rhs[isc1] = cplx_10();
-					solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+					solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 					m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 				
 					for (int j = 0; j < irow1; j++ )
@@ -5202,7 +5202,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 				
 				irow1= nteqa[i]-1;
 				rhs[irow1]=cplx_10();
-				solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+				solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 				m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 				
 				for (int j = 0; j < nteq; j++ )
@@ -5221,7 +5221,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 	if (0 == network_count)
 	{
 		/* solve for currents when no networks are present */
-		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 		m_geometry->get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 		ntsc=0;
 	}
@@ -5234,7 +5234,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 		for (i = 0; i < neqt; i++)
 			rhs[i]= einc[i];
 	
-		solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+		solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 		m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 	
 		for( i = 0; i < nteq; i++ )
@@ -5256,7 +5256,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 			einc[irow1] -= rhnt[i];
 		}
 	
-		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 		m_geometry->get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 
 
@@ -5670,7 +5670,7 @@ void nec_context::nhfld( nec_float xob, nec_float yob, nec_float zob,
 	*hz=cplx_00();
 	nec_float ax = 0.0;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	for (int i = 0; i < n; i++ )
 	{
 		xj= xob- m_geometry->x[i];
@@ -6034,7 +6034,7 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
 	
 		} /* if ( m_use_exk == true) */
 	
-		int n = m_geometry->n;
+		int n = m_geometry->n_segments;
 		for( i = 0; i < n; i++ )
 		{
 			xi= m_geometry->x[i];
@@ -7042,7 +7042,7 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
 	ciz=cplx_00();
 	
 	/* summation of field from individual segments */
-	for( i = 0; i < m_geometry->n; i++ )
+	for( i = 0; i < m_geometry->n_segments; i++ )
 	{
 		dx= m_geometry->cab[i];
 		dy= m_geometry->sab[i];
@@ -7189,7 +7189,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 	roy= thz* phx;
 	
 	jump = false;
-	if ( m_geometry->n != 0)
+	if ( m_geometry->n_segments != 0)
 	{
 		/* loop for structure image if any */
 		/* calculation of reflection coeffecients */
@@ -7241,7 +7241,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 		ciz=cplx_00();
 	
 		/* loop over structure segments */
-		for( i = 0; i < m_geometry->n; i++ )
+		for( i = 0; i < m_geometry->n_segments; i++ )
 		{
 		omega=-( rox* m_geometry->cab[i]+ roy* m_geometry->sab[i]+ roz* m_geometry->salp[i]);
 		el= pi()* m_geometry->segment_length[i];
@@ -7417,7 +7417,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 	roz= rozs;
 	{
 		// without ground 
-		complex_array temp = current_vector.segment(m_geometry->n, current_vector.size()-m_geometry->n);
+		complex_array temp = current_vector.segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
 		m_geometry->fflds(rox, roy, roz, temp, &ex, &ey, &ez);
 	}
 	if (ground.present())
@@ -7425,7 +7425,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 		// with ground
 		nec_complex tempx, tempy, tempz;
 		
-		complex_array temp = current_vector.segment(m_geometry->n, current_vector.size()-m_geometry->n);
+		complex_array temp = current_vector.segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
 		m_geometry->fflds(rox, roy, -roz, temp, &tempx, &tempy, &tempz);
 	
 		if (ground.type_perfect())

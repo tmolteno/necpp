@@ -126,7 +126,7 @@ public:
 		complex_array& scur, 
 		nec_complex *in_ex, nec_complex *in_ey, nec_complex *in_ez );
 		
-	int n;	// The number of segments
+	int n_segments;	// The number of segments
 	int np;
 	int_array segment_tags;
 	real_array x, y, z, segment_length, segment_radius;

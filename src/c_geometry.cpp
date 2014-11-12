@@ -26,8 +26,8 @@
 
 c_geometry::c_geometry()
 {
-	n = 0;
-	np = 0; 	// n is the number of segments
+	n_segments = 0;
+	np = 0; 	// n_segments is the number of segments
 	
 	m = 0;
 	mp = 0;		// m is the number of patches
@@ -75,7 +75,7 @@ int c_geometry::get_segment_number( int in_tag, int in_m)
 	}
 	
 	int tag_seg_count=0;
-	for (int i = 0; i < n; i++ )
+	for (int i = 0; i < n_segments; i++ )
 	{
 		if ( segment_tags[i] == in_tag )
 		{
@@ -129,7 +129,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 	
 	m_ipsym=0;
 	nwire=0;
-	n=0;
+	n_segments=0;
 	np=0;
 	m=0;
 	mp=0;
@@ -191,7 +191,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 			m_output->nec_printf( "\n"
 				" %5d  %10.4f %10.4f %10.4f %10.4f"
 				" %10.4f %10.4f %10.4f %5d %5d %5d %4d",
-				nwire, xw1, yw1, zw1, xw2, yw2, zw2, rad, wire_segment_count, n+1, n + wire_segment_count, wire_tag );
+				nwire, xw1, yw1, zw1, xw2, yw2, zw2, rad, wire_segment_count, n_segments+1, n_segments + wire_segment_count, wire_tag );
 		
 			if ( rad != 0.0)	// rad == 0 implies a tapered wire
 			{
@@ -382,8 +382,8 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 		else if (card_id == "GA")
 		{
 			nwire++;
-			i1= n+1;
-			i2= n+ card_int_2;
+			i1= n_segments+1;
+			i2= n_segments+ card_int_2;
 		
 			m_output->nec_printf( "\n"
 				" %5d  ARC RADIUS: %9.5f  FROM: %8.3f TO: %8.3f DEGREES"
@@ -455,8 +455,8 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 		else if (card_id == "GH")
 		{
 			nwire++;
-			i1= n+1;
-			i2= n+ card_int_2;
+			i1= n_segments+1;
+			i2= n_segments+ card_int_2;
 		
 			m_output->nec_printf( "\n"
 				" %5d HELIX STRUCTURE - SPACING OF TURNS: %8.3f AXIAL"
@@ -547,13 +547,13 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 
 	connect_segments( card_int_1);
 
-	if ( n != 0)
+	if ( n_segments != 0)
 	{
 		/* Allocate wire buffers */
-		segment_length.resize(n);
-		sab.resize(n);
-		cab.resize(n);
-		salp.resize(n);
+		segment_length.resize(n_segments);
+		sab.resize(n_segments);
+		cab.resize(n_segments);
+		salp.resize(n_segments);
 	
 		m_output->nec_printf( "\n\n\n"
 			"                              "
@@ -569,7 +569,7 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 			"   No:       X         Y         Z      LENGTH     ALPHA     "
 			" BETA    RADIUS    I-     I    I+   NO:" );
 	
-		for(int i = 0; i < n; i++ )
+		for(int i = 0; i < n_segments; i++ )
 		{
 			nec_float xw1= x2[i]- x[i];
 			nec_float yw1= y2[i]- y[i];
@@ -607,8 +607,8 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 			{
 				throw new nec_exception("SEGMENT DATA ERROR" );
 			}
-		} /* for( i = 0; i < n; i++ ) */
-	} /* if ( n != 0) */
+		} /* for( i = 0; i < n_segments; i++ ) */
+	} /* if ( n_segments != 0) */
 
 	if ( m != 0)
 	{
@@ -636,15 +636,15 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 		} /* for( i = 0; i < m; i++ ) */
 	} /* if ( m == 0) */
 
-	n_plus_m  = n+m;
-	n_plus_2m = n+2*m;
-	n_plus_3m = n+3*m;
+	n_plus_m  = n_segments+m;
+	n_plus_2m = n_segments+2*m;
+	n_plus_3m = n_segments+3*m;
 
-	x_unscaled.resize(n);
-	y_unscaled.resize(n);
-	z_unscaled.resize(n);
-	si_unscaled.resize(n);
-	bi_unscaled.resize(n);
+	x_unscaled.resize(n_segments);
+	y_unscaled.resize(n_segments);
+	z_unscaled.resize(n_segments);
+	si_unscaled.resize(n_segments);
+	bi_unscaled.resize(n_segments);
 	
 	px_unscaled.resize(m);
 	py_unscaled.resize(m);
@@ -652,7 +652,7 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 	pbi_unscaled.resize(m);
 	
 	// Fill the unscaled segments...
-	for (int i = 0; i < n; i++ )
+	for (int i = 0; i < n_segments; i++ )
 	{
 		x_unscaled[i]= x[i];
 		y_unscaled[i]= y[i];
@@ -684,9 +684,9 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
 {
 	nec_float delz, rd, fns, radz;
 	
-	int istart = n;
-	n = n + segment_count;
-	np= n;
+	int istart = n_segments;
+	n_segments += segment_count;
+	np= n_segments;
 	mp= m;
 	m_ipsym=0;
 	
@@ -694,16 +694,16 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
 		return;
 	
 	/* Reallocate tags buffer */
-	segment_tags.resize(n + m);
+	segment_tags.resize(n_segments + m);
 	
 	/* Reallocate wire buffers */
-	x.resize(n);
-	y.resize(n);
-	z.resize(n);
-	x2.resize(n);
-	y2.resize(n);
-	z2.resize(n);
-	segment_radius.resize(n);
+	x.resize(n_segments);
+	y.resize(n_segments);
+	z.resize(n_segments);
+	x2.resize(n_segments);
+	y2.resize(n_segments);
+	z2.resize(n_segments);
+	segment_radius.resize(n_segments);
 	
 	nec_3vector dx(xw2- xw1, yw2- yw1, zw2- zw1);
 	
@@ -771,7 +771,7 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
 
 	m_wires.push_back(nec_wire(xs1, x_end, rad, tag_id));
 
-	for (int i = istart; i < n; i++ )
+	for (int i = istart; i < n_segments; i++ )
 	{
 		segment_tags[i]= tag_id;
 		nec_3vector xs2(xs1 + dx*delz);
@@ -789,9 +789,9 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
 	}
 
 
-	x2[n-1]= xw2;
-	y2[n-1]= yw2;
-	z2[n-1]= zw2;
+	x2[n_segments-1]= xw2;
+	y2[n_segments-1]= yw2;
+	z2[n_segments-1]= zw2;
 
 }
 
@@ -805,9 +805,9 @@ void c_geometry::helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
 	int ist;
 	nec_float turns, zinc, copy, sangle, hdia, turn, pitch, hmaj, hmin;
 	
-	ist= n;
-	n += segment_count;
-	np= n;
+	ist= n_segments;
+	n_segments += segment_count;
+	np= n_segments;
 	mp= m;
 	m_ipsym=0;
 	
@@ -817,19 +817,19 @@ void c_geometry::helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
 	turns= fabs( hl/ s);
 	zinc= fabs( hl/ segment_count);
 	
-	segment_tags.resize(n+m); /*????*/
+	segment_tags.resize(n_segments+m); /*????*/
 	
 	/* Reallocate wire buffers */
-	x.resize(n);
-	y.resize(n);
-	z.resize(n);
-	x2.resize(n);
-	y2.resize(n);
-	z2.resize(n);
-	segment_radius.resize(n);
+	x.resize(n_segments);
+	y.resize(n_segments);
+	z.resize(n_segments);
+	x2.resize(n_segments);
+	y2.resize(n_segments);
+	z2.resize(n_segments);
+	segment_radius.resize(n_segments);
 	
 	z[ist]=0.;
-	for(int i = ist; i < n; i++ )
+	for(int i = ist; i < n_segments; i++ )
 	{
 		segment_radius[i]= rad;
 		segment_tags[i]= tag_id;
@@ -869,7 +869,7 @@ void c_geometry::helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
 		copy= x2[i];
 		x2[i]= y2[i];
 		y2[i]= copy;	
-	} /* for( i = ist; i < n; i++ ) */
+	} /* for( i = ist; i < n_segments; i++ ) */
 	
 	if ( a2 != a1)
 	{
@@ -950,7 +950,7 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
     nrp= nrpt;
 
   ix=1;
-  if ( n > 0)
+  if ( n_segments > 0)
   {
     i1= get_segment_number( its, 1);
     if ( i1 < 1)
@@ -961,14 +961,14 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
       k= i1-1;
     else
     {
-      k= n;
+      k= n_segments;
       /* Reallocate tags buffer */
-      segment_tags.resize(n+m + (n+1-i1)*nrpt);
-      // mreq = n+m + (n+1-i1)*nrpt;
+      segment_tags.resize(n_segments+m + (n_segments+1-i1)*nrpt);
+      // mreq = n_segments+m + (n_segments+1-i1)*nrpt;
       // segment_tags.resize(mreq);
 
       /* Reallocate wire buffers */
-      int new_size = (n+(n+1-i1)*nrpt);
+      int new_size = (n_segments+(n_segments+1-i1)*nrpt);
       x.resize(new_size);
       y.resize(new_size);
       z.resize(new_size);
@@ -980,7 +980,7 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
 
     for( ir = 0; ir < nrp; ir++ )
     {
-      for( i = i1-1; i < n; i++ )
+      for( i = i1-1; i < n_segments; i++ )
       {
 	xi= x[i];
 	yi= y[i];
@@ -1001,14 +1001,14 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
 
 	k++;
 
-      } /* for( i = i1; i < n; i++ ) */
+      } /* for( i = i1; i < n_segments; i++ ) */
 
-      i1= n+1;
-      n= k;
+      i1= n_segments+1;
+      n_segments= k;
 
     } /* for( ir = 0; ir < nrp; ir++ ) */
 
-  } /* if ( n >= n2) */
+  } /* if ( n_segments >= n2) */
 
   if ( m > 0)
   {
@@ -1070,7 +1070,7 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
   if ( (nrpt == 0) && (ix == 1) )
     return;
 
-  np= n;
+  np= n_segments;
   mp= m;
   m_ipsym=0;
 
@@ -1086,7 +1086,7 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 	int iti, i, nx, itagi, k;
 	nec_float e1, e2, fnop, sam, cs, ss, xk, yk;
 	
-	np= n;
+	np= n_segments;
 	mp= m;
 	m_ipsym=0;
 	iti= itx;
@@ -1103,14 +1103,14 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		{
 		m_ipsym=2;
 	
-		if ( n > 0 )
+		if ( n_segments > 0 )
 		{
 		/* Reallocate tags buffer */
-		segment_tags.resize(2*n + m);
-		// segment_tags.resize((2*n+m));
+		segment_tags.resize(2*n_segments + m);
+		// segment_tags.resize((2*n_segments+m));
 	
 		/* Reallocate wire buffers */
-		int new_size = 2*n;
+		int new_size = 2*n_segments;
 		x.resize(new_size);
 		y.resize(new_size);
 		z.resize(new_size);
@@ -1119,9 +1119,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		z2.resize(new_size);
 		segment_radius.resize(new_size);
 	
-		for( i = 0; i < n; i++ )
+		for( i = 0; i < n_segments; i++ )
 		{
-		nx= i+ n;
+		nx= i+ n_segments;
 		e1= z[i];
 		e2= z2[i];
 	
@@ -1148,12 +1148,12 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 	
 		segment_radius[nx]= segment_radius[i];
 	
-		} /* for( i = 0; i < n; i++ ) */
+		} /* for( i = 0; i < n_segments; i++ ) */
 	
-		n= n*2;
+		n_segments= n_segments*2;
 		iti= iti*2;
 	
-		} /* if ( n > 0) */
+		} /* if ( n_segments > 0) */
 	
 		if ( m > 0 )
 		{
@@ -1204,14 +1204,14 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		/* reflect along y axis */
 		if ( iy != 0)
 		{
-		if ( n > 0)
+		if ( n_segments > 0)
 		{
 		/* Reallocate tags buffer */
-		segment_tags.resize(2*n + m);
-		// segment_tags.resize((2*n+m));/*????*/
+		segment_tags.resize(2*n_segments + m);
+		// segment_tags.resize((2*n_segments+m));/*????*/
 	
 		/* Reallocate wire buffers */
-		int new_size = 2*n;
+		int new_size = 2*n_segments;
 		x.resize(new_size);
 		y.resize(new_size);
 		z.resize(new_size);
@@ -1220,9 +1220,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		z2.resize(new_size);
 		segment_radius.resize(new_size);
 	
-		for( i = 0; i < n; i++ )
+		for( i = 0; i < n_segments; i++ )
 		{
-			nx= i+ n;
+			nx= i+ n_segments;
 			e1= y[i];
 			e2= y2[i];
 		
@@ -1249,12 +1249,12 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		
 			segment_radius[nx]= segment_radius[i];
 		
-		} /* for( i = n2-1; i < n; i++ ) */
+		} /* for( i = n2-1; i < n_segments; i++ ) */
 	
-		n= n*2;
+		n_segments= n_segments*2;
 		iti= iti*2;
 	
-		} /* if ( n >= n2) */
+		} /* if ( n_segments >= n2) */
 	
 		if ( m > 0 )
 		{
@@ -1306,14 +1306,14 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		if ( ix == 0 )
 			return;
 	
-		if ( n > 0 )
+		if ( n_segments > 0 )
 		{
 		/* Reallocate tags buffer */
-		segment_tags.resize(2*n + m);
-		// segment_tags.resize((2*n+m));/*????*/
+		segment_tags.resize(2*n_segments + m);
+		// segment_tags.resize((2*n_segments+m));/*????*/
 	
 		/* Reallocate wire buffers */
-		int new_size = 2*n;
+		int new_size = 2*n_segments;
 		x.resize(new_size);
 		y.resize(new_size);
 		z.resize(new_size);
@@ -1322,9 +1322,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 		z2.resize(new_size);
 		segment_radius.resize(new_size);
 	
-		for( i = 0; i < n; i++ )
+		for( i = 0; i < n_segments; i++ )
 		{
-			nx= i+ n;
+			nx= i+ n_segments;
 			e1= x[i];
 			e2= x2[i];
 		
@@ -1352,9 +1352,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 			segment_radius[nx]= segment_radius[i];
 		}
 	
-		n= n*2;
+		n_segments= n_segments*2;
 	
-		} /* if ( n > 0) */
+		} /* if ( n_segments > 0) */
 	
 		if ( m == 0 )
 			return;
@@ -1409,25 +1409,25 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 	cs= cos( sam);
 	ss= sin( sam);
 	
-	if ( n > 0)
+	if ( n_segments > 0)
 	{
-		n *= nop;
+		n_segments *= nop;
 		nx= np;
 	
 		/* Reallocate tags buffer */
-		segment_tags.resize(n + m);
-		//segment_tags.resize((n+m));/*????*/
+		segment_tags.resize(n_segments + m);
+		//segment_tags.resize((n_segments+m));/*????*/
 	
 		/* Reallocate wire buffers */
-		x.resize(n);
-		y.resize(n);
-		z.resize(n);
-		x2.resize(n);
-		y2.resize(n);
-		z2.resize(n);
-		segment_radius.resize(n);
+		x.resize(n_segments);
+		y.resize(n_segments);
+		z.resize(n_segments);
+		x2.resize(n_segments);
+		y2.resize(n_segments);
+		z2.resize(n_segments);
+		segment_radius.resize(n_segments);
 	
-		for( i = nx; i < n; i++ )
+		for( i = nx; i < n_segments; i++ )
 		{
 			k= i- np;
 			xk= x[k];
@@ -1449,7 +1449,7 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 				segment_tags[i]= itagi+ iti;
 		}
 	
-	} /* if ( n >= n2) */
+	} /* if ( n_segments >= n2) */
 	
 	if ( m == 0 )
 		return;
@@ -1500,7 +1500,7 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 void c_geometry::scale( nec_float xw1 )
 {
 	// scale wires
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n_segments; i++)
 	{
 		x[i] = x[i]* xw1;
 		y[i] = y[i]* xw1;
@@ -1534,7 +1534,7 @@ void c_geometry::connect_segments( int ignd )
   nscon= -1;
   maxcon = 1;
   
-  if (n <= 1) {
+  if (n_segments <= 1) {
     throw new nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS. Please send bug report. This causes an error that we're trying to fix.");
   }
   
@@ -1552,24 +1552,24 @@ void c_geometry::connect_segments( int ignd )
     }
   
     if ( abs( m_ipsym) > 2 ) {
-      np= n;
+      np= n_segments;
       mp= m;
     }
   
-    if ( np > n) {
+    if ( np > n_segments) {
       throw new nec_exception("ERROR: NP > N IN c_geometry::connect_segments()" );
     }
   
-    if ( (np == n) && (mp == m) )
+    if ( (np == n_segments) && (mp == m) )
       m_ipsym=0;
   } /* if ( ignd != 0) */
   
-  if ( n != 0) {
+  if ( n_segments != 0) {
     /* Allocate memory to connections */
-    icon1.resize((n+m));
-    icon2.resize((n+m));
+    icon1.resize((n_segments+m));
+    icon2.resize((n_segments+m));
   
-    for (int i = 0; i < n; i++ ) {
+    for (int i = 0; i < n_segments; i++ ) {
       int iz = i+1;
     
       nec_float zi1 = z[i];
@@ -1599,9 +1599,9 @@ void c_geometry::connect_segments( int ignd )
       if ( false == segment_on_ground ) {
         int ic= i;
         nec_float sep=0.0;
-        for (int j = 1; j < n; j++) {
+        for (int j = 1; j < n_segments; j++) {
           ic++;
-          if ( ic >= n)
+          if ( ic >= n_segments)
             ic=0;
         
           nec_3vector vic(x[ic], y[ic], z[ic]);
@@ -1618,7 +1618,7 @@ void c_geometry::connect_segments( int ignd )
             break;
           }
         
-        } /* for( j = 1; j < n; j++) */
+        } /* for( j = 1; j < n_segments; j++) */
       
         if ( ((iz > 0) || (icon1[i] <= PCHCON)) && (sep > slen) )
           icon1[i]=0;
@@ -1653,9 +1653,9 @@ void c_geometry::connect_segments( int ignd )
       v2 = nec_3vector(x2[i], y2[i], z2[i]);
       int ic= i;
       nec_float sep=0.0;
-      for (int j = 1; j < n; j++ ) {
+      for (int j = 1; j < n_segments; j++ ) {
         ic++;
-        if ( ic >= n)
+        if ( ic >= n_segments)
           ic=0;
       
         nec_3vector vic(x[ic], y[ic], z[ic]);
@@ -1671,12 +1671,12 @@ void c_geometry::connect_segments( int ignd )
           icon2[i]= -(ic+1);
           break;
         }
-      } /* for( j = 1; j < n; j++ ) */
+      } /* for( j = 1; j < n_segments; j++ ) */
     
       if ( ((iz > 0) || (icon2[i] <= PCHCON)) && (sep > slen) )
         icon2[i]=0;
     
-    } /* for( i = 0; i < n; i++ ) */
+    } /* for( i = 0; i < n_segments; i++ ) */
     
 
     /* find wire-surface connections for new patches */
@@ -1684,7 +1684,7 @@ void c_geometry::connect_segments( int ignd )
 //			DEBUG_TRACE("i: " << ix+1 << " ix: " << ix << " m: " << m);		
       nec_3vector vs(px[ix], py[ix], pz[ix]);
     
-      for (int iseg = 0; iseg < n; iseg++ ) {
+      for (int iseg = 0; iseg < n_segments; iseg++ ) {
         nec_3vector v1(x[iseg], y[iseg], z[iseg]);
         nec_3vector v2(x2[iseg], y2[iseg], z2[iseg]);
       
@@ -1708,12 +1708,12 @@ void c_geometry::connect_segments( int ignd )
         }
       }
     }	
-  } /* if ( n != 0) */
+  } /* if ( n_segments != 0) */
   
   m_output->nec_printf( "\n\n"
     "     TOTAL SEGMENTS USED: %d   SEGMENTS IN A"
     " SYMMETRIC CELL: %d   SYMMETRY FLAG: %d",
-    n, np, m_ipsym );
+    n_segments, np, m_ipsym );
   
   if ( m > 0)
     m_output->nec_printf(	"\n"
@@ -1724,7 +1724,7 @@ void c_geometry::connect_segments( int ignd )
   if (0 == np + mp)
     throw new nec_exception("connect_segments Geometry has zero wires and zero patches.");
   
-  int symmetry = (n+m)/(np+mp); /* was iseg */
+  int symmetry = (n_segments+m)/(np+mp); /* was iseg */
   if ( symmetry != 1)	{
     /*** may be error condition?? ***/
     if ( m_ipsym == 0 )	{
@@ -1747,103 +1747,15 @@ void c_geometry::connect_segments( int ignd )
   
   } /* if ( symmetry == 1) */
     
-  if ( n == 0)
+  if ( n_segments == 0)
     return;
   
   /* Allocate to connection buffers */
   jco.resize(maxcon);
   
-  /*
-    Adjust connected seg. ends to exactly coincide.  print junctions
-    of 3 or more seg.  also find old seg. connecting to new seg.
-    
-    
-C     ADJUST CONNECTED SEG. ENDS TO EXACTLY COINCIDE.  PRINT JUNCTIONS
-C     OF 3 OR MORE SEG.  ALSO FIND OLD SEG. CONNECTING TO NEW SEG.
-      DO 44 J=1,N
-      IEND=-1
-      JEND=-1
-      IX=ICON1(J)
-      IC=1
-      JCO(1)=-J
-      XA=X(J)
-      YA=Y(J)
-      ZA=Z(J)
-31    IF (IX.EQ.0) GO TO 43
-      IF (IX.EQ.J) GO TO 43
-      IF (IX.GT.10000) GO TO 43
-      NSFLG=0
-32    IF (IX) 33,49,34
-33    IX=-IX
-      GO TO 35
-34    JEND=-JEND
-35    IF (IX.EQ.J) GO TO 37
-      IF (IX.LT.J) GO TO 43
-      IC=IC+1
-      IF (IC.GT.JMAX) GO TO 49
-      JCO(IC)=IX*JEND
-      IF (IX.GT.N1) NSFLG=1
-      IF (JEND.EQ.1) GO TO 36
-      XA=XA+X(IX)
-      YA=YA+Y(IX)
-      ZA=ZA+Z(IX)
-      IX=ICON1(IX)
-      GO TO 32
-36    XA=XA+X2(IX)
-      YA=YA+Y2(IX)
-      ZA=ZA+Z2(IX)
-      IX=ICON2(IX)
-      GO TO 32
-37    SEP=IC
-      XA=XA/SEP
-      YA=YA/SEP
-      ZA=ZA/SEP
-      DO 39 I=1,IC
-      IX=JCO(I)
-      IF (IX.GT.0) GO TO 38
-      IX=-IX
-      X(IX)=XA
-      Y(IX)=YA
-      Z(IX)=ZA
-      GO TO 39
-38    X2(IX)=XA
-      Y2(IX)=YA
-      Z2(IX)=ZA
-39    CONTINUE
-      IF (N1.EQ.0) GO TO 42
-      IF (NSFLG.EQ.0) GO TO 42
-      DO 41 I=1,IC
-      IX=IABS(JCO(I))
-      IF (IX.GT.N1) GO TO 41
-      IF (ICONX(IX).NE.0) GO TO 41
-      NSCON=NSCON+1
-      IF (NSCON.LE.NSMAX) GO TO 40
-      WRITE(3,62)  NSMAX
-      STOP
-40    ISCON(NSCON)=IX
-      ICONX(IX)=NSCON
-41    CONTINUE
-42    IF (IC.LT.3) GO TO 43
-      ISEG=ISEG+1
-      WRITE(3,51) ISEG,(JCO(I),I=1,IC)
-43    IF (IEND.EQ.1) GO TO 44
-      IEND=1
-      JEND=1
-      IX=ICON2(J)
-      IC=1
-      JCO(1)=J
-      XA=X2(J)
-      YA=Y2(J)
-      ZA=Z2(J)
-      GO TO 31
-44    CONTINUE
-      IF (ISEG.EQ.0) WRITE(3,52)
-      IF (N1.EQ.0.OR.M1.EQ.M) GO TO 48
-
-  */
   int junction_counter = 0; // used just to print the junction number out if there are 3 or more segments
   bool header_printed = false; // Have we printed the header
-  for (int j = 0; j < n; j++ ) {
+  for (int j = 0; j < n_segments; j++ ) {
     int jx = j+1;
     int iend = -1;
     int jend = -1;
@@ -1857,8 +1769,8 @@ C     OF 3 OR MORE SEG.  ALSO FIND OLD SEG. CONNECTING TO NEW SEG.
     while( true )	{
       if ( (ix != 0) && (ix != (j+1)) && (ix <= PCHCON) )	{
         bool jump = false;
-        int nsflg = 0; 
-        // NOTE nsflg appears to be used for controlling output in the original, but isn't used here");
+        int nsflg = 0;  // will be set to 1 if the junction includes any new segments when NGF is in use.
+        // NOTE nsflg is not used correctly.
         do {
           
           if ( ix == 0 ) {
@@ -1895,7 +1807,7 @@ C     OF 3 OR MORE SEG.  ALSO FIND OLD SEG. CONNECTING TO NEW SEG.
         
           int ixx = ix-1;
           if ( jend != 1) {
-            xa= xa+ x[ixx]; // dies here if n == 1. ix is totally fried.
+            xa= xa+ x[ixx]; // dies here if n_segments == 1. ix is totally fried.
             ya= ya+ y[ixx];
             za= za+ z[ixx];
             ix= icon1[ixx];
@@ -1977,7 +1889,7 @@ C     OF 3 OR MORE SEG.  ALSO FIND OLD SEG. CONNECTING TO NEW SEG.
       ya= y2[j];
       za= z2[j];
     } /* while( true ) */
-  } /* for( j = 0; j < n; j++ ) */
+  } /* for( j = 0; j < n_segments; j++ ) */
   
   ax.resize(maxcon);
   bx.resize(maxcon);
@@ -1988,9 +1900,9 @@ C     OF 3 OR MORE SEG.  ALSO FIND OLD SEG. CONNECTING TO NEW SEG.
 void c_geometry::arc( int tag_id, int segment_count, nec_float rada,
     nec_float ang1, nec_float ang2, nec_float rad )
 {
-	int istart = n;
-	n += segment_count;
-	np= n;
+	int istart = n_segments;
+	n_segments += segment_count;
+	np= n_segments;
 	mp= m;
 	m_ipsym=0;
 	
@@ -2003,23 +1915,23 @@ void c_geometry::arc( int tag_id, int segment_count, nec_float rada,
 	}
 	
 	/* Reallocate tags buffer */
-	segment_tags.resize(n+m);
+	segment_tags.resize(n_segments+m);
 
 	/* Reallocate wire buffers */
-	x.resize(n);
-	y.resize(n);
-	z.resize(n);
-	x2.resize(n);
-	y2.resize(n);
-	z2.resize(n);
-	segment_radius.resize(n);
+	x.resize(n_segments);
+	y.resize(n_segments);
+	z.resize(n_segments);
+	x2.resize(n_segments);
+	y2.resize(n_segments);
+	z2.resize(n_segments);
+	segment_radius.resize(n_segments);
 
 	nec_float ang = degrees_to_rad(ang1);
 	nec_float dang = degrees_to_rad(ang2- ang1) / segment_count;
 	nec_float xs1= rada * cos(ang);
 	nec_float zs1= rada * sin(ang);
 
-	for(int i = istart; i < n; i++ )
+	for(int i = istart; i < n_segments; i++ )
 	{
 		ang += dang;
 		nec_float xs2 = rada * cos(ang);
@@ -2034,7 +1946,7 @@ void c_geometry::arc( int tag_id, int segment_count, nec_float rada,
 		zs1= zs2;
 		segment_radius[i]= rad;
 		segment_tags[i]= tag_id;
-	} /* for( i = ist; i < n; i++ ) */
+	} /* for( i = ist; i < n_segments; i++ ) */
 }
 
 
@@ -2238,7 +2150,7 @@ void c_geometry::patch( int nx, int ny,
 	} /* if ( nx != 0) */
 	
 	m_ipsym=0;
-	np= n;
+	np= n_segments;
 	mp= m;
 }
 
@@ -3101,9 +3013,9 @@ void c_geometry::get_current_coefficients(nec_float wavelength, complex_array& c
 	nec_float ar, ai, sh;
 	nec_complex cs1, cs2;
 	
-	if ( n != 0)
+	if ( n_segments != 0)
 	{	
-		for (int i = 0; i < n; i++ )
+		for (int i = 0; i < n_segments; i++ )
 		{
 			air[i] = 0.0;
 			aii[i] = 0.0;
@@ -3113,7 +3025,7 @@ void c_geometry::get_current_coefficients(nec_float wavelength, complex_array& c
 			cii[i] = 0.0;
 		}
 
-		for (int i = 0; i < n; i++ )
+		for (int i = 0; i < n_segments; i++ )
 		{
 			ar= real( curx[i]);
 			ai= imag( curx[i]);
@@ -3129,7 +3041,7 @@ void c_geometry::get_current_coefficients(nec_float wavelength, complex_array& c
 				cir[j] += cx[jx]* ar;
 				cii[j] += cx[jx]* ai;
 			}
-		} /* for( i = 0; i < n; i++ ) */
+		} /* for( i = 0; i < n_segments; i++ ) */
 	
 		for (int is = 0; is < nqds; is++ )
 		{
@@ -3160,10 +3072,10 @@ void c_geometry::get_current_coefficients(nec_float wavelength, complex_array& c
 		
 		} /* for( is = 0; is < nqds; is++ ) */
 	
-		for (int i = 0; i < n; i++ )
+		for (int i = 0; i < n_segments; i++ )
 			curx[i]= nec_complex( air[i]+cir[i], aii[i]+cii[i] );
 	
-	} /* if ( n != 0) */
+	} /* if ( n_segments != 0) */
 	
 	if ( m == 0)
 		return;
@@ -3192,7 +3104,7 @@ void c_geometry::frequency_scale(nec_float freq_mhz)
 	nec_float fr = (1.0e6 * freq_mhz) / em::speed_of_light();
 	DEBUG_TRACE("       fr=(" << fr << ")");
 
-	for (int i = 0; i < n; i++ )
+	for (int i = 0; i < n_segments; i++ )
 	{
 		x[i]= x_unscaled[i]* fr;
 		y[i]= y_unscaled[i]* fr;
