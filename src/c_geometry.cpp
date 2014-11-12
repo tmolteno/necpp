@@ -34,7 +34,6 @@ c_geometry::c_geometry()
 	
 	m_ipsym = 0;
 	
-	n_plus_m = 0;
 	n_plus_2m = 0;
 	n_plus_3m = 0;
 	
@@ -636,7 +635,6 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 		} /* for( i = 0; i < m; i++ ) */
 	} /* if ( m == 0) */
 
-	n_plus_m  = n_segments+m;
 	n_plus_2m = n_segments+2*m;
 	n_plus_3m = n_segments+3*m;
 
@@ -797,118 +795,113 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
 
 /*-----------------------------------------------------------------------*/
 
-/* subroutine helix generates segment geometry */
-/* data for a helix of segment_count segments */
+/* subroutine helix generates segment geometry
+  data for a helix of segment_count segments 
+ 
+           S   (F1) - Spacing between turns.
+           HL  (F2) - Total length of the helix.
+           A1  (F3) - Radius in x at z = 0.
+           B1  (F4) - Radius in y at z = 0.
+           A2  (F5) - Radius in x at z = HL.
+           B2  (F6) - Radius in y at z = HL.
+           RAD (F7) - Radius of wire.
+*/
 void c_geometry::helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
     nec_float a2, nec_float b2, nec_float rad, int segment_count, int tag_id )
 {
-	int ist;
-	nec_float turns, zinc, copy, sangle, hdia, turn, pitch, hmaj, hmin;
-	
-	ist= n_segments;
-	n_segments += segment_count;
-	np= n_segments;
-	mp= m;
-	m_ipsym=0;
-	
-	if ( segment_count < 1)
-		return;
-	
-	turns= fabs( hl/ s);
-	zinc= fabs( hl/ segment_count);
-	
-	segment_tags.resize(n_segments+m); /*????*/
-	
-	/* Reallocate wire buffers */
-	x.resize(n_segments);
-	y.resize(n_segments);
-	z.resize(n_segments);
-	x2.resize(n_segments);
-	y2.resize(n_segments);
-	z2.resize(n_segments);
-	segment_radius.resize(n_segments);
-	
-	z[ist]=0.;
-	for(int i = ist; i < n_segments; i++ )
-	{
-		segment_radius[i]= rad;
-		segment_tags[i]= tag_id;
-	
-		if ( i != ist )
-		z[i]= z[i-1]+ zinc;
-	
-		z2[i]= z[i]+ zinc;
-	
-		if ( a2 == a1)
-		{
-			if ( b1 == 0.)
-				b1= a1;
-		
-			x[i]= a1* cos(2.* pi()* z[i]/ s);
-			y[i]= b1* sin(2.* pi()* z[i]/ s);
-			x2[i]= a1* cos(2.* pi()* z2[i]/ s);
-			y2[i]= b1* sin(2.* pi()* z2[i]/ s);
-		}
-		else
-		{
-			if ( b2 == 0.)
-				b2= a2;
-		
-			x[i]=( a1+( a2- a1)* z[i]/ fabs( hl))* cos(2.* pi()* z[i]/ s);
-			y[i]=( b1+( b2- b1)* z[i]/ fabs( hl))* sin(2.* pi()* z[i]/ s);
-			x2[i]=( a1+( a2- a1)* z2[i]/ fabs( hl))* cos(2.* pi()* z2[i]/ s);
-			y2[i]=( b1+( b2- b1)* z2[i]/ fabs( hl))* sin(2.* pi()* z2[i]/ s);	
-		} /* if ( a2 == a1) */
-	
-		if ( hl > 0.)
-			continue;
-	
-		copy= x[i];
-		x[i]= y[i];
-		y[i]= copy;
-		copy= x2[i];
-		x2[i]= y2[i];
-		y2[i]= copy;	
-	} /* for( i = ist; i < n_segments; i++ ) */
-	
-	if ( a2 != a1)
-	{
-		sangle= atan( a2/( fabs( hl)+( fabs( hl)* a1)/( a2- a1)));
-		m_output->nec_printf(
-			"\n       THE CONE ANGLE OF THE SPIRAL IS %10.4f", sangle );
-		return;
-	}
-	
-	if ( a1 == b1)
-	{
-		hdia=2.* a1;
-		turn= hdia* pi();
-		pitch= atan( s/( pi()* hdia));
-		turn= turn/ cos( pitch);
-		pitch=180.* pitch/ pi();
-	}
-	else
-	{
-		if ( a1 >= b1)
-		{
-			hmaj=2.* a1;
-			hmin=2.* b1;
-		}
-		else
-		{
-			hmaj=2.* b1;
-			hmin=2.* a1;
-		}
-	
-		hdia= sqrt(( hmaj*hmaj+ hmin*hmin)/2* hmaj);
-		turn=2.* pi()* hdia;
-		pitch=(180./ pi())* atan( s/( pi()* hdia));
-	
-	} /* if ( a1 == b1) */
-	
-	m_output->nec_printf( "\n"
-		"       THE PITCH ANGLE IS: %.4f    THE LENGTH OF WIRE/TURN IS: %.4f",
-		pitch, turn );
+  int ist;
+  nec_float zinc, sangle, hdia, turn, pitch, hmaj, hmin;
+  
+  ist= n_segments;
+  n_segments += segment_count;
+  np= n_segments;
+  mp= m;
+  m_ipsym=0;
+  
+  if ( segment_count < 1)
+    return;
+  
+  zinc= fabs( hl/ segment_count);
+  
+  segment_tags.resize(n_segments+m); /*????*/
+  
+  /* Reallocate wire buffers */
+  x.resize(n_segments);
+  y.resize(n_segments);
+  z.resize(n_segments);
+  x2.resize(n_segments);
+  y2.resize(n_segments);
+  z2.resize(n_segments);
+  segment_radius.resize(n_segments);
+  
+  z[ist]=0.;
+  for(int i = ist; i < n_segments; i++ ) {
+    segment_radius[i]= rad;
+    segment_tags[i]= tag_id;
+  
+    if ( i != ist )
+    z[i]= z[i-1]+ zinc;
+  
+    z2[i]= z[i]+ zinc;
+  
+    if ( a2 == a1) {
+      if ( b1 == 0.)
+        b1= a1;
+    
+      x[i]= a1* cos(2.* pi()* z[i]/ s);
+      y[i]= b1* sin(2.* pi()* z[i]/ s);
+      x2[i]= a1* cos(2.* pi()* z2[i]/ s);
+      y2[i]= b1* sin(2.* pi()* z2[i]/ s);
+    } else {
+      if ( b2 == 0.)
+        b2= a2;
+    
+      x[i]=( a1+( a2- a1)* z[i]/ fabs( hl))* cos(2.* pi()* z[i]/ s);
+      y[i]=( b1+( b2- b1)* z[i]/ fabs( hl))* sin(2.* pi()* z[i]/ s);
+      x2[i]=( a1+( a2- a1)* z2[i]/ fabs( hl))* cos(2.* pi()* z2[i]/ s);
+      y2[i]=( b1+( b2- b1)* z2[i]/ fabs( hl))* sin(2.* pi()* z2[i]/ s);	
+    } /* if ( a2 == a1) */
+  
+    if ( hl <= 0.) {	
+      nec_float copy= x[i];
+      x[i]= y[i];
+      y[i]= copy;
+      copy= x2[i];
+      x2[i]= y2[i];
+      y2[i]= copy;
+    }
+  } /* for( i = ist; i < n_segments; i++ ) */
+  
+  if ( a2 != a1) {
+    sangle= atan( a2/( fabs( hl)+( fabs( hl)* a1)/( a2- a1)));
+    m_output->nec_printf(
+      "\n       THE CONE ANGLE OF THE SPIRAL IS %10.4f", sangle );
+    return;
+  }
+  
+  if ( a1 == b1) {
+    hdia=2.* a1;
+    turn= hdia* pi();
+    pitch= atan( s/( pi()* hdia));
+    turn= turn/ cos( pitch);
+    pitch=180.* pitch/ pi();
+  } else {
+    if ( a1 >= b1) {
+      hmaj=2.* a1;
+      hmin=2.* b1;
+    } else {
+      hmaj=2.* b1;
+      hmin=2.* a1;
+    }
+  
+    hdia= sqrt(( hmaj*hmaj+ hmin*hmin)/2* hmaj);
+    turn=2.* pi()* hdia;
+    pitch=(180./ pi())* atan( s/( pi()* hdia));
+  } /* if ( a1 == b1) */
+  
+  m_output->nec_printf( "\n"
+    "       THE PITCH ANGLE IS: %.4f    THE LENGTH OF WIRE/TURN IS: %.4f",
+    pitch, turn );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -1770,7 +1763,7 @@ void c_geometry::connect_segments( int ignd )
       if ( (ix != 0) && (ix != (j+1)) && (ix <= PCHCON) )	{
         bool jump = false;
         int nsflg = 0;  // will be set to 1 if the junction includes any new segments when NGF is in use.
-        // NOTE nsflg is not used correctly.
+        // NOTE nsflg is not used correctly as we don't use Numerical Greens Functions
         do {
           
           if ( ix == 0 ) {
@@ -3164,16 +3157,15 @@ void c_geometry::fflds(nec_float rox, nec_float roy, nec_float roz,
 }
 
 
-int c_geometry::test_ek_approximation(int seg1, int seg2)
-{
-	nec_float segment_ratio = segment_radius[seg2] / segment_radius[seg1];
-	
-	nec_float xi = fabs(cab[seg1]*cab[seg2] + sab[seg1]*sab[seg2] + salp[seg1]*salp[seg2]);
-	
-	if ( (xi < 0.999999) || (fabs(segment_ratio-1.0) > 1.e-6))
-		return 2;
-	else
-		return 0;
+int c_geometry::test_ek_approximation(int seg1, int seg2) {
+  nec_float segment_ratio = segment_radius[seg2] / segment_radius[seg1];
+  
+  nec_float xi = fabs(cab[seg1]*cab[seg2] + sab[seg1]*sab[seg2] + salp[seg1]*salp[seg2]);
+  
+  if ( (xi < 0.999999) || (fabs(segment_ratio-1.0) > 1.e-6))
+    return 2;
+  else
+    return 0;
 }
 
 nec_float c_geometry::patch_angle(int patch_index, nec_float in_ax, nec_float in_ay, nec_float in_az)

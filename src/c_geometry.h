@@ -138,14 +138,17 @@ public:
 	real_array t1x, t1y, t1z, t2x, t2y, t2z;	// t1, t2 basis co-ordinates?
 	real_array px, py, pz, pbi, psalp;			// patch data
 
-	int n_plus_m, n_plus_2m, n_plus_3m; /* n+m,n+2m,n+3m */
 	
 	int_array icon1, icon2;
 	// Connected Segment Information (was common  /segj/  in FORTRAN code)
 	int jsno, nscon, maxcon; /* Max. no. connections */
 	int_array jco;
 	real_array ax, bx, cx;
-		
+	
+  inline int n_plus_m(void) const {
+    return n_segments + m;
+  }
+  int n_plus_2m, n_plus_3m; /* n+m,n+2m,n+3m */
 private:
 	//	The geometry data measured in meters is stored in these arrays
 	//	and the x,y,z,si,bi arrays are then scaled for each frequency

@@ -103,7 +103,7 @@ void nec_context::calc_prepare()
 	DEBUG_TRACE("calc_prepare()");
 	iflow=1;		
 	
-	int n_plus_m = m_geometry->n_plus_m;
+	int n_plus_m = m_geometry->n_plus_m();
 	/* Allocate some buffers */
 	air.resize(n_plus_m);
 	aii.resize(n_plus_m);
@@ -247,8 +247,7 @@ nec_float nec_context::benchmark()
 			nec.ex_card(EXCITATION_LINEAR, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 			nec.fr_card(0, 2, 2400.0, 100.0);
 			nec.rp_card(0, 1, 1, 0,5,0,0, 90.0, 90.0, 0.0, 0.0, 0.0, 0.0);
-			double g = 0;
-			g = nec.get_gain_max();
+			nec.get_gain_max();
 		}
 	}
 	/* time the process */
@@ -2584,128 +2583,111 @@ void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
 void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
     complex_array& cw, int ncw, int nrow, int itrp )
 {
-	nec_float fsign=1.0;
-	complex_array emel(9);
-	
-	/*! -1 offset to "m_geometry->jsno" for array indexing */
-	int jsnox = m_geometry->jsno-1;
-	
-	if (itrp < 0)
-		return;
+  nec_float fsign=1.0;
+  complex_array emel(9);
+  
+  /*! -1 offset to "m_geometry->jsno" for array indexing */
+  int jsnox = m_geometry->jsno-1;
+  
+  if (itrp < 0)
+    return;
 
-	int k=-1;
-	int icgo=0;
-	
-	/* observation loop */
-	for (int i = i1-1; i < i2; i++ )
-	{
-		k++;
-		nec_float xi = m_geometry->x[i];
-		nec_float yi= m_geometry->y[i];
-		nec_float zi= m_geometry->z[i];
-		nec_float cabi= m_geometry->cab[i];
-		nec_float sabi= m_geometry->sab[i];
-		nec_float salpi= m_geometry->salp[i];
-		
-		int ipch=0;
-		
-		if ( m_geometry->icon1[i] >= PCHCON)
-		{
-			ipch= m_geometry->icon1[i]-PCHCON;
-			fsign=-1.;
-		}
-		
-		if ( m_geometry->icon2[i] >= PCHCON)
-		{
-			ipch= m_geometry->icon2[i]-PCHCON;
-			fsign=1.;
-		}
-		
-		/* source loop */
-		int jl = -1;
-		for (int j = j1; j <= j2; j++ )
-		{
-			jl += 2;
-			int js = j-1;
-			t1xj= m_geometry->t1x[js];
-			t1yj= m_geometry->t1y[js];
-			t1zj= m_geometry->t1z[js];
-			t2xj= m_geometry->t2x[js];
-			t2yj= m_geometry->t2y[js];
-			t2zj= m_geometry->t2z[js];
-			xj= m_geometry->px[js];
-			yj= m_geometry->py[js];
-			zj= m_geometry->pz[js];
-			m_s = m_geometry->pbi[js];
-		
-			/* ground loop */
-			#warning weird problem to test here. replaced loop variable called ip
-			for (int ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ )
-			{	
-				if ( ((ipch == j) || (icgo != 0)) && (ipgnd != 2) )
-				{
-					if ( icgo <= 0 )
-					{
-						ASSERT(ipgnd != 2);
-						pcint( xi, yi, zi, cabi, sabi, salpi, emel);
-					
-						nec_float angle = pi()* m_geometry->segment_length[i]* fsign;
-						nec_float pxl = sin(angle);
-						nec_float pyl = cos(angle);
+  int k=-1;
+  int icgo=0;
+  
+  /* observation loop */
+  for (int i = i1-1; i < i2; i++ ) {
+    k++;
+    nec_float xi = m_geometry->x[i];
+    nec_float yi= m_geometry->y[i];
+    nec_float zi= m_geometry->z[i];
+    nec_float cabi= m_geometry->cab[i];
+    nec_float sabi= m_geometry->sab[i];
+    nec_float salpi= m_geometry->salp[i];
+    
+    int ipch=0;
+    
+    if ( m_geometry->icon1[i] >= PCHCON) {
+      ipch= m_geometry->icon1[i]-PCHCON;
+      fsign=-1.;
+    }
+    
+    if ( m_geometry->icon2[i] >= PCHCON) {
+      ipch= m_geometry->icon2[i]-PCHCON;
+      fsign=1.;
+    }
+    
+    /* source loop */
+    int jl = -1;
+    for (int j = j1; j <= j2; j++ ) {
+      jl += 2;
+      int js = j-1;
+      t1xj= m_geometry->t1x[js];
+      t1yj= m_geometry->t1y[js];
+      t1zj= m_geometry->t1z[js];
+      t2xj= m_geometry->t2x[js];
+      t2yj= m_geometry->t2y[js];
+      t2zj= m_geometry->t2z[js];
+      xj= m_geometry->px[js];
+      yj= m_geometry->py[js];
+      zj= m_geometry->pz[js];
+      m_s = m_geometry->pbi[js];
+    
+      /* ground loop */
+      #warning weird problem to test here. replaced loop variable called ip
+      for (int ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) {	
+        if ( ((ipch == j) || (icgo != 0)) && (ipgnd != 2) ) {
+          if ( icgo <= 0 ) {
+            ASSERT(ipgnd != 2);
+            pcint( xi, yi, zi, cabi, sabi, salpi, emel);
+          
+            nec_float angle = pi()* m_geometry->segment_length[i]* fsign;
+            nec_float pxl = sin(angle);
+            nec_float pyl = cos(angle);
 
-						exc= emel[8]* fsign;
-					
-						m_geometry->trio(i+1);
-					
-						int il= i-ncw;
-						if ( i < m_geometry->np)
-							il += (il/m_geometry->np)*2*m_geometry->mp;
-					
-						if ( itrp == 0 )
-							cw[k+il*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
-						else
-							cw[il+k*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
-					
-					} /* if ( icgo <= 0 ) */
-				
-					if ( itrp == 0)
-					{
-						in_cm[k+(jl-1)*nrow]= emel[icgo];
-						in_cm[k+jl*nrow]    = emel[icgo+4];
-					}
-					else
-					{
-						in_cm[(jl-1)+k*nrow]= emel[icgo];
-						in_cm[jl+k*nrow]    = emel[icgo+4];
-					}
-				
-					icgo++;
-					if ( icgo == 4)
-						icgo=0;
-				
-					continue;
-				
-				} /* if ( ((ipch == (j+1)) || (icgo != 0)) && (ipgnd != 2) ) */
-			
-				unere( xi, yi, zi, ipgnd == 2);
-			
-				/* normal fill */
-				if ( itrp == 0)
-				{
-					in_cm[k+(jl-1)*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
-					in_cm[k+jl*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
-					continue;
-				}
-			
-				/* transposed fill */
-				in_cm[(jl-1)+k*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
-				in_cm[jl+k*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
-			
-			} /* for( ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) */
-		
-		} /* for( j = j1; j <= j2; j++ ) */
-		
-	} /* for( i = i1-1; i < i2; i++ ) */
+            exc= emel[8]* fsign;
+          
+            m_geometry->trio(i+1);
+          
+            int il= i-ncw;
+            if ( i < m_geometry->np)
+              il += (il/m_geometry->np)*2*m_geometry->mp;
+          
+            if ( itrp == 0 )
+              cw[k+il*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
+            else
+              cw[il+k*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
+          } /* if ( icgo <= 0 ) */
+        
+          if ( itrp == 0) {
+            in_cm[k+(jl-1)*nrow]= emel[icgo];
+            in_cm[k+jl*nrow]    = emel[icgo+4];
+          } else {
+            in_cm[(jl-1)+k*nrow]= emel[icgo];
+            in_cm[jl+k*nrow]    = emel[icgo+4];
+          }
+        
+          icgo++;
+          if ( icgo == 4)
+            icgo=0;
+        
+          continue;
+        } /* if ( ((ipch == (j+1)) || (icgo != 0)) && (ipgnd != 2) ) */
+      
+        unere( xi, yi, zi, ipgnd == 2);
+      
+        /* normal fill */
+        if ( itrp == 0) {
+          in_cm[k+(jl-1)*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
+          in_cm[k+jl*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
+        } else {
+          /* transposed fill */
+          in_cm[(jl-1)+k*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
+          in_cm[jl+k*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
+        }
+      } /* for( ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) */
+    } /* for( j = j1; j <= j2; j++ ) */
+  } /* for( i = i1-1; i < i2; i++ ) */
 }
 
 /*-----------------------------------------------------------------------*/
@@ -3839,7 +3821,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 	// TODO: Split the following loop up into two loops i=1:n and i=1:m
 	// to loop over the patches and the segments seperately
 	
-	for (int i = 0; i < m_geometry->n_plus_m; i++ )
+	for (int i = 0; i < m_geometry->n_plus_m(); i++ )
 	{
 		if ( i < n )
 		{
@@ -3915,7 +3897,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 			e[i2] = cx*m_geometry->t1x[patch_index] + cy*m_geometry->t1y[patch_index] + cz*m_geometry->t1z[patch_index];
 			e[i1] = cx*m_geometry->t2x[patch_index] + cy*m_geometry->t2y[patch_index] + cz*m_geometry->t2z[patch_index];
 		} /* if ( i < n) */
-	} /* for( i = 0; i < m_geometry->n_plus_m; i++ ) */
+	} /* for( i = 0; i < m_geometry->n_plus_m(); i++ ) */
 }
 
 
@@ -5894,196 +5876,183 @@ void nec_context::impedance_print( int in1, int in2, int in3, nec_float fl1, nec
 /* fill incident field array for charge discontinuity voltage source */
 void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
 {
-	static nec_complex s_CCJ(0.0,-0.01666666667);
-	
-	int i, jx, j, jp1, ipr, i1;
-	nec_float xi, yi, zi, ai, cabi, sabi, salpi, tx, ty, tz;
-	nec_complex curd, etk, ets, etc;
-	
-	is--;
-	i= m_geometry->icon1[is];
-	m_geometry->icon1[is]=0;
-	m_geometry->tbf( is+1,0);
-	m_geometry->icon1[is]= i;
-	m_s = m_geometry->segment_length[is]*.5;
-	curd= s_CCJ * v/(( log(2.* m_s/ m_geometry->segment_radius[is])-1.)*( m_geometry->bx[m_geometry->jsno-1]*
-		cos( two_pi() * m_s)+ m_geometry->cx[m_geometry->jsno-1]* sin( two_pi() * m_s))* wavelength);
-	vqds[nqds]= v;
-	iqds[nqds]= is+1;
-	nqds++;
-	
-	for( jx = 0; jx < m_geometry->jsno; jx++ )
-	{
-		j= m_geometry->jco[jx]-1;
-		jp1 = j+1;
-		m_s= m_geometry->segment_length[j];
-		m_b= m_geometry->segment_radius[j];
-		xj= m_geometry->x[j];
-		yj= m_geometry->y[j];
-		zj= m_geometry->z[j];
-		cabj= m_geometry->cab[j];
-		sabj= m_geometry->sab[j];
-		salpj= m_geometry->salp[j];
-	
-		if ( m_use_exk == true)
-		{
-		ipr= m_geometry->icon1[j];
-	
-		if (ipr > PCHCON) ind1=2;
-		else if ( ipr < 0 )
-		{
-			ipr=- ipr;
-			ipr--;
-			if ( -m_geometry->icon1[ipr-1] != jp1 )
-				ind1=2;
-			else
-			{
-				ind1 = m_geometry->test_ek_approximation(j,ipr);
-				
-				int ind_test;
-				xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
-			}
-		}  /* if ( ipr < 0 ) */
-		else if ( ipr == 0 )
-			ind1=1;
-		else /* ipr > 0 */
-		{
-			ipr--;
-			if ( ipr != j )
-			{
-				if ( m_geometry->icon2[ipr] != jp1)
-					ind1=2;
-				else
-				{
-					ind1 = m_geometry->test_ek_approximation(j,ipr);
-					
-					int ind_test;
-					xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-					if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-						ind_test=2;
-					else
-						ind_test=0;
-					ASSERT(ind_test == ind1);
-				}
-			} /* if ( ipr != j ) */
-			else
-			{
-				if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
-					ind1=2;
-				else
-					ind1=0;
-			}
-		} /* else */
-	
-		ipr= m_geometry->icon2[j];
-		if (ipr > PCHCON) ind2=2;
-		else if ( ipr < 0 )
-		{
-			ipr = -ipr;
-			ipr--;
-			if ( -m_geometry->icon2[ipr] != jp1 )
-				ind1=2;
-			else
-			{
-				ind1 = m_geometry->test_ek_approximation(j,ipr);
-				
-				int ind_test;
-				xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
-			}
-		} /* if ( ipr < 0 ) */
-		else if ( ipr == 0 )
-			ind2=1;
-		else /* ipr > 0 */
-		{
-			ipr--;
-			if ( ipr != j )
-			{
-				if ( m_geometry->icon1[ipr] != jp1)
-					ind2=2;
-				else
-				{
-					ind2 = m_geometry->test_ek_approximation(j,ipr);
-					
-					int ind_test;
-					xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-					if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-						ind_test=2;
-					else
-						ind_test=0;
-					ASSERT(ind_test == ind2);
-				}
-			} /* if ( ipr != j )*/
-			else
-			{
-				if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
-					ind1=2;
-				else
-					ind1=0;
-			}
-		} /* else */
-	
-		} /* if ( m_use_exk == true) */
-	
-		int n = m_geometry->n_segments;
-		for( i = 0; i < n; i++ )
-		{
-			xi= m_geometry->x[i];
-			yi= m_geometry->y[i];
-			zi= m_geometry->z[i];
-			ai= m_geometry->segment_radius[i];
-			efld( xi, yi, zi, ai, (i != j));
-			cabi= m_geometry->cab[i];
-			sabi= m_geometry->sab[i];
-			salpi= m_geometry->salp[i];
-			etk= exk* cabi+ eyk* sabi+ ezk* salpi;
-			ets= exs* cabi+ eys* sabi+ ezs* salpi;
-			etc= exc* cabi+ eyc* sabi+ ezc* salpi;
-			e[i]= e[i]-( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd;
-		}
-	
-		int m = m_geometry->m;
-		if ( m != 0)
-		{
-			i1= n-1;
-			for( i = 0; i < m; i++ )
-			{
-				xi= m_geometry->px[i];
-				yi= m_geometry->py[i];
-				zi= m_geometry->pz[i];
-				hsfld( xi, yi, zi,0.);
-				i1++;
-				tx= m_geometry->t2x[i];
-				ty= m_geometry->t2y[i];
-				tz= m_geometry->t2z[i];
-				etk= exk* tx+ eyk* ty+ ezk* tz;
-				ets= exs* tx+ eys* ty+ ezs* tz;
-				etc= exc* tx+ eyc* ty+ ezc* tz;
-				e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx] )* curd* m_geometry->psalp[i];
-				i1++;
-				tx= m_geometry->t1x[i];
-				ty= m_geometry->t1y[i];
-				tz= m_geometry->t1z[i];
-				etk= exk* tx+ eyk* ty+ ezk* tz;
-				ets= exs* tx+ eys* ty+ ezs* tz;
-				etc= exc* tx+ eyc* ty+ ezc* tz;
-				e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd* m_geometry->psalp[i];
-			}	
-		} /* if ( m != 0) */
-	
-		if ( nload > 0 )
-			e[j] += zarray[j]* curd*(m_geometry->ax[jx]+ m_geometry->cx[jx]);
-	
-	} /* for( jx = 0; jx < m_geometry->jsno; jx++ ) */
+  static nec_complex s_CCJ(0.0,-0.01666666667);
+  
+  int i, jx, j, jp1, ipr, i1;
+  nec_float xi, yi, zi, ai, cabi, sabi, salpi, tx, ty, tz;
+  nec_complex curd, etk, ets, etc;
+  
+  is--;
+  i= m_geometry->icon1[is];
+  m_geometry->icon1[is]=0;
+  m_geometry->tbf( is+1,0);
+  m_geometry->icon1[is]= i;
+  m_s = m_geometry->segment_length[is]*.5;
+  curd= s_CCJ * v/(( log(2.* m_s/ m_geometry->segment_radius[is])-1.)*( m_geometry->bx[m_geometry->jsno-1]*
+    cos( two_pi() * m_s)+ m_geometry->cx[m_geometry->jsno-1]* sin( two_pi() * m_s))* wavelength);
+  vqds[nqds]= v;
+  iqds[nqds]= is+1;
+  nqds++;
+  
+  for( jx = 0; jx < m_geometry->jsno; jx++ ) {
+    j= m_geometry->jco[jx]-1;
+    jp1 = j+1;
+    m_s= m_geometry->segment_length[j];
+    m_b= m_geometry->segment_radius[j];
+    xj= m_geometry->x[j];
+    yj= m_geometry->y[j];
+    zj= m_geometry->z[j];
+    cabj= m_geometry->cab[j];
+    sabj= m_geometry->sab[j];
+    salpj= m_geometry->salp[j];
+  
+    if ( m_use_exk == true) {
+    ipr= m_geometry->icon1[j];
+  
+    if (ipr > PCHCON)
+      ind1=2;
+    else if ( ipr < 0 ) {
+      ipr=- ipr;
+      ipr--;
+      if ( -m_geometry->icon1[ipr-1] != jp1 )
+        ind1=2;
+      else
+      {
+        ind1 = m_geometry->test_ek_approximation(j,ipr);
+        
+        int ind_test;
+        xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
+        if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
+          ind_test=2;
+        else
+          ind_test=0;
+        ASSERT(ind_test == ind1);
+      }
+    }  /* if ( ipr < 0 ) */
+    else if ( ipr == 0 )
+      ind1=1;
+    else /* ipr > 0 */
+    {
+      ipr--;
+      if ( ipr != j ) {
+        if ( m_geometry->icon2[ipr] != jp1)
+          ind1=2;
+        else {
+          ind1 = m_geometry->test_ek_approximation(j,ipr);
+          
+          int ind_test;
+          xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
+          if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
+            ind_test=2;
+          else
+            ind_test=0;
+          ASSERT(ind_test == ind1);
+        }
+      } /* if ( ipr != j ) */
+      else {
+        if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
+          ind1=2;
+        else
+          ind1=0;
+      }
+    } /* else */
+  
+    ipr= m_geometry->icon2[j];
+    if (ipr > PCHCON) ind2=2;
+    else if ( ipr < 0 ) {
+      ipr = -ipr;
+      ipr--;
+      if ( -m_geometry->icon2[ipr] != jp1 )
+        ind1=2;
+      else {
+        ind1 = m_geometry->test_ek_approximation(j,ipr);
+        
+        int ind_test;
+        xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
+        if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
+          ind_test=2;
+        else
+          ind_test=0;
+        ASSERT(ind_test == ind1);
+      }
+    } /* if ( ipr < 0 ) */
+    else if ( ipr == 0 )
+      ind2=1;
+    else /* ipr > 0 */
+    {
+      ipr--;
+      if ( ipr != j ) {
+        if ( m_geometry->icon1[ipr] != jp1)
+          ind2=2;
+        else {
+          ind2 = m_geometry->test_ek_approximation(j,ipr);
+          
+          int ind_test;
+          xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
+          if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
+            ind_test=2;
+          else
+            ind_test=0;
+          ASSERT(ind_test == ind2);
+        }
+      } /* if ( ipr != j )*/
+      else {
+        if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
+          ind1=2;
+        else
+          ind1=0;
+      }
+    } /* else */
+  
+    } /* if ( m_use_exk == true) */
+  
+    int n = m_geometry->n_segments;
+    for( i = 0; i < n; i++ ) {
+      xi= m_geometry->x[i];
+      yi= m_geometry->y[i];
+      zi= m_geometry->z[i];
+      ai= m_geometry->segment_radius[i];
+      efld( xi, yi, zi, ai, (i != j));
+      cabi= m_geometry->cab[i];
+      sabi= m_geometry->sab[i];
+      salpi= m_geometry->salp[i];
+      etk= exk* cabi+ eyk* sabi+ ezk* salpi;
+      ets= exs* cabi+ eys* sabi+ ezs* salpi;
+      etc= exc* cabi+ eyc* sabi+ ezc* salpi;
+      e[i]= e[i]-( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd;
+    }
+  
+    int m = m_geometry->m;
+    if ( m != 0) {
+      i1= n-1;
+      for( i = 0; i < m; i++ ) {
+        xi= m_geometry->px[i];
+        yi= m_geometry->py[i];
+        zi= m_geometry->pz[i];
+        hsfld( xi, yi, zi,0.);
+        i1++;
+        tx= m_geometry->t2x[i];
+        ty= m_geometry->t2y[i];
+        tz= m_geometry->t2z[i];
+        etk= exk* tx+ eyk* ty+ ezk* tz;
+        ets= exs* tx+ eys* ty+ ezs* tz;
+        etc= exc* tx+ eyc* ty+ ezc* tz;
+        e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx] )* curd* m_geometry->psalp[i];
+        i1++;
+        tx= m_geometry->t1x[i];
+        ty= m_geometry->t1y[i];
+        tz= m_geometry->t1z[i];
+        etk= exk* tx+ eyk* ty+ ezk* tz;
+        ets= exs* tx+ eys* ty+ ezs* tz;
+        etc= exc* tx+ eyc* ty+ ezc* tz;
+        e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd* m_geometry->psalp[i];
+      }	
+    } /* if ( m != 0) */
+  
+    if ( nload > 0 )
+      e[j] += zarray[j]* curd*(m_geometry->ax[jx]+ m_geometry->cx[jx]);
+  
+  } /* for( jx = 0; jx < m_geometry->jsno; jx++ ) */
 }
 	
 /*-----------------------------------------------------------------------*/
@@ -6142,7 +6111,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 	complex_array t01(9), t10(9), t20(9), t11(9);
 
 	/*! tolerance for hitting upper limit */
-	const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m);
+	const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m());
 
 	/*! upper limit */
 	const nec_float zend = ze - ep;
@@ -6322,7 +6291,7 @@ loop12:
       GO TO 5
 */
 	nt=0;
-	if ( ns >= m_geometry->n_plus_m )
+	if ( ns >= m_geometry->n_plus_m() )
 	{
 		nec_error_mode em(m_output);
 		m_output.string("ROM2 -- STEP SIZE LIMITED AT Z = ");
@@ -6395,7 +6364,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 	}
 	
 	/*! tolerance for hitting upper limit */
-	const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m);
+	const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m());
 
 	/*! upper limit */
 	const nec_float zend = ze - ep;
@@ -6492,7 +6461,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 		if ( tr > rx)
 		{
 			nt=0;
-			if ( ns <= m_geometry->n_plus_m )
+			if ( ns <= m_geometry->n_plus_m() )
 			{
 				// halve step size
 				ns = ns*2;
