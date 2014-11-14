@@ -26,13 +26,17 @@
  The inspiration for this language is OpenSCAD.
   
     /* This is a comment */
+    w0 = wire(start=[1,2,3], end=[2,3,4], r=0.01);
+    w1 = wire(start=w0.end,  end=[2,3,5], r=0.01);
+    helix();
+    patch();
+
+    curve(p0=w1.end, p1=[], p2=[], p3=[], r=0.01);   /* bezier curve */
+    patch(start=[2,3,5], width=1.5, height=1.5);  /* rectangle */
+    scale(3.0);  /* scale all dimensions by 3.0 */
+
     geometry {
-      w0 = wire(start=[1,2,3], end=[2,3,4], r=0.01, n=5);
-      w1 = wire(start=w0.end,  end=[2,3,5], r=0.01, n=5);
-      arc(origin=[0,1,2], arc_radius=1.0, r=0.01 );
-      helix();
-      patch();
-      scale(3.0);
+      segment_size = 0.1; /* should be between 1% and 5% of a wavelength */
     }
 
     ground {
@@ -41,8 +45,7 @@
 
     excitation {
       type=VOLTAGE;
-      wire=w0;
-      segment=3;
+      point=w0.start;
       freq=range(start=1.575GHz, end=1.675GHz, n=5);
       extended_thin_wire_kernel = false; /* default */
     }
@@ -56,7 +59,22 @@
     execute();
 */
 
+/* GMSH-like geometry
+   
+    lc = 0.8;
+    Point(1) = {10.0,-10.0,2.0,lc};
+    Point(2) = {-10.0,-10.0,2.0,lc};
+    Point(3) = {-10.0,10.0,2.0,lc};
+    Point(4) = {10.0,10.0,2.0,lc};
+    Line(1) = {1,2};
+    Line(2) = {2,3};
+    Line(3) = {3,4};
+    Line(4) = {4,1};
+    Line Loop(5) = {1,2,3,4};
+    Plane Surface(6) = {5};
 
+    `gmsh #{$file_geo} -2 -o #{$file_msh}`
+*/
 header 
 {
   // The statements in this block appear in all header files
@@ -99,13 +117,13 @@ public:
 }
 
 startRule
-  :	( necFile
+  :	( electroFile
           | /* nothing */
           )
           EOF
   ;
 
-necFile
+electroFile
   :
     {
       nec->initialize();
@@ -125,34 +143,29 @@ necFile
 //
 
 geometrySection
+        {       int gpflag = 0; }
 	:
-		(geometryLine)+
-		geometryEnd
+		GEOMETRY(gpflag=intNum) LBRACE (geometryExpression)+ RBRACE
+                {
+                        c_geometry* geo = nec->get_geometry();
+                        geo->geometry_complete(nec, gpflag, 0);
+                        nec->calc_prepare();
+                        cout << "Geometry Complete" << endl;
+                }
 	;
 	
-geometryLine
-	:	wire
+geometryExpression
+	:	wireExpression SEMI;
 	;
 
 	
-geometryEnd
-	{	int gpflag = 0;	}
-	:	GE (gpflag=intNum)? NEWLINE
-		{
-			c_geometry* geo = nec->get_geometry();
-			geo->geometry_complete(nec, gpflag, 0);
-			nec->calc_prepare();
-			cout << "Geometry Complete" << endl;
-		}
-	;
-
-wire
+wireExpression
 	{	int tag = 0, ns = 0;
 		double xw1, yw1, zw1, xw2, yw2, zw2, rad;
 		double rDel = 1.0, rad1 = 1.0, rad2 = 0.0;
 		
 	}
-	:	GW	tag=intNum ns=intNum
+	:	WIRE	tag=intNum ns=intNum
 			xw1=realNum yw1=realNum zw1=realNum
 			xw2=realNum yw2=realNum zw2=realNum
 			(	rad=realNum NEWLINE
@@ -180,6 +193,30 @@ wire
 		}
 	;	
 	
+/////////////////////////////////////////////////////////////
+//
+//      Excitation Section
+//
+
+excitationSection
+        :       EXCITATION LBRACE (excitationLine)+ RBRACE
+        ;
+        
+excitationLine
+        :       frCard
+        |       ekCard
+        |       exCard
+        |       gnCard
+        |       ldCard
+        |       ntCard
+        |       rpCard
+        |       ptCard
+        |       tlCard
+        |       xqCard
+        |       enCard
+        ;
+
+
 /////////////////////////////////////////////////////////////
 //
 //	Analysis Section
@@ -383,6 +420,19 @@ enCard
 	}
 	;
 
+
+
+parameterList
+        {       }
+        :       LBRACKET parameterAssign (COMMA parameterAssign)* RBRACKET
+        ;
+
+parameterAssign
+        :       id = Value
+        {       }
+        ;
+
+
 protected
 realNum returns [double val]
 	:	r:REAL
@@ -416,25 +466,17 @@ options
 	charVocabulary = '\3'..'\377';
 	defaultErrorHandler=false;
 }
-
-/*
-	To make this column sensitive, use something like...
-	 
-	CM	:	{getColumn()==1}? "CM"	(~'\n')* '\n';
-*/
-CM	:	"cm"	(~'\n')* '\n' { newline(); } ;
-CE	:	"ce"	(~'\n')* '\n' { newline(); } ;
 	
-GW	:	"gw"	;
-GC	:	"gc"	;
-GH	:	"gh"	;
+GEOMETRY	:	"geometry"	;
+RAD_PATTERN	:	"radiation_pattern"	;
+SEMI	        :	";"	;
 GE	:	"ge"	;
 GX	:	"gx"	;
 
-SP	:	"sp"	;
+WIRE	:	"wire"	;
+HELIX	:	"helix"	;
 
-EK	:	"ek"	;
-EX	:	"ex"	;
+FOR	:	"for"	;
 FR	:	"fr"	;
 GN	:	"gn"	;
 LD	:	"ld"	;
