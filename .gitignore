@@ -8,6 +8,8 @@
 *.o
 *.lo
 *.la
+src/nec2++
+src/nec2diff
 
 # Packages #
 ############
@@ -35,14 +37,27 @@
 *.outc
 *.outcpp
 *.outf
+*.swp
 *.diff
 
-config.*
+# Autotools #
+#############
 Makefile
 Makefile.in
-depcomp
 aclocal.m4
-m4
+autom4te.cache/
+compile
+config.*
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+m4/
+missing
+src/.deps/
+src/.libs/
+stamp-h1
 
 html/*
 xml/*
