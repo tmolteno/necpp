@@ -283,7 +283,6 @@ public:
 class nec_norm_rx_pattern : public nec_base_result
 {
 	// Receiving Pattern
-	nec_float _norm_factor;
 	nec_float _eta, _axial_ratio;
 	int _segment_number;
 	string _type;
