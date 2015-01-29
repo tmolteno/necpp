@@ -101,8 +101,9 @@ void str_toupper(std::string &str)
 	std::transform(str.begin(), 
 		str.end(), 
 		str.begin(),
-		[](char c) { return (toupper(c)); });
-//		(int(*)(int)) std::toupper);
+		::toupper);
+//	[](char c) { return (toupper(c)); });
+	//		(int(*)(int)) std::toupper);
 }
 void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 {
