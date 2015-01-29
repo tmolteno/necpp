@@ -2634,7 +2634,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
       m_s = m_geometry->pbi[js];
     
       /* ground loop */
-      #warning weird problem to test here. replaced loop variable called ip
+     // TODO weird problem to test here. replaced loop variable called ip
       for (int ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) {	
         if ( ((ipch == j) || (icgo != 0)) && (ipgnd != 2) ) {
           if ( icgo <= 0 ) {

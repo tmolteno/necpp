@@ -210,7 +210,7 @@ using namespace std;
 #include "matrix_algebra.h"
 #include "nec_output.h"
 
-#include "config.h"
+#include "common.h"
 
 #ifdef NEC_MATRIX_CHECK
 //#define NEC_MATRIX_CHECK

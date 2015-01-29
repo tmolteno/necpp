@@ -19,6 +19,7 @@
 #ifndef __nec_wire__
 #define __nec_wire__
 
+#include <algorithm>
 #include "math_util.h"
 
 /*!\brief A class to handle properties of wires.
