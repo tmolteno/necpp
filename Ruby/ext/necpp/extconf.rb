@@ -1,6 +1,7 @@
 require 'mkmf'
 
-NECPP_SRC = "/home/tim/github/necpp/src"
+#NECPP_SRC = "/home/tim/github/necpp/src"
+NECPP_SRC = "../../../src"
 $CFLAGS << " -I#{NECPP_SRC}"
 $CPPFLAGS << " -I#{NECPP_SRC}"
 
