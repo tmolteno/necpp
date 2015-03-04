@@ -2,8 +2,10 @@
 #include <stdio.h>
 
 /*
-	Enter the following file into test_nec.c, and compile with
-	gcc -o test_nec test_nec.c -L . -lnecpp -lm -lstdc++
+  C Example using nec2++ as a library
+  
+  Enter the following file into test_nec.c, and compile with
+  gcc -o test_nec test_nec.c -L . -lnecpp -lm
 */
 
 #define NEC_ERROR_HANDLE(_x) { if (_x != 0) printf("Error: %s\n", nec_error_message()); }
@@ -23,7 +25,6 @@ void seven_wire_antenna() {
   nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
   nec_fr_card(nec, 0, 1, 1600.0, 0.0);
   nec_ex_card(nec, 0, 1, 1,  0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0);
-//	nec_rp_card(nec, 0, 90, 1, 0,0,0,0, 0, 90, 1, 0, 0, 0);
   nec_rp_card(nec, 0, 17, 45, 0,5,0,0, 0, 0, 5, 8, 0, 0);
   
   printf("Impedance: %f, %f\n",nec_impedance_real(nec,0), nec_impedance_imag(nec,0));
@@ -35,12 +36,13 @@ void seven_wire_antenna() {
 }
 
 void simple_example() {
-  /* 	GW 0 9 0. 0. 2. 0. 0. 7 .1
-          GE 1
-          FR 0 1 0 30.
-          EX 0 5 0 1.
-          GN 1
-          RP 0 90 1 0000 0 90 1 0 */
+  /*  GW 0 9 0. 0. 2. 0. 0. 7 .1
+      GE 1
+      FR 0 1 0 30.
+      EX 0 5 0 1.
+      GN 1
+      RP 0 90 1 0000 0 90 1 0 
+  */
   
   nec_context* nec;	
   nec = nec_create();
