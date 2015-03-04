@@ -21,13 +21,16 @@
 #	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
+LD_LIBRARY_PATH=/usr/lib/atlas-base/atlas solve
+
 all: test_cpp
 
 test_static: test_nec.c
-	gcc --static -o test_static test_nec.c -lnecpp -lstdc++ -lm
+	gcc --static -o test_static test_nec.c -lnecpp -lstdc++ -lm -llapack  -lblas
 
-test_nec: test_nec.c
+test_c: test_nec.c
 	gcc -o test_nec test_nec.c -lnecpp
+	./test_nec
 
 
 #####################################################################################
@@ -49,7 +52,6 @@ CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
 CXXFLAGS=-I ../src/ -I .. -O3
 
-LD_LIBRARY_PATH=/usr/lib/atlas-base/atlas solve
 
 test_cpp: ${CPP_OBJS} ${NECPP_OBJS}
 	gcc -o test_cpp ${CPP_OBJS} ${NECPP_OBJS} -lstdc++ -lm -llapack
@@ -57,3 +59,6 @@ test_cpp: ${CPP_OBJS} ${NECPP_OBJS}
 
 cpp_clean:
 	rm -f ${CPP_OBJS} ${NECPP_OBJS} 
+
+clean: cpp_clean
+	rm -f test_cpp test_static test_nec
