@@ -4,7 +4,7 @@
 #	version of nec++. This lets you incorporate NEC2
 #	antenna electromagnetic modeling into your own programs
 #
-#	Copyright (C) 2004-2005  Timothy C.A. Molteno
+#	Copyright (C) 2004-2005, 2015  Timothy C.A. Molteno
 #	
 #	This program is free software; you can redistribute it and/or modify
 #	it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ NECPP_SRC  = ../src/c_ggrid.cpp ../src/matrix_algebra.cpp ../src/nec_ground.cpp 
              ../src/c_evlcom.cpp ../src/c_plot_card.cpp ../src/misc.cpp \
              ../src/nec_context.cpp ../src/nec_output.cpp ../src/c_geometry.cpp \
              ../src/nec_exception.cpp ../src/nec_radiation_pattern.cpp \
-	     ../src/nec_structure_currents.cpp
+	     ../src/nec_structure_currents.cpp ../src/electromag.cpp
 NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 
 
@@ -49,8 +49,10 @@ CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
 CXXFLAGS=-I ../src/ -I .. -O3
 
+LD_LIBRARY_PATH=/usr/lib/atlas-base/atlas solve
+
 test_cpp: ${CPP_OBJS} ${NECPP_OBJS}
-	gcc -o test_cpp ${CPP_OBJS} ${NECPP_OBJS} -lstdc++ -lm
+	gcc -o test_cpp ${CPP_OBJS} ${NECPP_OBJS} -lstdc++ -lm -llapack
 	./test_cpp
 
 cpp_clean:

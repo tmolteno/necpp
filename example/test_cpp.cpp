@@ -7,7 +7,7 @@ using namespace std;
 	See the makefile target 'test_cpp' for how to compile this
 	(as well as the nec2++) source code.
 
-	Copyright (C) 2005  Timothy C.A. Molteno (tim@molteno.net)
+	Copyright (C) 2005,2015  Timothy C.A. Molteno (tim@molteno.net)
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 			<< "Nec2++ C++ example. Running (takes a few minutes...)" << endl;
 		
 		nec_context nec;
-		nec.set_results_stdout(false);
+		//nec.set_results_stdout(false);
 		nec.initialize();
 		
 	/*
