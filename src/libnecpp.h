@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004-2008 by Tim Molteno                                     *
+ *   Copyright (C) 2004-2008,2015 by Tim Molteno                                     *
  *   tim@molteno.net                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -117,7 +117,7 @@ All co-ordinates are in meters.
 	\param rdel For tapered wires, the. Otherwise set to 1.0
 	\param rrad For tapered wires, the. Otherwise set to 1.0
 */
-void nec_wire(nec_context* in_context, int tag_id, int segment_count,
+long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		double xw1, double yw1, double zw1,
 		double xw2, double yw2, double zw2, 
 		double rad, double rdel, double rrad);
@@ -130,8 +130,12 @@ void nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		-1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
 	\param card_int_2 Unused (set to zero)
 */
-void nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
+long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
 
+
+/*! \brief Get the last error message
+ * */
+const char* nec_error_message();
 
 /*
 	NEC card functions.

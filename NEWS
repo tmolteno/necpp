@@ -1,4 +1,4 @@
-Version 2.0
+Version 2.0 (alpha)
 
 Introducing a new NEC parser. This uses ANTLR and now is fairly complete. It will have two modes, one is the compatability mode,
 the other is a human readable format that is MUCH more explicit.

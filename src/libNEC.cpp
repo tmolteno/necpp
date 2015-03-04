@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2004-2008 by Tim Molteno                                  *
+ *   Copyright (C) 2004-2008, 2015 by Tim Molteno                                  *
  *   tim@molteno.net                                                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,29 +21,30 @@
 #include "libnecpp.h"
 #include "nec_context.h"
 #include "nec_exception.h"
+#include <string>
 
-#define NEC_ERROR_HANDLE(__x)	{ try { __x; } catch (nec_exception* ex) { return 1; }}
-#define NEC_VOID_HANDLE(__x)	{ try { __x; } catch (nec_exception* ex) { }}
+static std::string _err_message;
+
+#define NEC_ERROR_HANDLE(__x)	{ try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); return 1; } return 0;}
+#define NEC_VOID_HANDLE(__x)	{ try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); }}
+
 
 /*! \brief Create an nec_context and initialize it.
 
 Note: Do NOT delete or free the nec_context yourself, rather call nec_delete()
 to free memory associated with the nec simulation.
 */
-nec_context* nec_create()
-{
-	nec_context* ret = new nec_context();
-	ret->initialize();
-	
-	return ret;
+nec_context* nec_create() {
+  nec_context* ret = new nec_context();
+  ret->initialize();
+  
+  return ret;
 }
  
 /*! \brief Delete an nec_context.
 */
-long nec_delete(nec_context* in_context)
-{
-	NEC_ERROR_HANDLE(delete in_context);
-	return 0;
+long nec_delete(nec_context* in_context) {
+  NEC_ERROR_HANDLE(delete in_context);
 }
  
 long nec_benchmark()
@@ -51,19 +52,20 @@ long nec_benchmark()
 	return long(100.0*nec_context::benchmark());
 }
 
-void nec_wire(nec_context* in_context, int tag_id, int segment_count, double xw1, double yw1, double zw1,
-	double xw2, double yw2, double zw2, double rad,
-	double rdel, double rrad)
-{
-	in_context->wire(tag_id, segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, rdel, rrad);
+long nec_wire(nec_context* in_context, int tag_id, int segment_count, double xw1, double yw1, double zw1,
+  double xw2, double yw2, double zw2, double rad,
+  double rdel, double rrad) {
+  NEC_ERROR_HANDLE(in_context->wire(tag_id, segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, rdel, rrad));
 }
  
  
-void nec_geometry_complete(nec_context* in_context, int card_int_1, int card_int_2)
-{
-	in_context->geometry_complete(card_int_1, card_int_2);
+long nec_geometry_complete(nec_context* in_context, int card_int_1, int card_int_2) {
+  NEC_ERROR_HANDLE(in_context->geometry_complete(card_int_1, card_int_2));
 }
 
+const char* nec_error_message() {
+  return _err_message.c_str();
+}
 
 /* Statistics about the Gain distribution */
 double nec_gain_max(nec_context* in_context, int freq_index)

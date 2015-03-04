@@ -1,4 +1,4 @@
-AC_INIT([necpp], [1.5.4])
+AC_INIT([necpp], [1.6.0])
 AC_CONFIG_MACRO_DIR([m4])
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE

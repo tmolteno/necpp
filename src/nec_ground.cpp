@@ -54,6 +54,7 @@
 #include "nec_ground.h"
 #include "nec_output.h"
 #include "misc.h" // for stop() function
+#include "electromag.h"
 
 /*
 	Parse a GN card. The input parameters here are the fields of the

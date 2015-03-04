@@ -17,6 +17,7 @@
 */
 #include "c_ggrid.h"
 #include "common.h"
+#include "electromag.h"
 #include "nec_output.h" // for DEBUG_TRACE()
 
 #include <cstdlib>
