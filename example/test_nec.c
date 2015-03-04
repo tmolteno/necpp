@@ -22,10 +22,10 @@ void seven_wire_antenna() {
   NEC_ERROR_HANDLE(nec_wire(nec, 6, 5, -0.0318, 0.0045, 0.0624, -0.0106, 0.0378, 0.0866, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_wire(nec, 7, 7, -0.0106, 0.0378, 0.0866, -0.0106, 0.0257, 0.023, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_geometry_complete(nec, 1, 0));
-  nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
-  nec_fr_card(nec, 0, 1, 1600.0, 0.0);
-  nec_ex_card(nec, 0, 1, 1,  0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0);
-  nec_rp_card(nec, 0, 17, 45, 0,5,0,0, 0, 0, 5, 8, 0, 0);
+  NEC_ERROR_HANDLE(nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0));
+  NEC_ERROR_HANDLE(nec_fr_card(nec, 0, 1, 1600.0, 0.0));
+  NEC_ERROR_HANDLE(nec_ex_card(nec, 0, 1, 1,  0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0));
+  NEC_ERROR_HANDLE(nec_rp_card(nec, 0, 17, 45, 0,5,0,0, 0, 0, 5, 8, 0, 0));
   
   printf("Impedance: %f, %f\n",nec_impedance_real(nec,0), nec_impedance_imag(nec,0));
   printf("Gain: %f, %f +/- %f dB\n",nec_gain_max(nec,0), nec_gain_mean(nec,0), nec_gain_sd(nec,0));

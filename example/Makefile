@@ -50,7 +50,7 @@ NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 CPP_SRC  = test_cpp.cpp
 CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
-CXXFLAGS=-I ../src/ -I .. -O3
+CXXFLAGS=-I ../src/ -I .. -O3 -Wall
 
 
 test_cpp: ${CPP_OBJS} ${NECPP_OBJS}

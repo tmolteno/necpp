@@ -22,48 +22,47 @@
     
 \verbatim
 How to use libNEC. 
-	
-	Enter the following file into test_nec.c, and compile with
-	gcc -o test_nec test_nec.c -lnecpp
-	
-	#include "libnecpp.h"
-	#include <stdio.h>
-	
-	int main(int argc, char **argv)
-	{
-		nec_context* nec;
-		double gain;
-			
-		nec = nec_create();
-		nec_wire(nec, 0, 36, 0, 0, 0, -0.042, 0.008, 0.017, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 21, -0.042, 0.008, 0.017, -0.048, 0.021, -0.005, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 70, -0.048, 0.021, -0.005, 0.039, 0.032, -0.017, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 70, -0.048, 0.021, -0.005, 0.035, 0.043, 0.014, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 50, -0.042, 0.008, 0.017, 0.017, -0.015, 0.014, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 66, 0.017, -0.015, 0.014, -0.027, 0.04, -0.031, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 85, -0.027, 0.04, -0.031, 0.046, -0.01, 0.028, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 47, 0.046, -0.01, 0.028, -0.013, -0.005, 0.031, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 70, 0.017, -0.015, 0.014, -0.048, -0.038, -0.04, 0.001, 1.0, 1.0);
-		nec_wire(nec, 0, 77, -0.048, -0.038, -0.04, 0.049, -0.045, -0.04, 0.001, 1.0, 1.0);
-		nec_geometry_complete(nec, 0, 0);
-		
-		nec_gn_card(nec, -1,0,0.0, 0.0, 0.0,0.0, 0.0, 0.0);
-		nec_ld_card(nec, 5,0,0,0,3.72e7,0.0,0.0);
-		nec_pt_card(nec, -1, 0, 0, 0);
-		nec_ex_card(nec, 1, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-		nec_fr_card(nec, 0, 2, 2400.0, 100.0);
-		nec_rp_card(nec, 0, 1, 1, 0,5,0,0, 90.0, 90.0, 0.0, 0.0, 0.0, 0.0);
+  
+  Enter the following file into test_nec.c, and compile with
+  gcc -o test_nec test_nec.c -lnecpp
+  
+  #include "libnecpp.h"
+  #include <stdio.h>
+  
+  int main(int argc, char **argv)
+  {
+    nec_context* nec;
+    double gain;
+            
+    nec = nec_create();
+    nec_wire(nec, 0, 36, 0, 0, 0, -0.042, 0.008, 0.017, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 21, -0.042, 0.008, 0.017, -0.048, 0.021, -0.005, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 70, -0.048, 0.021, -0.005, 0.039, 0.032, -0.017, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 70, -0.048, 0.021, -0.005, 0.035, 0.043, 0.014, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 50, -0.042, 0.008, 0.017, 0.017, -0.015, 0.014, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 66, 0.017, -0.015, 0.014, -0.027, 0.04, -0.031, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 85, -0.027, 0.04, -0.031, 0.046, -0.01, 0.028, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 47, 0.046, -0.01, 0.028, -0.013, -0.005, 0.031, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 70, 0.017, -0.015, 0.014, -0.048, -0.038, -0.04, 0.001, 1.0, 1.0);
+    nec_wire(nec, 0, 77, -0.048, -0.038, -0.04, 0.049, -0.045, -0.04, 0.001, 1.0, 1.0);
+    nec_geometry_complete(nec, 0, 0);
+    
+    nec_gn_card(nec, -1,0,0.0, 0.0, 0.0,0.0, 0.0, 0.0);
+    nec_ld_card(nec, 5,0,0,0,3.72e7,0.0,0.0);
+    nec_pt_card(nec, -1, 0, 0, 0);
+    nec_ex_card(nec, 1, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    nec_fr_card(nec, 0, 2, 2400.0, 100.0);
+    nec_rp_card(nec, 0, 1, 1, 0,5,0,0, 90.0, 90.0, 0.0, 0.0, 0.0, 0.0);
 
-		printf("Impedance: %f, %f\n",nec_impedance_real(nec,0), nec_impedance_imag(nec,0));
-		printf("Gain: %f, %f +/- %f dB\n",nec_gain_max(nec,0), nec_gain_mean(nec,0), nec_gain_sd(nec,0));
-		printf("RHCP Gain: %f, %f +/- %f dB\n",nec_gain_rhcp_max(nec,0), nec_gain_rhcp_mean(nec,0), nec_gain_rhcp_sd(nec,0));
-		printf("LHCP Gain: %f, %f +/- %f dB\n",nec_gain_lhcp_max(nec,0), nec_gain_lhcp_mean(nec,0), nec_gain_lhcp_sd(nec,0));
-		
-		nec_delete(nec);
-		
-		
-		return 0;
-	}
+    printf("Impedance: %f, %f\n",nec_impedance_real(nec,0), nec_impedance_imag(nec,0));
+    printf("Gain: %f, %f +/- %f dB\n",nec_gain_max(nec,0), nec_gain_mean(nec,0), nec_gain_sd(nec,0));
+    printf("RHCP Gain: %f, %f +/- %f dB\n",nec_gain_rhcp_max(nec,0), nec_gain_rhcp_mean(nec,0), nec_gain_rhcp_sd(nec,0));
+    printf("LHCP Gain: %f, %f +/- %f dB\n",nec_gain_lhcp_max(nec,0), nec_gain_lhcp_mean(nec,0), nec_gain_lhcp_sd(nec,0));
+    
+    nec_delete(nec);
+    
+    return 0;
+  }
 \endverbatim
 */
 
@@ -94,28 +93,28 @@ long nec_benchmark();
 
 
 /*! \brief Generates segment geometry for a straigt wire
-	\param in_context The nec_context created with nec_create()
-	\param tag_id
-	\param segment_count Number of Elements (should be around 12-20 per wavelength)
-	\param rad Wire radius of first segment (in Meters)
-	\param rdel Ratio of the length of a segment to the length of the previous segment.  (Set to 1.0 if segments have uniform length)
-	\param rrad The ratio of the radii of adjacent segments (Set to 1.0 if not tapered)
+    \param in_context The nec_context created with nec_create()
+    \param tag_id
+    \param segment_count Number of Elements (should be around 12-20 per wavelength)
+    \param rad Wire radius of first segment (in Meters)
+    \param rdel Ratio of the length of a segment to the length of the previous segment.  (Set to 1.0 if segments have uniform length)
+    \param rrad The ratio of the radii of adjacent segments (Set to 1.0 if not tapered)
 */
 /*! Add a wire to the geometry,
 
-All co-ordinates are in meters.
+    All co-ordinates are in meters.
 
-	\param tag_id The tag ID.
-	\param segment_count The number of segments.
-	\param xw1 The x coordinate of the wire starting point.
-	\param yw1 The y coordinate of the wire starting point.
-	\param zw1 The z coordinate of the wire starting point.
-	\param xw2 The x coordinate of the wire ending point.
-	\param yw2 The y coordinate of the wire ending point.
-	\param zw2 The z coordinate of the wire ending point.
-	\param rad The wire radius (meters)
-	\param rdel For tapered wires, the. Otherwise set to 1.0
-	\param rrad For tapered wires, the. Otherwise set to 1.0
+    \param tag_id The tag ID.
+    \param segment_count The number of segments.
+    \param xw1 The x coordinate of the wire starting point.
+    \param yw1 The y coordinate of the wire starting point.
+    \param zw1 The z coordinate of the wire starting point.
+    \param xw2 The x coordinate of the wire ending point.
+    \param yw2 The y coordinate of the wire ending point.
+    \param zw2 The z coordinate of the wire ending point.
+    \param rad The wire radius (meters)
+    \param rdel For tapered wires, the. Otherwise set to 1.0
+    \param rrad For tapered wires, the. Otherwise set to 1.0
 */
 long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		double xw1, double yw1, double zw1,
@@ -123,64 +122,66 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		double rad, double rdel, double rrad);
 
 /*! \brief Indicate that the geometry is complete (GE card)
-	\param in_context The nec_context created with nec_create()
-	\param gpflag Geometry ground plain flag.
-		0 - no ground plane is present. 
-		1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero) 
-		-1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
-	\param card_int_2 Unused (set to zero)
+    \param in_context The nec_context created with nec_create()
+    \param gpflag Geometry ground plain flag.
+            0 - no ground plane is present. 
+            1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero) 
+            -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
+    \param card_int_2 Unused (set to zero)
 */
 long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
 
 
 /*! \brief Get the last error message
+ * All functions return a long. If this is != 0. Then an error has occurred.
+ * The error message can be retrieved with this function.
  * */
 const char* nec_error_message();
 
 /*
-	NEC card functions.
+  NEC card functions.
 */
 /*!\brief Ground Card
-Examples:
+  Examples:
 
-1) Infinite ground plane
-	nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
+  1) Infinite ground plane
+    nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
 
-2) Radial Wire Ground Plane (4 wires, 2 meters long, 5mm in radius)
-	nec_gn_card(nec, 4, 0, 0.0, 0.0, 2.0, 0.005, 0.0, 0.0)
+  2) Radial Wire Ground Plane (4 wires, 2 meters long, 5mm in radius)
+    nec_gn_card(nec, 4, 0, 0.0, 0.0, 2.0, 0.005, 0.0, 0.0)
 */
-void nec_gn_card(nec_context* in_context, int itmp1, int itmp2, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_gn_card(nec_context* in_context, int itmp1, int itmp2, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
 /*!
  * FR card
- *	@param in_context The nec_context created with nec_create()
- *	@param in_ifrq 0 is a linear range of frequencies, 1 is a log range.
- *	@param in_nfrq The number of frequencies
- *	@param in_freq_mhz The starting frequency in MHz.
- *	@param in_del_freq The frequency step (in MHz for ifrq = 0)
+ * @param in_context The nec_context created with nec_create()
+ * @param in_ifrq 0 is a linear range of frequencies, 1 is a log range.
+ * @param in_nfrq The number of frequencies
+ * @param in_freq_mhz The starting frequency in MHz.
+ * @param in_del_freq The frequency step (in MHz for ifrq = 0)
  */
-void nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq);
+long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq);
 
 
 
 /*!
 * LD card (Loading)
-*	@param in_context The nec_context created with nec_create()
-*	@param ldtyp Type of loading (5 = segment conductivity)
-*	@param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
-*	@param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. 
-*	@param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous param- eter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
+* @param in_context The nec_context created with nec_create()
+* @param ldtyp Type of loading (5 = segment conductivity)
+* @param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
+* @param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. 
+* @param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous param- eter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
 
 Floating Point Input for the Various Load Types:
 */
-void nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3);
+long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3);
 
 
-void nec_ex_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
-void nec_tl_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
-void nec_nt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
-void nec_xq_card(nec_context* in_context, int itmp1);
-void nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3, double tmp4);
+long nec_ex_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_tl_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_nt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_xq_card(nec_context* in_context, int itmp1);
+long nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3, double tmp4);
 
 	/*! \brief Standard radiation pattern parameters 
 	
@@ -248,20 +249,20 @@ void nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3,
 	\li When a ground plane has been specified, field points should not be requested below the ground (theta greater than 90 degrees or Z less than zero.)
 	
 	*/
-void nec_rp_card(nec_context* in_context,
+long nec_rp_card(nec_context* in_context,
 	int calc_mode, int n_theta, int n_phi,
 	int output_format, int normalization, int D, int A,	
 	double theta0, double phi0, double delta_theta, double delta_phi,
 	double radial_distance, double gain_norm);
 
-void nec_pt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
-void nec_pq_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
-void nec_kh_card(nec_context* in_context, double tmp1);
-void nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
-void nec_nh_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
-void nec_ek_card(nec_context* in_context, int itmp1);
-void nec_cp_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
-void nec_pl_card(nec_context* in_context, char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4);
+long nec_pt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
+long nec_pq_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
+long nec_kh_card(nec_context* in_context, double tmp1);
+long nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_nh_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_ek_card(nec_context* in_context, int itmp1);
+long nec_cp_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
+long nec_pl_card(nec_context* in_context, char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4);
 
 
 /*! \brief Get statistics of the gains in dB.
