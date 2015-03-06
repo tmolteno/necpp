@@ -228,10 +228,11 @@ long nec_pq_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int i
   NEC_ERROR_HANDLE(in_context->pq_card(itmp1, itmp2, itmp3, itmp4));
 }
 
-
-
 /* "kh" card, matrix integration limit */
-long nec_kh_card(nec_context* in_context, double tmp1);
+long nec_kh_card(nec_context* in_context, double tmp1)
+{ 
+  NEC_ERROR_HANDLE(in_context->kh_card(tmp1));
+}
 
 long nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)
 {

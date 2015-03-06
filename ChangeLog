@@ -1,8 +1,9 @@
-Version 1.6
-* C-style library now supports error messages (initial)
+Version 1.6a
+* C-style library now supports error messages 
+* Added missing library function nec_kh_card()
 * Cleaned up bitrot in example code.
         
-Version 1.5.4 
+Version 1.5.4 [December 2014]
 * Changed default compiler options to remove debugging symbols
 * Fixed bug printing maximum gain on the command line.
 * Remove vector test code from main loop 
