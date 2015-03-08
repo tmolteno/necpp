@@ -25,7 +25,7 @@
 
 all:	check_build test python
 
-BUILD=bin
+BUILD=../src
 TARGET = ${BUILD}/nec2++
 NEC2DIFF = ${BUILD}/nec2diff
 
@@ -35,14 +35,10 @@ NECF = FORTRAN/nec2
 #
 #	This target makes sure that the C and FORTRAN executables have been built
 #	Please note that the testharness assumes that you have built the debug
-#	version of nec2++ using kdevelop.
+#	version of nec2++ using ./configure --with-bounds
 #
 check_build: ${NEC2C} ${TARGET}
 
-
-test_fast:	
-	make -f Makefile.test test 'BUILD=optimized'
-	
 
 ############################################################################
 #	
@@ -90,7 +86,7 @@ test:
 	rm -f $(DO_TESTS:.nec=.outcpp)
 	rm -f $(DO_TESTS:.nec=.outc)
 	rm -f $(DO_TESTS:.nec=.outf)
-	make -f Makefile.test test_aux
+	make test_aux
 
 test_f: ${NECF} $(DO_TESTS:.nec=.outf)
 	echo "Fortran test complete"
