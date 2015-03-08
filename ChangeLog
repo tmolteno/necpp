@@ -1,4 +1,5 @@
 Version 1.6a
+* Yoshi Takeyasu. Change instances of int to long long, to allow simulations up to 140 GB.
 * C-style library now supports error messages 
 * Added missing library function nec_kh_card()
 * Cleaned up bitrot in example code.
