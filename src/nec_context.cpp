@@ -843,34 +843,33 @@ void nec_context::pt_card(int itmp1, int itmp2, int itmp3, int itmp4)
 
 
 	/* "pq" card, print control for charge */
-void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4)
-{
-	iptflq= itmp1;
-	iptaq= itmp2;
-	iptaqf= itmp3;
-	iptaqt= itmp4;
+void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4) {
+  iptflq= itmp1;
+  iptaq= itmp2;
+  iptaqf= itmp3;
+  iptaqt= itmp4;
 
-	if ( (itmp3 == 0) && (iptflq != -1) )
-		iptflq=-2;
-	if ( itmp4 == 0)
-		iptaqt= iptaqf;
+  if ( (itmp3 == 0) && (iptflq != -1) )
+    iptflq=-2;
+  if ( itmp4 == 0)
+    iptaqt= iptaqf;
 }
 
 
 
 /* "kh" card, matrix integration limit */
-void nec_context::kh_card(nec_float tmp1)
-{
-	rkh = tmp1;
-	if ( processing_state > 2)
-		processing_state=2;
-	iflow=1;
+void nec_context::kh_card(nec_float tmp1) {
+  rkh = tmp1;
+  if ( processing_state > 2)
+    processing_state=2;
+  iflow=1;
 }
 
 void nec_context::ne_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
 	ne_nh_card(0, itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
 }
+
 void nec_context::nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
 	ne_nh_card(1, itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
@@ -880,100 +879,95 @@ void nec_context::nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float 
 */
 void nec_context::ne_nh_card(int in_nfeh, int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
-	nfeh = in_nfeh;
+  nfeh = in_nfeh;
 
-	if ( (iflow == 8) && (nfrq != 1) )
-	{
-		m_output.endl(2);
-		m_output.line("WHEN MULTIPLE FREQUENCIES ARE REQUESTED, "
-			"ONLY ONE NEAR FIELD CARD CAN BE USED -");
-		m_output.line("  LAST CARD READ WILL BE USED" );
-	}
+  if ( (iflow == 8) && (nfrq != 1) ) {
+    m_output.endl(2);
+    m_output.line("WHEN MULTIPLE FREQUENCIES ARE REQUESTED, "
+            "ONLY ONE NEAR FIELD CARD CAN BE USED -");
+    m_output.line("  LAST CARD READ WILL BE USED" );
+  }
 
-	m_near= itmp1;
-	nrx= itmp2;
-	nry= itmp3;
-	nrz= itmp4;
-	xnr= tmp1;
-	ynr= tmp2;
-	znr= tmp3;
-	dxnr= tmp4;
-	dynr= tmp5;
-	dznr= tmp6;
-	iflow=8;
+  m_near= itmp1;
+  nrx= itmp2;
+  nry= itmp3;
+  nrz= itmp4;
+  xnr= tmp1;
+  ynr= tmp2;
+  znr= tmp3;
+  dxnr= tmp4;
+  dynr= tmp5;
+  dznr= tmp6;
+  iflow=8;
 
-	if ( nfrq == 1)
-		simulate();
+  if ( nfrq == 1)
+    simulate();
 }
 
 
 /* "ek" card,  extended thin wire kernel option */
-void nec_context::set_extended_thin_wire_kernel(bool ek_flag)
-{
-	m_use_exk = ek_flag;
-	
-	if ( processing_state > 2)
-		processing_state=2;
-	iflow=1;	
+void nec_context::set_extended_thin_wire_kernel(bool ek_flag) {
+  m_use_exk = ek_flag;
+  
+  if ( processing_state > 2)
+    processing_state=2;
+  iflow=1;	
 }
 
 
 /* "cp" card, maximum coupling between antennas */
-void nec_context::cp_card(int itmp1, int itmp2, int itmp3, int itmp4)
-{
-	if ( iflow != 2)
-	{
-		ncoup=0;
-		nctag.resize(0);
-		ncseg.resize(0);
-		y11a.resize(0);
-		y12a.resize(0);
-	}
+void nec_context::cp_card(int itmp1, int itmp2, int itmp3, int itmp4) {
+  if ( iflow != 2) {
+    ncoup=0;
+    nctag.resize(0);
+    ncseg.resize(0);
+    y11a.resize(0);
+    y12a.resize(0);
+  }
 
-	icoup=0;
-	iflow=2;
+  icoup=0;
+  iflow=2;
 
-	if ( itmp2 == 0)
-		return; /* continue card input loop */
+  if ( itmp2 == 0)
+    return; /* continue card input loop */
 
-	ncoup++;
-	nctag.resize(ncoup);
-	ncseg.resize(ncoup);
-	nctag[ncoup-1]= itmp1;
-	ncseg[ncoup-1]= itmp2;
+  ncoup++;
+  nctag.resize(ncoup);
+  ncseg.resize(ncoup);
+  nctag[ncoup-1]= itmp1;
+  ncseg[ncoup-1]= itmp2;
 
-	if ( itmp4 == 0)
-		return; /* continue card input loop */
+  if ( itmp4 == 0)
+    return; /* continue card input loop */
 
-	ncoup++;
-	nctag.resize(ncoup);
-	ncseg.resize(ncoup);
-	nctag[ncoup-1]= itmp3;
-	ncseg[ncoup-1]= itmp4;
+  ncoup++;
+  nctag.resize(ncoup);
+  ncseg.resize(ncoup);
+  nctag[ncoup-1]= itmp3;
+  ncseg[ncoup-1]= itmp4;
 }
 
 
 /* "pl" card, plot flags 
 	throws int on error.
 */
-void nec_context::pl_card(const char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4)
-{
-	std::string fname(ploutput_filename);
-	plot_card = c_plot_card(itmp1,itmp2,itmp3,itmp4, fname);
+void nec_context::pl_card(const char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4) {
+  std::string fname(ploutput_filename);
+  plot_card = c_plot_card(itmp1,itmp2,itmp3,itmp4, fname);
 }
 
 
 
-/*!	\brief Start a simulation
+/*! \brief Start a simulation
 
-	This function will trigger a calculation. In the traditional NEC
-	world, This signals the end of the main input section and the
-	beginning of the frequency do loop.
-	
-	\param far_field_flag is true if last card was XQ or RP
-	\warning far_field_flag is should never be specified as true
-	because both the xq_card() and rp_card() functions will call
-	this function automatically.
+    This function will trigger a calculation. In the traditional NEC
+    world, This signals the end of the main input section and the
+    beginning of the frequency do loop.
+    
+    \param far_field_flag is true if last card was XQ or RP
+    \warning far_field_flag is should never be specified as true
+    because both the xq_card() and rp_card() functions will call
+    this function automatically.
 */
 void nec_context::simulate(bool far_field_flag)
 {
@@ -2329,150 +2323,136 @@ void nec_context::load()
 }
 
 /* cmset sets up the complex structure matrix in the array in_cm */
-void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
-{
-	int mp2, iout, it, j, i1, i2, in2;
-	int im1, im2, ist, ij, jss, jm1, jm2, jst, k, kk;
-	complex_array scm;
-	
-	int np = m_geometry->np;
-	int mp = m_geometry->mp;
-	
-	mp2 = 2 * mp;
+void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx) {
+  int mp2, iout, it, i1, i2, in2;
+  int im1, im2, ist, ij, jss, jm1, jm2, jst;
+  complex_array scm;
+  
+  int np = m_geometry->np;
+  int mp = m_geometry->mp;
+  
+  mp2 = 2 * mp;
 //	 = np + mp2;
 //	neq= m_geometry->n_plus_2m; // n + 2* m;
-	
-	rkh= rkhx;
-	iout=2* npblk* nrow;
-	it= nlast;
-			
-	vector_fill(in_cm,0,it*nrow,cplx_00());
-	
-	i1= 1;
-	i2= it;
-	in2= i2;
-	
-	if ( in2 > np)
-		in2= np;
-	
-	im1= i1- np;
-	im2= i2- np;
-	
-	if ( im1 < 1)
-		im1=1;
-	
-	ist=1;
-	if ( i1 <= np)
-		ist= np- i1+2;
-	
-	/* wire source loop */
-	int n = m_geometry->n_segments;
-		
-	for( j = 1; j <= n; j++ )
-	{
-		m_geometry->trio(j);
-		
-		for (int i = 0; i < m_geometry->jsno; i++ )
-		{
-			ij = m_geometry->jco[i];
-			m_geometry->jco[i] = ((ij-1)/ np)* mp2+ij;
-		}
-	
-		if ( i1 <= in2)
-			cmww( j, i1, in2, in_cm, nrow, in_cm, nrow,1);
-	
-		if ( im1 <= im2)
-		{
-			complex_array temp = in_cm.segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
-			cmws( j, im1, im2, temp, nrow, in_cm, 1);
-		}
-		/* matrix elements modified by loading */
-		if ( nload == 0)
-			continue;
-	
-		if ( j > np)
-			continue;
-	
-		int ipr = j;
-		if ( (ipr < 1) || (ipr > it) )
-			continue;
-	
-		nec_complex zaj= zarray[j-1];
-	
-		for (int i = 0; i < m_geometry->jsno; i++ )
-		{
-			jss = m_geometry->jco[i];
-			in_cm[(jss-1)+(ipr-1)*nrow] -= ( m_geometry->ax[i]+ m_geometry->cx[i])* zaj;
-		}
-	} /* for( j = 1; j <= n; j++ ) */
-	
-	int m = m_geometry->m;
-	if ( m != 0)
-	{
-		/* matrix elements for patch current sources */
-		jm1=1- mp;
-		jm2=0;
-		jst=1- mp2;
-	
-		for (int i = 0; i < nop; i++ )
-		{
-			jm1 += mp;
-			jm2 += mp;
-			jst += npeq;
-		
-			if ( i1 <= in2)
-			{
-				int tmp_n = (jst-1);
-				complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
-				cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
-			}
-		
-			if ( im1 <= im2)
-			{
-				int tmp_n = (jst-1)+(ist-1)*nrow;
-				complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
-				compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
-			}
-		}
-	
-	} /* if ( m != 0) */
-	
-	if ( icase == 1)
-		return;
-	
-	/* Allocate to scratch memory */
-	scm.resize(m_geometry->n_plus_2m);
-	
-	/* combine elements for symmetry modes */
-	for (int i = 0; i < it; i++ )
-	{
-		int row_offset = i*nrow;
-		
-		for( j = 0; j < npeq; j++ )
-		{
-			for( k = 0; k < nop; k++ )
-			{
-				int ka = j+ k*npeq;
-				scm[k] = in_cm[row_offset + ka];
-			}
-		
-			in_cm[row_offset + j] = scm.segment(0,nop).sum(); //scm.sum(0,nop);
-			
-			for( k = 1; k < nop; k++ )
-			{
-				int ka = j+ k*npeq;
-				nec_complex deter = scm[0];
-			
-				for( kk = 1; kk < nop; kk++ )
-				{
-					deter += scm[kk] * symmetry_array[k+kk*nop];
-				}
-				in_cm[row_offset + ka] = deter;
-			}
-		}
-	}
-	
-	scm.resize(0);
+  
+  rkh= rkhx;
+  iout=2* npblk* nrow;
+  it= nlast;
+                  
+  vector_fill(in_cm,0,it*nrow,cplx_00());
+  
+  i1= 1;
+  i2= it;
+  in2= i2;
+  
+  if ( in2 > np)
+          in2= np;
+  
+  im1= i1- np;
+  im2= i2- np;
+  
+  if ( im1 < 1)
+    im1=1;
+  
+  ist=1;
+  if ( i1 <= np)
+    ist= np- i1+2;
+  
+  /* wire source loop */
+  int n = m_geometry->n_segments;
+          
+  for( int j = 1; j <= n; j++ ) {
+    m_geometry->trio(j);
+    
+    for (int i = 0; i < m_geometry->jsno; i++ ) {
+      ij = m_geometry->jco[i];
+      m_geometry->jco[i] = ((ij-1)/ np)* mp2+ij;
+    }
+
+    if ( i1 <= in2)
+      cmww( j, i1, in2, in_cm, nrow, in_cm, nrow,1);
+
+    if ( im1 <= im2) {
+      complex_array temp = in_cm.segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
+      cmws( j, im1, im2, temp, nrow, in_cm, 1);
+    }
+    /* matrix elements modified by loading */
+    if ( nload == 0)
+      continue;
+
+    if ( j > np)
+      continue;
+
+    int ipr = j;
+    if ( (ipr < 1) || (ipr > it) )
+      continue;
+
+    nec_complex zaj= zarray[j-1];
+
+    for (int i = 0; i < m_geometry->jsno; i++ ) {
+      jss = m_geometry->jco[i];
+      in_cm[(jss-1)+(ipr-1)*nrow] -= ( m_geometry->ax[i]+ m_geometry->cx[i])* zaj;
+    }
+  } /* for( j = 1; j <= n; j++ ) */
+  
+  int m = m_geometry->m;
+  if ( m != 0)  {
+    /* matrix elements for patch current sources */
+    jm1=1- mp;
+    jm2=0;
+    jst=1- mp2;
+
+    for (int i = 0; i < nop; i++ ) {
+      jm1 += mp;
+      jm2 += mp;
+      jst += npeq;
+
+      if ( i1 <= in2) {
+        int tmp_n = (jst-1);
+        complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
+        cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
+      }
+
+      if ( im1 <= im2) {
+        int tmp_n = (jst-1)+(ist-1)*nrow;
+        complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
+        compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
+      }
+    }
+
+  } /* if ( m != 0) */
+  
+  if ( icase == 1)
+    return;
+  
+  /* Allocate to scratch memory */
+  scm.resize(m_geometry->n_plus_2m);
+  
+  /* combine elements for symmetry modes */
+  for (int i = 0; i < it; i++ ) {
+    int row_offset = i*nrow;
+    
+    for( int j = 0; j < npeq; j++ ) {
+      for( int k = 0; k < nop; k++ ) {
+        int ka = j+ k*npeq;
+        scm[k] = in_cm[row_offset + ka];
+      }
+
+      in_cm[row_offset + j] = scm.segment(0,nop).sum(); //scm.sum(0,nop);
+      
+      for( int k = 1; k < nop; k++ ) {
+        int ka = j+ k*npeq;
+        nec_complex deter = scm[0];
+
+        for( int kk = 1; kk < nop; kk++ ) {
+          deter += scm[kk] * symmetry_array[k+kk*nop];
+        }
+        in_cm[row_offset + ka] = deter;
+      }
+    }
+  }
+  
+  scm.resize(0);
 }
 
 /* compute_matrix_ss computes matrix elements for surface-surface interactions. */
@@ -2797,171 +2777,145 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
 
 /* cmww computes matrix elements for wire-wire interactions */
 void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
-    int nr, complex_array& cw, int nw, int itrp)
+    int nr, complex_array& cw, int nw, int itrp) 
 {
-	int i, jx;
-	nec_float xi, yi, zi, ai, cabi, sabi, salpi;
-	nec_complex etk, ets, etc;
-	
-	/* set source segment parameters */
-	jx = j;
-	j--;
-	m_s= m_geometry->segment_length[j];
-	m_b= m_geometry->segment_radius[j];
-	xj= m_geometry->x[j];
-	yj= m_geometry->y[j];
-	zj= m_geometry->z[j];
-	cabj= m_geometry->cab[j];
-	sabj= m_geometry->sab[j];
-	salpj= m_geometry->salp[j];
-	
-	/* Decide whether ext. t.w. approx. can be used */
-	if ( m_use_exk == true)
-	{
-		int ipr = m_geometry->icon1[j];
+  int i, jx;
+  nec_float xi, yi, zi, ai, cabi, sabi, salpi;
+  nec_complex etk, ets, etc;
+  
+  /* set source segment parameters */
+  jx = j;
+  j--;
+  m_s= m_geometry->segment_length[j];
+  m_b= m_geometry->segment_radius[j];
+  xj= m_geometry->x[j];
+  yj= m_geometry->y[j];
+  zj= m_geometry->z[j];
+  cabj= m_geometry->cab[j];
+  sabj= m_geometry->sab[j];
+  salpj= m_geometry->salp[j];
+  
+  /* Decide whether ext. t.w. approx. can be used */
+  if ( m_use_exk == true) {
+    int ipr = m_geometry->icon1[j];
 
+    if (ipr > PCHCON) ind1 = 0; // trap bug also in original fortran
+    else if (ipr == 0) ind1 = 1;
+    else if ((ipr == jx) && ( cabj*cabj + sabj*sabj > 1.e-8))
+            ind1=2;
+    else if (ipr < 0) {
+      ind1 = 2;
+      int iprx= -ipr - 1;
+      if ( m_geometry->icon1[iprx] == -jx )
+        ind1 = m_geometry->test_ek_approximation(j,iprx);
+    } else {  /* if ( ipr > 0 ) */
+      if ( ipr != jx ) {
+        ind1=2;
+        int iprx = ipr-1;
+        if ( m_geometry->icon2[iprx] == jx )
+          ind1 = m_geometry->test_ek_approximation(j,iprx);
+      }
+      else if ( (cabj* cabj+ sabj* sabj) > 1.e-8)
+        ind1=2;
+      else
+        ind1=0;
+    } /* if ( ipr < 0 ) */
 
-		if (ipr > PCHCON) ind1 = 0; // trap bug also in original fortran
-		else if (ipr == 0) ind1 = 1;
-		else if ((ipr == jx) && ( cabj*cabj + sabj*sabj > 1.e-8))
-			ind1=2;
-		else if (ipr < 0)
-		{
-			ind1 = 2;
-			int iprx= -ipr - 1;
-			if ( m_geometry->icon1[iprx] == -jx )
-				ind1 = m_geometry->test_ek_approximation(j,iprx);
-			
-		} /* if ( ipr < 0 ) */
-		else
-		{
-			if ( ipr != jx )
-			{
-				ind1=2;
-				int iprx = ipr-1;
-				if ( m_geometry->icon2[iprx] == jx )
-					ind1 = m_geometry->test_ek_approximation(j,iprx);
-			}
-			else if ( (cabj* cabj+ sabj* sabj) > 1.e-8)
-				ind1=2;
-			else
-				ind1=0;
-		} /* if ( ipr < 0 ) */
+    {
+      int iprx = std::abs(ipr) - 1;
+      int ind1_test = 2;
+      if (ipr > PCHCON)
+        ind1_test = 0;
+      else if (ipr == 0)
+        ind1_test = 1;
+      else if ((ipr == jx) && (cabj*cabj + sabj*sabj <= 1.e-8))
+        ind1_test = 0;
+      else if ((ipr > 0) && (m_geometry->icon2[iprx] == jx))
+        ind1_test = m_geometry->test_ek_approximation(j, ipr - 1);
+      else if ((ipr < 0) && (m_geometry->icon1[iprx] == -jx))
+        ind1_test = m_geometry->test_ek_approximation(j, -ipr - 1);
+      ASSERT(ind1_test == ind1);
+    }
 
-		{
-		int iprx = std::abs(ipr) - 1;
-		int ind1_test = 2;
-		if (ipr > PCHCON)
-			ind1_test = 0;
-		else if (ipr == 0)
-			ind1_test = 1;
-		else if ((ipr == jx) && (cabj*cabj + sabj*sabj <= 1.e-8))
-				ind1_test = 0;
-		else if ((ipr > 0) && (m_geometry->icon2[iprx] == jx))
-			ind1_test = m_geometry->test_ek_approximation(j, ipr - 1);
-		else if ((ipr < 0) && (m_geometry->icon1[iprx] == -jx))
-			ind1_test = m_geometry->test_ek_approximation(j, -ipr - 1);
-		ASSERT(ind1_test == ind1);
-		}
+    ipr = m_geometry->icon2[j];
 
+    if (ipr > PCHCON) ind2 = 2; // trap bug also in original fortran
+    else if (ipr == 0) ind2 = 1;
+    else if (ipr < 0) {
+      int iprx = -ipr - 1;
+      if ( -m_geometry->icon2[iprx] != jx ) {
+        ind2=2;
+      } else {
+        ind2 = m_geometry->test_ek_approximation(j,iprx);
+      }
+    } else { /* if ( ipr>= 0 ) */
+      if ( ipr != jx ) {
+        int iprx = ipr-1;
+        if ( m_geometry->icon1[iprx] != jx ) {
+          ind2=2;
+        } else {
+          ind2 = m_geometry->test_ek_approximation(j,iprx);
+        }
+      }
+      else if ( (cabj* cabj+ sabj* sabj) > 1.e-8) {
+        ind2=2;
+      } else {
+        ind2=0;
+      }
+    } /* if ( ipr < 0 ) */
+  } /* if ( m_use_exk == true) */
+  
+  /* observation loop */
+  int ipr=-1;
+  for( i = i1-1; i < i2; i++ ) {
+    ipr++;
+    xi= m_geometry->x[i];
+    yi= m_geometry->y[i];
+    zi= m_geometry->z[i];
+    ai= m_geometry->segment_radius[i];
+    cabi= m_geometry->cab[i];
+    sabi= m_geometry->sab[i];
+    salpi= m_geometry->salp[i];
 
+    efld( xi, yi, zi, ai, i != j);
 
-		ipr = m_geometry->icon2[j];
+    etk= exk* cabi+ eyk* sabi+ ezk* salpi;
+    ets= exs* cabi+ eys* sabi+ ezs* salpi;
+    etc= exc* cabi+ eyc* sabi+ ezc* salpi;
 
+    /* fill matrix elements. element locations */
+    /* determined by connection data. */
 
+    /* normal fill */
+    if ( itrp == 0) {
+      for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+        jx = m_geometry->jco[ij]-1;
+        in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      }
+      continue;
+    }
 
+    /* transposed fill */
+    if ( itrp != 2) {
+      for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+        jx= m_geometry->jco[ij]-1;
+        in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      }
+      continue;
+    }
 
-		if (ipr > PCHCON) ind2 = 2; // trap bug also in original fortran
-		else if (ipr == 0) ind2 = 1;
-		else if (ipr < 0)
-		{
-			int iprx = -ipr - 1;
-			if ( -m_geometry->icon2[iprx] != jx )
-				ind2=2;
-			else
-			{
-				ind2 = m_geometry->test_ek_approximation(j,iprx);
-			}
-		} /* if ( ipr < 0 ) */
-		else
-		{
-			if ( ipr != jx )
-			{
-				int iprx = ipr-1;
-				if ( m_geometry->icon1[iprx] != jx )
-					ind2=2;
-				else
-				{
-					ind2 = m_geometry->test_ek_approximation(j,iprx);
-				}
-			
-			} /* if ( ipr != jx ) */
-			else if ( (cabj* cabj+ sabj* sabj) > 1.e-8)
-				ind2=2;
-			else
-				ind2=0;
-		} /* if ( ipr < 0 ) */
-	} /* if ( m_use_exk == true) */
-	
-	/* observation loop */
-	int ipr=-1;
-	for( i = i1-1; i < i2; i++ )
-	{
-		ipr++;
-		xi= m_geometry->x[i];
-		yi= m_geometry->y[i];
-		zi= m_geometry->z[i];
-		ai= m_geometry->segment_radius[i];
-		cabi= m_geometry->cab[i];
-		sabi= m_geometry->sab[i];
-		salpi= m_geometry->salp[i];
-	
-		efld( xi, yi, zi, ai, i != j);
-	
-		etk= exk* cabi+ eyk* sabi+ ezk* salpi;
-		ets= exs* cabi+ eys* sabi+ ezs* salpi;
-		etc= exc* cabi+ eyc* sabi+ ezc* salpi;
-	
-		/* fill matrix elements. element locations */
-		/* determined by connection data. */
-	
-		/* normal fill */
-		if ( itrp == 0)
-		{
-			for (int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				jx = m_geometry->jco[ij]-1;
-				in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-			continue;
-		}
-	
-		/* transposed fill */
-		if ( itrp != 2)
-		{
-			for (int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				jx= m_geometry->jco[ij]-1;
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-			continue;
-		}
-	
-		/* trans. fill for c(ww) - test for elements for d(ww)prime.  (=cw) */
-		for (int ij = 0; ij < m_geometry->jsno; ij++ )
-		{
-			jx= m_geometry->jco[ij]-1;
-			if ( jx < nr)
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			else
-			{
-				jx -= nr;
-				cw[jx*ipr*nw] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		
-		} /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
-	
-	} /* for( i = i1-1; i < i2; i++ ) */
+    /* trans. fill for c(ww) - test for elements for d(ww)prime.  (=cw) */
+    for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+      jx= m_geometry->jco[ij]-1;
+      if ( jx < nr) {
+        in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      } else {
+        jx -= nr;
+        cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      }
+    } /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
+
+  } /* for( i = i1-1; i < i2; i++ ) */
 }
 
 
