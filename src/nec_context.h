@@ -815,15 +815,15 @@ private:
 	
 	void load();
 
-	void cmset(int nrow, complex_array& in_cm, nec_float rkhx);
+	void cmset(int64_t nrow, complex_array& in_cm, nec_float rkhx);
 	void compute_matrix_ss(int j1, int j2, int im1, int im2,
-			complex_array& in_cm, int nrow, int itrp);
+			complex_array& in_cm, int64_t nrow, int itrp);
 	void cmsw(int j1, int j2, int i1, int i2, complex_array& in_cm,
-			complex_array& cw, int ncw, int nrow, int itrp);
-	void cmws(int j, int i1, int i2, complex_array& in_cm, int nr,
+			complex_array& cw, int64_t ncw, int64_t nrow, int itrp);
+	void cmws(int j, int i1, int i2, complex_array& in_cm, int64_t nr,
 			complex_array& cw, int itrp);
-	void cmww(int j, int i1, int i2, complex_array& in_cm, int nr,
-			complex_array& cw, int nw, int itrp);
+	void cmww(int j, int i1, int i2, complex_array& in_cm, int64_t nr,
+			complex_array& cw, int64_t nw, int itrp);
 	void couple(complex_array& cur, nec_float wlam);
 
 	void efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, bool on_source_segment);

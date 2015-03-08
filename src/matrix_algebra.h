@@ -2,33 +2,33 @@
 #define __matrix_algebra__
 
 /*
-	Copyright (C) 2004  Timothy C.A. Molteno
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004, 2015  Timothy C.A. Molteno
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "math_util.h"
 #include "nec_output.h"
 
-void lu_decompose(nec_output_file& s_output, int n, complex_array& a, int_array& ip, int ndim);
-void factrs(nec_output_file& s_output,  int np, int nrow, complex_array& a, int_array& ip );
-void solve( int n, complex_array& a, int_array& ip, complex_array& b, int ndim );
+void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
+void factrs(nec_output_file& s_output,  int64_t np, int64_t nrow, complex_array& a, int_array& ip );
+void solve( int n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
-void solves(complex_array& a, int_array& ip, complex_array& b, int neq,
-	int nrh, int np, int n, int mp, int m, int nop, 
-	complex_array& symmetry_array);
+void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
+  int64_t nrh, int64_t np, int64_t n, int64_t mp, int64_t m, int64_t nop, 
+  complex_array& symmetry_array);
 
 
 /* Do some simple tests for integration convergence */

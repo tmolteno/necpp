@@ -3075,8 +3075,8 @@ void c_geometry::get_current_coefficients(nec_float wavelength, complex_array& c
 	
 	/* convert surface currents from */
 	/* t1,t2 components to x,y,z components */
-	int jco1 = n_plus_2m;
-	int jco2 = jco1 + m;
+	uint64_t jco1 = n_plus_2m;
+	uint64_t jco2 = jco1 + m;
 	
 	for (int i = 1; i <= m; i++ )
 	{

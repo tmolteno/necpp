@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004-2008  Timothy C.A. Molteno
+	Copyright (C) 2004-2008, 2015  Timothy C.A. Molteno
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -233,7 +233,7 @@ void to_octave(nec_complex* a, int n, int ndim)
 	cout << "[";
 	for (int row = 0; row < n; row++ )
 	{
-		int row_offset = row*ndim;
+		int64_t row_offset = row*ndim;
 		for (int i = 0; i < n; i++ )
 		{
 			to_octave(a[i+row_offset]);
@@ -285,7 +285,7 @@ void to_octave(int_array& a, int n)
 	
 	(matrix transposed.)
 */
-void lu_decompose(nec_output_file& s_output, int n, complex_array& a, int_array& ip, int ndim)
+void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
 {
 	DEBUG_TRACE("lu_decompose_ge(" << n << "," << ndim << ")");
 	
@@ -302,8 +302,8 @@ void lu_decompose(nec_output_file& s_output, int n, complex_array& a, int_array&
 	/* Un-transpose the matrix for Gauss elimination */
 	for (int i = 1; i < n; i++ )
 	{
-		int i_offset = i * ndim;
-		int j_offset = 0;
+		int64_t i_offset = i * ndim;
+		int64_t j_offset = 0;
 		for (int j = 0; j < i; j++ )
 		{
 			nec_complex aij = a[i+j_offset];
@@ -318,7 +318,7 @@ void lu_decompose(nec_output_file& s_output, int n, complex_array& a, int_array&
 	/* step 1 */
 	for (int r = 0; r < n; r++ )
 	{
-		int r_offset = r*ndim;
+		int64_t r_offset = r*ndim;
 		
 		for (int k = 0; k < n; k++ )
 			scm[k]= a[k+r_offset];
@@ -333,7 +333,7 @@ void lu_decompose(nec_output_file& s_output, int n, complex_array& a, int_array&
 			scm[pj]= scm[j];
 			int jp1 = j+1;
 		
-			int j_offset = j*ndim;
+			int64_t j_offset = j*ndim;
 			for (int i = jp1; i < n; i++ )
 				scm[i] -= a[i+j_offset]* arj;
 		
@@ -435,7 +435,7 @@ C
 	
 */
 void solve( int n, complex_array& a, int_array& ip,
-    complex_array& b, int ndim )
+    complex_array& b, int64_t ndim )
 {
 	DEBUG_TRACE("solve(" << n << "," << ndim << ")");
 /*	
@@ -494,7 +494,7 @@ extern "C"
 
 /*! Use lapack to perform LU decomposition
 */
-void lu_decompose(nec_output_file& s_output,  int n, complex_array& a_in, int_array& ip, int ndim)
+void lu_decompose(nec_output_file& s_output,  int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
 {
 	DEBUG_TRACE("factor_lapack(" << n << "," << ndim << ")");
 	ASSERT(n <= ndim);
@@ -598,22 +598,20 @@ void lu_decompose(nec_output_file& s_output,  int n, complex_array& a_in, int_ar
 	solution is returned through vector b.   (matrix transposed)
 */
 void solve( int n, complex_array& a, int_array& ip,
-    complex_array& b, int ndim )
+    complex_array& b, int64_t ndim )
 {
-	DEBUG_TRACE("solve(" << n << "," << ndim << ")");
+  DEBUG_TRACE("solve(" << n << "," << ndim << ")");
 
-	int info = clapack_zgetrs (CblasColMajor, CblasNoTrans, 
-		n, 1, (void*) a.data(), ndim, ip.data(), b.data(), n);
-	
-	if (0 != info)
-	{
-		/*
-			The factorization has been completed, but the factor U is exactly singular,
-			and division by zero will occur if it is used to solve a system of equations. 
-		*/
-		throw new nec_exception("nec++: Solving Failed: ",info);
-	}
-	
+  int info = clapack_zgetrs (CblasColMajor, CblasNoTrans, 
+    n, 1, (void*) a.data(), ndim, ip.data(), b.data(), n);
+  
+  if (0 != info) {
+    /*
+      The factorization has been completed, but the factor U is exactly singular,
+      and division by zero will occur if it is used to solve a system of equations. 
+    */
+    throw new nec_exception("nec++: Solving Failed: ",info);
+  }
 }
 
 #endif /*  LAPACK */
@@ -621,36 +619,34 @@ void solve( int n, complex_array& a, int_array& ip,
 
 /*-----------------------------------------------------------------------*/
 
-/**	factrs
+/** factrs
 
-	For symmetric structure, transforms submatricies to form
-	matricies of the symmetric modes and calls routine to LU decompose
-	matricies.
-	
-	If no symmetry [nrow = np], the routine is called to LU decompose the
-	complete matrix.
+  For symmetric structure, transforms submatricies to form
+  matricies of the symmetric modes and calls routine to LU decompose
+  matricies.
+  
+  If no symmetry [nrow = np], the routine is called to LU decompose the
+  complete matrix.
 */
-void factrs(nec_output_file& s_output,  int np, int nrow, complex_array& a, int_array& ip )
+void factrs(nec_output_file& s_output,  int64_t np, int64_t nrow, complex_array& a, int_array& ip )
 {
-	DEBUG_TRACE("factrs(" << np << "," << nrow << ")");
-	if (nrow == np) // no symmetry
-	{
-		lu_decompose(s_output,  np, a, ip, nrow );
-		return;
-	}
-	
-	int num_symmetric_modes = nrow / np;
-	DEBUG_TRACE("\tnum_symmetric_modes = " << num_symmetric_modes);
-	
-	for (int mode = 0; mode < num_symmetric_modes; mode++ )
-	{
-		int mode_offset = mode * np;
-		
-		complex_array a_temp = a.segment(mode_offset, a.size()-mode_offset);
-		int_array ip_temp = ip.segment(mode_offset, ip.size()-mode_offset);
-		
-		lu_decompose(s_output,  np, a_temp, ip_temp, nrow );
-	}
+  DEBUG_TRACE("factrs(" << np << "," << nrow << ")");
+  if (nrow == np) { // no symmetry
+    lu_decompose(s_output,  np, a, ip, nrow );
+    return;
+  }
+  
+  int num_symmetric_modes = nrow / np;
+  DEBUG_TRACE("\tnum_symmetric_modes = " << num_symmetric_modes);
+  
+  for (int mode = 0; mode < num_symmetric_modes; mode++ ) {
+    int64_t mode_offset = mode * np;
+    
+    complex_array a_temp = a.segment(mode_offset, a.size()-mode_offset);
+    int_array ip_temp = ip.segment(mode_offset, ip.size()-mode_offset);
+    
+    lu_decompose(s_output,  np, a_temp, ip_temp, nrow );
+  }
 }
 
 /*-----------------------------------------------------------------------*/
@@ -658,20 +654,18 @@ void factrs(nec_output_file& s_output,  int np, int nrow, complex_array& a, int_
 
 
 /**
-	Subroutine solves, for symmetric structures, handles the
-	transformation of the right hand side vector and solution
-	of the matrix eq.
-	\param neq number of equations?
-	\param nrh dimension of right hand  vector?
+  Subroutine solves, for symmetric structures, handles the
+  transformation of the right hand side vector and solution
+  of the matrix eq.
+  \param neq number of equations?
+  \param nrh dimension of right hand  vector?
 */
-void solves(complex_array& a, int_array& ip, complex_array& b, int neq,
-	int nrh, int np, int n, int mp, int m, int nop, 
-	complex_array& symmetry_array
-)
+void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
+      int64_t nrh, int64_t np, int64_t n, int64_t mp, int64_t m, int64_t nop, 
+      complex_array& symmetry_array)
 {
 	DEBUG_TRACE("solves(" << neq << "," << nrh << "," << np << "," << n << ")");
 	DEBUG_TRACE("      ( nop=" << nop << ")");
-
 	
 	/* Allocate some scratch memory */
 	complex_array scm;
@@ -686,7 +680,7 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int neq,
 	{
 		for (int ic = 0; ic < nrh; ic++ )
 		{
-			int column_offset = ic*neq;
+			int64_t column_offset = ic*neq;
 			if ( (n != 0) && (m != 0) )
 			{
 				for (int i = 0; i < neq; i++ )
@@ -727,7 +721,7 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int neq,
 			{
 				for (int k = 0; k < nop; k++ )
 				{
-					int ia= i+ k* npeq;
+					int64_t ia= i+ k* npeq;
 					scm[k]= b[ia+column_offset];
 				}
 			
@@ -814,12 +808,12 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int neq,
 	
 		int j = np-1;
 	
-		for (int k = 0; k < nop; k++ )
+		for (int32_t k = 0; k < nop; k++ )
 		{
 			if ( k != 0 )
 			{
 				int ia = np-1;
-				for (int i = 0; i < np; i++ )
+				for (int32_t i = 0; i < np; i++ )
 				{
 					ia++;
 					j++;

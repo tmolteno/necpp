@@ -1009,7 +1009,7 @@ void nec_context::simulate(bool far_field_flag)
 	
 	try
 	{
-	int iresrv = 0;
+	int64_t iresrv = 0;
 	bool in_freq_loop = false;
 	
 	do
@@ -2323,7 +2323,7 @@ void nec_context::load()
 }
 
 /* cmset sets up the complex structure matrix in the array in_cm */
-void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx) {
+void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   int mp2, iout, it, i1, i2, in2;
   int im1, im2, ist, ij, jss, jm1, jm2, jst;
   complex_array scm;
@@ -2458,7 +2458,7 @@ void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx) {
 /* compute_matrix_ss computes matrix elements for surface-surface interactions. */
 
 void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
-    complex_array& in_cm, int nrow, int itrp )
+    complex_array& in_cm, int64_t nrow, int itrp )
 {
 	int i1, i2, icomp, ii1, i, il, ii2, jj1, jl, jj2;
 	nec_float t1xi, t1yi, t1zi, t2xi, t2yi, t2zi, xi, yi, zi;
@@ -2561,7 +2561,7 @@ void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
 
 /* computes matrix elements for e along wires due to patch current */
 void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
-    complex_array& cw, int ncw, int nrow, int itrp )
+    complex_array& cw, int64_t ncw, int64_t nrow, int itrp )
 {
   nec_float fsign=1.0;
   complex_array emel(9);
@@ -2674,7 +2674,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
 
 /* cmws computes matrix elements for wire-surface interactions */
 void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
-    int nr, complex_array& cw, int itrp )
+    int64_t nr, complex_array& cw, int itrp )
 {
 	int ipr, ipatch, ik, js=0, jx;
 	nec_float xi, yi, zi, tx, ty, tz;
@@ -2777,7 +2777,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
 
 /* cmww computes matrix elements for wire-wire interactions */
 void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
-    int nr, complex_array& cw, int nw, int itrp) 
+    int64_t nr, complex_array& cw, int64_t nw, int itrp) 
 {
   int i, jx;
   nec_float xi, yi, zi, ai, cabi, sabi, salpi;
