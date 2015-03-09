@@ -43,12 +43,9 @@ To build a debugging version use
 Versions of nec2++ since 1.2.3 now compile fine with the MinGW (http://www.mingw.org/) free compiler tools. 
 Just download the source distribution, and follow the unix installation guide (./configure and make).
 
-### Compiling with Visual Studio 7
+### Compiling with Visual Studio 2013
 
-NEC2++ has been tested with Microsoft Visual Studio 7. A project file for VC++ 7.0 is part of the source code distribution. 
-Visual Studio 6.0 is not supported because it does not conform to modern C++ standards.
-
+NEC2++ has been tested with Microsoft Visual Studio 2013.
 Step-by-step instructions
 
-* Unzip the Windows source code distribution.
-* Build the project inside the win32 subdirectory with Visual Studio 7.
+* Build the project inside the win32 subdirectory with Visual Studio 2103.
