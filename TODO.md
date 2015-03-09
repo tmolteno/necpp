@@ -1,21 +1,20 @@
-TODO list for nec2++
+# TODO list for nec2++
 
+* Add remaining commands to the API for C, Ruby and Python.
 * Test and make sure that the Somerfeld Ground code is working (compare outputs with the FORTRAN version)
 * Get CurrentInput comparison going with nec2diff
 
 * Work on Doxygen Source Documentation
-* Work on the LaTeX users guide.
 * Get rid of libnec's dependance on the C++ standard library. See Below.
 * Export only the C API functions from libnec. This requires some extra know-how that I don't have right now -- probably an exports file. When done, this will mean that libnec can be linked to without additional libc++ linking.
 
-
-NEC Syntax Improvements
+## NEC Syntax Improvements
 
 * Handle commenting out lines (Look into how this should be done). Some folk seem to use a ' at the start of the line.
 * Add a geometry method (and nec card) for catenary hung wires (cf NEC4) CW card input.
 
 
-NEC improvements
+## NEC improvements
 
 * Export radiation patterns (command line switch) as CSV files. This will allow them to be plotted using other plotting tools.
 * Add Leeson Corrections for tapered wires (these are frequency dependant).
