@@ -87,8 +87,13 @@ LIBEIGEN=
 		[])
 	])
 
-
-
-
 AC_CHECK_LIB([m],[pow])
-AC_OUTPUT(Makefile src/Makefile)
+
+EXPLICIT_LIBS=""
+PRIVATE_LIBS=" $LDFLAGS -lstdc++ -llapack -lblas -lpthread -lm"
+
+AC_SUBST(EXPLICIT_LIBS)
+AC_SUBST(PRIVATE_LIBS)
+
+AC_OUTPUT(Makefile src/Makefile necpp.pc)
+

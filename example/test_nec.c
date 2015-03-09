@@ -18,7 +18,7 @@ void seven_wire_antenna() {
   NEC_ERROR_HANDLE(nec_wire(nec, 2, 7, -0.0166, 0.0045, 0.0714, -0.0318, -0.0166, 0.017, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_wire(nec, 3, 7, -0.0318, -0.0166, 0.017, -0.0318, -0.0287, 0.0775, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_wire(nec, 4, 11, -0.0318, -0.0287, 0.0775, -0.0318, 0.0439, 0.014, 0.001, 1.0, 1.0));
-  NEC_ERROR_HANDLE(nec_wire(nec, 5, 7, -0.0318, 0.0439, 0.014, -0.0318, 0.0045, 0.0624, 0.001, 1.0, 1.0));
+/*  NEC_ERROR_HANDLE(nec_wire(nec, 5, 7, -0.0318, 0.0439, 0.014, -0.0318, 0.0045, 0.0624, 0.001, 1.0, 1.0));*/
   NEC_ERROR_HANDLE(nec_wire(nec, 6, 5, -0.0318, 0.0045, 0.0624, -0.0106, 0.0378, 0.0866, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_wire(nec, 7, 7, -0.0106, 0.0378, 0.0866, -0.0106, 0.0257, 0.023, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_geometry_complete(nec, 1, 0));
@@ -61,7 +61,8 @@ void simple_example() {
   nec_delete(nec);
 }
 
-int main(int argc, char **argv) {
+int main() {
   simple_example();
   seven_wire_antenna();
+  return 0;
 }

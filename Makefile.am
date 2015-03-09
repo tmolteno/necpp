@@ -12,6 +12,9 @@ EXTRA_DIST = \
 	win32 \
 	Makefile.test
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = necpp.pc
+
 dist-hook:
 	rm -rf `find $(distdir)testharness/data -name *.out*`
 	rm -rf `find $(distdir)testharness/data -name *.diff*`

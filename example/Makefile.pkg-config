@@ -1,0 +1,12 @@
+FLAGS  = `pkg-config --cflags necpp`
+LIBS = `pkg-config --libs necpp`
+SLIBS = `pkg-config --static --libs necpp`
+
+all: test_nec test_static
+
+test_nec: test_nec.c
+	gcc -Wall $(FLAGS) test_nec.c -o test_nec $(LIBS)
+
+test_static: test_nec.c
+	g++ -Wall --static $(FLAGS) test_nec.c -o test_static $(SLIBS)
+
