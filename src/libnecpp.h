@@ -17,15 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-/*! \file libnecpp.h
-    \brief nec++ Library Functions.
-    
+/*! \mainpage NEC2++ interface
+ *
+ * \section intro_sec C-Style API
+ *
+ * The NEC2++ library provides an API for modeling structures.
+ * This is described in \ref libnecpp.h.
+ * 
+ * 
+ * \file libnecpp.h
+ * \brief nec++ Library Functions.
+ * \section _how_to_use How to use libNEC. 
+ * Enter the following file into test_nec.c, and compile with
 \verbatim
-How to use libNEC. 
-  
-  Enter the following file into test_nec.c, and compile with
   gcc -o test_nec test_nec.c -lnecpp
-  
+\endverbatim
+
+\verbatim
   #include "libnecpp.h"
   #include <stdio.h>
   
@@ -82,28 +90,21 @@ typedef struct nec_context nec_context;
 extern "C" {
 #endif
 
-/*! \brief Construct and initialize an nec_context */
+/*! \brief Construct and initialize an nec_context 
+ */
 nec_context* nec_create();
 
-/*!\brief Delete an nec_context object. */
+/*!\brief Delete an nec_context object. 
+ */
 long nec_delete(nec_context* in_context);
 
-/*!\brief Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. */
+/*!\brief Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. 
+ */
 long nec_benchmark();
 
 
 /*! \brief Generates segment geometry for a straigt wire
     \param in_context The nec_context created with nec_create()
-    \param tag_id
-    \param segment_count Number of Elements (should be around 12-20 per wavelength)
-    \param rad Wire radius of first segment (in Meters)
-    \param rdel Ratio of the length of a segment to the length of the previous segment.  (Set to 1.0 if segments have uniform length)
-    \param rrad The ratio of the radii of adjacent segments (Set to 1.0 if not tapered)
-*/
-/*! Add a wire to the geometry,
-
-    All co-ordinates are in meters.
-
     \param tag_id The tag ID.
     \param segment_count The number of segments.
     \param xw1 The x coordinate of the wire starting point.
@@ -115,6 +116,8 @@ long nec_benchmark();
     \param rad The wire radius (meters)
     \param rdel For tapered wires, the. Otherwise set to 1.0
     \param rrad For tapered wires, the. Otherwise set to 1.0
+    
+    \remark All co-ordinates are in meters.
 */
 long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		double xw1, double yw1, double zw1,
@@ -122,20 +125,20 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		double rad, double rdel, double rrad);
 
 /*! \brief Indicate that the geometry is complete (GE card)
-    \param in_context The nec_context created with nec_create()
-    \param gpflag Geometry ground plain flag.
-            0 - no ground plane is present. 
-            1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero) 
-            -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
-    \param card_int_2 Unused (set to zero)
-*/
+ * \param in_context The nec_context created with nec_create()
+ * \param gpflag Geometry ground plain flag.
+ *     0 - no ground plane is present.
+ *     1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
+ *     -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
+ * \param card_int_2 Unused (set to zero)
+ **/
 long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
 
 
 /*! \brief Get the last error message
  * All functions return a long. If this is != 0. Then an error has occurred.
  * The error message can be retrieved with this function.
- * */
+ **/
 const char* nec_error_message();
 
 /*
@@ -152,27 +155,24 @@ const char* nec_error_message();
 */
 long nec_gn_card(nec_context* in_context, int itmp1, int itmp2, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
-/*!
- * FR card
- * @param in_context The nec_context created with nec_create()
- * @param in_ifrq 0 is a linear range of frequencies, 1 is a log range.
- * @param in_nfrq The number of frequencies
- * @param in_freq_mhz The starting frequency in MHz.
- * @param in_del_freq The frequency step (in MHz for ifrq = 0)
+/*! \brief FR card
+ * \param in_context The nec_context created with nec_create()
+ * \param in_ifrq 0 is a linear range of frequencies, 1 is a log range.
+ * \param in_nfrq The number of frequencies
+ * \param in_freq_mhz The starting frequency in MHz.
+ * \param in_del_freq The frequency step (in MHz for ifrq = 0)
  */
 long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq);
 
 
 
-/*!
-* LD card (Loading)
-* @param in_context The nec_context created with nec_create()
-* @param ldtyp Type of loading (5 = segment conductivity)
-* @param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
-* @param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. 
-* @param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous param- eter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
-
-Floating Point Input for the Various Load Types:
+/*! \brief LD card (Loading)
+* \param in_context The nec_context created with nec_create()
+* \param ldtyp Type of loading (5 = segment conductivity)
+* \param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
+* \param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. 
+* \param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous param- eter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
+* Floating Point Input for the Various Load Types:
 */
 long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3);
 
@@ -183,72 +183,68 @@ long nec_nt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int i
 long nec_xq_card(nec_context* in_context, int itmp1);
 long nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3, double tmp4);
 
-	/*! \brief Standard radiation pattern parameters 
-	
-	\param calc_mode This integer selects the mode of calculation for the radiated field. Some values of (calc_mode) will affect the meaning of the remaining parameters on the card. Options available for calc_mode are:
-		\arg \c O - normal mode. Space-wave fields are computed. An infinite ground plane is included if it has been specified previously on a GN card; otherwise, the antenna is in free space.
-		\arg \c 1 - surface wave propagating along ground is added to the normal space wave. This option changes the meaning of some of the other parameters on the RP card as explained below, and the results appear in a special output format. Ground parameters must have been input on a GN card. The following options cause calculation of only the space wave but with special ground conditions. Ground conditions include a two-medium ground (cliff where the media join in a circle or a line), and a radial wire ground screen. Ground parameters and dimensions must be input on a GN or GD card before the RP card is read. The RP card only selects the option for inclusion in the field calculation. (Refer to the GN and GD cards for further explanation.)
-		\arg \c  2 - linear cliff with antenna above upper level. Lower medium parameters are as specified for the second medium on the GN card or on the GD card.
-		\arg \c 3 - circular cliff centered at origin of coordinate system: with antenna above upper level. Lower medium parameters are as specified for the second medium on the GN card or on the GD card.
-		\arg \c 4 - radial wire ground screen centered at origin.
-		\arg \c 5 - both radial wire ground screen and linear cliff.
-		\arg \c 6 - both radial wire ground screen ant circular cliff.
-	
-	\param n_theta The number of theta angles.
-	\param n_phi The number of phi angles. 
-		 
+/*! \brief Standard radiation pattern parameters 
 
-		 
-\param output_format The output format:
-	\arg \c 0 major axis, minor axis and total gain printed. 
-	\arg \c 1 vertical, horizontal ant total gain printed.
-	
-\param normalization Controls the type of normalization of the radiation pattern
-	\arg \c 0 no normalized gain. 
-	\arg \c 1 major axis gain normalized. 
-	\arg \c 2 minor axis gain normalized. 
-	\arg \c 3 vertical axis gain normalized. 
-	\arg \c 4 horizontal axis gain normalized. 
-	\arg \c 5 total gain normalized.
+  \param calc_mode This integer selects the mode of calculation for the radiated field. Some values of (calc_mode) will affect the meaning of the remaining parameters on the card. Options available for calc_mode are:
+        \arg \c O - normal mode. Space-wave fields are computed. An infinite ground plane is included if it has been specified previously on a GN card; otherwise, the antenna is in free space.
+        \arg \c 1 - surface wave propagating along ground is added to the normal space wave. This option changes the meaning of some of the other parameters on the RP card as explained below, and the results appear in a special output format. Ground parameters must have been input on a GN card. The following options cause calculation of only the space wave but with special ground conditions. Ground conditions include a two-medium ground (cliff where the media join in a circle or a line), and a radial wire ground screen. Ground parameters and dimensions must be input on a GN or GD card before the RP card is read. The RP card only selects the option for inclusion in the field calculation. (Refer to the GN and GD cards for further explanation.)
+        \arg \c  2 - linear cliff with antenna above upper level. Lower medium parameters are as specified for the second medium on the GN card or on the GD card.
+        \arg \c 3 - circular cliff centered at origin of coordinate system: with antenna above upper level. Lower medium parameters are as specified for the second medium on the GN card or on the GD card.
+        \arg \c 4 - radial wire ground screen centered at origin.
+        \arg \c 5 - both radial wire ground screen and linear cliff.
+        \arg \c 6 - both radial wire ground screen ant circular cliff.
 
-\param D Selects either power gain or directive gain for both standard printing and normalization. If the structure excitation is an incident plane wave, the quantities printed under the heading "gain" will actually be the scattering cross section (a/lambda 2 ) and will not be affected by the value of d. The column heading for the output will still read "power" or "directive gain," however. 
-	\arg \c 0 power gain. 
-	\arg \c 1 directive gain.
+  \param n_theta The number of theta angles.
+  \param n_phi The number of phi angles. 
+            
+  \param output_format The output format:
+      \arg \c 0 major axis, minor axis and total gain printed. 
+      \arg \c 1 vertical, horizontal ant total gain printed.
+      
+  \param normalization Controls the type of normalization of the radiation pattern
+      \arg \c 0 no normalized gain. 
+      \arg \c 1 major axis gain normalized. 
+      \arg \c 2 minor axis gain normalized. 
+      \arg \c 3 vertical axis gain normalized. 
+      \arg \c 4 horizontal axis gain normalized. 
+      \arg \c 5 total gain normalized.
+
+  \param D Selects either power gain or directive gain for both standard printing and normalization. If the structure excitation is an incident plane wave, the quantities printed under the heading "gain" will actually be the scattering cross section (a/lambda 2 ) and will not be affected by the value of d. The column heading for the output will still read "power" or "directive gain," however. 
+      \arg \c 0 power gain. 
+      \arg \c 1 directive gain.
 
 
-\param A - Requests calculation of average power gain over the region covered by field points. 
-	\arg \c 0 no averaging. 
-	\arg \c 1 average gain computed. 
-	\arg \c 2 average gain computed, printing of gain at the field points used for averaging is suppressed. If n_theta or NPH is equal to one, average gain will not be computed for any value of A since the area of the region covered by field points vanishes.
+  \param A - Requests calculation of average power gain over the region covered by field points. 
+      \arg \c 0 no averaging. 
+      \arg \c 1 average gain computed. 
+      \arg \c 2 average gain computed, printing of gain at the field points used for averaging is suppressed. If n_theta or NPH is equal to one, average gain will not be computed for any value of A since the area of the region covered by field points vanishes.
 
+  \param theta0 - Initial theta angle in degrees (initial z coordinate in meters if calc_mode = 1).
 
-	
-	\param theta0 - Initial theta angle in degrees (initial z coordinate in meters if calc_mode = 1).
-	
-	\param phi0 - Initial phi angle in degrees.
-	
-	\param delta_theta - Increment for theta in degrees (increment for z in meters if calc_mode = 1).
-	
-	\param delta_phi - Increment for phi in degrees.
-	
-	\param radial_distance - Radial distance (R) of field point from the origin in meters. radial_distance is optional. If it is zero, the radiated electric field will have the factor exp(-jkR)/R omitted. If a value of R is specified, it should represent a point in the far-field region since near components of the field cannot be obtained with an RP card. (If calc_mode = 1, then radial_distance represents the cylindrical coordinate phi in meters and is not optional. It must be greater than about one wavelength.)
-	
-	\param gain_norm - Determines the gain normalization factor if normalization has been requested in the normalization parameter. If gain_norm is zero, the gain will be normalized to its maximum value. If gain_norm is not zero, the gain wi11 be normalized to the value of gain_norm.
-	
-	\remark
-	The field point is specified in spherical coordinates (R, sigma, theta), except when the surface wave is computed. For computing the surface wave field (calc_mode = l), cylindrical coordinates (phi, theta, z) are used to accurately define points near the ground plane at large radial distances.
-		 
-	\remark
-	The rp_card() function allows automatic stepping of the field point to compute the field over a region about the antenna at uniformly spaced points.
-	\remark
-	The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_theta, delta_phi, radial_distance, and gain_norm control the field-point stepping.
-		
-	\li The nec_rp_card() function will cause the interaction matrix to be computed and factored and the structure currents to be computed if these operations have not already been performed. Hence, all required input parameters must be set before the nec_rp_card() function is called. 
-	\li At a single frequency, any number of nec_rp_card() calls may occur in sequence so that different field-point spacings may be used over different regions of space. If automatic frequency stepping is being used (i.e., in_nfrq on the nec_fr_card() function is greater than one), only one nec_rp_card() function will act as data inside the loop. Subsequent calls to nec_rp_card() will calculate patterns at the final frequency. 
-	\li When both n_theta and n_phi are greater than one, the angle theta (or Z) will be stepped faster than phi. 
-	\li When a ground plane has been specified, field points should not be requested below the ground (theta greater than 90 degrees or Z less than zero.)
-	
-	*/
+  \param phi0 - Initial phi angle in degrees.
+
+  \param delta_theta - Increment for theta in degrees (increment for z in meters if calc_mode = 1).
+
+  \param delta_phi - Increment for phi in degrees.
+
+  \param radial_distance - Radial distance (R) of field point from the origin in meters. radial_distance is optional. If it is zero, the radiated electric field will have the factor exp(-jkR)/R omitted. If a value of R is specified, it should represent a point in the far-field region since near components of the field cannot be obtained with an RP card. (If calc_mode = 1, then radial_distance represents the cylindrical coordinate phi in meters and is not optional. It must be greater than about one wavelength.)
+
+  \param gain_norm - Determines the gain normalization factor if normalization has been requested in the normalization parameter. If gain_norm is zero, the gain will be normalized to its maximum value. If gain_norm is not zero, the gain wi11 be normalized to the value of gain_norm.
+
+  \remark
+  The field point is specified in spherical coordinates (R, sigma, theta), except when the surface wave is computed. For computing the surface wave field (calc_mode = l), cylindrical coordinates (phi, theta, z) are used to accurately define points near the ground plane at large radial distances.
+            
+  \remark
+  The rp_card() function allows automatic stepping of the field point to compute the field over a region about the antenna at uniformly spaced points.
+  \remark
+  The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_theta, delta_phi, radial_distance, and gain_norm control the field-point stepping.
+          
+  \li The nec_rp_card() function will cause the interaction matrix to be computed and factored and the structure currents to be computed if these operations have not already been performed. Hence, all required input parameters must be set before the nec_rp_card() function is called. 
+  \li At a single frequency, any number of nec_rp_card() calls may occur in sequence so that different field-point spacings may be used over different regions of space. If automatic frequency stepping is being used (i.e., in_nfrq on the nec_fr_card() function is greater than one), only one nec_rp_card() function will act as data inside the loop. Subsequent calls to nec_rp_card() will calculate patterns at the final frequency. 
+  \li When both n_theta and n_phi are greater than one, the angle theta (or Z) will be stepped faster than phi. 
+  \li When a ground plane has been specified, field points should not be requested below the ground (theta greater than 90 degrees or Z less than zero.)
+
+*/
 long nec_rp_card(nec_context* in_context,
 	int calc_mode, int n_theta, int n_phi,
 	int output_format, int normalization, int D, int A,	

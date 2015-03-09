@@ -309,9 +309,8 @@ All co-ordinates are in meters.
 	\param rad The wire radius.
 */
 void nec_context::arc( int tag_id, int segment_count, nec_float rada,
-		nec_float ang1, nec_float ang2, nec_float rad )
-{
-	m_geometry->arc(tag_id, segment_count, rada, ang1, ang2, rad);
+        nec_float ang1, nec_float ang2, nec_float rad ) {
+    m_geometry->arc(tag_id, segment_count, rada, ang1, ang2, rad);
 }
 		
 
@@ -332,9 +331,8 @@ All co-ordinates are in meters.
 	\param rad The wire radius.
 */
 void nec_context::helix(int tag_id, int segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1,
-		nec_float a2, nec_float b2, nec_float rad)
-{
-	m_geometry->helix(s, hl, a1, b1, a2, b2, rad, segment_count, tag_id);
+		nec_float a2, nec_float b2, nec_float rad) {
+  m_geometry->helix(s, hl, a1, b1, a2, b2, rad, segment_count, tag_id);
 }
 
 /* "fr" card, frequency parameters
@@ -347,21 +345,20 @@ I4- BLANK -- not used in this function
 F1- FREQUENCY OR START FREQUENCY
 F2- FREQ INCREMENT, ADD OR MULTIPLY
 */
-void nec_context::fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq)
-{
-	DEBUG_TRACE("fr_card()");
-	ifrq = in_ifrq;
-	nfrq = in_nfrq;
-	if ( nfrq == 0)
-		nfrq=1;
-		
-	freq_mhz = in_freq_mhz;
-	delfrq = in_del_freq;
-	if ( iped == 1)
-		impedance_norm_factor = 0.0;
-		
-	processing_state = 1;
-	iflow = 1;
+void nec_context::fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq) {
+  DEBUG_TRACE("fr_card()");
+  ifrq = in_ifrq;
+  nfrq = in_nfrq;
+  if ( nfrq == 0)
+          nfrq=1;
+          
+  freq_mhz = in_freq_mhz;
+  delfrq = in_del_freq;
+  if ( iped == 1)
+          impedance_norm_factor = 0.0;
+          
+  processing_state = 1;
+  iflow = 1;
 }
 
 
