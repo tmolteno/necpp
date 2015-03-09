@@ -1,6 +1,9 @@
-PyNEC is a Python module wrapped from NEC-2 
+# PyNEC is a Python module wrapped from NEC-2 
 
-*** How one can build it ? ***
+This module was contributed by Remi Sassolas. It wraps the C++ interface to nec2++. There is a more recent python module
+that wraps the C-style interface. It is in the directory ../python.
+
+## How one can build it ?
 
 To build it one must have Swig ver 1.3.25 installed
 (http://www.swig.org/). SWIG is the tool used for the wrapping of NEC-2.
@@ -32,7 +35,7 @@ mentioned above).
 - You can now load the module.  
 
 
-*** How one can load it ? ***
+## How one can load it ?
 
 To load PyNEC move to the "python_module/" directory, and import the
 module from a python interpreter :
@@ -47,7 +50,7 @@ Then you can start using the module.
 
 
 
-*** List of directories ***
+## List of directories
 
 - The directory "interface_files/" contains the different interface files. "PyNEC.i" is the "master" interface file.
 

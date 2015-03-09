@@ -164,7 +164,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 			print_structure_spec = false;
 		}
 
-		if ( card_id != "GH") // gm_num != 10 )
+		if ( card_id != "SC") // gm_num != 10 )
 			isct=0;
 
 		/* "gw" card, generate segment data for straight wire.

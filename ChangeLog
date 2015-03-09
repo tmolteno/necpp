@@ -1,7 +1,8 @@
 Version 1.6a
 * Yoshi Takeyasu. Change instances of int to long long, to allow simulations up to 140 GB.
-* C-style library now supports error messages 
-* Added missing library function nec_kh_card()
+* Bugfix in c_geometry::cmss
+* C-style library now supports error messages. This changes the public API.
+* Added missing library function nec_kh_card(). 
 * Cleaned up bitrot in example code.
         
 Version 1.5.4 [December 2014]
