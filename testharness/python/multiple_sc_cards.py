@@ -57,6 +57,11 @@ class TestSurfacePatches(unittest.TestCase):
     PT,-1
     RP,0,361,3,1500,0.000000,0.000000,1.000000,45.000000
     EN
+    
+    max_gain = nec_get_max_gain_db(nec)
+    Necpp.nec_delete(nec)
+
+    self.assertEqual(max_gain, 10.333162)
 
 if __name__ == '__main__':
   unittest.main()
