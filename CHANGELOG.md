@@ -1,7 +1,7 @@
 ## Version 1.6a
 * Added python library for the c-stye API.
 * Fixed bug.  "SP" with multiple "SC" doesn't work #10.
-* Yoshi Takeyasu. Change instances of int to long long, to allow simulations up to 140 GB.
+* Yoshi Takeyasu. Change instances of int to int64_t, to allow simulations up to 140 GB.
 * Bugfix in c_geometry::cmss
 * C-style library now supports error messages. This changes the public API.
 * Added missing library function nec_kh_card(). 
