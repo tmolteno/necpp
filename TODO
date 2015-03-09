@@ -1,7 +1,6 @@
 TODO list for nec2++
 
 * Test and make sure that the Somerfeld Ground code is working (compare outputs with the FORTRAN version)
-* BUG with S/N nec2++ -i gn2.nec -g (check with PJW)
 * Get CurrentInput comparison going with nec2diff
 
 * Work on Doxygen Source Documentation
