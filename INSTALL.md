@@ -1,10 +1,9 @@
-Installation from CVS
-=====================
+# Installation from CVS
 
 To create the files using autoconf and friends, issue the following 
 command, and then proceed to the Basic Installation.
 
-==Pre-requisites==
+## Pre-requisites
 
 Nec2++ requires a C++ compiler and uses the GNU autoconf packages for
 keeping track of dependencies. On Debian or a derivative, you can
@@ -12,7 +11,7 @@ install these with the following command.
 
   aptitude install g++ make automake autoconf libtool libatlas-base-dev
 
-==Installation Steps==
+## Installation Steps
 
   1. Install the autoconf and libtool packages.
      On Debian this is done with 
@@ -33,7 +32,7 @@ install these with the following command.
         make
         sudo make install
 
-==Compiling for a specific architecture==
+## Compiling for a specific architecture
 
 Particularly using gcc-4.0 it is important to specify the architecture you
 are using (this will produce approximately a 50% speedup on the athlon-xp
@@ -43,8 +42,14 @@ for example. The following configure options will do this:
   2. make
   3. make install
 
+## [Testing only] Using Eigen
 
-==Building for Windows==
+Eigen is a fast matrix library for C++. Nec2++ can be build to use eigen rather than its own safe_array class for vectors.
+
+    sudo aptitude install libeigen3-dev
+    ./configure --with-eigen
+
+## Building for Windows
 
 The MinGW toolset (a free compiler for Windows based on GCC) can be used to
 compile nec2++ for windows operating systems. This is easily done from a

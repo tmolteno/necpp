@@ -32,64 +32,64 @@
 
 using namespace std;
 
+#include "common.h"
 #include "AntennaInput.h"
 #include "RadiationInput.h"
 #include "PowerBudget.h"
 
 
+int main(int argc, char** argv) {
 
-int main(int argc, char** argv)
-{
-	cout << "NecDiff 0.12" << endl;
+  if (argc < 2) {
+    cout << "Usage: nec2diff fila, file b" << endl;
+  }
+  cout << "NecDiff 0.12" << endl;
 
-	string file1(argv[1]);
-	string file2(argv[2]);
+  string file1(argv[1]);
+  string file2(argv[2]);
 
-	cout << "File1: " << file1 << endl;
-	cout << "File2: " << file2 << endl;
+  cout << "File1: " << file1 << endl;
+  cout << "File2: " << file2 << endl;
 
-	{
-		AntennaInput ai1(file1);
-		AntennaInput ai2(file2);
-	
-		cout << "AntennaInput Difference = " << ai1.difference(ai2) << endl;
-		if (!ai1.equalto(ai2))
-		{
-			cerr << file1 << "::" << file2;
-			cerr << ". Input Parameters Different " << ai1.difference(ai2) <<  endl;
-		}	
-	}
-	// Compare Power Budget
+  {
+    AntennaInput ai1(file1);
+    AntennaInput ai2(file2);
 
-	{
-		PowerBudget r1(file1);
-		PowerBudget r2(file2);
-	
-		cout << "PowerBudget Difference = " << r1.difference(r2) << endl;
-		if (!r1.equalto(r2))
-		{
-			cerr << file1 << "::" << file2;
-			cerr << ". Power Budgets Different " << r1.difference(r2) << endl;
-//			return 1;
-		}
-	}
+    cout << "AntennaInput Difference = " << ai1.difference(ai2) << endl;
+    if (!ai1.equalto(ai2)) {
+      cerr << file1 << "::" << file2;
+      cerr << ". Input Parameters Different " << ai1.difference(ai2) <<  endl;
+    }
+  }
+  
+  // Compare Power Budget
 
-	// Compare Radiation Patterns
+  {
+    PowerBudget r1(file1);
+    PowerBudget r2(file2);
 
-	{
-		RadiationInput r1(file1);
-		RadiationInput r2(file2);
-	
-		cout << "RadiationInput Difference = " << r1.difference(r2) << endl;
-		if (!r1.equalto(r2))
-		{
-			cerr << file1 << "::" << file2;
-			cerr << ". Radiation Patterns Different " << r1.difference(r2) << endl;
-//			return 1;
-		}
-	}
-	
-	return 0;
+    cout << "PowerBudget Difference = " << r1.difference(r2) << endl;
+    if (!r1.equalto(r2)) {
+      cerr << file1 << "::" << file2;
+      cerr << ". Power Budgets Different " << r1.difference(r2) << endl;
+      // return 1;
+    }
+  }
+
+  // Compare Radiation Patterns
+  {
+    RadiationInput r1(file1);
+    RadiationInput r2(file2);
+
+    cout << "RadiationInput Difference = " << r1.difference(r2) << endl;
+    if (!r1.equalto(r2)) {
+      cerr << file1 << "::" << file2;
+      cerr << ". Radiation Patterns Different " << r1.difference(r2) << endl;
+      // return 1;
+    }
+  }
+  
+  return 0;
 }
 
 

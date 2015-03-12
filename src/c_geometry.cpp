@@ -1837,7 +1837,7 @@ void c_geometry::connect_segments( int ignd )
           ix= jco[i];
           if ( ix <= 0) {
             ix=- ix;
-            int ixx = ix-1;
+            int ixx = ix-1; // TODO if ix == 0 we have a problem
             x[ixx]= xa;
             y[ixx]= ya;
             z[ixx]= za;
