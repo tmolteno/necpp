@@ -288,4 +288,16 @@ private:
 }; 
 
 
+template<typename T>
+class safe_matrix : public safe_array<T> {
+public:
+  safe_matrix(long rows, long cols) : safe_array<T>(rows*cols) {
+    this->resize(rows, cols);
+  }
+
+private:
+  using safe_array<T>::operator[]; /* Stop folk from using square bracket indexing */
+
+};
+
 #endif /* __safe_array__ */

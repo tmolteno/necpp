@@ -86,15 +86,16 @@ TEST_CASE( "Segments", "[safe_array]") {
 
 
 TEST_CASE( "2D", "[safe_array]") {
-    safe_array<int> v( 25 );
-    v.resize(5,5);
+    safe_matrix<int> v( 5,5 );
     for (int i=0;i<5;i++)
        for (int j=0;j<5;j++)
          v(i,j) = i*j;
 
     REQUIRE(v.size() == 25);
     REQUIRE(v(1,1) == 1);
-    REQUIRE(v(6,1) == 1);
+    REQUIRE(v(4,1) == 4);
     
+    REQUIRE_THROWS(v(5,1) == 5);
+    REQUIRE_THROWS(v(5,0) == 0);
 }
 
