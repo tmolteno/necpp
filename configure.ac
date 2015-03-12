@@ -71,21 +71,39 @@ AM_PROG_LIBTOOL
 
 
 AC_ARG_WITH([eigen],
-	[AS_HELP_STRING([--without-eigen],
-	[disable support for eigen])],
-	[],
-	[with_eigen=no])
+        [AS_HELP_STRING([--without-eigen],
+        [disable support for eigen])],
+        [],
+        [with_eigen=no])
+
+AC_ARG_WITH([eigenv],
+        [AS_HELP_STRING([--without-eigenv],
+        [disable support for eigen])],
+        [],
+        [with_eigenv=no])
 
 LIBEIGEN=
-	AS_IF([test "x$with_eigen" != xno],
-	[
-		CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-		AC_CHECK_HEADER(
-		[Eigen/Core],
-		[AC_DEFINE([USING_EIGEN_ARRAY], [1], [Define if you have eigen])],
-		[AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
-		[])
-	])
+        AS_IF([test "x$with_eigen" != xno],
+        [
+                CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+                AC_CHECK_HEADER(
+                [Eigen/Core],
+                [AC_DEFINE([USING_EIGEN_ARRAY], [1], [Define if you have eigen])],
+                [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
+                [])
+        ])
+
+LIBEIGENV=
+        AS_IF([test "x$with_eigenv" != xno],
+        [
+                CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+                AC_CHECK_HEADER(
+                [Eigen/Core],
+                [AC_DEFINE([USING_EIGEN_3VECT], [1], [Define if you have eigen])],
+                [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
+                [])
+        ])
+
 
 AC_CHECK_LIB([m],[pow])
 

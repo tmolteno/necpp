@@ -4,7 +4,7 @@ nec2___SOURCES = common.h nec2cpp.cpp nec2cpp.h XGetopt.cpp XGetopt.h
 
 nec2diff_SOURCES =  AntennaInput.h BaseInput.h CurrentInput.h necDiff.cpp PowerBudget.h RadiationInput.h
 
-testbench_SOURCES = safe_array_tb.cpp catch.hpp
+testbench_SOURCES = safe_array_tb.cpp math_util_tb.cpp catch.hpp
 
 include_HEADERS = libnecpp.h 
 noinst_HEADERS = nec_debug.h nec_exception.h nec_wire.h

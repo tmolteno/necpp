@@ -42,6 +42,23 @@ TEST_CASE( "Resizing Array", "[safe_array]") {
 }
 
 TEST_CASE( "Indexing Array", "[safe_array]") {
+  safe_array<float> v( 5 );
+
+  v.fill(0,5,5);
+  
+  for (int i=0;i<5;i++)
+    REQUIRE( v[i] == 5 );
+
+  SECTION( "Negative Indices" ) {
+    REQUIRE_THROWS( v[-1] == 0 );      
+  }
+  SECTION( "Out of Bound Indices" ) {
+    REQUIRE_THROWS( v[5] == 0 );      
+  }
+}
+
+
+TEST_CASE( "Filling Array", "[safe_array]") {
     safe_array<float> v( 5 );
 
     v.fill(0,5,5);
@@ -49,7 +66,7 @@ TEST_CASE( "Indexing Array", "[safe_array]") {
     for (int i=0;i<5;i++)
        REQUIRE( v[i] == 5 );
 
-    SECTION( "resizing bigger pads with zeros" ) {
+    SECTION( "Filling from the Middle" ) {
         v.resize( 10 );
         v.fill(5,5,0);
         
