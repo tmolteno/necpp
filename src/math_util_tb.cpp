@@ -14,4 +14,5 @@ TEST_CASE( "Addition", "[nec_3vector]") {
 
     nec_3vector s(3,5,7);
     REQUIRE( s == x+y);  
+    REQUIRE( y == x+y-x);  
 }
