@@ -10,6 +10,7 @@
 *.la
 src/nec2++
 src/nec2diff
+src/testbench
 
 # Packages #
 ############
