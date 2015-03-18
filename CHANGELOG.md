@@ -10,6 +10,7 @@
 * Added C-style support for GM card (move command). nec_gm_card.
 * Added python based testharness
 * Start to use matrix operations for multi-dimensional arrays. safe_matrix class.
+* Errors are thrown if zeros are specified for ground conductivity and dielectric constant.
 
 ## Version 1.5.4 [December 2014]
 * Changed default compiler options to remove debugging symbols

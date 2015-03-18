@@ -102,8 +102,8 @@ void example3() {
   printf("Impedance 2 %f\n", nec_impedance_real(nec,0)); // 83.7552291016712)
 }
 int main() {
-  //simple_example();
+  simple_example();
   example3();
-  //seven_wire_antenna();
+  seven_wire_antenna();
   return 0;
 }

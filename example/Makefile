@@ -22,8 +22,9 @@
 #
 
 LD_LIBRARY_PATH=/usr/lib/atlas-base/atlas solve
-TEST_LIBRARY_PATH=../lib
+# TEST_LIBRARY_PATH=../lib
 # ./configure  --prefix=`pwd` --with-bounds
+
 all: test_cpp
 
 test_static: test_nec.c
@@ -54,7 +55,7 @@ NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 CPP_SRC  = test_cpp.cpp
 CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
-CXXFLAGS=-I ../src/ -I .. -O2 -Wall -D NEC_ERROR_CHECK
+CXXFLAGS=-I ../src/ -I .. -O2 -Wall
 
 
 test_cpp: ${CPP_OBJS} ${NECPP_OBJS}
