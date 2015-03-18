@@ -1,33 +1,31 @@
 /*
-	Copyright (C) 2004-2008  Timothy C.A. Molteno
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004-2008,2015  Timothy C.A. Molteno
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "nec_structure_currents.h"
 #include "nec_context.h"
 #include "nec_exception.h"
 #include "c_geometry.h"
 
-int nec_structure_currents::get_n()
-{
-	return m_geometry->n_segments;
+int nec_structure_currents::get_n() {
+  return m_geometry->n_segments;
 }
 
-int nec_structure_currents::get_m()
-{
-	return m_geometry->m;
+int nec_structure_currents::get_m() {
+  return m_geometry->m;
 }
 			
 
@@ -86,11 +84,10 @@ std::string nec_structure_currents::hpol(enum excitation_type e)
 	}
 }
 
+
 void nec_structure_currents::analyze()
 {
-	int jump;
 	nec_float cmag;
-//	nec_complex curi;
 	nec_float fr;
 	nec_complex eth, eph, ex, ey, ez;
 	
@@ -99,7 +96,7 @@ void nec_structure_currents::analyze()
 		if (iptflg!= -1)
 		{
 			int itmp1=0;
-			jump= iptflg+1;
+			//int jump= iptflg+1;
 	
 			for (int i = 0; i < m_geometry->n_segments; i++ )
 			{
@@ -109,10 +106,10 @@ void nec_structure_currents::analyze()
 				if ( (nload != 0) && (fabs(real(m_context->zarray[i])) >= 1.e-20) )
 					structure_power_loss += 0.5*cmag*cmag*real( m_context->zarray[i]) * m_geometry->segment_length[i];
 	
-				if ( jump == 0)
+				if ( iptflg == -1) // Never true
 				continue;
 
-				if ( jump > 0 )
+				if ( iptflg > -1 )  // I
 				{
 					if ( (iptag != 0) && (m_geometry->segment_tags[i] != iptag) )
 						continue;
@@ -125,7 +122,7 @@ void nec_structure_currents::analyze()
 					{
 						if ( iptflg >= 2 )
 						{
-							m_context->fnorm[m_context->get_inc()-1]= cmag;
+							m_context->fnorm(m_context->get_inc()-1,0)= cmag; // WARNING: work out what inc, isave are.
 							m_context->set_isave(i+1);
 						}
 

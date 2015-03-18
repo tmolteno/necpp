@@ -1,2 +1,2 @@
 test:
-	python multiple_sc_cards.py
+	python -m unittest discover

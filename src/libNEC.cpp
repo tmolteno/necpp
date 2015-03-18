@@ -57,10 +57,27 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count, double xw1
   NEC_ERROR_HANDLE(in_context->wire(tag_id, segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, rdel, rrad));
 }
  
- 
+long nec_patch(nec_context* in_context, int nx, int ny,
+    double ax1, double ay1, double az1,
+    double ax2, double ay2, double az2,
+    double ax3, double ay3, double az3,
+    double ax4, double ay4, double az4) {
+  NEC_ERROR_HANDLE(in_context->patch(nx, ny, ax1, ay1, az1, 
+               ax2, ay2, az2,  ax3,  ay3,  az3, ax4,  ay4,  az4));
+}
+
+long nec_gm_card(nec_context* in_context,  int itsi, int nrpt,
+                 double rox, double roy, double roz, double xs,
+                 double ys, double zs, int its)
+{
+  NEC_ERROR_HANDLE(in_context->move(rox, roy, roz, xs, ys, zs, its, nrpt, itsi));
+}
+
+
 long nec_geometry_complete(nec_context* in_context, int card_int_1, int card_int_2) {
   NEC_ERROR_HANDLE(in_context->geometry_complete(card_int_1, card_int_2));
 }
+
 
 const char* nec_error_message() {
   return _err_message.c_str();

@@ -14,7 +14,7 @@ necpp_module = Extension('_necpp',
                            )
 
 setup (name = 'necpp',
-       version = '0.1.0',
+       version = '0.1.2',
        author      = "Tim Molteno tim@physics.otago.ac.nz",
        description = """Python Antenna Simulation Module (nec2++)""",
        ext_modules = [necpp_module],

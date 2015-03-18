@@ -124,6 +124,53 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 		double xw2, double yw2, double zw2, 
 		double rad, double rdel, double rrad);
 
+
+/*! \brief Surface Patch (SP Card)
+    \param in_context The nec_context created with nec_create()
+    \param nx The tag ID.
+    \param ny The number of segments.
+    \param ax1 The x coordinate of the wire starting point.
+    \param ay1 The y coordinate of the wire starting point.
+    \param az1 The z coordinate of the wire starting point.
+    \param ax2 The x coordinate of the wire starting point.
+    \param ay2 The y coordinate of the wire starting point.
+    \param az2 The z coordinate of the wire starting point.
+    \param ax3 The x coordinate of the wire starting point.
+    \param ay3 The y coordinate of the wire starting point.
+    \param az3 The z coordinate of the wire starting point.
+    \param ax4 The x coordinate of the wire starting point.
+    \param ay4 The y coordinate of the wire starting point.
+    \param az4 The z coordinate of the wire starting point.
+    
+    \remark All co-ordinates are in meters.
+*/
+long nec_patch(nec_context* in_context, int nx, int ny,
+    double ax1, double ay1, double az1,
+    double ax2, double ay2, double az2,
+    double ax3, double ay3, double az3,
+    double ax4, double ay4, double az4);
+
+/*! \brief Coordinate Transformation
+ * 
+ * \param itsi  Tag number increment.
+ * \param nprt  The number of new Structures to be generated
+ * \param ROX   Angle in degrees through which the structure is rotated about
+ *              the X-axis.  A positive angle causes a right-hand rotation.
+ * \param ROY   Angle of rotation about Y-axis.
+ * \param ROZ   Angle of rotation about
+ * \param XS    X, Y. Z components of vector by which
+ * \param YS    structure is translated with respect to
+ * \param ZS    the coordinate system.
+ * \param ITS   This number is input as a decimal number but is rounded
+ *             to an integer before use.  Tag numbers are searched sequentially
+ *             until a segment having a tag of this segment through the end of
+ *             the sequence of segments is moved by the card.  If ITS is zero 
+ *             the entire structure is moved.
+**/
+long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
+                 double rox, double roy, double roz, double xs,
+                 double ys, double zs, int its );
+
 /*! \brief Indicate that the geometry is complete (GE card)
  * \param in_context The nec_context created with nec_create()
  * \param gpflag Geometry ground plain flag.
@@ -180,7 +227,24 @@ long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int 
 long nec_ex_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_tl_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_nt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+
+/*! \brief XQ Card (Execute)
+ * 
+ * Purpose:   To cause program execution at points in the data stream where
+ *            execution is not automatic.  Options on the card also allow for
+ *            automatic generation of radiation patterns in either of two vertical
+ *            cuts.
+ * \param in_context The nec_context created with nec_create()
+ * \param itmp1 Options controlled by (I1) are:
+ *            0 - no patterns requested (normal case).
+ *            1 - generates a pattern cut in the XZ plane, i.e., phi = 0 degrees
+ *                and theta varies from 0 degrees to 90 degrees in 1 degree steps.
+ *            2 - generates a pattern cut in the YZ plane, i.e., phi = 90 degrees
+ *                theta varies from 0 degrees to 90 degrees in 1 degree steps.
+ *            3 - generates both of the cuts described for the values 1 and 2.
+ **/
 long nec_xq_card(nec_context* in_context, int itmp1);
+
 long nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3, double tmp4);
 
 /*! \brief Standard radiation pattern parameters 
@@ -251,8 +315,25 @@ long nec_rp_card(nec_context* in_context,
 	double theta0, double phi0, double delta_theta, double delta_phi,
 	double radial_distance, double gain_norm);
 
+/*! \brief Print Flag (Printing of Currents
+ * \param IPTFLG Print control flag, specifies the type of format used in printing segment currents. The options are:
+      \arg \c -2 - all currents printed. This it a default value for the program if the card is Omitted.
+      \arg \c -1 - suppress printing of all wire segment currents.
+      \arg \c O - current printing will be limited to the segments specified by the next three parameters.
+      \arg \c 1 - currents are printed by using a format designed for a receiving pattern (refer to output section in this manual Only currents for the segments specified by the next three parameters are printed.
+      \arg \c 2 - same as for 1 above; in addition, however, the current for one Segment will Cue normalized to its maximum, ant the normalized values along with the relative strength in tB will be printed in a table. If the currents for more than one segment are being printed, only currents from the last segment in the group appear in the normalized table.
+      \arg \c 3 - only normalized currents from one segment are printed for the receiving pattern case. 
+
+    \param IPTAG - Tag number of the segments for which currents will be printed. 
+
+    \param IPTAGF - Equal to m, specifies the mth segment of the set of segments having the tag numbers of IPTAG, at which printing of currents starts. If IPTAG is zero or blank, then IPTAGF refers to an absolute segment number. If IPTAGF is blank, the current is printed for all segments.
+
+    \param IPTAGT - Equal to n specifies the nth segment of the set of segments having tag numbers of IPTAG. Currents are printed for segments having tag number IPTAG starting at the m th segment in the set and ending at the nth segment. If IPTAG is zero or blank, then IPTAGF and IPTAGT refer to absoulte segment numbers. In IPTAGT is left blank, it is set to IPTAGF.
+ */
 long nec_pt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
+
 long nec_pq_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
+
 long nec_kh_card(nec_context* in_context, double tmp1);
 long nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_nh_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);

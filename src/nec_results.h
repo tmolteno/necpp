@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004-2008  Timothy C.A. Molteno
+	Copyright (C) 2004-2008, 2015  Timothy C.A. Molteno
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -27,11 +27,10 @@
 #include "math_util.h"
 using namespace std;
 
-enum RESULT_FORMAT
-{
-	RESULT_FORMAT_NEC = 1,
-	RESULT_FORMAT_XML = 2,
-	RESULT_FORMAT_CSV = 3
+enum RESULT_FORMAT {
+  RESULT_FORMAT_NEC = 1,
+  RESULT_FORMAT_XML = 2,
+  RESULT_FORMAT_CSV = 3
 };
 
 
@@ -297,7 +296,7 @@ class nec_norm_rx_pattern : public nec_base_result
 public:
 	nec_norm_rx_pattern(
 		int in_n_theta, int in_n_phi,
-		real_array& in_mag,
+		real_matrix& in_mag,
 		nec_float theta0, nec_float theta_step,
 		nec_float phi0, nec_float phi_step,
 		nec_float in_eta, 

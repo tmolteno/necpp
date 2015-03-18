@@ -6,13 +6,17 @@
 * C-style library now supports error messages. This changes the public API.
 * Added missing library function nec_kh_card(). 
 * Cleaned up bitrot in example code.
-        
+* Added C-style support for patch command. nec_patch.
+* Added C-style support for GM card (move command). nec_gm_card.
+* Added python based testharness
+* Start to use matrix operations for multi-dimensional arrays. safe_matrix class.
+
 ## Version 1.5.4 [December 2014]
 * Changed default compiler options to remove debugging symbols
 * Fixed bug printing maximum gain on the command line.
 * Remove vector test code from main loop 
 * Renamed the c_geometry->n to n_segments
-        
+
 ## Version 1.5.3 [October 2014]
 * Compatability with gcc4.9
 * Compatability with gcc4.9

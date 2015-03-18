@@ -322,6 +322,15 @@ public:
 		nec_float xw2, nec_float yw2, nec_float zw2,
 		nec_float rad, nec_float rdel, nec_float rrad);
 
+        void patch(int nx, int ny,
+            nec_float ax1, nec_float ay1, nec_float az1,
+            nec_float ax2, nec_float ay2, nec_float az2,
+            nec_float ax3, nec_float ay3, nec_float az3,
+            nec_float ax4, nec_float ay4, nec_float az4);
+
+        void move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
+                        nec_float ys, nec_float zs, int its, int nrpt, int itgi );
+
 	/*! Add an arc to the geometry,
 	
 	All co-ordinates are in meters.
@@ -661,7 +670,7 @@ public:
 	real_array zlr, zli, zlc;
 	
 	// normalized receiving pattern
-	real_array fnorm;
+	real_matrix fnorm;
 	
 	int nthi, nphi;
 	nec_float thetis, phiss;

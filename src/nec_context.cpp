@@ -23,28 +23,27 @@
 
 #include <cstdlib>
 
-nec_context::nec_context()
-{
-	m_output_fp=NULL;
-	m_geometry = new c_geometry();
-	inc=0;
-	isave=0;
-	nthic=0;
-	nphic=0;
-	
-	impedance_norm_factor = 0.0; // was zpnorm
-	xpr1=0.0;
-	xpr2=0.0;
-	xpr3=0.0;
-	xpr4=0.0;
-	xpr5=0.0;
-	xpr7=0.0;
-	
-	/*structure_currents is a pointer to the "nec_base_result" which takes care of storing and printing of the currents*/
-	structure_currents = NULL;
-		
-	// allocate the ground grid
-	ggrid.initialize();
+nec_context::nec_context() : fnorm(0,0), current_vector(0) {
+  m_output_fp=NULL;
+  m_geometry = new c_geometry();
+  inc=0;
+  isave=0;
+  nthic=0;
+  nphic=0;
+  
+  impedance_norm_factor = 0.0; // was zpnorm
+  xpr1=0.0;
+  xpr2=0.0;
+  xpr3=0.0;
+  xpr4=0.0;
+  xpr5=0.0;
+  xpr7=0.0;
+  
+  /*structure_currents is a pointer to the "nec_base_result" which takes care of storing and printing of the currents*/
+  structure_currents = NULL;
+          
+  // allocate the ground grid
+  ggrid.initialize();
 }
 
 nec_context::~nec_context()
@@ -296,6 +295,24 @@ void nec_context::wire(int tag_id, int segment_count,
 {
 	m_geometry->wire(tag_id, segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, rdel, rrad);
 }
+
+
+void nec_context::patch(int nx, int ny,
+    nec_float ax1, nec_float ay1, nec_float az1,
+    nec_float ax2, nec_float ay2, nec_float az2,
+    nec_float ax3, nec_float ay3, nec_float az3,
+    nec_float ax4, nec_float ay4, nec_float az4)
+{
+  m_geometry->patch(nx, ny, ax1, ay1, az1, ax2, ay2, az2,  ax3,  ay3,  az3, ax4,  ay4,  az4);
+}
+
+
+void nec_context::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
+    nec_float ys, nec_float zs, int its, int nrpt, int itgi )
+{
+  m_geometry->move(rox, roy, roz, xs, ys, zs, its, nrpt, itgi);
+}
+
 
 /*! Add an arc to the geometry,
 
@@ -966,22 +983,15 @@ void nec_context::pl_card(const char* ploutput_filename, int itmp1, int itmp2, i
     because both the xq_card() and rp_card() functions will call
     this function automatically.
 */
-void nec_context::simulate(bool far_field_flag)
-{
-	DEBUG_TRACE("simulate(" << far_field_flag << ")");
-	/* Allocate the normalization buffer */
-	{
-		int mreq1 = 0;
-		int mreq2 = 0;
-	
-		if ( iped )
-			mreq1 = 4*nfrq;
-		if ( iptflg >= 2 )
-			mreq2 = nthi*nphi;
-	
-		int newsize = std::max(mreq1,mreq2);
-		fnorm.resize(newsize);
-	}
+void nec_context::simulate(bool far_field_flag) {
+  DEBUG_TRACE("simulate(" << far_field_flag << ")");
+  
+  /* Allocate the normalization buffer */
+  if ( iped )
+    fnorm.resize(nfrq,4);
+  if ( iptflg >= 2 )
+    fnorm.resize(nthi, nphi);
+
 
 	/* igox is a state variable that is used to change from
 		one processing mode to another. The processing to be 
@@ -1710,64 +1720,58 @@ void nec_context::print_power_budget(void)
 	} /* if ( (m_excitation_type == EXCITATION_VOLTAGE) || (m_excitation_type == EXCITATION_VOLTAGE_DISC) ) */
 }
 
-void nec_context::print_input_impedance()
-{
-	nec_float tmp1, tmp2, tmp3, tmp4, tmp5;
-	int i, itmp1, itmp2;
+void nec_context::print_input_impedance() {
+  nec_float tmp1, tmp2, tmp3, tmp4, tmp5;
 
-	if ( iped != 0)
-	{
-		int iss;
+  if ( iped != 0) {
+    int iss;
 
-		if ( nvqd > 0)
-			iss = ivqd[nvqd-1];
-		else
-			iss = source_segment_array[voltage_source_count-1];
+    if ( nvqd > 0)
+      iss = ivqd[nvqd-1];
+    else
+      iss = source_segment_array[voltage_source_count-1];
 
-		m_output.endl(3);
-		m_output.nec_printf(
-		    "                            "
-		    " -------- INPUT IMPEDANCE DATA --------\n"
-		    "                                     "
-		    " SOURCE SEGMENT No: %d\n"
-		    "                                  "
-		    " NORMALIZATION FACTOR:%12.5E\n\n"
-		    "              ----------- UNNORMALIZED IMPEDANCE ----------  "
-		    "  ------------ NORMALIZED IMPEDANCE -----------\n"
-		    "      FREQ    RESISTANCE    REACTANCE    MAGNITUDE    PHASE  "
-		    "  RESISTANCE    REACTANCE    MAGNITUDE    PHASE\n"
-		    "       MHz       OHMS         OHMS         OHMS     DEGREES  "
-		    "     OHMS         OHMS         OHMS     DEGREES",
-		    iss, impedance_norm_factor );
+    m_output.endl(3);
+    m_output.nec_printf(
+        "                            "
+        " -------- INPUT IMPEDANCE DATA --------\n"
+        "                                     "
+        " SOURCE SEGMENT No: %d\n"
+        "                                  "
+        " NORMALIZATION FACTOR:%12.5E\n\n"
+        "              ----------- UNNORMALIZED IMPEDANCE ----------  "
+        "  ------------ NORMALIZED IMPEDANCE -----------\n"
+        "      FREQ    RESISTANCE    REACTANCE    MAGNITUDE    PHASE  "
+        "  RESISTANCE    REACTANCE    MAGNITUDE    PHASE\n"
+        "       MHz       OHMS         OHMS         OHMS     DEGREES  "
+        "     OHMS         OHMS         OHMS     DEGREES",
+        iss, impedance_norm_factor );
 
-		itmp1= nfrq;
-		if ( 0 == ifrq )
-			tmp1= freq_mhz-( nfrq-1)* delfrq;
-		else
-			tmp1= freq_mhz/( pow(delfrq, (nfrq-1)) );
+    if ( 0 == ifrq )
+      tmp1= freq_mhz-( nfrq-1)* delfrq;
+    else
+      tmp1= freq_mhz/( pow(delfrq, (nfrq-1)) );
 
-		for( i = 0; i < itmp1; i++ )
-		{
-			itmp2= 4*i;
-			tmp2= fnorm[itmp2  ]/ impedance_norm_factor;
-			tmp3= fnorm[itmp2+1]/ impedance_norm_factor;
-			tmp4= fnorm[itmp2+2]/ impedance_norm_factor;
-			tmp5= fnorm[itmp2+3];
+    for(int i = 0; i < nfrq; i++ ) {
+      tmp2= fnorm(i,0)/ impedance_norm_factor;
+      tmp3= fnorm(i,1)/ impedance_norm_factor;
+      tmp4= fnorm(i,2)/ impedance_norm_factor;
+      tmp5= fnorm(i,3);
 
-			m_output.endl();
-			m_output.nec_printf(
-			    " %9.3f   %11.4E  %11.4E  %11.4E  %7.2f  "
-			    " %11.4E  %11.4E  %11.4E  %7.2f",
-			    tmp1, fnorm[itmp2], fnorm[itmp2+1], fnorm[itmp2+2],
-			    fnorm[itmp2+3], tmp2, tmp3, tmp4, tmp5 );
+      m_output.endl();
+      m_output.nec_printf(
+          " %9.3f   %11.4E  %11.4E  %11.4E  %7.2f  "
+          " %11.4E  %11.4E  %11.4E  %7.2f",
+          tmp1, fnorm(i,0), fnorm(i,1), fnorm(i,2),
+          fnorm(i,3), tmp2, tmp3, tmp4, tmp5 );
 
-			if ( ifrq == 0)
-				tmp1 += delfrq;
-			else
-				tmp1 *= delfrq;
-		} /* for( i = 0; i < itmp1; i++ ) */
-		m_output.end_section();
-	} /* if ( iped != 0) */
+      if ( ifrq == 0)
+        tmp1 += delfrq;
+      else
+        tmp1 *= delfrq;
+    } /* for( i = 0; i < itmp1; i++ ) */
+    m_output.end_section();
+  } /* if ( iped != 0) */
 }
 
 
@@ -1886,17 +1890,17 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 
 			if ( iped != 0)
 			{
-				itmp1= 4*( mhz-1);
+				itmp1= ( mhz-1);
 
-				fnorm[itmp1  ] = real( zped);
-				fnorm[itmp1+1] = imag( zped);
-				fnorm[itmp1+2] = abs( zped);
-				fnorm[itmp1+3] = arg_degrees( zped);
+				fnorm(itmp1,0) = real( zped);
+				fnorm(itmp1,1) = imag( zped);
+				fnorm(itmp1,2) = abs( zped);
+				fnorm(itmp1,3) = arg_degrees( zped);
 
 				if ( iped != 2 )
 				{
-			 		 if ( fnorm[itmp1+2] > impedance_norm_factor)
-			 			impedance_norm_factor = fnorm[itmp1+2];
+			 		 if ( fnorm(itmp1,2) > impedance_norm_factor)
+			 			impedance_norm_factor = fnorm(itmp1,2);
 				}
 			} /* if ( iped != 0) */
 

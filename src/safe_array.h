@@ -56,12 +56,6 @@ public:
     resize(in_size);
   }
   
-/*	safe_array(long n_rows, long n_cols)
-        : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
-{
-        resize(n_rows, n_cols);
-}*/
-  
   safe_array(const safe_array<T>& in_array)
     : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
   {
