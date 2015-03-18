@@ -172,16 +172,6 @@ long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_fr
 }
 
 
-/*!
-* LD card (Loading)
-* @param in_context The nec_context created with nec_create()
-* @param ldtyp Type of loading (5 = segment conductivity)
-* @param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
-* @param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. 
-* @param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous param- eter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
-
-Floating Point Input for the Various Load Types:
-*/
 long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3)
 {
   NEC_ERROR_HANDLE(in_context->ld_card(ldtyp, ldtag, ldtagf, ldtagt, tmp1, tmp2, tmp3));

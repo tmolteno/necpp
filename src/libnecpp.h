@@ -174,9 +174,9 @@ long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
 /*! \brief Indicate that the geometry is complete (GE card)
  * \param in_context The nec_context created with nec_create()
  * \param gpflag Geometry ground plain flag.
- *     0 - no ground plane is present.
- *     1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
- *     -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
+ *    \arg \c 0 - no ground plane is present.
+ *    \arg \c 1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
+ *    \arg \c -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
  * \param card_int_2 Unused (set to zero)
  **/
 long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
@@ -201,10 +201,10 @@ const char* nec_error_message();
     nec_gn_card(nec, 4, 0, 0.0, 0.0, 2.0, 0.005, 0.0, 0.0)
     
   \param iperf Ground-type flag
-  \opt \c -1 Nullifies ground parameters previously used and sets free-space condition. The remainder of the parameters are ignored in this case.
-  \opt \c 0 Finite ground, reflection coefficient approximation
-  \opt \c 1 Perfectly conducting ground.
-  \opt \c 2 Finite ground, Sommerfeld/Norton method.
+  \arg \c -1 Nullifies ground parameters previously used and sets free-space condition. The remainder of the parameters are ignored in this case.
+  \arg \c 0 Finite ground, reflection coefficient approximation
+  \arg \c 1 Perfectly conducting ground.
+  \arg \c 2 Finite ground, Sommerfeld/Norton method.
   
   \param nradl Number of radial wires in the ground screen approximation, O implies no ground screen.
   
@@ -228,9 +228,15 @@ long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_fr
 * \param in_context The nec_context created with nec_create()
 * \param ldtyp Type of loading (5 = segment conductivity)
 * \param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
-* \param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. 
-* \param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous param- eter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
-* Floating Point Input for the Various Load Types:
+* \param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number 
+* specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. 
+* If both LDTAG and LDTAGF are zero, all segments will be loaded. 
+* \param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified 
+* in the parameter LDTAG. This parameter must be greater than or equal to the previous parameter. 
+* The loading specified is applied to each of the mth through nth segments of the set of segments having tags 
+* equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. 
+* If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
+* \remark Floating Point Input for the Various Load Types:
 */
 long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3);
 
