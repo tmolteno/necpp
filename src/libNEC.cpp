@@ -149,14 +149,12 @@ double nec_gain_lhcp_sd(nec_context* in_context, int freq_index)
 /****************** IMPEDANCE CHARACTERISTICS *********************/
 
 /*! \brief Impedance: Real Part */
-double nec_impedance_real(nec_context* in_context, int freq_index)
-{
-	return in_context->get_impedance_real(freq_index);
+double nec_impedance_real(nec_context* in_context, int freq_index) {
+  return in_context->get_impedance_real(freq_index);
 }
 /*! \brief Impedance: Imaginary Part */
-double nec_impedance_imag(nec_context* in_context, int freq_index)
-{
-	return in_context->get_impedance_imag(freq_index);
+double nec_impedance_imag(nec_context* in_context, int freq_index) {
+  return in_context->get_impedance_imag(freq_index);
 }
 
 
@@ -191,8 +189,8 @@ long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int 
 
 
 /* "gn" card, ground parameters under the antenna */
-long nec_gn_card(nec_context* in_context, int itmp1, int itmp2, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6) {
-  NEC_ERROR_HANDLE(in_context->gn_card(itmp1, itmp2, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6));
+long nec_gn_card(nec_context* in_context, int iperf, int nradl, double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6) {
+  NEC_ERROR_HANDLE(in_context->gn_card(iperf, nradl, epse, sig, tmp3, tmp4, tmp5, tmp6));
 }
 
 long nec_ex_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)

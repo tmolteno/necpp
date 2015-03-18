@@ -449,13 +449,13 @@ GN		NEAR GROUND, GROUND SCREEN, ADDED GROUND
 */
 void nec_context::gn_card(int ground_type, int rad_wire_count, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
-	DEBUG_TRACE("gn_card(" << ground_type << ")");
-	ground.parse_gn(ground_type, rad_wire_count, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-	
-	iflow=4;
+  DEBUG_TRACE("gn_card(" << ground_type << ")");
+  ground.parse_gn(ground_type, rad_wire_count, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+  
+  iflow=4;
 
-	if ( processing_state > 2)
-		processing_state=2;
+  if ( processing_state > 2)
+          processing_state=2;
 }
 
 
@@ -5299,7 +5299,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 	nec_antenna_input* antenna_input = new nec_antenna_input();
 	antenna_input->set_frequency(freq_mhz/(1.e-6));
 	m_results.add(antenna_input);
-	
+	DEBUG_TRACE("Creating new antenna input")
 /*	m_output.end_section();
 	m_output.nec_printf( 
 		"                        "

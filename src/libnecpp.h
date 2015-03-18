@@ -199,8 +199,19 @@ const char* nec_error_message();
 
   2) Radial Wire Ground Plane (4 wires, 2 meters long, 5mm in radius)
     nec_gn_card(nec, 4, 0, 0.0, 0.0, 2.0, 0.005, 0.0, 0.0)
+    
+  \param iperf Ground-type flag
+  \opt \c -1 Nullifies ground parameters previously used and sets free-space condition. The remainder of the parameters are ignored in this case.
+  \opt \c 0 Finite ground, reflection coefficient approximation
+  \opt \c 1 Perfectly conducting ground.
+  \opt \c 2 Finite ground, Sommerfeld/Norton method.
+  
+  \param nradl Number of radial wires in the ground screen approximation, O implies no ground screen.
+  
+  \param epse Relative dielectric constant for ground in the vicinity of the antenna. Zero in the case of perfect ground.
+  \param sig Conductivity in mhos/meter of the ground in the vicinity of the antenna. Use zero in the case of a perfect ground. If SIG is input as a negative number, the complex dielectric constant Ec = Er -j sigma/omaga epslon is set to EPSR - |SIG|. 
 */
-long nec_gn_card(nec_context* in_context, int itmp1, int itmp2, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+long nec_gn_card(nec_context* in_context, int iperf, int nradl, double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6);
 
 /*! \brief FR card
  * \param in_context The nec_context created with nec_create()
@@ -337,7 +348,14 @@ long nec_pq_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int i
 long nec_kh_card(nec_context* in_context, double tmp1);
 long nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_nh_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+
+/*!\brief To control use of the extended thin-wire kernal approximation.
+ * \param itmp1 
+ * \arg \c -1 Return to normal kernel
+ * \arg \c 0 Use Extended thin wire kernel
+ * */
 long nec_ek_card(nec_context* in_context, int itmp1);
+
 long nec_cp_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
 long nec_pl_card(nec_context* in_context, char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4);
 

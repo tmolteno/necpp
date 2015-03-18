@@ -635,17 +635,7 @@ public:
 		return RESULT_ANTENNA_INPUT;
 	}
 	
-	void set_input(int tag, int segment, nec_complex voltage, nec_complex current, nec_complex impedance, nec_complex admittance, nec_float power)
-	{
-		n_items++;
-		_tag.push_back(tag);
-		_segment.push_back(segment);
-		_voltage.push_back(voltage);
-		_current.push_back(current);
-		_impedance.push_back(impedance);
-		_admittance.push_back(admittance);
-		_power.push_back(power);
-	}
+	void set_input(int tag, int segment, nec_complex voltage, nec_complex current, nec_complex impedance, nec_complex admittance, nec_float power);
 	
 	virtual void write_to_file(ostream& os)
 	{
@@ -692,10 +682,7 @@ public:
 		return _voltage;
 	}
 		
-	vector<nec_complex>& get_impedance()
-	{
-		return _impedance;
-	}
+	vector<nec_complex>& get_impedance();
 		
 	vector<nec_float> get_power()
 	{
@@ -733,16 +720,7 @@ public:
 		return RESULT_NEAR_FIELD_PATTERN;
 	}
 	
-	void set_input(nec_float x, nec_float y, nec_float z, nec_complex field_x, nec_complex field_y, nec_complex field_z)
-	{
-		n_items++;
-		_x.push_back(x);
-		_y.push_back(y);
-		_z.push_back(z);
-		_field_x.push_back(field_x);
-		_field_y.push_back(field_y);
-		_field_z.push_back(field_z);
-	}		 
+	void set_input(nec_float x, nec_float y, nec_float z, nec_complex field_x, nec_complex field_y, nec_complex field_z);
 	
 	virtual void write_to_file(ostream& os)
 	{

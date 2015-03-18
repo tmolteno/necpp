@@ -37,5 +37,56 @@ class TestDipoleGain(unittest.TestCase):
     
     nec_delete(nec)
 
+  def test_example3(self):
+    '''
+    CMEXAMPLE 3. VERTICAL HALF WAVELENGTH ANTENNA OVER GROUND 
+    CM           EXTENDED THIN WIRE KERNEL USED 
+    CM           1. PERFECT GROUND 
+    CM           2. IMPERFECT GROUND INCLUDING GROUND WAVE AND RECEIVING 
+    CE              PATTERN CALCULATIONS 
+    GW 0 9 0. 0. 2. 0. 0. 7. .03 
+    GE 1 
+    EK 
+    FR 0 1 0 0 30. 
+    EX 0 0 5 0 1. 
+    GN 1
+    RP 0 10 2 1301 0. 0. 10. 90. 
+    GN 0 0 0 0 6. 1.000E-03  
+    RP 0 10 2 1301 0. 0. 10. 90. 
+    RP 1 10 1 0 1. 0. 2. 0. 1.000E+05 
+    EX 1 10 1 0 0. 0. 0. 10.
+    PT 2 0 5 5 
+    XQ 
+    EN
+    '''
+    nec = nec_create()
+    self.handle_nec(nec_wire(nec, 0, 9, 0., 0.0, 2.0, 0.0, 0.0, 7.0, 0.03, 1.0, 1.0))
+    self.handle_nec(nec_geometry_complete(nec, 1, 0))
+    self.handle_nec(nec_ek_card(nec, 0))
+    self.handle_nec(nec_fr_card(nec, 0, 1, 30., 0 ))
+    self.handle_nec(nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+    self.handle_nec(nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0))
+    self.handle_nec(nec_rp_card(nec, 0,10,2,1,3,0,1,0.0,0.0,10.0,90.0, 0, 0))
+
+    self.assertAlmostEqual(nec_impedance_real(nec,0),83.7552291016712)
+    self.assertAlmostEqual(nec_impedance_imag(nec,0),45.32205265591289)
+    self.assertAlmostEqual(nec_gain_max(nec,0),8.393875976328134)
+   
+    self.handle_nec(nec_gn_card(nec, 0, 0, 6.0, 1.000E-03, 0, 0, 0, 0))
+    self.handle_nec(nec_rp_card(nec, 0,10,2,1,3,0,1, 0.0,0.0,10.0,90.0, 0, 0))
+    
+    self.assertAlmostEqual(nec_impedance_real(nec,1),86.415,3)
+    self.assertAlmostEqual(nec_impedance_imag(nec,1),47.822,3)
+    self.assertAlmostEqual(nec_gain_max(nec,1),1.44837,3)
+
+    self.handle_nec(nec_rp_card(nec, 1,10,1,0,0,0,0, 1.0,0.0,2.0,0.0, 1.000E+05, 0))
+    # Not sure what to check here.
+    
+    self.handle_nec(nec_ex_card(nec, 1, 10, 1, 0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.0))
+    self.handle_nec(nec_pt_card(nec, 2, 0, 5, 5))
+    # Not sure what to check here.
+
+    nec_delete(nec)
+
 if __name__ == '__main__':
   unittest.main()
