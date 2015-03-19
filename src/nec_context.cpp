@@ -297,19 +297,27 @@ void nec_context::wire(int tag_id, int segment_count,
 }
 
 
-void nec_context::patch(int nx, int ny,
-    nec_float ax1, nec_float ay1, nec_float az1,
-    nec_float ax2, nec_float ay2, nec_float az2,
-    nec_float ax3, nec_float ay3, nec_float az3,
-    nec_float ax4, nec_float ay4, nec_float az4)
+void nec_context::sp_card(int ns,
+    nec_float x1, nec_float y1, nec_float z1,
+    nec_float x2, nec_float y2, nec_float z2)
 {
-  m_geometry->patch(nx, ny, ax1, ay1, az1, ax2, ay2, az2,  ax3,  ay3,  az3, ax4,  ay4,  az4);
+  m_geometry->sp_card(ns, x1, y1, z1, x2, y2, z2);
+}
+
+
+
+void nec_context::sc_card(int i2,
+    nec_float x3, nec_float y3, nec_float z3,
+    nec_float x4, nec_float y4, nec_float z4)
+{
+  m_geometry->sc_card(i2, x3, y3, z3, x4, y4, z4);
 }
 
 
 void nec_context::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
     nec_float ys, nec_float zs, int its, int nrpt, int itgi )
 {
+  DEBUG_TRACE("nec_context::move nrpt=" << nrpt);
   m_geometry->move(rox, roy, roz, xs, ys, zs, its, nrpt, itgi);
 }
 
@@ -455,7 +463,7 @@ void nec_context::gn_card(int ground_type, int rad_wire_count, nec_float tmp1, n
   iflow=4;
 
   if ( processing_state > 2)
-          processing_state=2;
+    processing_state=2;
 }
 
 

@@ -24,7 +24,8 @@
 #include <cstring>
 #include <stdint.h>
 
-c_geometry::c_geometry()
+c_geometry::c_geometry() 
+    : patch_x1(0,0,0), patch_x2(0,0,0), patch_x3(0,0,0), patch_x4(0,0,0)
 {
 	n_segments = 0;
 	np = 0; 	// n_segments is the number of segments
@@ -107,7 +108,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 {
 	char gm[3];
 	char ifx[2] = {'*', 'X'}, ify[2]={'*','Y'}, ifz[2]={'*','Z'};
-	char ipt[4] = { 'P', 'R', 'T', 'Q' };
+	const char ipt[4] = { 'P', 'R', 'T', 'Q' };
 	
 	/* input card mnemonic list */
 	/* "XT" stands for "exit", added for testing */
@@ -312,7 +313,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 		
 			if ( card_int_2 > 1)
 			{
-				// read another geometry card for the rest of the patch data
+				// read another geometry card for the rest of the patch data. 
 				int ix,iy;
 				read_geometry_card(input_fp, gm, &ix, &iy, &x3, &y3, &z3, &x4, &y4, &z4, &dummy);
 			
@@ -544,7 +545,7 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 		the surface as a wire grid.
 	*/
 
-	connect_segments( card_int_1);
+ 	connect_segments( card_int_1);
 
 	if ( n_segments != 0)
 	{
@@ -914,7 +915,8 @@ void c_geometry::helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
 void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
     nec_float ys, nec_float zs, int its, int nrpt, int itgi )
 {
-  int nrp, ix, i1, k, ir, i, ii;
+  DEBUG_TRACE("move " << nrpt << " Copies");
+  int nrp, ix, i1, k;
   nec_float sps, cps, sth, cth, sph, cph, xx, xy;
   nec_float xz, yx, yy, yz, zx, zy, zz, xi, yi, zi;
 
@@ -943,8 +945,7 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
     nrp= nrpt;
 
   ix=1;
-  if ( n_segments > 0)
-  {
+  if ( n_segments > 0) {
     i1= get_segment_number( its, 1);
     if ( i1 < 1)
       i1= 1;
@@ -971,36 +972,32 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
       segment_radius.resize(new_size);
     }
 
-    for( ir = 0; ir < nrp; ir++ )
-    {
-      for( i = i1-1; i < n_segments; i++ )
-      {
-	xi= x[i];
-	yi= y[i];
-	zi= z[i];
-	x[k]= xi* xx+ yi* xy+ zi* xz+ xs;
-	y[k]= xi* yx+ yi* yy+ zi* yz+ ys;
-	z[k]= xi* zx+ yi* zy+ zi* zz+ zs;
-	xi= x2[i];
-	yi= y2[i];
-	zi= z2[i];
-	x2[k]= xi* xx+ yi* xy+ zi* xz+ xs;
-	y2[k]= xi* yx+ yi* yy+ zi* yz+ ys;
-	z2[k]= xi* zx+ yi* zy+ zi* zz+ zs;
-	segment_radius[k]= segment_radius[i];
-	segment_tags[k]= segment_tags[i];
-	if ( segment_tags[i] != 0)
-	  segment_tags[k]= segment_tags[i]+ itgi;
+    for (int ir = 0; ir < nrp; ir++ ) {
+      DEBUG_TRACE("GM: Segment Copy #" << ir);
+      for (int i = i1-1; i < n_segments; i++ ) {
+        xi= x[i];
+        yi= y[i];
+        zi= z[i];
+        x[k]= xi* xx+ yi* xy+ zi* xz+ xs;
+        y[k]= xi* yx+ yi* yy+ zi* yz+ ys;
+        z[k]= xi* zx+ yi* zy+ zi* zz+ zs;
+        xi= x2[i];
+        yi= y2[i];
+        zi= z2[i];
+        x2[k]= xi* xx+ yi* xy+ zi* xz+ xs;
+        y2[k]= xi* yx+ yi* yy+ zi* yz+ ys;
+        z2[k]= xi* zx+ yi* zy+ zi* zz+ zs;
+        segment_radius[k]= segment_radius[i];
+        segment_tags[k]= segment_tags[i];
+        if ( segment_tags[i] != 0)
+          segment_tags[k]= segment_tags[i]+ itgi;
 
-	k++;
-
+        k++;
       } /* for( i = i1; i < n_segments; i++ ) */
 
       i1= n_segments+1;
       n_segments= k;
-
     } /* for( ir = 0; ir < nrp; ir++ ) */
-
   } /* if ( n_segments >= n2) */
 
   if ( m > 0)
@@ -1025,37 +1022,33 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
     pbi.resize(new_size);
     psalp.resize(new_size);
 
-    for( ii = 0; ii < nrp; ii++ )
-    {
-      for( i = i1; i < m; i++ )
-      {
-	xi= px[i];
-	yi= py[i];
-	zi= pz[i];
-	px[k]= xi* xx+ yi* xy+ zi* xz+ xs;
-	py[k]= xi* yx+ yi* yy+ zi* yz+ ys;
-	pz[k]= xi* zx+ yi* zy+ zi* zz+ zs;
-	xi= t1x[i];
-	yi= t1y[i];
-	zi= t1z[i];
-	t1x[k]= xi* xx+ yi* xy+ zi* xz;
-	t1y[k]= xi* yx+ yi* yy+ zi* yz;
-	t1z[k]= xi* zx+ yi* zy+ zi* zz;
-	xi= t2x[i];
-	yi= t2y[i];
-	zi= t2z[i];
-	t2x[k]= xi* xx+ yi* xy+ zi* xz;
-	t2y[k]= xi* yx+ yi* yy+ zi* yz;
-	t2z[k]= xi* zx+ yi* zy+ zi* zz;
-	psalp[k]= psalp[i];
-	pbi[k]= pbi[i];
-	k++;
-
+    for (int ii = 0; ii < nrp; ii++ ) {
+      DEBUG_TRACE("GM: Patch Copy #" << ii);
+      for(int i = i1; i < m; i++ ) {
+        xi= px[i];
+        yi= py[i];
+        zi= pz[i];
+        px[k]= xi* xx+ yi* xy+ zi* xz+ xs;
+        py[k]= xi* yx+ yi* yy+ zi* yz+ ys;
+        pz[k]= xi* zx+ yi* zy+ zi* zz+ zs;
+        xi= t1x[i];
+        yi= t1y[i];
+        zi= t1z[i];
+        t1x[k]= xi* xx+ yi* xy+ zi* xz;
+        t1y[k]= xi* yx+ yi* yy+ zi* yz;
+        t1z[k]= xi* zx+ yi* zy+ zi* zz;
+        xi= t2x[i];
+        yi= t2y[i];
+        zi= t2z[i];
+        t2x[k]= xi* xx+ yi* xy+ zi* xz;
+        t2y[k]= xi* yx+ yi* yy+ zi* yz;
+        t2z[k]= xi* zx+ yi* zy+ zi* zz;
+        psalp[k]= psalp[i];
+        pbi[k]= pbi[i];
+        k++;
       } /* for( i = i1; i < m; i++ ) */
-
       i1= m;
       m = k;
-
     } /* for( ii = 0; ii < nrp; ii++ ) */
 
   } /* if ( m >= m2) */
@@ -1944,6 +1937,159 @@ void c_geometry::arc( int tag_id, int segment_count, nec_float rada,
 
 
 /*-----------------------------------------------------------------------*/
+
+void c_geometry::sp_card(int ns,
+      nec_float x1, nec_float y1, nec_float z1,
+      nec_float x2, nec_float y2, nec_float z2)
+{
+  const char ipt[4] = { 'P', 'R', 'T', 'Q' };
+  this->patch_type = ns;
+  m_output->nec_printf( "\n"
+          " %5d%c %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
+          m+1, ipt[ns], x1, y1, z1, x2, y2, z2 );
+  switch (ns) {
+    case 0: { // Arbitrary Shape
+      nec_float elevation = degrees_to_rad(x2);
+      nec_float azimuth = degrees_to_rad(y2);
+      patch( 0, 0, x1, y1, z1, elevation, azimuth, z2, 0, 0, 0, 0, 0, 0);
+      break;
+    }
+      
+    case 1: // Rectangular (require SC card)
+    case 2: // triangular, (require SC card)
+    case 3: // quadrilateral (require SC card)
+      this->patch_x1 = nec_3vector(x1, y1, z1);
+      this->patch_x2 = nec_3vector(x2, y2, z2);
+      this->patch_type = ns;
+      break;
+      
+    default:
+      throw new nec_exception("PATCH DATA ERROR ns ",ns );
+  }
+  _prev_sc = false;
+}
+
+/*
+ * For the rectangular or quadrilateral options, multiple SC cards may follow a SP card 
+ * to specify a string of patches. The parameters on the second or subsequent SC card 
+ * specify corner 3 for a rectangle or corners 3 and 4 for a quadrilateral, while 
+ * corners 3 and 4 of the previous patch become corners 2 and 1, respectively, of 
+ * the new patch. The integer I2 on the second or subsequent SC card specifies 
+ * the new patch shape and must be 1 for rectangular shape or 3 for quadrilateral 
+ * shape. On the first SC card after SP, I2 has no effect. 
+ * 
+ * Rectangular or quadrilateral patches may be intermixed, but triangular or arbitrary
+ * shapes are not allowed in a string of linked patches. 
+ */
+void c_geometry::sc_card(int i2,
+      nec_float x3, nec_float y3, nec_float z3,
+      nec_float x4, nec_float y4, nec_float z4)
+{
+  if (_prev_sc) {
+    sc_multiple_card(i2, x3, y3, z3, x4, y4, z4);
+    return;
+  }
+    
+  DEBUG_TRACE("sc_card(" << i2 << ")");
+  
+  m_output->nec_printf( "\n"
+        "      %11.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
+        x3, y3, z3, x4, y4, z4 );
+  
+  this->patch_x3 = nec_3vector(x3, y3, z3);
+  this->patch_x4 = nec_3vector(x4, y4, z4);
+
+  switch (this->patch_type) {
+    case 0:  // Arbritrary
+      throw new nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=0) ");
+      break;
+    
+    case 1:  // Rectangular
+      this->patch_x4 = this->patch_x1 + this->patch_x3 - this->patch_x2;
+      break;
+      
+    case 2:  // Triangular
+      break;
+      
+    case 3:  // Quadrilateral
+      break;
+      
+    default:
+      throw new nec_exception("PATCH DATA ERROR ns ", this->patch_type );
+  }
+  patch( this->patch_type, i2, 
+          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2), 
+          this->patch_x2(0), this->patch_x2(1), this->patch_x2(2),
+          this->patch_x3(0), this->patch_x3(1), this->patch_x3(2),
+          this->patch_x4(0), this->patch_x4(1), this->patch_x4(2));
+  
+  _prev_sc = true;
+}
+
+/*
+ * For the rectangular or quadrilateral options, multiple SC cards may follow a SP card 
+ * to specify a string of patches. The parameters on the second or subsequent SC card 
+ * specify corner 3 for a rectangle or corners 3 and 4 for a quadrilateral, while 
+ * corners 3 and 4 of the previous patch become corners 2 and 1, respectively, of 
+ * the new patch. The integer I2 on the second or subsequent SC card specifies 
+ * the new patch shape and must be 1 for rectangular shape or 3 for quadrilateral 
+ * shape. On the first SC card after SP, I2 has no effect. 
+ * 
+ * Rectangular or quadrilateral patches may be intermixed, but triangular or arbitrary
+ * shapes are not allowed in a string of linked patches. 
+ */
+void c_geometry::sc_multiple_card(int i2,
+      nec_float x3, nec_float y3, nec_float z3,
+      nec_float x4, nec_float y4, nec_float z4)
+{
+  DEBUG_TRACE("sc_multiple_card(" << i2 << ")");
+  
+  const char ipt[4] = { 'P', 'R', 'T', 'Q' };
+  switch (i2) {
+    case 0:  // Arbritrary
+      throw new nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=0) ");
+      break;
+    case 2:  // Arbritrary
+      throw new nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=2) ");
+      break;
+    
+    case 1:  // Rectangular
+      this->patch_x1 = this->patch_x4;
+      this->patch_x2 = this->patch_x3;
+      this->patch_x3 = nec_3vector(x3, y3, z3);
+      this->patch_x4 = this->patch_x1 + this->patch_x3 - this->patch_x2;
+      break;
+      
+    case 3:  // Quadrilateral
+      this->patch_x1 = this->patch_x4;
+      this->patch_x2 = this->patch_x3;
+      this->patch_x3 = nec_3vector(x3, y3, z3);
+      this->patch_x4 = nec_3vector(x4, y4, z4);
+      break;
+      
+    default:
+      throw new nec_exception("PATCH DATA ERROR i2 = ", i2 );
+  }
+  
+  patch( this->patch_type, i2, 
+          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2), 
+          this->patch_x2(0), this->patch_x2(1), this->patch_x2(2),
+          this->patch_x3(0), this->patch_x3(1), this->patch_x3(2),
+          this->patch_x4(0), this->patch_x4(1), this->patch_x4(2));
+  
+  m_output->nec_printf( "\n"
+          " %5d%c %10.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
+          this->patch_type, ipt[i2], 
+          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2),
+          this->patch_x2(0), this->patch_x2(1), this->patch_x2(2));
+
+  m_output->nec_printf( "\n"
+          "      %11.5f %11.5f %11.5f  %11.5f %11.5f %11.5f",
+          x3, y3, z3, x4, y4, z4 );
+
+  _prev_sc = true;
+}
+
 
 /*! \brief patch generates and modifies patch geometry data.
 */

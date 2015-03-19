@@ -57,20 +57,26 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count, double xw1
   NEC_ERROR_HANDLE(in_context->wire(tag_id, segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, rdel, rrad));
 }
  
-long nec_patch(nec_context* in_context, int nx, int ny,
-    double ax1, double ay1, double az1,
-    double ax2, double ay2, double az2,
-    double ax3, double ay3, double az3,
-    double ax4, double ay4, double az4) {
-  NEC_ERROR_HANDLE(in_context->patch(nx, ny, ax1, ay1, az1, 
-               ax2, ay2, az2,  ax3,  ay3,  az3, ax4,  ay4,  az4));
+long nec_sp_card(nec_context* in_context, int ns,
+    double x1, double y1, double z1,
+    double x2, double y2, double z2) {
+  NEC_ERROR_HANDLE(in_context->sp_card(ns, x1, y1, z1, x2, y2, z2));
+}
+
+long nec_sc_card(nec_context* in_context, int i2,
+    double x3, double y3, double z3,
+    double x4, double y4, double z4) {
+  NEC_ERROR_HANDLE(in_context->sc_card(i2, x3, y3, z3, x4, y4, z4));
 }
 
 long nec_gm_card(nec_context* in_context,  int itsi, int nrpt,
                  double rox, double roy, double roz, double xs,
                  double ys, double zs, int its)
 {
-  NEC_ERROR_HANDLE(in_context->move(rox, roy, roz, xs, ys, zs, its, nrpt, itsi));
+  double roxd = degrees_to_rad(rox);
+  double royd = degrees_to_rad(roy);
+  double rozd = degrees_to_rad(roz);
+  NEC_ERROR_HANDLE(in_context->move(roxd, royd, rozd, xs, ys, zs, its, nrpt, itsi));
 }
 
 

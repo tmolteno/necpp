@@ -127,28 +127,39 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count,
 
 /*! \brief Surface Patch (SP Card)
     \param in_context The nec_context created with nec_create()
-    \param nx The tag ID.
-    \param ny The number of segments.
-    \param ax1 The x coordinate of the wire starting point.
-    \param ay1 The y coordinate of the wire starting point.
-    \param az1 The z coordinate of the wire starting point.
-    \param ax2 The x coordinate of the wire starting point.
-    \param ay2 The y coordinate of the wire starting point.
-    \param az2 The z coordinate of the wire starting point.
-    \param ax3 The x coordinate of the wire starting point.
-    \param ay3 The y coordinate of the wire starting point.
-    \param az3 The z coordinate of the wire starting point.
-    \param ax4 The x coordinate of the wire starting point.
-    \param ay4 The y coordinate of the wire starting point.
-    \param az4 The z coordinate of the wire starting point.
+    \param ns The Patch Type.
+          \arg \c 0 (default) arbitrary patch shape
+          \arg \c 1 rectangular patch
+          \arg \c 2 triangular patch
+          \arg \c 3 quadrilateral patch 
+    \param x1 The x coordinate of patch corner1.
+    \param y1 The y coordinate of patch corner1.
+    \param z1 The z coordinate of patch corner1.
+    \param x2 The x coordinate of patch corner2.
+    \param y2 The y coordinate of patch corner2.
+    \param z2 The z coordinate of patch corner2.
+    
+    \remark All co-ordinates are in meters, except for arbitrary patches where the angles are in degrees
+*/
+long nec_sp_card(nec_context* in_context, int ns,
+    double x1, double y1, double z1,
+    double x2, double y2, double z2);
+
+/*! \brief Surface Patch Continuation (SC Card)
+    \param in_context The nec_context created with nec_create()
+    \param i2  Weird integer parameter.
+    \param x3 The x coordinate of patch corner 3.
+    \param y3 The y coordinate of patch corner 3.
+    \param z3 The z coordinate of patch corner 3.
+    \param x4 The x coordinate of patch corner 4.
+    \param y4 The y coordinate of patch corner 4.
+    \param z4 The z coordinate of patch corner 4.
     
     \remark All co-ordinates are in meters.
 */
-long nec_patch(nec_context* in_context, int nx, int ny,
-    double ax1, double ay1, double az1,
-    double ax2, double ay2, double az2,
-    double ax3, double ay3, double az3,
-    double ax4, double ay4, double az4);
+long nec_sc_card(nec_context* in_context, int i2,
+    double x3, double y3, double z3,
+    double x4, double y4, double z4);
 
 /*! \brief Coordinate Transformation
  * 

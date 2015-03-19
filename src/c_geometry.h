@@ -80,13 +80,25 @@ public:
 	/*! \brief Scale all dimensions of a structure by a constant.*/
 	void scale( nec_float xw1);
 	
-	void patch( int nx, int ny,
-			nec_float ax1, nec_float ay1, nec_float az1,
-			nec_float ax2, nec_float ay2, nec_float az2,
-			nec_float ax3, nec_float ay3, nec_float az3,
-			nec_float ax4, nec_float ay4, nec_float az4 );
-	
-	
+        void patch( int nx, int ny,
+                      nec_float ax1, nec_float ay1, nec_float az1,
+                      nec_float ax2, nec_float ay2, nec_float az2,
+                      nec_float ax3, nec_float ay3, nec_float az3,
+                      nec_float ax4, nec_float ay4, nec_float az4 );
+        
+        
+        void sp_card( int ns,
+                      nec_float x1, nec_float y1, nec_float z1,
+                      nec_float x2, nec_float y2, nec_float z2);
+        
+        void sc_card( int i2,
+                      nec_float x3, nec_float y3, nec_float z3,
+                      nec_float x4, nec_float y4, nec_float z4);
+        void sc_multiple_card(int i2,
+              nec_float x3, nec_float y3, nec_float z3,
+              nec_float x4, nec_float y4, nec_float z4);
+        
+        
 	/*! \brief Geometry is complete
 		\exception nec_exception* If there is an error with the geometry.
 	*/
@@ -150,27 +162,31 @@ public:
   }
   int n_plus_2m, n_plus_3m; /* n+m,n+2m,n+3m */
 private:
-	//	The geometry data measured in meters is stored in these arrays
-	//	and the x,y,z,si,bi arrays are then scaled for each frequency
-	real_array x_unscaled, y_unscaled, z_unscaled, si_unscaled, bi_unscaled;
-	real_array px_unscaled, py_unscaled, pz_unscaled, pbi_unscaled;
-	
-	void sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc );
+  //	The geometry data measured in meters is stored in these arrays
+  //	and the x,y,z,si,bi arrays are then scaled for each frequency
+  real_array x_unscaled, y_unscaled, z_unscaled, si_unscaled, bi_unscaled;
+  real_array px_unscaled, py_unscaled, pz_unscaled, pbi_unscaled;
+  
+  void sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc );
 
-	void divide_patch( int nx );
+  void divide_patch( int nx );
 
-	void connect_segments( int ignd );
+  void connect_segments( int ignd );
 
-	void read_geometry_card(FILE* input_fp, char *gm,
-		int *i1, int *i2, 
-		nec_float *x1, nec_float *y1,nec_float *z1,
-		nec_float *x2, nec_float *y2, nec_float *z2, 
-		nec_float *rad );
+  void read_geometry_card(FILE* input_fp, char *gm,
+          int *i1, int *i2, 
+          nec_float *x1, nec_float *y1,nec_float *z1,
+          nec_float *x2, nec_float *y2, nec_float *z2, 
+          nec_float *rad );
 
-	nec_context* m_context;
-	nec_output_file* m_output;
+  nec_context* m_context;
+  nec_output_file* m_output;
 
-	std::vector<nec_wire> m_wires;
+  std::vector<nec_wire> m_wires;
+  
+  int patch_type;
+  nec_3vector patch_x1, patch_x2, patch_x3, patch_x4;
+  bool   _prev_sc;
 };
 
 
