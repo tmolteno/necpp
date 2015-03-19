@@ -78,27 +78,33 @@ TEST_CASE( "Filling Array", "[safe_array]") {
 }
 
 TEST_CASE( "Segments", "[safe_array]") {
-    safe_array<int> v( 5 );
-    for (int i=0;i<5;i++)
-       v[i] = i;
+  safe_array<int> v( 5 );
+  for (int i=0;i<5;i++)
+      v[i] = i;
 
-    const safe_array<int>& f = v.segment(0,3);
-    
-    REQUIRE(f.size() == 3);
-    
-    for (int i=0;i<5;i++)
-       REQUIRE( v[i] == i );
+  const safe_array<int>& f = v.segment(0,3);
+  
+  REQUIRE(f.size() == 4);
+  
+  for (int i=0;i<5;i++)
+      REQUIRE( v[i] == i );
 
-    for (int i=0;i<3;i++)
-       REQUIRE( f[i] == i );
+  for (int i=0;i<3;i++)
+      REQUIRE( f[i] == i );
 
-    SECTION( "modifying segment" ) {
-        
-        v[2] = 1;
-        
-        REQUIRE( f[2] == 1 );      
-        REQUIRE( v[2] == 1 );      
-    }
+  SECTION( "modifying segment" ) {
+      
+      v[2] = 1;
+      
+      REQUIRE( f[2] == 1 );      
+      REQUIRE( v[2] == 1 );      
+  }
+  
+  SECTION( "Zero length segment" ) {
+      const safe_array<int>& f = v.segment(1,1);
+              
+      REQUIRE( f[0] == 1 );      
+  }
 }
 
 

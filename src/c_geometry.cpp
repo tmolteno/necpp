@@ -2047,10 +2047,10 @@ void c_geometry::sc_multiple_card(int i2,
   const char ipt[4] = { 'P', 'R', 'T', 'Q' };
   switch (i2) {
     case 0:  // Arbritrary
-      throw new nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=0) ");
+      throw new nec_exception("PATCH DATA ERROR: MULTIPLE SC CARDS FOR ARBITRARY PATCH TYPE (NS=0) ");
       break;
-    case 2:  // Arbritrary
-      throw new nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=2) ");
+    case 2:  // Triangular
+      throw new nec_exception("PATCH DATA ERROR: MULTIPLE SC CARDS FOR TRIANGULAR PATCH (NS=2) ");
       break;
     
     case 1:  // Rectangular

@@ -1035,7 +1035,7 @@ void nec_context::simulate(bool far_field_flag) {
 
 			if (false == in_freq_loop)
 			{
-				iresrv = m_geometry->n_plus_2m * (m_geometry->np+2*m_geometry->mp);
+				iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+2*m_geometry->mp);
 				cm.resize(iresrv);
 			
 				/* Memory allocation for symmetry array */
@@ -2685,7 +2685,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
 void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
     int64_t nr, complex_array& cw, int itrp )
 {
-	int ipr, ipatch, ik, js=0, jx;
+	int ipr, ipatch, ik, js=0;
 	nec_float xi, yi, zi, tx, ty, tz;
 	nec_complex etk, ets, etc;
 	
@@ -2747,7 +2747,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
 		{
 			for(int ij = 0; ij < m_geometry->jsno; ij++ )
 			{
-				jx= m_geometry->jco[ij]-1;
+				int jx= m_geometry->jco[ij]-1;
 				in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
 			}
 		
@@ -2759,7 +2759,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
 		{
 			for(int ij = 0; ij < m_geometry->jsno; ij++ )
 			{
-				jx= m_geometry->jco[ij]-1;
+				int jx= m_geometry->jco[ij]-1;
 				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
 			}
 		
@@ -2769,7 +2769,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
 		/* transposed fill - c(ws) and d(ws)prime (=cw) */
 		for (int ij = 0; ij < m_geometry->jsno; ij++ )
 		{
-			jx= m_geometry->jco[ij]-1;
+			int jx= m_geometry->jco[ij]-1;
 			if ( jx < nr)
 				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
 			else

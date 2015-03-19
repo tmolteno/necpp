@@ -12,7 +12,7 @@
   GNU General Public License for more details.
   
   You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
+  aint32_t with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #ifndef __safe_array__
@@ -21,6 +21,7 @@
 #include <iostream>
 #include <cstring>
 #include <sstream>
+#include <stdint.h>
 
 #include "nec_exception.h"
 
@@ -29,7 +30,7 @@
 
 class BoundsViol : public nec_exception {
 public:
-  BoundsViol(const char* message, long index, long bound)
+  BoundsViol(const char* message, int64_t index, int64_t bound)
     : nec_exception(message)
   {
     m_message << "array index: " << index << " exceeds " << bound << std::endl;
@@ -50,7 +51,7 @@ public:
     : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
   { }
 
-  safe_array(long in_size)
+  safe_array(int64_t in_size)
     : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
   {
     resize(in_size);
@@ -68,15 +69,15 @@ public:
   }
   
   
-  long size() const {
+  int64_t size() const {
     return len_;
   }
 
-  long capacity() const {
+  int64_t capacity() const {
     return data_size_;
   }
 
-  void resize(long n_rows, long n_cols) {
+  void resize(int32_t n_rows, int32_t n_cols) {
     rows_ = n_rows;
     cols_ = n_cols;
     
@@ -91,12 +92,12 @@ public:
     else
       resize(in_array.rows_,in_array.cols_);
       
-    for (long i=0; i<len_; i++)
+    for (int64_t i=0; i<len_; i++)
       data_[i] = in_array[i];
   }
 
   
-  void resize(long new_length) {
+  void resize(int32_t new_length) {
 #ifdef NEC_ERROR_CHECK
     if (! own_data_)
       throw new nec_exception("attempt to resize data we do not own");
@@ -123,7 +124,7 @@ public:
 
     T ret = data_[check(0)];
     
-    for (long i = 1; i < len_; i++ ) {
+    for (int64_t i = 1; i < len_; i++ ) {
       if ( data_[check(i)] > ret)
         ret = data_[check(i)];
     }
@@ -137,7 +138,7 @@ public:
 
     T ret = data_[check(0)];
     
-    for (long i = 1; i < len_; i++ ) {
+    for (int64_t i = 1; i < len_; i++ ) {
       if ( data_[check(i)] < ret)
         ret = data_[check(i)];
     }
@@ -145,10 +146,10 @@ public:
   }
 
   /*!\brief return the sum of the specified elements in the array */
-  T sum(long start_index, long stop_index)  {
+  T sum(int64_t start_index, int64_t stop_index)  {
     T ret = data_[check(start_index)];
     
-    for (long i = start_index+1; i < stop_index; i++ )  {
+    for (int32_t i = start_index+1; i < stop_index; i++ )  {
       ret += data_[check(i)];
     }
     return ret;
@@ -160,9 +161,9 @@ public:
   }
 
   // fill specified elements of the array with x
-  void fill(long start, long N, const T& x) {
-    long stop = start + N;
-    for (long i = start; i < stop; i++ ) {
+  void fill(int64_t start, int64_t N, const T& x) {
+    int64_t stop = start + N;
+    for (int64_t i = start; i < stop; i++ ) {
       data_[check(i)] = x;
     }
   }
@@ -174,25 +175,25 @@ public:
 
   /*! \brief Set an element assuming that the data is stored in column major form.
   */
-  void set_col_major(int col_dim, int col, int row, const T& val) {
+  void set_col_major(int32_t col_dim, int32_t col, int32_t row, const T& val) {
     data_[check(row*col_dim + col)] = val;
   }
 
   /*! \brief Get an element assuming that the data is stored in column major form.
   */
-  T& get_col_major(int col_dim, int col, int row) {
+  T& get_col_major(int32_t col_dim, int32_t col, int32_t row) {
     return data_[check(row*col_dim + col)];
   }
   
-  T& operator()(long row, long col)  {
+  T& operator()(int32_t row, int32_t col)  {
     return data_[check(row,col)];
   }
   
-  const T& operator[](long i) const  {
+  const T& operator[](int64_t i) const  {
     return data_[check(i)];
   }
   
-  T& operator[](long i)  {
+  T& operator[](int64_t i)  {
     return data_[check(i)];
   }
   
@@ -200,7 +201,7 @@ public:
       \param start_index The index of the first element
       \param end_index If -1, then finish at the end of the array
   */
-  safe_array<T> segment(long start_index, long end_index)  {
+  safe_array<T> segment(int64_t start_index, int64_t end_index)  {
     if (-1 == end_index)
       throw "foo";
     return safe_array<T>(*this, start_index, end_index, false);
@@ -210,8 +211,8 @@ public:
       \param start_index The index of the first element
       \param n Number of elements in the segment
   */
-  safe_array<T> eigen_segment(long start_index, long n)  {
-    long end_index = start_index + n;
+  safe_array<T> eigen_segment(int64_t start_index, int64_t n)  {
+    int64_t end_index = start_index + n;
     return safe_array<T>(*this, start_index, end_index, false);
   }
   
@@ -227,23 +228,25 @@ public:
           
 
 private:
-  long len_;
-  long rows_;
-  long cols_;
-  long resize_chunk_;
+  int64_t len_;
+  int32_t rows_;
+  int32_t cols_;
+  int32_t resize_chunk_;
   
   T*  data_;
-  long data_size_;
+  int64_t data_size_;
   
   bool own_data_;
   
   /*!\brief Constructor only used to construct segment
+  \param start_index The first element of in_array to copy.
+  \param end_index The last element of in_array to copy.
   \param in_copy_data True if we create a copy of data from in_array. False - just reference the data in in_array.
   */
-  safe_array(safe_array<T>& in_array, long start_index, long end_index, bool in_copy_data)
+  safe_array(safe_array<T>& in_array, int64_t start_index, int64_t end_index, bool in_copy_data)
   {
     resize_chunk_ = in_array.resize_chunk_;
-    len_ = (end_index - start_index);
+    len_ = (end_index - start_index)+1; // include the end_index element
     rows_ = 0;
     cols_ = 0;
     
@@ -251,7 +254,7 @@ private:
       data_ = new T[len_];
       data_size_ = len_;
       
-      for (long i=0; i<len_; i++)
+      for (int64_t i=0; i<len_; i++)
         data_[check(i)] = in_array[start_index + i];
 
       own_data_ = true;
@@ -262,7 +265,7 @@ private:
     }
   }
   
-  inline long check(long i) const  {
+  inline int64_t check(int64_t i) const  {
 #ifdef NEC_ERROR_CHECK
     if (i < 0 || i >= len_)
       throw new BoundsViol("safe_array: ", i, len_);
@@ -270,7 +273,7 @@ private:
     return i;
   }
 
-  inline long check(long row, long col) const  {
+  inline int64_t check(int32_t row, int32_t col) const  {
 #ifdef NEC_ERROR_CHECK
     if (row < 0 || row >= rows_)
       throw new BoundsViol("safe_array: ", row, rows_);
@@ -285,7 +288,7 @@ private:
 template<typename T>
 class safe_matrix : public safe_array<T> {
 public:
-  safe_matrix(long rows, long cols) : safe_array<T>(rows*cols) {
+  safe_matrix(int32_t rows, int32_t cols) : safe_array<T>(rows*cols) {
     this->resize(rows, cols);
   }
 
