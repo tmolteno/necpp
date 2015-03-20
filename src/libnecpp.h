@@ -182,6 +182,41 @@ long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
                  double rox, double roy, double roz, double xs,
                  double ys, double zs, int its );
 
+/*!\brief Parameters:
+        Integers
+   \param i1 - Tag number increment.
+   \param i2 - This integer is divided into three independent digits, in
+                  columns 8, 9, and 10 of the card, which control reflection
+                  in the three orthogonal coordinate planes.  A one in column
+                  8 causes reflection along the X-axis (reflection in Y, Z
+                  plane); a one in column 9 causes reflection along the Y-axis;
+                  and a one in column 10 causes reflection along the Z axis.
+                  A zero or blank in any of these columns causes the corres-
+                  ponding reflection to be skipped.
+
+   \remark Any combination of reflections along the X, Y and Z axes may be used. 
+   For example, 101 for (I2) will cause reflection along axes X and Z, and 111 will 
+   cause reflection along axes X, Y and Z. When combinations of reflections are requested, 
+   the reflections are done in reverse alphabetical order. That is, if a structure is 
+   generated in a single octant of space and a GX card is then read with I2 equal to 111, 
+   the structure is first reflected along the Z-axis; the structure and its image are 
+   then reflected along the Y-axis; and, finally, these four structures are reflected 
+   along the X-axis to fill all octants. This order determines the position of a segment 
+   in the sequence and, hence, the absolute segment numbers.
+   
+   \remark The tag increment I1 is used to avoid duplication of tag numbers in the image 
+   segments. All valid tags on the original structure are incremented by I1 on the image.
+   When combinations of reflections are employed, the tag increment is doubled after each 
+   reflection. Thus, a tag increment greater than or equal to the largest tag an the 
+   original structure will ensure that no duplicate tags are generated. For example, 
+   if tags from 1 to 100 are used on the original structure with I2 equal to 011 and 
+   a tag increment of 100, the first reflection, along the Z-axis, will produce tags 
+   from 101 to 200; and the second reflection, along the Y-axis, will produce tags 
+   from 201 to 400, as a result of the increment being doubled to 200. 
+ */
+long nec_gx_card(int i1, int i2);
+
+
 /*! \brief Indicate that the geometry is complete (GE card)
  * \param in_context The nec_context created with nec_create()
  * \param gpflag Geometry ground plain flag.

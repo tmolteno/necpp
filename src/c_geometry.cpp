@@ -107,7 +107,6 @@ void str_toupper(std::string &str)
 void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 {
 	char gm[3];
-	char ifx[2] = {'*', 'X'}, ify[2]={'*','Y'}, ifz[2]={'*','Z'};
 	const char ipt[4] = { 'P', 'R', 'T', 'Q' };
 	
 	/* input card mnemonic list */
@@ -230,21 +229,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 		/* axes or rotate to form cylinder.  */
 		/* "gx" card */
 		else if (card_id == "GX")
-		{	int iy= card_int_2/10;
-			int iz= card_int_2- iy*10;
-			int ix= iy/10;
-			iy= iy- ix*10;
-		
-			if ( ix != 0)	ix=1;
-			if ( iy != 0)	iy=1;
-			if ( iz != 0)	iz=1;
-		
-			m_output->nec_printf(
-				"\n  STRUCTURE REFLECTED ALONG THE AXES %c %c %c"
-				" - TAGS INCREMENTED BY %d\n",
-				ifx[ix], ify[iy], ifz[iz], card_int_1 );
-		
-			reflect( ix, iy, iz, card_int_1, card_int_2);
+		{	gx_card(card_int_1, card_int_2);
 		}
 	
 		/* "gr" card */
@@ -1969,6 +1954,26 @@ void c_geometry::sp_card(int ns,
   _prev_sc = false;
 }
 
+
+void c_geometry::gx_card(int card_int_1, int card_int_2) {       
+  const char ifx[2] = {'*', 'X'}, ify[2]={'*','Y'}, ifz[2]={'*','Z'};
+  
+  int iy= card_int_2/10;
+  int iz= card_int_2- iy*10;
+  int ix= iy/10;
+  iy= iy- ix*10;
+
+  if ( ix != 0)   ix=1;
+  if ( iy != 0)   iy=1;
+  if ( iz != 0)   iz=1;
+
+  m_output->nec_printf(
+          "\n  STRUCTURE REFLECTED ALONG THE AXES %c %c %c"
+          " - TAGS INCREMENTED BY %d\n",
+          ifx[ix], ify[iy], ifz[iz], card_int_1 );
+
+  reflect( ix, iy, iz, card_int_1, card_int_2);
+}
 /*
  * For the rectangular or quadrilateral options, multiple SC cards may follow a SP card 
  * to specify a string of patches. The parameters on the second or subsequent SC card 

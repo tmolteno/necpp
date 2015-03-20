@@ -106,8 +106,8 @@ class TestDipoleGain(unittest.TestCase):
     EN
     '''
     nec = nec_create()
-    self.handle_nec(nec_sp_card(nec, 0, 0, 0.1, 0.05, 0.05, 0.0, 0.0, 0.01))
-    self.handle_nec(nec_sp_card(nec, 0, 0, .05, .1, .05, 0.0, 90.0, 0.01))
+    self.handle_nec(nec_sp_card(nec, 0, 0.1, 0.05, 0.05, 0.0, 0.0, 0.01))
+    self.handle_nec(nec_sp_card(nec, 0, .05, .1, .05, 0.0, 90.0, 0.01))
     self.handle_nec(nec_gx_card(nec, 0, 110))
     self.handle_nec(nec_sp_card(nec, 0, 0, 0.0, 0.0, 0.1, 90.0, 0.0, 0.04))
     

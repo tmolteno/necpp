@@ -79,6 +79,10 @@ long nec_gm_card(nec_context* in_context,  int itsi, int nrpt,
   NEC_ERROR_HANDLE(in_context->move(roxd, royd, rozd, xs, ys, zs, its, nrpt, itsi));
 }
 
+long nec_gx_card(int i1, int i2) {
+  NEC_ERROR_HANDLE(in_context->m_geometry->gx_card(i1,i2));
+}
+
 
 long nec_geometry_complete(nec_context* in_context, int card_int_1, int card_int_2) {
   NEC_ERROR_HANDLE(in_context->geometry_complete(card_int_1, card_int_2));

@@ -11,6 +11,8 @@
 * Added python based testharness
 * Start to use matrix operations for multi-dimensional arrays. safe_matrix class.
 * Errors are thrown if zeros are specified for ground conductivity and dielectric constant.
+* Added Reflection nec_gx_card to C-style interface.
+* Added Reflection gx_card to c_geometry class.
 
 ## Version 1.5.4 [December 2014]
 * Changed default compiler options to remove debugging symbols

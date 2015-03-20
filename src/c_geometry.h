@@ -98,7 +98,8 @@ public:
               nec_float x3, nec_float y3, nec_float z3,
               nec_float x4, nec_float y4, nec_float z4);
         
-        
+        void gx_card(int card_int_1, int card_int_2);
+       
 	/*! \brief Geometry is complete
 		\exception nec_exception* If there is an error with the geometry.
 	*/
