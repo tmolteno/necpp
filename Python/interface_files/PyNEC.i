@@ -99,8 +99,8 @@
 %include "nec_ground.i"
 
 /*The function below is added to the init function of the wrapped module.
-It's mandatory to do so before to use the numarray API*/
+It's mandatory to do so before to use the numpy API*/
 %init %{
-import_libnumarray();
+import_array();
 %} 
 

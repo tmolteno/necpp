@@ -214,7 +214,7 @@ long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
    from 101 to 200; and the second reflection, along the Y-axis, will produce tags 
    from 201 to 400, as a result of the increment being doubled to 200. 
  */
-long nec_gx_card(int i1, int i2);
+long nec_gx_card(nec_context* in_context, int i1, int i2);
 
 
 /*! \brief Indicate that the geometry is complete (GE card)

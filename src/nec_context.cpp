@@ -313,6 +313,9 @@ void nec_context::sc_card(int i2,
   m_geometry->sc_card(i2, x3, y3, z3, x4, y4, z4);
 }
 
+void nec_context::gx_card(int i1, int i2) {
+  m_geometry->gx_card(i1, i2);
+}
 
 void nec_context::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
     nec_float ys, nec_float zs, int its, int nrpt, int itgi )

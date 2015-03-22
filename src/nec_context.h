@@ -301,36 +301,38 @@ public:
 	}
 	
 	
-	/*! Add a wire to the geometry,
-	
-	All co-ordinates are in meters.
-	
-		\param tag_id The tag ID.
-		\param segment_count The number of segments.
-		\param xw1 The x coordinate of the wire starting point.
-		\param yw1 The y coordinate of the wire starting point.
-		\param zw1 The z coordinate of the wire starting point.
-		\param xw2 The x coordinate of the wire ending point.
-		\param yw2 The y coordinate of the wire ending point.
-		\param zw2 The z coordinate of the wire ending point.
-		\param rad The wire radius (meters)
-		\param rdel For tapered wires, the. Otherwise set to 1.0
-		\param rrad For tapered wires, the. Otherwise set to 1.0
-	*/
-	void wire(int tag_id, int segment_count,
-		nec_float xw1, nec_float yw1, nec_float zw1,
-		nec_float xw2, nec_float yw2, nec_float zw2,
-		nec_float rad, nec_float rdel, nec_float rrad);
+  /*! Add a wire to the geometry,
 
-        void sp_card(int ns,
-            nec_float x1, nec_float y1, nec_float z1,
-            nec_float x2, nec_float y2, nec_float z2);
+  All co-ordinates are in meters.
 
-        void sc_card( int i2,
-            nec_float x3, nec_float y3, nec_float z3,
-            nec_float x4, nec_float y4, nec_float z4);
+  \param tag_id The tag ID.
+  \param segment_count The number of segments.
+  \param xw1 The x coordinate of the wire starting point.
+  \param yw1 The y coordinate of the wire starting point.
+  \param zw1 The z coordinate of the wire starting point.
+  \param xw2 The x coordinate of the wire ending point.
+  \param yw2 The y coordinate of the wire ending point.
+  \param zw2 The z coordinate of the wire ending point.
+  \param rad The wire radius (meters)
+  \param rdel For tapered wires, the. Otherwise set to 1.0
+  \param rrad For tapered wires, the. Otherwise set to 1.0
+  */
+  void wire(int tag_id, int segment_count,
+  nec_float xw1, nec_float yw1, nec_float zw1,
+  nec_float xw2, nec_float yw2, nec_float zw2,
+  nec_float rad, nec_float rdel, nec_float rrad);
 
-        void move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
+  void sp_card(int ns,
+      nec_float x1, nec_float y1, nec_float z1,
+      nec_float x2, nec_float y2, nec_float z2);
+
+  void sc_card( int i2,
+      nec_float x3, nec_float y3, nec_float z3,
+      nec_float x4, nec_float y4, nec_float z4);
+
+  void gx_card(int i1, int i2);
+
+  void move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
                         nec_float ys, nec_float zs, int its, int nrpt, int itgi );
 
 	/*! Add an arc to the geometry,

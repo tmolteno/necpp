@@ -7,17 +7,17 @@ print('Installation start')
 platform = sys.platform
 
 #==================================================================================================================================================================================
-#checks the Numarray installation
+#checks the Numpy installation
 
-print('\nNumarray installation check...')
+print('\nNumpy installation check...')
 try:
-	from numpy import numarray
+	import numpy
 except:
-	print('FAILURE - PyNEC requires Numarray to be installed. Please install Numarrray first.')
+	print('FAILURE - PyNEC requires numpy to be installed. Please install numpy first.')
 	print('Installation aborted')
 	sys.exit(-1)
 
-print('SUCCESS - Numarray seems to be installed.')
+print('SUCCESS - Numpy seems to be installed.')
 
 #==================================================================================================================================================================================
 #Detects the Python version number
@@ -74,9 +74,9 @@ python_include_path = search_include_path(False)
 print('SUCCESS - Python include path found')
 
 #==================================================================================================================================================================================
-#Looks for the Numarray "API path"
+#Looks for the Numpy "API path"
 
-print('\nLooking for the Numarray API path...')
+print('\nLooking for the Numpy API path...')
 
 def test_api_path(str):
 	open(os.path.join(str, 'libnumarray.h'), 'rb')
@@ -85,14 +85,14 @@ def test_api_path(str):
 def search_api_path(flag):
 	try:
 		if platform == 'win32' :
-			api_path = os.path.join(sys.prefix, 'include','numarray')
+			api_path = os.path.join(sys.prefix, 'include','numpy')
 		else :
-			api_path = os.path.join(sys.prefix, 'include', 'python'+python_version, 'numarray')
+			api_path = os.path.join(sys.prefix, 'include', 'python'+python_version, 'numpy')
 		test_api_path(api_path)
 		return api_path
 	except:
 		if flag == False :
-			print("PROBLEM - Can not find the Numarray API path.\nPlease enter the actual Numarray API path ( example : " + api_path + ") :")
+			print("PROBLEM - Can not find the Numarray API path.\nPlease enter the actual Numpy API path ( example : " + api_path + ") :")
 		else :
 			print('Try again :')
 
