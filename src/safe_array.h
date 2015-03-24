@@ -243,7 +243,7 @@ private:
   \param end_index The last element of in_array to copy.
   \param in_copy_data True if we create a copy of data from in_array. False - just reference the data in in_array.
   */
-  safe_array(safe_array<T>& in_array, int64_t start_index, int64_t end_index, bool in_copy_data)
+  safe_array(const safe_array<T>& in_array, int64_t start_index, int64_t end_index, bool in_copy_data)
   {
     resize_chunk_ = in_array.resize_chunk_;
     len_ = (end_index - start_index)+1; // include the end_index element

@@ -833,8 +833,9 @@ private:
 			complex_array& in_cm, int64_t nrow, int itrp);
 	void cmsw(int j1, int j2, int i1, int i2, complex_array& in_cm,
 			complex_array& cw, int64_t ncw, int64_t nrow, int itrp);
-	void cmws(int j, int i1, int i2, complex_array& in_cm, int64_t nr,
-			complex_array& cw, int itrp);
+	void cmws( int j, int i1, int i2, complex_array& in_cm,
+                        int64_t nr, complex_array& cw, int64_t nw, int itrp );
+        
 	void cmww(int j, int i1, int i2, complex_array& in_cm, int64_t nr,
 			complex_array& cw, int64_t nw, int itrp);
 	void couple(complex_array& cur, nec_float wlam);
