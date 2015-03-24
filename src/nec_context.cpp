@@ -2355,10 +2355,11 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   
   i1= 1;
   i2= it;
-  in2= i2;
   
+  in2= i2; 
   if ( in2 > np)
-          in2= np;
+    in2= np;
+  
   
   im1= i1- np;
   im2= i2- np;
@@ -2369,11 +2370,11 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   ist=1;
   if ( i1 <= np)
     ist= np- i1+2;
+
+  ASSERT(in2 == std::min(nlast, np));
   
   /* wire source loop */
-  int n = m_geometry->n_segments;
-          
-  for( int j = 1; j <= n; j++ ) {
+  for( int j = 1; j <= m_geometry->n_segments; j++ ) {
     m_geometry->trio(j);
     
     for (int i = 0; i < m_geometry->jsno; i++ ) {
@@ -2386,7 +2387,8 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
 
     if ( im1 <= im2) {
       complex_array temp = in_cm.segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
-      cmws( j, im1, im2, temp, nrow, in_cm, 1);
+      cmws( j, im1, im2, temp, nrow, in_cm, nrow, 1);
+      /* CMWS (J,IM1,IM2,CM(1,IST),NROW,CM,NROW,1) */
     }
     /* matrix elements modified by loading */
     if ( nload == 0)
@@ -2686,103 +2688,89 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
 
 /* cmws computes matrix elements for wire-surface interactions */
 void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
-    int64_t nr, complex_array& cw, int itrp )
+    int64_t nr, complex_array& cw, int64_t nw, int itrp )
 {
-	int ipr, ipatch, ik, js=0;
-	nec_float xi, yi, zi, tx, ty, tz;
-	nec_complex etk, ets, etc;
-	
-	j--;
-	m_s= m_geometry->segment_length[j];
-	m_b= m_geometry->segment_radius[j];
-	xj= m_geometry->x[j];
-	yj= m_geometry->y[j];
-	zj= m_geometry->z[j];
-	cabj= m_geometry->cab[j];
-	sabj= m_geometry->sab[j];
-	salpj= m_geometry->salp[j];
-	
-	/* observation loop */
-	ipr= -1;
-	for(int i = i1; i <= i2; i++ )
-	{
-		ipr++;
-		ipatch=(i+1)/2;
-		ik= i-( i/2)*2;
-	
-		if ( (ik != 0) || (ipr == 0) )
-		{
-			js= ipatch-1;
-			xi= m_geometry->px[js];
-			yi= m_geometry->py[js];
-			zi= m_geometry->pz[js];
-			hsfld( xi, yi, zi,0.);
-		
-			if ( ik != 0 )
-			{
-				tx= m_geometry->t2x[js];
-				ty= m_geometry->t2y[js];
-				tz= m_geometry->t2z[js];
-			}
-			else
-			{
-				tx= m_geometry->t1x[js];
-				ty= m_geometry->t1y[js];
-				tz= m_geometry->t1z[js];
-			}
-		} /* if ( (ik != 0) || (ipr == 0) ) */
-		else
-		{
-			tx= m_geometry->t1x[js];
-			ty= m_geometry->t1y[js];
-			tz= m_geometry->t1z[js];
-		} /* if ( (ik != 0) || (ipr == 0) ) */
-	
-		etk=-( exk* tx+ eyk* ty+ ezk* tz)* m_geometry->psalp[js];
-		ets=-( exs* tx+ eys* ty+ ezs* tz)* m_geometry->psalp[js];
-		etc=-( exc* tx+ eyc* ty+ ezc* tz)* m_geometry->psalp[js];
-	
-		/* fill matrix elements.  element locations */
-		/* determined by connection data. */
-	
-		/* normal fill */
-		if ( itrp == 0)
-		{
-			for(int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				int jx= m_geometry->jco[ij]-1;
-				in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		
-			continue;
-		} /* if ( itrp == 0) */
-	
-		/* transposed fill */
-		if ( itrp != 2)
-		{
-			for(int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				int jx= m_geometry->jco[ij]-1;
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		
-			continue;
-		} /* if ( itrp != 2) */
-	
-		/* transposed fill - c(ws) and d(ws)prime (=cw) */
-		for (int ij = 0; ij < m_geometry->jsno; ij++ )
-		{
-			int jx= m_geometry->jco[ij]-1;
-			if ( jx < nr)
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			else
-			{
-				jx -= nr;
-				cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		} /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
-	
-	} /* for( i = i1; i <= i2; i++ ) */
+  int ipr, js=0;
+  nec_float xi, yi, zi, tx, ty, tz;
+  nec_complex etk, ets, etc;
+  
+  j--;
+  m_s= m_geometry->segment_length[j];
+  m_b= m_geometry->segment_radius[j];
+  xj= m_geometry->x[j];
+  yj= m_geometry->y[j];
+  zj= m_geometry->z[j];
+  cabj= m_geometry->cab[j];
+  sabj= m_geometry->sab[j];
+  salpj= m_geometry->salp[j];
+  
+  /* observation loop */
+  ipr= -1;
+  for(int i = i1; i <= i2; i++ ) {
+    ipr++;
+    int ipatch=(i+1)/2;
+    int ik= i-( i/2)*2;
+
+    if ( (ik != 0) || (ipr == 0) ) {
+      js= ipatch-1;
+      xi= m_geometry->px[js];
+      yi= m_geometry->py[js];
+      zi= m_geometry->pz[js];
+      hsfld( xi, yi, zi,0.);
+
+      if ( ik != 0 ) {
+        tx= m_geometry->t2x[js];
+        ty= m_geometry->t2y[js];
+        tz= m_geometry->t2z[js];
+      } else {
+        tx= m_geometry->t1x[js];
+        ty= m_geometry->t1y[js];
+        tz= m_geometry->t1z[js];
+      }
+    } /* if ( (ik != 0) || (ipr == 0) ) */
+    else {
+      tx= m_geometry->t1x[js];
+      ty= m_geometry->t1y[js];
+      tz= m_geometry->t1z[js];
+    } /* if ( (ik != 0) || (ipr == 0) ) */
+
+    etk=-( exk* tx+ eyk* ty+ ezk* tz)* m_geometry->psalp[js];
+    ets=-( exs* tx+ eys* ty+ ezs* tz)* m_geometry->psalp[js];
+    etc=-( exc* tx+ eyc* ty+ ezc* tz)* m_geometry->psalp[js];
+
+    /* fill matrix elements.  element locations */
+    /* determined by connection data. */
+    
+    switch (itrp) {
+      case 0:   /* normal fill */
+        for(int ij = 0; ij < m_geometry->jsno; ij++ ) {
+          int jx= m_geometry->jco[ij]-1;
+          in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          /* CM(IPR,JX)=CM(IPR,JX)+ETK*AX(IJ)+ETS*BX(IJ)+ETC*CX(IJ) */
+        }
+        break;
+      
+      case 2:  /* transposed fill - c(ws) and d(ws)prime (=cw) */
+        for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+          int jx= m_geometry->jco[ij]-1;
+          if ( jx < nr) {
+            in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          } else {
+            jx -= nr;
+            cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          }
+        }
+        break;
+        
+      default:  /* transposed fill */
+        for(int ij = 0; ij < m_geometry->jsno; ij++ ) {
+          int jx= m_geometry->jco[ij]-1;
+          in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          /* CM(JX,IPR)=CM(JX,IPR)+ETK*AX(IJ)+ETS*BX(IJ)+ETC*CX(IJ) */
+        }
+        break;
+    }
+  } /* for( i = i1; i <= i2; i++ ) */
 }
 
 /*-----------------------------------------------------------------------*/
