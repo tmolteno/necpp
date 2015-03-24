@@ -109,7 +109,7 @@ class TestDipoleGain(unittest.TestCase):
     self.handle_nec(nec_sp_card(nec, 0, 0.1, 0.05, 0.05, 0.0, 0.0, 0.01))
     self.handle_nec(nec_sp_card(nec, 0, .05, .1, .05, 0.0, 90.0, 0.01))
     self.handle_nec(nec_gx_card(nec, 0, 110))
-    self.handle_nec(nec_sp_card(nec, 0, 0, 0.0, 0.0, 0.1, 90.0, 0.0, 0.04))
+    self.handle_nec(nec_sp_card(nec, 0, 0.0, 0.0, 0.1, 90.0, 0.0, 0.04))
     
     self.handle_nec(nec_wire(nec, 1, 4, 0., 0.0, 0.1, 0.0,  0.0, 0.3, .001, 1.0, 1.0))
     self.handle_nec(nec_wire(nec, 2, 2, 0., 0.0, 0.3, 0.15, 0.0, 0.3, .001, 1.0, 1.0))
@@ -120,6 +120,11 @@ class TestDipoleGain(unittest.TestCase):
     
     self.handle_nec(nec_ex_card(nec, 0, 1, 1, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     self.handle_nec(nec_rp_card(nec, 0,10,4,1,0,0,1,0.0,0.0,10.0,30.0, 0, 0))
+    
+    self.assertAlmostEqual(nec_gain_max(nec,0),5.076,3)
+    self.assertAlmostEqual(nec_impedance_real(nec,0),180.727,3)
+    self.assertAlmostEqual(nec_impedance_imag(nec,0),217.654,3)
+
     nec_delete(nec)
     
 
