@@ -106,13 +106,16 @@ public:
       // We allocate resize_chunk_ more bytes than we need to avoid
       // resizing too often. 
       data_size_ = new_length + resize_chunk_;
-      T* new_data_ = new T[data_size_];
-      
-      if (0 != len_)
-        std::memcpy(new_data_, data_, len_ * sizeof(T));
+      try {
+        T* new_data_ = new T[data_size_];
+        if (0 != len_)
+          std::memcpy(new_data_, data_, len_ * sizeof(T));
 
-      delete[] data_;
-      data_ = new_data_;
+        delete[] data_;
+        data_ = new_data_;
+      } catch (std::bad_alloc& ba) {
+        throw new nec_exception("Error: Out of Memory ");
+      }
     }
     len_ = new_length;
   }
