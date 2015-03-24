@@ -111,8 +111,10 @@ void nec_context::calc_prepare()
 	cir.resize(n_plus_m);
 	cii.resize(n_plus_m);
 	
-	ip.resize(m_geometry->n_plus_2m);		
-	current_vector.resize(m_geometry->n_plus_3m);
+	ip.resize(m_geometry->n_plus_2m);
+        ASSERT((m_geometry->n_segments + m_geometry->m*3 == m_geometry->n_plus_3m));
+        // TODO FIX HERE... THIS SIZE AINT RIGHT
+	current_vector.resize(m_geometry->n_segments + m_geometry->m*4);
 	
 	/* Matrix parameters */
 	if ( imat == 0)
@@ -1038,7 +1040,8 @@ void nec_context::simulate(bool far_field_flag) {
 
 			if (false == in_freq_loop)
 			{
-				iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+2*m_geometry->mp);
+				// TODO fix up the following (changed 2* to 3*)
+                                iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
 				cm.resize(iresrv);
 			
 				/* Memory allocation for symmetry array */
@@ -5868,19 +5871,10 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
     else if ( ipr < 0 ) {
       ipr=- ipr;
       ipr--;
-      if ( -m_geometry->icon1[ipr-1] != jp1 )
+      if ( -m_geometry->icon1[ipr-1] != jp1 ) {
         ind1=2;
-      else
-      {
+      } else {
         ind1 = m_geometry->test_ek_approximation(j,ipr);
-        
-        int ind_test;
-        xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-        if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-          ind_test=2;
-        else
-          ind_test=0;
-        ASSERT(ind_test == ind1);
       }
     }  /* if ( ipr < 0 ) */
     else if ( ipr == 0 )
@@ -5889,18 +5883,10 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
     {
       ipr--;
       if ( ipr != j ) {
-        if ( m_geometry->icon2[ipr] != jp1)
+        if ( m_geometry->icon2[ipr] != jp1) {
           ind1=2;
-        else {
+        } else {
           ind1 = m_geometry->test_ek_approximation(j,ipr);
-          
-          int ind_test;
-          xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-          if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-            ind_test=2;
-          else
-            ind_test=0;
-          ASSERT(ind_test == ind1);
         }
       } /* if ( ipr != j ) */
       else {
@@ -5916,18 +5902,10 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
     else if ( ipr < 0 ) {
       ipr = -ipr;
       ipr--;
-      if ( -m_geometry->icon2[ipr] != jp1 )
+      if ( -m_geometry->icon2[ipr] != jp1 ) {
         ind1=2;
-      else {
+      } else {
         ind1 = m_geometry->test_ek_approximation(j,ipr);
-        
-        int ind_test;
-        xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-        if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-          ind_test=2;
-        else
-          ind_test=0;
-        ASSERT(ind_test == ind1);
       }
     } /* if ( ipr < 0 ) */
     else if ( ipr == 0 )
@@ -5936,18 +5914,10 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
     {
       ipr--;
       if ( ipr != j ) {
-        if ( m_geometry->icon1[ipr] != jp1)
+        if ( m_geometry->icon1[ipr] != jp1) {
           ind2=2;
-        else {
+        } else {
           ind2 = m_geometry->test_ek_approximation(j,ipr);
-          
-          int ind_test;
-          xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-          if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-            ind_test=2;
-          else
-            ind_test=0;
-          ASSERT(ind_test == ind2);
         }
       } /* if ( ipr != j )*/
       else {

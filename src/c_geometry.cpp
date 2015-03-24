@@ -1737,10 +1737,10 @@ void c_geometry::connect_segments( int ignd )
     nec_float ya = y[j];
     nec_float za = z[j];
   
-    while( true )	{
+    while ( true )  {
       if ( (ix != 0) && (ix != (j+1)) && (ix <= PCHCON) )	{
         bool jump = false;
-        int nsflg = 0;  // will be set to 1 if the junction includes any new segments when NGF is in use.
+        // int nsflg = 0;  // will be set to 1 if the junction includes any new segments when NGF is in use.
         // NOTE nsflg is not used correctly as we don't use Numerical Greens Functions
         do {
           
@@ -1773,8 +1773,8 @@ void c_geometry::connect_segments( int ignd )
           }
           jco[ic-1]= ix* jend;
         
-          if ( ix > 0)
-            nsflg=1;
+          // if ( ix > 0)
+          //  nsflg=1;
         
           int ixx = ix-1;
           if ( jend != 1) {

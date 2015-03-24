@@ -2,7 +2,14 @@
 
 #include "libnecpp.h"
 #include <iostream>
-#define HANDLE_NEC(x) { int __tmp = (x);  if (__tmp != 0) std::cout << nec_error_message() << std::endl; REQUIRE((__tmp) == 0); }
+
+void HANDLE_NEC(long x) { 
+  int __tmp = (x);  
+  if (__tmp != 0) {
+    std::cout << nec_error_message() << std::endl;
+  }
+  REQUIRE((__tmp) == 0); 
+}
 
 TEST_CASE( "Geometry", "[surface_patch]") {
     nec_context* nec;     
@@ -65,4 +72,5 @@ TEST_CASE( "Geometry", "[surface_patch]") {
     REQUIRE((nec_impedance_imag(nec,0) - -7.8930E+00 < 1E-3));
     REQUIRE((nec_gain_max(nec, 0) - 10.3332 < 1E-4));
 
+    nec_delete(nec);
 }

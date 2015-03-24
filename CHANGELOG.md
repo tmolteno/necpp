@@ -13,6 +13,8 @@
 * Errors are thrown if zeros are specified for ground conductivity and dielectric constant.
 * Added Reflection nec_gx_card to C-style interface.
 * Added Reflection gx_card to c_geometry class.
+* Catch out of memory errors and create nice error messages
+* Fix memory allocation errors in patch simulations.
 
 ## Version 1.5.4 [December 2014]
 * Changed default compiler options to remove debugging symbols
