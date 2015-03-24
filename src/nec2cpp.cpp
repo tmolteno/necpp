@@ -573,7 +573,7 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	int line_idx;
 	int n_integer_params = 4, n_float_params = 6;
 	int integer_array[4] = { 0, 0, 0, 0 };
-	nec_float real_array[6] = { 0., 0., 0., 0., 0., 0. };
+	nec_float r_array[6] = { 0., 0., 0., 0., 0., 0. };
 	
 	/* read a line from input file */
 	int eof = load_line( line_buf, input_fp );
@@ -636,12 +636,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}
 		
@@ -676,12 +676,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}		
 	} /* for( i = 0; i < n_integer_params; i++ ) */
@@ -701,17 +701,17 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}
 		
 		/* read a nec_float from line */
-		real_array[i] = atof( &line_buf[line_idx] );
+		r_array[i] = atof( &line_buf[line_idx] );
 		parameter_count++;
 		
 		/* traverse numerical field to next ' ' or ',' */
@@ -744,12 +744,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}		
 	} /* for( i = 0; i < n_float_params; i++ ) */
@@ -758,12 +758,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	*i2= integer_array[1];
 	*i3= integer_array[2];
 	*i4= integer_array[3];
-	*f1= real_array[0];
-	*f2= real_array[1];
-	*f3= real_array[2];
-	*f4= real_array[3];
-	*f5= real_array[4];
-	*f6= real_array[5];
+	*f1= r_array[0];
+	*f2= r_array[1];
+	*f3= r_array[2];
+	*f4= r_array[3];
+	*f5= r_array[4];
+	*f6= r_array[5];
 	
 	return parameter_count;
 }

@@ -1924,27 +1924,27 @@ void c_geometry::arc( int tag_id, int segment_count, nec_float rada,
 /*-----------------------------------------------------------------------*/
 
 void c_geometry::sp_card(int ns,
-      nec_float x1, nec_float y1, nec_float z1,
-      nec_float x2, nec_float y2, nec_float z2)
+      nec_float in_x1, nec_float in_y1, nec_float in_z1,
+      nec_float in_x2, nec_float in_y2, nec_float in_z2)
 {
   const char ipt[4] = { 'P', 'R', 'T', 'Q' };
   this->patch_type = ns;
   m_output->nec_printf( "\n"
           " %5d%c %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
-          m+1, ipt[ns], x1, y1, z1, x2, y2, z2 );
+          m+1, ipt[ns], in_x1, in_y1, in_z1, in_x2, in_y2, in_z2 );
   switch (ns) {
     case 0: { // Arbitrary Shape
-      nec_float elevation = degrees_to_rad(x2);
-      nec_float azimuth = degrees_to_rad(y2);
-      patch( 0, 0, x1, y1, z1, elevation, azimuth, z2, 0, 0, 0, 0, 0, 0);
+      nec_float elevation = degrees_to_rad(in_x2);
+      nec_float azimuth = degrees_to_rad(in_y2);
+      patch( 0, 0, in_x1, in_y1, in_z1, elevation, azimuth, in_z2, 0, 0, 0, 0, 0, 0);
       break;
     }
       
     case 1: // Rectangular (require SC card)
     case 2: // triangular, (require SC card)
     case 3: // quadrilateral (require SC card)
-      this->patch_x1 = nec_3vector(x1, y1, z1);
-      this->patch_x2 = nec_3vector(x2, y2, z2);
+      this->patch_x1 = nec_3vector(in_x1, in_y1, in_z1);
+      this->patch_x2 = nec_3vector(in_x2, in_y2, in_z2);
       this->patch_type = ns;
       break;
       

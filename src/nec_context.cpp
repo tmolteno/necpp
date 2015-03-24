@@ -2339,7 +2339,7 @@ void nec_context::load()
 
 /* cmset sets up the complex structure matrix in the array in_cm */
 void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
-  int mp2, iout, it, i1, i2, in2;
+  int mp2, it, i1, i2, in2;
   int im1, im2, ist, ij, jss, jm1, jm2, jst;
   complex_array scm;
   
@@ -2351,7 +2351,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
 //	neq= m_geometry->n_plus_2m; // n + 2* m;
   
   rkh= rkhx;
-  iout=2* npblk* nrow;
+  //iout=2* npblk* nrow;
   it= nlast;
                   
   vector_fill(in_cm,0,it*nrow,cplx_00());
@@ -2693,6 +2693,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
 void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
     int64_t nr, complex_array& cw, int64_t nw, int itrp )
 {
+  UNUSED(nw);
   int ipr, js=0;
   nec_float xi, yi, zi, tx, ty, tz;
   nec_complex etk, ets, etc;
@@ -2782,6 +2783,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
 void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
     int64_t nr, complex_array& cw, int64_t nw, int itrp) 
 {
+  UNUSED(nw);
   int i, jx;
   nec_float xi, yi, zi, ai, cabi, sabi, salpi;
   nec_complex etk, ets, etc;
@@ -2801,7 +2803,7 @@ void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
   /* Decide whether ext. t.w. approx. can be used */
   if ( m_use_exk == true) {
     int ipr = m_geometry->icon1[j];
-
+#if 0
     if (ipr > PCHCON) ind1 = 0; // trap bug also in original fortran
     else if (ipr == 0) ind1 = 1;
     else if ((ipr == jx) && ( cabj*cabj + sabj*sabj > 1.e-8))
@@ -2823,21 +2825,20 @@ void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
       else
         ind1=0;
     } /* if ( ipr < 0 ) */
-
+#endif
     {
       int iprx = std::abs(ipr) - 1;
-      int ind1_test = 2;
+      ind1 = 2;
       if (ipr > PCHCON)
-        ind1_test = 0;
+        ind1 = 0;
       else if (ipr == 0)
-        ind1_test = 1;
+        ind1 = 1;
       else if ((ipr == jx) && (cabj*cabj + sabj*sabj <= 1.e-8))
-        ind1_test = 0;
+        ind1 = 0;
       else if ((ipr > 0) && (m_geometry->icon2[iprx] == jx))
-        ind1_test = m_geometry->test_ek_approximation(j, ipr - 1);
+        ind1 = m_geometry->test_ek_approximation(j, ipr - 1);
       else if ((ipr < 0) && (m_geometry->icon1[iprx] == -jx))
-        ind1_test = m_geometry->test_ek_approximation(j, -ipr - 1);
-      ASSERT(ind1_test == ind1);
+        ind1 = m_geometry->test_ek_approximation(j, -ipr - 1);
     }
 
     ipr = m_geometry->icon2[j];

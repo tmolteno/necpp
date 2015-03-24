@@ -22,18 +22,22 @@
 #include "safe_array.h"
 
 TEST_CASE( "Resizing Array", "[safe_array]") {
-    safe_array<float> v( 5 );
 
-    REQUIRE( v.size() == 5 );
-    REQUIRE( v.capacity() >= 5 );
+    SECTION( "Capacity is bigger or equal to size" ) {
+        safe_array<float> v( 5 );
+        REQUIRE( v.size() == 5 );
+        REQUIRE( v.capacity() >= 5 );
+    }
 
     SECTION( "resizing bigger changes size and capacity" ) {
+        safe_array<float> v( 5 );
         v.resize( 10 );
 
         REQUIRE( v.size() == 10 );
         REQUIRE( v.capacity() >= 10 );
     }
     SECTION( "resizing smaller changes size but not capacity" ) {
+        safe_array<float> v( 5 );
         v.resize( 0 );
 
         REQUIRE( v.size() == 0 );
@@ -44,16 +48,18 @@ TEST_CASE( "Resizing Array", "[safe_array]") {
 TEST_CASE( "Indexing Array", "[safe_array]") {
   safe_array<float> v( 5 );
 
-  v.fill(0,5,5);
   
-  for (int i=0;i<5;i++)
-    REQUIRE( v[i] == 5 );
+  SECTION( "Filling works" ) {
+    v.fill(0,5,5);
+    for (int i=0;i<5;i++)
+      REQUIRE( v[i] == 5 );
+  }
 
   SECTION( "Negative Indices" ) {
-    REQUIRE_THROWS( v[-1] == 0 );      
+    REQUIRE_THROWS( v[-1] );      
   }
   SECTION( "Out of Bound Indices" ) {
-    REQUIRE_THROWS( v[5] == 0 );      
+    REQUIRE_THROWS( v[5] );      
   }
 }
 
@@ -101,9 +107,9 @@ TEST_CASE( "Segments", "[safe_array]") {
   }
   
   SECTION( "Zero length segment" ) {
-      const safe_array<int>& f = v.segment(1,1);
+      const safe_array<int>& g = v.segment(1,1);
               
-      REQUIRE( f[0] == 1 );      
+      REQUIRE( g[0] == 1 );      
   }
 }
 
@@ -118,7 +124,7 @@ TEST_CASE( "2D", "[safe_array]") {
     REQUIRE(v(1,1) == 1);
     REQUIRE(v(4,1) == 4);
     
-    REQUIRE_THROWS(v(5,1) == 5);
-    REQUIRE_THROWS(v(5,0) == 0);
+    REQUIRE_THROWS(v(5,1));
+    REQUIRE_THROWS(v(5,0));
 }
 

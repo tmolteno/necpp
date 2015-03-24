@@ -472,7 +472,6 @@ void solve( int n, complex_array& a, int_array& ip,
 
 
 #else /*  LAPACK */
-#warning("Using lapack")
 
 extern "C"
 {
@@ -496,7 +495,8 @@ extern "C"
 */
 void lu_decompose(nec_output_file& s_output,  int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
 {
-	DEBUG_TRACE("factor_lapack(" << n << "," << ndim << ")");
+	UNUSED(s_output);
+        DEBUG_TRACE("factor_lapack(" << n << "," << ndim << ")");
 	ASSERT(n <= ndim);
 
 #ifdef NEC_MATRIX_CHECK

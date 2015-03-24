@@ -88,8 +88,8 @@ public:
         
         
         void sp_card( int ns,
-                      nec_float x1, nec_float y1, nec_float z1,
-                      nec_float x2, nec_float y2, nec_float z2);
+                      nec_float in_x1, nec_float in_y1, nec_float in_z1,
+                      nec_float in_x2, nec_float in_y2, nec_float in_z2);
         
         void sc_card( int i2,
                       nec_float x3, nec_float y3, nec_float z3,
@@ -143,7 +143,8 @@ public:
 	int np;
 	int_array segment_tags;
 	real_array x, y, z, segment_length, segment_radius;
-	real_array x2, y2, z2, cab, sab, salp;
+	real_array x2, y2, z2;
+        real_array cab, sab, salp;
 	
 	int m, mp;	// The number of patches
 	int m_ipsym;
