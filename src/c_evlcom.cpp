@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2004  Timothy C.A. Molteno
+  Copyright (C) 2004,2015  Timothy C.A. Molteno
   
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
