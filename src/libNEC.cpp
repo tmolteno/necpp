@@ -29,11 +29,6 @@ static std::string _err_message;
 #define NEC_VOID_HANDLE(__x)	{ try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); }}
 
 
-/*! \brief Create an nec_context and initialize it.
-
-Note: Do NOT delete or free the nec_context yourself, rather call nec_delete()
-to free memory associated with the nec simulation.
-*/
 nec_context* nec_create() {
   nec_context* ret = new nec_context();
   ret->initialize();
@@ -41,8 +36,6 @@ nec_context* nec_create() {
   return ret;
 }
  
-/*! \brief Delete an nec_context.
-*/
 long nec_delete(nec_context* in_context) {
   NEC_ERROR_HANDLE(delete in_context);
 }
@@ -158,11 +151,9 @@ double nec_gain_lhcp_sd(nec_context* in_context, int freq_index)
 
 /****************** IMPEDANCE CHARACTERISTICS *********************/
 
-/*! \brief Impedance: Real Part */
 double nec_impedance_real(nec_context* in_context, int freq_index) {
   return in_context->get_impedance_real(freq_index);
 }
-/*! \brief Impedance: Imaginary Part */
 double nec_impedance_imag(nec_context* in_context, int freq_index) {
   return in_context->get_impedance_imag(freq_index);
 }

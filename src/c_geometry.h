@@ -31,19 +31,22 @@ class nec_context;
 
 
 
-/**! \brief Use of the c_geometry class.
-	
-		c_geometry g = new c_geometry();
-		g.parse_geometry(file);
-		
-	OR
-	
-		c_geometry g = new c_geometry();
-		g.wire(xxxxxxx);
-		g.arc();
-		...
-		g.geometry_complete();		
-
+/*! \brief A Class describing the antenna geometry
+ * \file c_geometry.h
+ * \par Using c_geometry
+ * 
+  \verbatim
+    c_geometry g = new c_geometry();
+    g.parse_geometry(file);
+ \endverbatim           
+  OR
+  \verbatim
+    c_geometry g = new c_geometry();
+    g.wire(xxxxxxx);
+    g.arc();
+    ...
+    g.geometry_complete();
+ \endverbatim		
 */
 class c_geometry
 {

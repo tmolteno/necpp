@@ -109,7 +109,6 @@ FILE_PATTERNS          = *.c \
                          *.h \
                          *.hh \
                          *.hxx \
-                         *.hpp \
                          *.h++ \
                          *.md \
                          *.odl \
@@ -128,9 +127,9 @@ FILE_PATTERNS          = *.c \
 RECURSIVE              = NO
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = *_tb.*
 EXCLUDE_SYMBOLS        = 
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = example
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 

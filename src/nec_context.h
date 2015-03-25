@@ -36,16 +36,27 @@ class c_geometry;
 
 enum excitation_return
 {
-	FREQ_PRINT_NORMALIZATION = 0,
-	FREQ_LOOP_CONTINUE = 1,
-	FREQ_LOOP_CARD_CONTINUE = 2
+    FREQ_PRINT_NORMALIZATION = 0,
+    FREQ_LOOP_CONTINUE = 1,
+    FREQ_LOOP_CARD_CONTINUE = 2
 };
 
-/*!
-	A nec_context object is the container for an nec2++ simulation. A c_geometry object
-	is associated with the nec_context, and then after the simulation is done, the results
-	can be requested from this object.
+/*! \brief Using nec_context
+ * \file nec_context.h
+ * 
+ * The following code shows an example of how the nec_context class is used.
+ * 
+ * \example test_cpp.cpp
  */
+
+
+/*! \brief Container for an nec2++ simulation
+ * 
+ * An nec_context object is the container for an nec2++ simulation. A c_geometry object
+ * is associated with the nec_context, and then after the simulation is done, the results
+ * can be requested from this object.
+ * */
+
 class nec_context
 {
 public:

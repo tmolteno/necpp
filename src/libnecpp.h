@@ -19,59 +19,24 @@
  ***************************************************************************/
 /*! \mainpage NEC2++ interface
  *
- * \section intro_sec C-Style API
+ * \section intro_sec C API
  *
  * The NEC2++ library provides an API for modeling structures.
- * This is described in \ref libnecpp.h.
+ * This is described in \ref libnecpp.h
  * 
+ * \section intro_cpp C++ API
+ *
+ * The C++ API for using NEC2++ is described in \ref nec_context.h
  * 
+ */
+
+/**
  * \file libnecpp.h
  * \brief nec++ Library Functions.
  * \section _how_to_use How to use libNEC. 
- * Enter the following file into test_nec.c, and compile with
-\verbatim
-  gcc -o test_nec test_nec.c -lnecpp
-\endverbatim
-
-\verbatim
-  #include "libnecpp.h"
-  #include <stdio.h>
-  
-  int main(int argc, char **argv)
-  {
-    nec_context* nec;
-    double gain;
-            
-    nec = nec_create();
-    nec_wire(nec, 0, 36, 0, 0, 0, -0.042, 0.008, 0.017, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 21, -0.042, 0.008, 0.017, -0.048, 0.021, -0.005, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 70, -0.048, 0.021, -0.005, 0.039, 0.032, -0.017, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 70, -0.048, 0.021, -0.005, 0.035, 0.043, 0.014, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 50, -0.042, 0.008, 0.017, 0.017, -0.015, 0.014, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 66, 0.017, -0.015, 0.014, -0.027, 0.04, -0.031, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 85, -0.027, 0.04, -0.031, 0.046, -0.01, 0.028, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 47, 0.046, -0.01, 0.028, -0.013, -0.005, 0.031, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 70, 0.017, -0.015, 0.014, -0.048, -0.038, -0.04, 0.001, 1.0, 1.0);
-    nec_wire(nec, 0, 77, -0.048, -0.038, -0.04, 0.049, -0.045, -0.04, 0.001, 1.0, 1.0);
-    nec_geometry_complete(nec, 0, 0);
-    
-    nec_gn_card(nec, -1,0,0.0, 0.0, 0.0,0.0, 0.0, 0.0);
-    nec_ld_card(nec, 5,0,0,0,3.72e7,0.0,0.0);
-    nec_pt_card(nec, -1, 0, 0, 0);
-    nec_ex_card(nec, 1, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    nec_fr_card(nec, 0, 2, 2400.0, 100.0);
-    nec_rp_card(nec, 0, 1, 1, 0,5,0,0, 90.0, 90.0, 0.0, 0.0, 0.0, 0.0);
-
-    printf("Impedance: %f, %f\n",nec_impedance_real(nec,0), nec_impedance_imag(nec,0));
-    printf("Gain: %f, %f +/- %f dB\n",nec_gain_max(nec,0), nec_gain_mean(nec,0), nec_gain_sd(nec,0));
-    printf("RHCP Gain: %f, %f +/- %f dB\n",nec_gain_rhcp_max(nec,0), nec_gain_rhcp_mean(nec,0), nec_gain_rhcp_sd(nec,0));
-    printf("LHCP Gain: %f, %f +/- %f dB\n",nec_gain_lhcp_max(nec,0), nec_gain_lhcp_mean(nec,0), nec_gain_lhcp_sd(nec,0));
-    
-    nec_delete(nec);
-    
-    return 0;
-  }
-\endverbatim
+ * Have a look at \ref test_nec.c
+ * 
+ * \example test_nec.c
 */
 
 #ifndef __libnecpp__
@@ -90,8 +55,10 @@ typedef struct nec_context nec_context;
 extern "C" {
 #endif
 
-/*! \brief Construct and initialize an nec_context 
- */
+/*! \brief Create an nec_context and initialize it.
+
+\par Note: Do NOT delete or free the nec_context yourself, rather call nec_delete() to free memory associated with the nec simulation.
+*/
 nec_context* nec_create();
 
 /*!\brief Delete an nec_context object. 
@@ -120,9 +87,9 @@ long nec_benchmark();
     \remark All co-ordinates are in meters.
 */
 long nec_wire(nec_context* in_context, int tag_id, int segment_count,
-		double xw1, double yw1, double zw1,
-		double xw2, double yw2, double zw2, 
-		double rad, double rdel, double rrad);
+              double xw1, double yw1, double zw1,
+              double xw2, double yw2, double zw2, 
+              double rad, double rdel, double rrad);
 
 
 /*! \brief Surface Patch (SP Card)
@@ -401,7 +368,7 @@ long nec_kh_card(nec_context* in_context, double tmp1);
 long nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_nh_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
-/*!\brief To control use of the extended thin-wire kernal approximation.
+/*!\brief To control use of the extended thin-wire kernel approximation.
  * \param itmp1 
  * \arg \c -1 Return to normal kernel
  * \arg \c 0 Use Extended thin wire kernel
@@ -433,7 +400,12 @@ double nec_gain_lhcp_min(nec_context* in_context, int freq_index);
 double nec_gain_lhcp_mean(nec_context* in_context, int freq_index);
 double nec_gain_lhcp_sd(nec_context* in_context, int freq_index);
 
+/*! \brief Impedance: Real Part 
+ */
 double nec_impedance_real(nec_context* in_context, int freq_index);
+
+/*! \brief Impedance: Imaginary Part 
+ */
 double nec_impedance_imag(nec_context* in_context, int freq_index);
 
 
