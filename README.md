@@ -26,7 +26,7 @@ Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics C
 
 ## Documentation
 
-Available http://tmolteno.github.io/necpp/
+Online documentation built form the source code is available at http://tmolteno.github.io/necpp/
 
 ## Instructions for Linux
 
@@ -36,7 +36,6 @@ nec2++ is available precompiled as part of most modern linux distributions, incl
 
 ## Compiling on Linux
 
-!NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 See the INSTALL file. But here is the short version
 
@@ -49,6 +48,8 @@ See the INSTALL file. But here is the short version
 To build a debugging version use
 
     ./configure --with-bounds
+
+!NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 ## Instructions for Compiling on Windows
 
