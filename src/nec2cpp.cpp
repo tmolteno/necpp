@@ -296,7 +296,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 		s_output.line(" __________________________________________");
 		s_output.line("|                                          |");
 		s_output.line("| NUMERICAL ELECTROMAGNETICS CODE (nec2++) |");
-		s_output.line("| Translated to 'C++' in Double Precision  |");
+		s_output.line("| Implemented in 'C++' in Double Precision |");
 		s_output.line("|        Version " nec_version "        |");
 		s_output.line("|__________________________________________|");
 	
