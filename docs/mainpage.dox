@@ -15,7 +15,7 @@
 - Simulate in different media (for example antennas in seawater) by modifying the dielectric properties.
 - Uses fast numerical routines (BLAS and LAPACK). Can use the Intel MKL or OpenBLAS.
 
-\section sec_citing Citing NEC2++
+\subsection sec_citing Citing NEC2++
 
 If you use nec2++, please cite it as follows:
 
@@ -44,14 +44,19 @@ usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]
        -v: print nec2++ version number and exit.
 \endverbatim
 
- * \subsection intro_sec C API
- *
- * The NEC2++ library provides an API for modeling structures.
- * This is described in \ref libnecpp.h
- * 
- * \subsection intro_cpp C++ API
- *
- * The C++ API for using NEC2++ is described in \ref nec_context.h
- * 
- */
+\subsection intro_sec C API
+
+ The NEC2++ library provides an API for modeling structures.
+ This is described in \ref libnecpp.h
+ 
+ \subsection intro_cpp C++ API
+
+ The C++ API for using NEC2++ is described in \ref nec_context.h
+ 
+\subsection intro_py Python 
+
+ An example using the python module is \ref test.py
+ \example test.py
+
+**/
 

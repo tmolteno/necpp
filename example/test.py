@@ -2,7 +2,7 @@ import necpp
 
 #
 # \brief Using the python interface to the C-style nec2++ API
-#
+# 
 # This is built in the 'python' directory of the source code distribution
 #
 
