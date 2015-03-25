@@ -10,7 +10,7 @@ Nec2++ is developed on Debian linux, but will work on a variety of other operati
 
 ## Features
 
-* Nec2 compatable
+* NEC-2 syntax compatable.
 * C, C++, Python and Ruby libraries included. Ideal for antenna optimization.
 * Large designs can be simulated with tens of thousands of elements (to the limit of 64-bit address space)
 * Geometry error detection. Throws exceptions if wires intersect or lie too close to one another.
