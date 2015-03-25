@@ -17,19 +17,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-/*! \mainpage NEC2++ interface
- *
- * \section intro_sec C API
- *
- * The NEC2++ library provides an API for modeling structures.
- * This is described in \ref libnecpp.h
- * 
- * \section intro_cpp C++ API
- *
- * The C++ API for using NEC2++ is described in \ref nec_context.h
- * 
- */
-
 /**
  * \file libnecpp.h
  * \brief nec++ Library Functions.
