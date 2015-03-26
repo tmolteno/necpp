@@ -26,3 +26,4 @@ def frequency_response():
     necpp.nec_delete(nec)
 
 frequency_response()
+

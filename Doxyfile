@@ -113,8 +113,8 @@ FILE_PATTERNS          = *.c \
                          *.md \
                          *.odl \
                          *.cs \
-                         *.php \
-                         *.php3 \
+                         *.rb \
+                         *.py \
                          *.inc \
                          *.C \
                          *.H \

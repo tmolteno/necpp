@@ -24,5 +24,5 @@ issue the following commands
       
 Then test with 
 
-    python test.py
+    python ../example/test.py
 
