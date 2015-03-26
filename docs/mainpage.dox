@@ -47,7 +47,7 @@ usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]
 \subsection intro_sec C API
 
  The NEC2++ library provides an API for modeling structures.
- This is described in \ref libnecpp.h
+ This interface is described in the \ref libnecpp.h header file.
  
  \subsection intro_cpp C++ API
 
@@ -57,6 +57,11 @@ usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]
 
  An example using the python module is \ref test.py
  \example test.py
+
+\subsection intro_py Ruby 
+
+ An example using the python module is \ref test.rb
+ \example test.rb
 
 **/
 

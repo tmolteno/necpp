@@ -32,7 +32,7 @@ Alternatively use the build.sh script.
       
 Then test with 
 
-    ruby test.rb
+    ruby ../example/test.rb
 
 ## Genetic Optimization of Antennas
 
