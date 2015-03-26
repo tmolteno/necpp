@@ -64,8 +64,10 @@ public:
   }
   
   ~safe_array()  {
-    if (own_data_)
+    if (own_data_) {
       delete[] data_;
+      data_ = NULL;
+    }
   }
   
   
