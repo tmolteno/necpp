@@ -6,7 +6,7 @@ import necpp
 # This is built in the 'python' directory of the source code distribution
 #
 
-def handle_nec(self, result):
+def handle_nec(result):
   if (result != 0):
     print nec_error_message()
 
