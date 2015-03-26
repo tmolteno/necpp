@@ -20,7 +20,26 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include <sys/types.h>
+#if 0 // Used for checking large int64_t types in safe_array.h
+  class int64_t
+  {
+  public:
+    int64_t(int x) : _x(x);
+    
+    operator==(const int64_t);
+    operator>=(const int64_t);
+    operator<(const int64_t);
+    operator>(const int64_t);
+    operator+(const int64_t);
+    operator-(const int64_t);
+    operator++(int);
+  private:
+    long long _x;
+  };
+#else
+  #include <stdint.h>
+#endif
+
 #include <complex>
 /*! \brief Change basic type used by nec2++
   This typedef allows us to use nec2++ with

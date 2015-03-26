@@ -97,7 +97,7 @@ public:
   }
 
   
-  void resize(int32_t new_length) {
+  void resize(int64_t new_length) {
 #ifdef NEC_ERROR_CHECK
     if (! own_data_)
       throw new nec_exception("attempt to resize data we do not own");
@@ -136,7 +136,7 @@ public:
 
   /*!\brief return the largest element of the array */
   T minCoeff() const {
-    if (0 == len_)
+    if (int64_t(0) == len_)
       throw new nec_exception("No elements in minCoeff");
 
     T ret = data_[check(0)];
@@ -152,7 +152,7 @@ public:
   T sum(int64_t start_index, int64_t stop_index)  {
     T ret = data_[check(start_index)];
     
-    for (int32_t i = start_index+1; i < stop_index; i++ )  {
+    for (int64_t i = start_index+1; i < stop_index; i++ )  {
       ret += data_[check(i)];
     }
     return ret;
@@ -205,7 +205,7 @@ public:
       \param end_index If -1, then finish at the end of the array
   */
   safe_array<T> segment(int64_t start_index, int64_t end_index)  {
-    if (-1 == end_index)
+    if (int64_t(-1) == end_index)
       throw "foo";
     return safe_array<T>(*this, start_index, end_index, false);
   }
@@ -283,7 +283,7 @@ private:
     if (col < 0 || col >= cols_)
       throw new BoundsViol("safe_array: ", col, cols_);
 #endif
-    return check(col*rows_ + row);
+    return check(int64_t(col)*rows_ + row);
   }
 }; 
 
