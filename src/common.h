@@ -3,7 +3,7 @@
 /*
   Various Definitions for nec2++
   
-  Copyright (C) 2004-2008  Timothy C.A. Molteno
+  Copyright (C) 2004-2015  Timothy C.A. Molteno
   
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -20,25 +20,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#if 0 // Used for checking large int64_t types in safe_array.h
-  class int64_t
-  {
-  public:
-    int64_t(int x) : _x(x);
-    
-    operator==(const int64_t);
-    operator>=(const int64_t);
-    operator<(const int64_t);
-    operator>(const int64_t);
-    operator+(const int64_t);
-    operator-(const int64_t);
-    operator++(int);
-  private:
-    long long _x;
-  };
-#else
-  #include <stdint.h>
-#endif
+#include "typesafe_stdint.h"
 
 #include <complex>
 /*! \brief Change basic type used by nec2++

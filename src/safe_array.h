@@ -236,7 +236,7 @@ private:
   int64_t len_;
   int32_t rows_;
   int32_t cols_;
-  int32_t resize_chunk_;
+  int64_t resize_chunk_;
   
   T*  data_;
   int64_t data_size_;

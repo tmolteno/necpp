@@ -24,6 +24,23 @@ AS_IF([test "x$with_bounds" = xyes],
   AC_SUBST([CXXFLAGS], ["-g3 -O0 -DNEC_ERROR_CHECK=1"])
 ])
 
+dnl ************************************************
+dnl *** Trigger typesafe integer checking
+dnl ************************************************
+
+
+AC_ARG_WITH([typecheck],
+  [AS_HELP_STRING([--with-typecheck],
+  [Enable support for typesafe integer checking])],
+  [],
+  [with_typecheck=no])
+
+AS_IF([test "x$with_typecheck" = xyes],
+[
+  AC_SUBST([AM_CPPFLAGS], ["-DTYPESAFE_PEDANTIC=1"])
+  AC_SUBST([CXXFLAGS], ["-g3 -O0 -DTYPESAFE_PEDANTIC=1"])
+])
+
 
 dnl ************************************************
 dnl *** Add an automatic build date
