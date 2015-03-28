@@ -707,7 +707,7 @@ public:
 	
 	/* common  /matpar/ */
 	int icase, npblk, nlast;
-	int imat, nbbx, npbx, nlbx, nbbl, npbl, nlbl;
+	int nbbx, npbx, nlbx, nbbl, npbl, nlbl;
 	
 	/* common  /save/ */
 	int_array ip;
