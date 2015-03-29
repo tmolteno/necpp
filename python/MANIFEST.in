@@ -1,35 +1,3 @@
-include ../src/AntennaInput.h
-include ../src/c_ggrid.h
-include ../src/electromag.h
-include ../src/misc.h
-include ../src/nec_exception.h
-include ../src/nec_results.h
-include ../src/RadiationInput.h
-
-include ../src/BaseInput.h
-include ../src/common.h
-include ../src/libnecpp.h
-include ../src/nec_ground.h
-include ../src/nec_structure_currents.h
-include ../src/safe_array.h
-
-include ../src/c_evlcom.h
-include ../src/c_plot_card.h
-include ../src/math_util.h
-include ../src/nec_context.h
-include ../src/nec_output.h
-include ../src/nec_wire.h
-include ../src/typesafe_stdint.h
-
-include ../src/c_geometry.h
-include ../src/CurrentInput.h
-include ../src/matrix_algebra.h
-include ../src/nec_debug.h
-include ../src/nec_radiation_pattern.h
-include ../src/PowerBudget.h
-
-graft ../src/
-
 include README.md
 
 include ../config.h

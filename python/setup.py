@@ -26,6 +26,7 @@ nec_headers.extend(glob("../config.h"))
 necpp_module = Extension('_necpp',
     sources=nec_sources,
     include_dirs=['../src/', '../'],
+    depends=nec_headers,
     define_macros=[('BUILD_PYTHON', '1')],
     language='c++'
     )
@@ -40,12 +41,12 @@ necpp_module = Extension('_necpp',
 
 
 setup (name = 'necpp',
-       version = '0.1.3',
-       author      = "Tim Molteno",
-       author_email      = "tim@physics.otago.ac.nz",
-       url      = "http://github.com/tmolteno/necpp",
-       description = """Python Antenna Simulation Module (nec2++)""",
-       headers=nec_headers,
+       version = '0.1.4',
+       author  = "Tim Molteno",
+       author_email  = "tim@physics.otago.ac.nz",
+       url  = "http://github.com/tmolteno/necpp",
+       description = "Python Antenna Simulation Module (nec2++)",
        ext_modules = [necpp_module],
        py_modules = ["necpp"],
+       license='GPLv2'
        )
