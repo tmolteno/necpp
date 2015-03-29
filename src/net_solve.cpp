@@ -189,7 +189,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 						rhs[j] = cplx_00();
 				
 					rhs[isc1] = cplx_10();
-					solves( cm, ip, rhs, neq, 1, geometry.np, geometry.n, geometry.mp, geometry.m, nop, symmetry_array);
+					solves( cm, ip, rhs, neq, 1, geometry.np, geometry.n_segments, geometry.mp, geometry.m, nop, symmetry_array);
 					geometry.get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 				
 					for (int j = 0; j < irow1; j++ )
@@ -232,8 +232,8 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 		if ( network_count != 0)
 		{
 			// zero the cmn array, and the rhnx array
-			cmn.fill(cplx_00());
-			rhnx.fill(cplx_00());
+			cmn.setConstant(cplx_00());
+			rhnx.setConstant(cplx_00());
 			
 /*			for( i = 0; i < ndimn; i++ )
 			{
@@ -422,7 +422,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 				
 				irow1= nteqa[i]-1;
 				rhs[irow1]=cplx_10();
-				solves( cm, ip, rhs, neq, 1, geometry.np, geometry.n, geometry.mp, geometry.m, nop, symmetry_array);
+				solves( cm, ip, rhs, neq, 1, geometry.np, geometry.n_segments, geometry.mp, geometry.m, nop, symmetry_array);
 				geometry.get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 				
 				for (int j = 0; j < nteq; j++ )
@@ -433,7 +433,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 			} /* for( i = 0; i < nteq; i++ ) */
 		
 			/* factor network equation matrix */
-			lu_decompose( nteq, cmn, ipnt, ndimn);
+			lu_decompose(s_output, nteq, cmn, ipnt, ndimn);
 			
 		} /* if ( network_count != 0) */
 	} /* if ( ntsol != 0) */
@@ -441,7 +441,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 	if (0 == network_count)
 	{
 		/* solve for currents when no networks are present */
-		solves( cm, ip, einc, neq, 1, geometry.np, geometry.n, geometry.mp, geometry.m, nop, symmetry_array);
+		solves( cm, ip, einc, neq, 1, geometry.np, geometry.n_segments, geometry.mp, geometry.m, nop, symmetry_array);
 		geometry.get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 		ntsc=0;
 	}
@@ -452,7 +452,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 		for( i = 0; i < neqt; i++ )
 			rhs[i]= einc[i];
 	
-		solves( cm, ip, rhs, neq, 1, geometry.np, geometry.n, geometry.mp, geometry.m, nop, symmetry_array);
+		solves( cm, ip, rhs, neq, 1, geometry.np, geometry.n_segments, geometry.mp, geometry.m, nop, symmetry_array);
 		geometry.get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 	
 		for( i = 0; i < nteq; i++ )
@@ -472,7 +472,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 			einc[irow1] -= rhnt[i];
 		}
 	
-		solves( cm, ip, einc, neq, 1, geometry.np, geometry.n, geometry.mp, geometry.m, nop, symmetry_array);
+		solves( cm, ip, einc, neq, 1, geometry.np, geometry.n_segments, geometry.mp, geometry.m, nop, symmetry_array);
 		geometry.get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 
 		if ( nprint == 0)
@@ -643,4 +643,4 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 	} /* for( i = 0; i < nvqd; i++ ) */
 }
 
-flerf
+
