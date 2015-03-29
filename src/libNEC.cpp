@@ -29,7 +29,7 @@ static std::string _err_message;
 #define NEC_VOID_HANDLE(__x)	{ try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); }}
 
 
-nec_context* nec_create() {
+nec_context* nec_create(void) {
   nec_context* ret = new nec_context();
   ret->initialize();
   
@@ -40,7 +40,7 @@ long nec_delete(nec_context* in_context) {
   NEC_ERROR_HANDLE(delete in_context);
 }
  
-long nec_benchmark() {
+long nec_benchmark(void) {
   return long(100.0*nec_context::benchmark());
 }
 
@@ -82,7 +82,7 @@ long nec_geometry_complete(nec_context* in_context, int card_int_1, int card_int
 }
 
 
-const char* nec_error_message() {
+const char* nec_error_message(void) {
   return _err_message.c_str();
 }
 

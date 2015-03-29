@@ -46,7 +46,7 @@ extern "C" {
 
 \par Note: Do NOT delete or free the nec_context yourself, rather call nec_delete() to free memory associated with the nec simulation.
 */
-nec_context* nec_create();
+nec_context* nec_create(void);
 
 /*!\brief Delete an nec_context object. 
  */
@@ -54,7 +54,7 @@ long nec_delete(nec_context* in_context);
 
 /*!\brief Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. 
  */
-long nec_benchmark();
+long nec_benchmark(void);
 
 
 /*! \brief Generates segment geometry for a straigt wire
@@ -186,7 +186,7 @@ long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
  * All functions return a long. If this is != 0. Then an error has occurred.
  * The error message can be retrieved with this function.
  **/
-const char* nec_error_message();
+const char* nec_error_message(void);
 
 /*
   NEC card functions.
