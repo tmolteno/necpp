@@ -73,8 +73,6 @@ void nec_context::initialize()
 	
 	init_voltage_sources();
 	m_geometry->set_context(this);
-
-	imat=0; // this should go away! It appears to be related to some very old code for handling out-of-core situations */
 }
 
 /*! \brief Private method to initialize the voltage source buffers
@@ -116,11 +114,8 @@ void nec_context::calc_prepare()
 	current_vector.resize(m_geometry->n_segments + m_geometry->m*4);
 	
 	/* Matrix parameters */
-	if ( imat == 0)
-	{
-		neq= m_geometry->n_plus_2m;
-		neq2=0;
-	}
+	neq= m_geometry->n_plus_2m;
+	neq2=0;
 
 	/* default values for input parameters and flags */
 	npeq = m_geometry->np + 2*m_geometry->mp;
@@ -1048,9 +1043,7 @@ void nec_context::simulate(bool far_field_flag) {
 				symmetry_array.resize(nop*nop);	
 				mhz = 1;
 				
-				/* irngf is not used (NGF function not implemented) */
-				if ( imat == 0)
-					fblock( npeq, neq, iresrv, m_geometry->m_ipsym);
+				fblock( npeq, neq, iresrv, m_geometry->m_ipsym);
 				
 				in_freq_loop = true;
 			}
@@ -6832,7 +6825,6 @@ void nec_context::fblock( int nrow, int ncol, int imax, int ipsym )
 	{
 		npblk= nrow;
 		nlast= nrow;
-		imat= nrow* ncol;
 		
 		if ( nrow == ncol)
 		{

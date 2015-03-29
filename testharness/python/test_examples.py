@@ -37,6 +37,54 @@ class TestDipoleGain(unittest.TestCase):
     
     nec_delete(nec)
 
+  def test_example2(self):
+    ''' CMEXAMPLE 2. CENTER FED LINEAR ANTENNA. 
+        CM           CURRENT SLOPE DISCONTINUITY SOURCE. 
+        CM           1. THIN PERFECTLY CONDUCTING WIRE 
+        CE           2. THIN ALUMINUM WIRE 
+        GW 0 8 0. 0. -.25 0. 0. .25 .00001 
+        GE 
+        FR 0 3 0 0 200. 50. 
+        EX 5 0 5 1 1. 0. 50. 
+        XQ 
+        LD 5 0 0 0 3.720E+07 
+        FR 0 1 0 0 300. 
+        EX 5 0 5 0 1. 
+        XQ 
+        EN
+    '''
+    nec = nec_create()
+    self.handle_nec(nec_wire(nec,  0, 8, 0., 0., -.25, 0., 0., .25, .00001, 1.0, 1.0))
+    self.handle_nec(nec_geometry_complete(nec, 0, 0))
+    self.handle_nec(nec_fr_card(nec, 0, 3, 200., 50 ))
+    self.handle_nec(nec_ex_card(nec, 5, 0, 5, 1, 1.0, 0.0, 50.0, 0.0, 0.0, 0.0))
+    self.handle_nec(nec_xq_card(nec,0))
+                    
+    ''' 
+                          ----- ANTENNA INPUT PARAMETERS -----
+  TAG   SEG       VOLTAGE (VOLTS)         CURRENT (AMPS)         IMPEDANCE (OHMS)        ADMITTANCE (MHOS)     POWER
+  NO.   NO.     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY    REAL       IMAGINARY   (WATTS)
+   0     5  1.0000E+00  0.0000E+00  6.6413E-05  1.5794E-03  2.6577E+01 -6.3204E+02  6.6413E-05  1.5794E-03  3.3207E-05
+    '''
+    self.assertAlmostEqual(nec_impedance_real(nec,0)/26.5762,1.0,4)
+    self.assertAlmostEqual(nec_impedance_imag(nec,0)/-632.060,1.0,4)
+
+    self.handle_nec(nec_ld_card(nec, 0, 0, 4, 4, 10., 3.000E-09, 5.300E-11))
+    self.handle_nec(nec_fr_card(nec, 0, 3, 200., 50 ))
+    self.handle_nec(nec_ex_card(nec, 5, 0, 5, 1, 1.0, 0.0, 50.0, 0.0, 0.0, 0.0))
+    self.handle_nec(nec_xq_card(nec,0))
+
+    '''
+                          ----- ANTENNA INPUT PARAMETERS -----
+      TAG   SEG       VOLTAGE (VOLTS)         CURRENT (AMPS)         IMPEDANCE (OHMS)        ADMITTANCE (MHOS)     POWER
+      NO.   NO.     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY    REAL       IMAGINARY   (WATTS)
+      0     5  1.0000E+00  0.0000E+00  6.1711E-04  3.5649E-03  4.7145E+01 -2.7235E+02  6.1711E-04  3.5649E-03  3.0856E-04
+    ''' 
+    self.assertAlmostEqual(nec_impedance_real(nec,1)/47.1431, 1.0, 4)
+    self.assertAlmostEqual(nec_impedance_imag(nec,1)/-272.372, 1.0, 3)
+    nec_delete(nec)
+
+     
   def test_example3(self):
     '''
     CMEXAMPLE 3. VERTICAL HALF WAVELENGTH ANTENNA OVER GROUND 
