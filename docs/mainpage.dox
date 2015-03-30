@@ -62,7 +62,8 @@ An example using the python module is \ref test.py
 The code for the Ruby module for using nec2++ is contained in the 
 directory Ruby.
 
-An example using the python module is \ref test.rb
+An example using the python module is \ref test.rb. The Python API
+is the same as the C-style API, that is described in \ref libnecpp.h
 
 \example test.rb
 \example test.py

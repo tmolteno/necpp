@@ -3,7 +3,9 @@ import necpp
 #
 # \brief Using the python interface to the C-style nec2++ API
 # 
-# This is built in the 'python' directory of the source code distribution
+# Documentation on the interface can be found at
+#
+# http://tmolteno.github.io/necpp/
 #
 
 def handle_nec(result):
