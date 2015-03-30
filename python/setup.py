@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
 """
@@ -47,6 +48,7 @@ setup (name = 'necpp',
        url  = "http://github.com/tmolteno/necpp",
        description = "Python Antenna Simulation Module (nec2++)",
        ext_modules = [necpp_module],
+       dependency_links=['http://github.com/tmolteno/necpp'],
        py_modules = ["necpp"],
        license='GPLv2'
        )
