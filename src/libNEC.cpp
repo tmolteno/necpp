@@ -160,14 +160,6 @@ double nec_impedance_imag(nec_context* in_context, int freq_index) {
 
 
 
-/**
- * FR crd
- * @param in_context The nec_context created with nec_create()
- * @param in_ifrq 0 is a linear range of frequencies, 1 is a log range.
- * @param in_nfrq The number of frequencies
- * @param in_freq_mhz The starting frequency in MHz.
- * @param in_del_freq The frequency step (in MHz for ifrq = 0)
- */
 long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq) {
   NEC_ERROR_HANDLE(in_context->fr_card(in_ifrq, in_nfrq, in_freq_mhz, in_del_freq));
 }
@@ -179,14 +171,27 @@ long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int 
 }
 
 
-/* "gn" card, ground parameters under the antenna */
-long nec_gn_card(nec_context* in_context, int iperf, int nradl, double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6) {
+long nec_gn_card(nec_context* in_context, int iperf, int nradl, 
+                 double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6) {
   NEC_ERROR_HANDLE(in_context->gn_card(iperf, nradl, epse, sig, tmp3, tmp4, tmp5, tmp6));
 }
 
-long nec_ex_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)
-{
- NEC_ERROR_HANDLE(in_context->ex_card((enum excitation_type)itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6));
+long nec_ex_card(nec_context* in_context, int extype, int i2, int i3, int i4, 
+                 double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6) {
+ NEC_ERROR_HANDLE(in_context->ex_card((enum excitation_type)extype, i2, i3, i4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6));
+}
+
+long nec_excitation_current(nec_context* in_context, double x, double y, double z, double a, double beta, double moment) {
+ NEC_ERROR_HANDLE(in_context->ex_card(EXCITATION_CURRENT, 0, 0, 0, x, y, z, a, beta, moment));
+}
+
+long nec_excitation_voltage(nec_context* in_context, int tag, int segment, double v_real, double v_imag) {
+ NEC_ERROR_HANDLE(in_context->ex_card(EXCITATION_VOLTAGE, tag, segment, 0, v_real, v_imag, 0.0, 0.0, 0.0, 0.0));
+}
+
+long nec_excitation_planewave(nec_context* in_context, int n_theta, int n_phi, 
+                              double theta, double phi, double eta, double dtheta, double dphi, double pol_ratio) {
+ NEC_ERROR_HANDLE(in_context->ex_card(EXCITATION_LINEAR, n_theta, n_phi, 0, theta, phi, eta, dtheta, dphi, pol_ratio));
 }
 
 

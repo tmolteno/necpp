@@ -241,7 +241,80 @@ long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_fr
 long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3);
 
 
-long nec_ex_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+/*! \brief EX card (Excitation)
+* \param in_context The nec_context created with nec_create()
+* \param extype Type of excitation
+*   \arg \c O - voltage source (applied-E-field source). 
+*   \arg \c 1 - incident plane wave, linear polarization. 
+*   \arg \c 2 - incident plane wave, right-hand (thumb along the incident k vector) elliptic polarization. 
+*   \arg \c 3 - incident plane wave, left-hand elliptic polarization. 
+*   \arg \c 4 - elementary current source. 
+*   \arg \c 5 - voltage source (current-slope-discontinuity). 
+* \param i2 Tag number the source segment. This tag number along with the number to be given in (i3), 
+*        which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. 
+*   \arg \c O - Blank or zero in field (i2) implies that the Source segment will be identified by using the absolute segment 
+*        number in the next field (i3). 
+* \param i3 Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number 
+*        set by the previous parameter. If the previous parameter is zero, the number in (i3) must be the absolute 
+*        segment number of the source. 
+* \param i4 Meaning Depends on the extype parameter. See http://www.nec2.org/part_3/cards/ex.html
+* 
+* \remark Simpler versions are nec_voltage_excitation, nec_current_excitation and nec_planewave_excitation
+*/
+long nec_ex_card(nec_context* in_context, int extype, int i2, int i3, int i4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+
+/*! \brief Voltage Source Excitation. 
+* \param in_context The nec_context created with nec_create()
+* \param tag Tag number of the source segment. This tag number along with the number to be given in (segment), 
+*        which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. 
+*   \arg \c O - Blank or zero in field (tag) implies that the Source segment will be identified by using the absolute segment 
+*        number in the next field (segment). 
+* \param segment Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number 
+*        set by the previous parameter. If the previous parameter is zero, the number in (segment) must be the absolute 
+*        segment number of the source. 
+* \param v_real real part of the voltage excitation (Volts)
+* \param v_imag imaginary part of the voltage excitation (Volts)
+* 
+* \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
+* Also plane-wave or current-source excitation is not allowed with voltage sources. 
+* If the excitation types are mixed, the program will use the last excitation type encountered. 
+*/
+long nec_excitation_voltage(nec_context* in_context, int tag, int segment, double v_real, double v_imag);
+
+/*! \brief Current Source Excitation. 
+* \param in_context The nec_context created with nec_create()
+* \param (F1) - X position in meters. 
+* \param (F2) - Y position in meters. 
+* \param (F3) - Z position in meters. 
+* \param (F4) - a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. 
+* \param (F5) - beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. 
+* \param (F6) - "Current moment" of the source. This parameter is equal to the product Il in amp meters.
+* 
+* \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
+* Also plane-wave or current-source excitation is not allowed with voltage sources. 
+* If the excitation types are mixed, the program will use the last excitation type encountered. 
+*/
+long nec_excitation_current(nec_context* in_context, double x, double y, double z, double a, double beta, double moment);
+
+/*! \brief Planewave Excitation (Linear Polarization)
+* \param in_context The nec_context created with nec_create()
+* \param n_theta - Number of theta angles desired for the incident plane wave . 
+* \param n_phi - Number of phi angles desired for the incident plane wave. 
+* \param theta - Theta in degrees. Theta 19 defined in standard spherical coordinates as illustrated
+* \param phi - Phi in degrees. Phi is the standard spherical angle defined lned in the XY plane. 
+* \param eta - Eta in degrees. Eta is the polarization angle defined as the angle between the theta unit vector and the direction
+*              of the electric field for linear polarization or the major ellipse axis for elliptical polarization. 
+* \param dtheta - Theta angle stepping increment in degrees. 
+* \param dphi - Phi angle stepping increment in degrees. 
+* \param pol_ratio - Ratio of minor axis to major axis for elliptic polarization (major axis field strength - 1 V/m). 
+* 
+* \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
+* Also plane-wave or current-source excitation is not allowed with voltage sources. 
+* If the excitation types are mixed, the program will use the last excitation type encountered. 
+*/
+long nec_excitation_planewave(nec_context* in_context, int n_theta, int n_phi, 
+                              double theta, double phi, double eta, double dtheta, double dphi, double pol_ratio);
+
 long nec_tl_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_nt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
