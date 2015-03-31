@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004-2008, 2015 by Tim Molteno                                  *
- *   tim@molteno.net                                                        *
+ *   Copyright (C) 2004-2008,2015 by Tim Molteno                           *
+ *   tim@molteno.net                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -25,8 +25,8 @@
 
 static std::string _err_message;
 
-#define NEC_ERROR_HANDLE(__x)	{ try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); return 1; } return 0;}
-#define NEC_VOID_HANDLE(__x)	{ try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); }}
+#define NEC_ERROR_HANDLE(__x)   { try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); return 1; } return 0;}
+#define NEC_VOID_HANDLE(__x)    { try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); }}
 
 
 nec_context* nec_create(void) {

@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004-2008,2015 by Tim Molteno                                     *
- *   tim@molteno.net                                               *
+ *   Copyright (C) 2004-2008,2015 by Tim Molteno                           *
+ *   tim@molteno.net                                                       *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -442,15 +442,46 @@ long nec_cp_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int i
 long nec_pl_card(nec_context* in_context, char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4);
 
 
-/*! \brief Get statistics of the gains in dB.
+/*! \brief Get the maximum gain from a radiation pattern.
 
-This function requires a previous rp_card() method to have been called (with the gain normalization set to 5)
-\param index The rp_card frequency index
+\param freq_index The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent
+ simulations will store their results at higher indices.
 \return The maximum gain in dB or -999.0 if no radiation pattern had been previously requested.
+
+\remark This function requires a previous nec_rp_card() method to have been called (with the gain normalization set to 5)
 */
 double nec_gain_max(nec_context* in_context, int freq_index);
+
+/*! \brief Get the minimum gain from a radiation pattern.
+
+\param freq_index The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent
+ simulations will store their results at higher indices.
+\return The minimum gain in dB or -999.0 if no radiation pattern had been previously requested.
+
+\remark This function requires a previous nec_rp_card() method to have been called (with the gain normalization set to 5)
+*/
 double nec_gain_min(nec_context* in_context, int freq_index);
+
+/*! \brief Get the mean gain from a radiation pattern.
+
+\param freq_index The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent
+ simulations will store their results at higher indices.
+\return The mean gain in dB or -999.0 if no radiation pattern had been previously requested.
+
+\remark This function returns the mean over the sphere.
+\remark This function requires a previous nec_rp_card() method to have been called (with the gain normalization set to 5)
+*/
 double nec_gain_mean(nec_context* in_context, int freq_index);
+
+/*! \brief Get the standard deviation of the gain from a radiation pattern.
+
+\param freq_index The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent
+ simulations will store their results at higher indices.
+\return The standard deviation in dB or -999.0 if no radiation pattern had been previously requested.
+
+\remark This function returns the standard deviation over the sphere.
+\remark This function requires a previous nec_rp_card() method to have been called (with the gain normalization set to 5)
+*/
 double nec_gain_sd(nec_context* in_context, int freq_index);
 
 double nec_gain_rhcp_max(nec_context* in_context, int freq_index);
