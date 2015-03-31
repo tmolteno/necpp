@@ -1,4 +1,8 @@
-## Version 1.6a
+## Version 1.6.2
+* Added new functions for nec_excitation_voltage, nec_excitation_current and nec_excitation_planewave to simplfy C-style API calls
+* More documentation
+
+## Version 1.6.1 [March 29 2015]
 * Added python library for the c-stye API.
 * Fixed bug.  "SP" with multiple "SC" doesn't work #10.
 * Yoshi Takeyasu. Change instances of int to int64_t, to allow simulations up to 140 GB.

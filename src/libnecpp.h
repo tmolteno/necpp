@@ -259,7 +259,10 @@ long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int 
 *        segment number of the source. 
 * \param i4 Meaning Depends on the extype parameter. See http://www.nec2.org/part_3/cards/ex.html
 * 
-* \remark Simpler versions are nec_voltage_excitation, nec_current_excitation and nec_planewave_excitation
+* \remark Simpler versions of the function are provided for common uses. These are nec_voltage_excitation, 
+*         nec_current_excitation and nec_planewave_excitation.
+* \remark The meaning of the floating point parameter depends on the excitation type. See http://www.nec2.org/part_3/cards/ex.html for
+*         more details.
 */
 long nec_ex_card(nec_context* in_context, int extype, int i2, int i3, int i4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
@@ -283,12 +286,12 @@ long nec_excitation_voltage(nec_context* in_context, int tag, int segment, doubl
 
 /*! \brief Current Source Excitation. 
 * \param in_context The nec_context created with nec_create()
-* \param (F1) - X position in meters. 
-* \param (F2) - Y position in meters. 
-* \param (F3) - Z position in meters. 
-* \param (F4) - a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. 
-* \param (F5) - beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. 
-* \param (F6) - "Current moment" of the source. This parameter is equal to the product Il in amp meters.
+* \param x - X position in meters. 
+* \param y - Y position in meters. 
+* \param z - Z position in meters. 
+* \param a - a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. 
+* \param beta - beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. 
+* \param moment - "Current moment" of the source. This parameter is equal to the product Il in amp meters.
 * 
 * \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
 * Also plane-wave or current-source excitation is not allowed with voltage sources. 
