@@ -210,20 +210,16 @@ using namespace std;
 
 #include "common.h"
 
-#ifdef NEC_MATRIX_CHECK
-//#define NEC_MATRIX_CHECK
+#ifdef NEC_ERROR_CHECK
 
-void to_octave(nec_complex& x);
 void to_octave(nec_complex& x)  {
   cout << real(x) << " + " << imag(x) << "I";
 }
 
-void to_octave(int& x);
 void to_octave(int& x)  {
   cout << x;
 }
 
-void to_octave(nec_complex* a, int n, int ndim);
 void to_octave(nec_complex* a, int n, int ndim)  {
   cout << "[";
   for (int row = 0; row < n; row++ )
@@ -241,12 +237,10 @@ void to_octave(nec_complex* a, int n, int ndim)  {
   cout << "];" << endl;
 }
 
-void to_octave(complex_array& a, int n, int ndim);
 void to_octave(complex_array& a, int n, int ndim)  {
-  to_octave(a.get_ptr(),n,ndim);
+  to_octave(a.data(),n,ndim);
 }
 
-void to_octave(int* a, int n);
 void to_octave(int* a, int n)  {
   cout << "[";
   for (int i = 0; i < n; i++ )  {
@@ -257,15 +251,13 @@ void to_octave(int* a, int n)  {
   cout << "];" << endl;
 }
 
-void to_octave(int_array& a, int n);
 void to_octave(int_array& a, int n)  {
-  to_octave(a.get_ptr(),n);
+  to_octave(a.data(),n);
 }
-#endif
+#endif /* NEC_ERROR_CHECK */
 
 
 
-#ifndef LAPACK
 /*! \brief Solve The system of equations using Gaussian Elimination.
   Subroutine to factor a matrix into a unit lower triangular matrix 
   and an upper triangular matrix using the Gauss-Doolittle algorithm 
@@ -276,7 +268,7 @@ void to_octave(int_array& a, int n)  {
   
   (matrix transposed.)
 */
-void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
+void lu_decompose_ge(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
 {
   DEBUG_TRACE("lu_decompose_ge(" << n << "," << ndim << ")");
   
@@ -375,13 +367,13 @@ void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_ar
 }
 
 
-/*! \brief
+/*! \brief Solve system of linear equations
     Subroutine to solve the matrix equation lu*x=b where l is a unit
     lower triangular matrix and u is an upper triangular matrix both
-    of which are stored in a.  the rhs vector b is input and the
+    of which are stored in a.  The RHS vector b is input and the
     solution is returned through vector b.   (matrix transposed)
 */
-void solve( int n, complex_array& a, int_array& ip,
+void solve_ge( int n, complex_array& a, int_array& ip,
     complex_array& b, int64_t ndim )
 {
   DEBUG_TRACE("solve(" << n << "," << ndim << ")");
@@ -413,7 +405,7 @@ void solve( int n, complex_array& a, int_array& ip,
 }
 
 
-#else /*  LAPACK */
+#if LAPACK
 
 extern "C"
 {
@@ -423,10 +415,10 @@ extern "C"
 
 /*! \brief Use lapack to perform LU decomposition
 */
-void lu_decompose(nec_output_file& s_output,  int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
+void lu_decompose_lapack(nec_output_file& s_output,  int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
 {
   UNUSED(s_output);
-  DEBUG_TRACE("factor_lapack(" << n << "," << ndim << ")");
+  DEBUG_TRACE("lu_decompose_lapack(" << n << "," << ndim << ")");
   ASSERT(n <= ndim);
 
 #ifdef NEC_MATRIX_CHECK
@@ -492,8 +484,8 @@ void lu_decompose(nec_output_file& s_output,  int64_t n, complex_array& a_in, in
   
   if (0 != info) {
     /*
-            The factorization has been completed, but the factor U is exactly singular,
-            and division by zero will occur if it is used to solve a system of equations. 
+      The factorization has been completed, but the factor U is exactly singular,
+      and division by zero will occur if it is used to solve a system of equations. 
     */
     throw new nec_exception("nec++:  LU Decomposition Failed: ",info);
   }
@@ -508,26 +500,16 @@ void lu_decompose(nec_output_file& s_output,  int64_t n, complex_array& a_in, in
 #endif
 } 
 
-// extern "C" void zgetrs_(char* TRANS, int* N, int* NRHS, void *A, int* LDA, int *IPIV, void* B, int* LDB, int *INFOp);
-// // SUBROUTINE ZGETRS( TRANS, N, NRHS, A, LDA, IPIV, B, LDB, INFO )
-// int lapack_zgetrs(int N, int NRHS, void *A, int LDA, int *IPIV, void* B, int LDB)
-// {
-//   int info;
-//   char transp = 'N';
-//   zgetrs_(&transp, &N, &NRHS, (void*)A, &LDA, IPIV, B, &LDB, &info);
-//   return info;
-// }
-
-/*! \brief
+/*! \brief Solve system of linear equations
   Subroutine to solve the matrix equation lu*x=b where l is a unit
   lower triangular matrix and u is an upper triangular matrix both
   of which are stored in a.  the rhs vector b is input and the
   solution is returned through vector b.   (matrix transposed)
 */
-void solve( int n, complex_array& a, int_array& ip,
+void solve_lapack( int n, complex_array& a, int_array& ip,
     complex_array& b, int64_t ndim )
 {
-  DEBUG_TRACE("solve(" << n << "," << ndim << ")");
+  DEBUG_TRACE("solve_lapack(" << n << "," << ndim << ")");
 
   int info = clapack_zgetrs (CblasColMajor, CblasNoTrans, 
     n, 1, (void*) a.data(), ndim, ip.data(), b.data(), n);
@@ -543,6 +525,24 @@ void solve( int n, complex_array& a, int_array& ip,
 
 #endif /*  LAPACK */
 
+
+void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
+{
+#if LAPACK
+  return lu_decompose_lapack(s_output, n, a, ip, ndim);
+#else
+  return lu_decompose_ge(s_output, n, a, ip, ndim);
+#endif
+}
+
+void solve( int n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim )
+{
+#if LAPACK
+  return solve_lapack(n, a, ip, b, ndim);
+#else
+  return solve_ge(n, a, ip, b, ndim);
+#endif
+}
 
 /*-----------------------------------------------------------------------*/
 

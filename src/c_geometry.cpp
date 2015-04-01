@@ -2955,7 +2955,7 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 	
 	do
 	{
-		DEBUG_TRACE("c_geometry::sbf(" << i << "," << is << "): " << jcox);
+		// DEBUG_TRACE("c_geometry::sbf(" << i << "," << is << "): " << jcox);
 		if ( jcox != 0 )
 		{
 			if ( jcox < 0 )
