@@ -46,4 +46,4 @@ and return a (possibly) different pointer */
 
 /* No need for special IN typemap, it works anyway */
 
-%include "../src/libnecpp.h"
+%include "libnecpp.h"
