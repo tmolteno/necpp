@@ -42,6 +42,14 @@ typedef struct nec_context nec_context;
 extern "C" {
 #endif
 
+
+/** @name Initialization and Cleanup
+ * Functions dealing with antenna simulation contexts. The contexts should be created before
+ * a simulation begins and deleted after the simluation is complete to recover any memory
+ * allocated.
+ */
+///@{
+
 /*! \brief Create an nec_context and initialize it.
 
 \par Note: Do NOT delete or free the nec_context yourself, rather call nec_delete() to free memory associated with the nec simulation.
@@ -52,12 +60,17 @@ nec_context* nec_create(void);
  */
 long nec_delete(nec_context* in_context);
 
-/*!\brief Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. 
+///@}
+
+
+/** @name Antenna Geometry
+ * Functions for creating wires and surface patches, as well as geometry 
+ * transformations
  */
-long nec_benchmark(void);
+///@{
 
+/*! \brief Create a straigt wire
 
-/*! \brief Generates segment geometry for a straigt wire
     \param in_context The nec_context created with nec_create()
     \param tag_id The tag ID.
     \param segment_count The number of segments.
@@ -136,8 +149,7 @@ long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
                  double rox, double roy, double roz, double xs,
                  double ys, double zs, int its );
 
-/*!\brief Parameters:
-        Integers
+/*!\brief Reflection in Coordinate Planes
    \param i1 - Tag number increment.
    \param i2 - This integer is divided into three independent digits, in
                   columns 8, 9, and 10 of the card, which control reflection
@@ -178,9 +190,21 @@ long nec_gx_card(nec_context* in_context, int i1, int i2);
  *    \arg \c 1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
  *    \arg \c -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
  * \param card_int_2 Unused (set to zero)
+ * \retval err \c 0 indicates that the result is successful and \c 1 indicates that an error occurred.
  **/
 long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
 
+///@}
+
+
+/** @name Error Handling
+ * Functions for error handling and utility
+ */
+///@{
+
+/*!\brief Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. 
+ */
+long nec_benchmark(void);
 
 /*! \brief Get the last error message
  * All functions return a long. If this is != 0. Then an error has occurred.
@@ -188,9 +212,15 @@ long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
  **/
 const char* nec_error_message(void);
 
-/*
-  NEC card functions.
-*/
+///@}
+
+
+/** @name Antenna Environment
+ * Functions for specifying the ground and antenna excitation,
+ * frequency and loading.
+ */
+///@{
+
 /*!\brief Ground Card
   Examples:
 
@@ -222,6 +252,12 @@ long nec_gn_card(nec_context* in_context, int iperf, int nradl, double epse, dou
  */
 long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq);
 
+/*!\brief To control use of the extended thin-wire kernel approximation.
+ * \param itmp1 
+ * \arg \c -1 Return to normal kernel
+ * \arg \c 0 Use Extended thin wire kernel
+ * */
+long nec_ek_card(nec_context* in_context, int itmp1);
 
 
 /*! \brief LD card (Loading)
@@ -340,6 +376,16 @@ long nec_xq_card(nec_context* in_context, int itmp1);
 
 long nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3, double tmp4);
 
+///@}
+
+
+
+/** @name Simulation Output
+ * Functions for calculating radiation patterns, and requesting
+ * printed output of simulation results.
+ */
+///@{
+
 /*! \brief Standard radiation pattern parameters 
 
   \param calc_mode This integer selects the mode of calculation for the radiated field. Some values of (calc_mode) will affect the meaning of the remaining parameters on the card. Options available for calc_mode are:
@@ -431,16 +477,19 @@ long nec_kh_card(nec_context* in_context, double tmp1);
 long nec_ne_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 long nec_nh_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
-/*!\brief To control use of the extended thin-wire kernel approximation.
- * \param itmp1 
- * \arg \c -1 Return to normal kernel
- * \arg \c 0 Use Extended thin wire kernel
- * */
-long nec_ek_card(nec_context* in_context, int itmp1);
 
 long nec_cp_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
 long nec_pl_card(nec_context* in_context, char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4);
 
+
+///@}
+
+
+/** @name Analysis of Output
+ * Functions for calculating statistics from simulation outputs. These
+ * are useful for automatic optimization.
+ */
+///@{
 
 /*! \brief Get the maximum gain from a radiation pattern.
 
@@ -502,7 +551,7 @@ double nec_impedance_real(nec_context* in_context, int freq_index);
  */
 double nec_impedance_imag(nec_context* in_context, int freq_index);
 
-
+///@}
 
 #ifdef __cplusplus
 }
