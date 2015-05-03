@@ -48,8 +48,7 @@
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#typedef-members">Typedefs</a>  </div>
   <div class="headertitle">
 <div class="title">libnecpp.h File Reference</div>  </div>
 </div><!--header-->
@@ -68,19 +67,20 @@ typedef struct <a class="el" href="classnec__context.html">nec_context</a>&#160;
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Initialization and Cleanup</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Functions dealing with antenna simulation contexts. The contexts should be created before a simulation begins and deleted after the simluation is complete to recover any memory allocated. </p>
+</div></td></tr>
 <tr class="memitem:a03d9347b31b3558fb40130e490314ae0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0">nec_create</a> (void)</td></tr>
 <tr class="memdesc:a03d9347b31b3558fb40130e490314ae0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> and initialize it.  <a href="#a03d9347b31b3558fb40130e490314ae0">More...</a><br /></td></tr>
 <tr class="separator:a03d9347b31b3558fb40130e490314ae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb9647688b07b4a3f96b4685236e6de5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb9647688b07b4a3f96b4685236e6de5"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#abb9647688b07b4a3f96b4685236e6de5">nec_delete</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context)</td></tr>
-<tr class="memdesc:abb9647688b07b4a3f96b4685236e6de5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete an <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> object. <br /></td></tr>
+<tr class="memitem:abb9647688b07b4a3f96b4685236e6de5"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#abb9647688b07b4a3f96b4685236e6de5">nec_delete</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context)</td></tr>
+<tr class="memdesc:abb9647688b07b4a3f96b4685236e6de5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete an <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> object.  <a href="#abb9647688b07b4a3f96b4685236e6de5">More...</a><br /></td></tr>
 <tr class="separator:abb9647688b07b4a3f96b4685236e6de5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d7e57c6016a9694cd788a3a1de45e9f"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a3d7e57c6016a9694cd788a3a1de45e9f">nec_benchmark</a> (void)</td></tr>
-<tr class="memdesc:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. <br /></td></tr>
-<tr class="separator:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Antenna Geometry</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Functions for creating wires and surface patches, as well as geometry transformations </p>
+</div></td></tr>
 <tr class="memitem:a502901392b718d50c168f368a2b2c650"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a502901392b718d50c168f368a2b2c650">nec_wire</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int tag_id, int segment_count, double xw1, double yw1, double zw1, double xw2, double yw2, double zw2, double rad, double rdel, double rrad)</td></tr>
-<tr class="memdesc:a502901392b718d50c168f368a2b2c650"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates segment geometry for a straigt wire.  <a href="#a502901392b718d50c168f368a2b2c650">More...</a><br /></td></tr>
+<tr class="memdesc:a502901392b718d50c168f368a2b2c650"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a straigt wire.  <a href="#a502901392b718d50c168f368a2b2c650">More...</a><br /></td></tr>
 <tr class="separator:a502901392b718d50c168f368a2b2c650"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a667503026caacf2557878252ea0bba53"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a667503026caacf2557878252ea0bba53">nec_sp_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int ns, double x1, double y1, double z1, double x2, double y2, double z2)</td></tr>
 <tr class="memdesc:a667503026caacf2557878252ea0bba53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Surface Patch (SP Card)  <a href="#a667503026caacf2557878252ea0bba53">More...</a><br /></td></tr>
@@ -92,27 +92,49 @@ long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libn
 <tr class="memdesc:ad93663f439a51cd1a8d1bfb6dba32ba8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coordinate Transformation.  <a href="#ad93663f439a51cd1a8d1bfb6dba32ba8">More...</a><br /></td></tr>
 <tr class="separator:ad93663f439a51cd1a8d1bfb6dba32ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#ab46bfa6c6c11167bff5dc143ec6b0ae8">nec_gx_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int i1, int i2)</td></tr>
-<tr class="memdesc:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameters: Integers.  <a href="#ab46bfa6c6c11167bff5dc143ec6b0ae8">More...</a><br /></td></tr>
+<tr class="memdesc:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reflection in Coordinate Planes.  <a href="#ab46bfa6c6c11167bff5dc143ec6b0ae8">More...</a><br /></td></tr>
 <tr class="separator:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b8d952ae97fde0b12668d9ee4032573"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a7b8d952ae97fde0b12668d9ee4032573">nec_geometry_complete</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int gpflag, int card_int_2)</td></tr>
 <tr class="memdesc:a7b8d952ae97fde0b12668d9ee4032573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicate that the geometry is complete (GE card)  <a href="#a7b8d952ae97fde0b12668d9ee4032573">More...</a><br /></td></tr>
 <tr class="separator:a7b8d952ae97fde0b12668d9ee4032573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Error Handling</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Functions for error handling and utility </p>
+</div></td></tr>
+<tr class="memitem:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d7e57c6016a9694cd788a3a1de45e9f"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a3d7e57c6016a9694cd788a3a1de45e9f">nec_benchmark</a> (void)</td></tr>
+<tr class="memdesc:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. <br /></td></tr>
+<tr class="separator:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6181b069555b93c36729ff71122b230b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6181b069555b93c36729ff71122b230b"></a>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b">nec_error_message</a> (void)</td></tr>
 <tr class="memdesc:a6181b069555b93c36729ff71122b230b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the last error message All functions return a long. If this is != 0. Then an error has occurred. The error message can be retrieved with this function. <br /></td></tr>
 <tr class="separator:a6181b069555b93c36729ff71122b230b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Antenna Environment</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Functions for specifying the ground and antenna excitation, frequency and loading. </p>
+</div></td></tr>
 <tr class="memitem:a9cf02620e0d0365cbdd24071a7ebeae9"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a9cf02620e0d0365cbdd24071a7ebeae9">nec_gn_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int iperf, int nradl, double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6)</td></tr>
 <tr class="memdesc:a9cf02620e0d0365cbdd24071a7ebeae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ground Card Examples:  <a href="#a9cf02620e0d0365cbdd24071a7ebeae9">More...</a><br /></td></tr>
 <tr class="separator:a9cf02620e0d0365cbdd24071a7ebeae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a213a22a180172d94c718b16091e982ad"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a213a22a180172d94c718b16091e982ad">nec_fr_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq)</td></tr>
 <tr class="memdesc:a213a22a180172d94c718b16091e982ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">FR card.  <a href="#a213a22a180172d94c718b16091e982ad">More...</a><br /></td></tr>
 <tr class="separator:a213a22a180172d94c718b16091e982ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2feb3c8e848dc62e14a413b4ee03a26"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#af2feb3c8e848dc62e14a413b4ee03a26">nec_ek_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int itmp1)</td></tr>
+<tr class="memdesc:af2feb3c8e848dc62e14a413b4ee03a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">To control use of the extended thin-wire kernel approximation.  <a href="#af2feb3c8e848dc62e14a413b4ee03a26">More...</a><br /></td></tr>
+<tr class="separator:af2feb3c8e848dc62e14a413b4ee03a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abeec00296eee071b853260290843c53f"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#abeec00296eee071b853260290843c53f">nec_ld_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3)</td></tr>
 <tr class="memdesc:abeec00296eee071b853260290843c53f"><td class="mdescLeft">&#160;</td><td class="mdescRight">LD card (Loading)  <a href="#abeec00296eee071b853260290843c53f">More...</a><br /></td></tr>
 <tr class="separator:abeec00296eee071b853260290843c53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7790bcca76a4fd10042875520e4af40b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7790bcca76a4fd10042875520e4af40b"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_ex_card</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)</td></tr>
-<tr class="separator:a7790bcca76a4fd10042875520e4af40b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b9e6701ef3373fcaf187af5eb9bec06"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a0b9e6701ef3373fcaf187af5eb9bec06">nec_ex_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int extype, int i2, int i3, int i4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)</td></tr>
+<tr class="memdesc:a0b9e6701ef3373fcaf187af5eb9bec06"><td class="mdescLeft">&#160;</td><td class="mdescRight">EX card (Excitation)  <a href="#a0b9e6701ef3373fcaf187af5eb9bec06">More...</a><br /></td></tr>
+<tr class="separator:a0b9e6701ef3373fcaf187af5eb9bec06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5ee6d5036af78c80d08db554432c7ab"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#ad5ee6d5036af78c80d08db554432c7ab">nec_excitation_voltage</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int tag, int <a class="el" href="classsegment.html">segment</a>, double v_real, double v_imag)</td></tr>
+<tr class="memdesc:ad5ee6d5036af78c80d08db554432c7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Voltage Source Excitation.  <a href="#ad5ee6d5036af78c80d08db554432c7ab">More...</a><br /></td></tr>
+<tr class="separator:ad5ee6d5036af78c80d08db554432c7ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7795e625022d5a39bb0909322ad4a90f"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a7795e625022d5a39bb0909322ad4a90f">nec_excitation_current</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, double x, double y, double z, double a, double beta, double moment)</td></tr>
+<tr class="memdesc:a7795e625022d5a39bb0909322ad4a90f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current Source Excitation.  <a href="#a7795e625022d5a39bb0909322ad4a90f">More...</a><br /></td></tr>
+<tr class="separator:a7795e625022d5a39bb0909322ad4a90f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a166bd4f71d1be7344ece9b5ed10ea0b0"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a166bd4f71d1be7344ece9b5ed10ea0b0">nec_excitation_planewave</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int n_theta, int n_phi, double theta, double phi, double eta, double dtheta, double dphi, double pol_ratio)</td></tr>
+<tr class="memdesc:a166bd4f71d1be7344ece9b5ed10ea0b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Planewave Excitation (Linear Polarization)  <a href="#a166bd4f71d1be7344ece9b5ed10ea0b0">More...</a><br /></td></tr>
+<tr class="separator:a166bd4f71d1be7344ece9b5ed10ea0b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb7a2047bc6aa1f4c787b0c918e1b928"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb7a2047bc6aa1f4c787b0c918e1b928"></a>
 long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_tl_card</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)</td></tr>
 <tr class="separator:adb7a2047bc6aa1f4c787b0c918e1b928"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,6 +147,9 @@ long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_nt_card</b> (<a c
 <tr class="memitem:ac8309cfb1b85d702b53745abc9436483"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8309cfb1b85d702b53745abc9436483"></a>
 long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_gd_card</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, double tmp1, double tmp2, double tmp3, double tmp4)</td></tr>
 <tr class="separator:ac8309cfb1b85d702b53745abc9436483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Simulation Output</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Functions for calculating radiation patterns, and requesting printed output of simulation results. </p>
+</div></td></tr>
 <tr class="memitem:a6c6b8b44633c3a5b33e95b56d3c9fcec"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec">nec_rp_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int calc_mode, int n_theta, int n_phi, int output_format, int normalization, int D, int A, double theta0, double phi0, double delta_theta, double delta_phi, double radial_distance, double gain_norm)</td></tr>
 <tr class="memdesc:a6c6b8b44633c3a5b33e95b56d3c9fcec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Standard radiation pattern parameters.  <a href="#a6c6b8b44633c3a5b33e95b56d3c9fcec">More...</a><br /></td></tr>
 <tr class="separator:a6c6b8b44633c3a5b33e95b56d3c9fcec"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -143,26 +168,26 @@ long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_ne_card</b> (<a c
 <tr class="memitem:a924381fb8c22c3d901f7896d0d65ea5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a924381fb8c22c3d901f7896d0d65ea5e"></a>
 long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_nh_card</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int itmp1, int itmp2, int itmp3, int itmp4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6)</td></tr>
 <tr class="separator:a924381fb8c22c3d901f7896d0d65ea5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2feb3c8e848dc62e14a413b4ee03a26"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#af2feb3c8e848dc62e14a413b4ee03a26">nec_ek_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int itmp1)</td></tr>
-<tr class="memdesc:af2feb3c8e848dc62e14a413b4ee03a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">To control use of the extended thin-wire kernel approximation.  <a href="#af2feb3c8e848dc62e14a413b4ee03a26">More...</a><br /></td></tr>
-<tr class="separator:af2feb3c8e848dc62e14a413b4ee03a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a500f3fbc6d8489667448c87a9521c975"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a500f3fbc6d8489667448c87a9521c975"></a>
 long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_cp_card</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int itmp1, int itmp2, int itmp3, int itmp4)</td></tr>
 <tr class="separator:a500f3fbc6d8489667448c87a9521c975"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fa923c4bc75bd8ac3c6080cee9a143e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fa923c4bc75bd8ac3c6080cee9a143e"></a>
 long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_pl_card</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, char *ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4)</td></tr>
 <tr class="separator:a1fa923c4bc75bd8ac3c6080cee9a143e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Analysis of Output</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>Functions for calculating statistics from simulation outputs. These are useful for automatic optimization. </p>
+</div></td></tr>
 <tr class="memitem:a9309dfc8da521b3c86e59e282c31ae3c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a9309dfc8da521b3c86e59e282c31ae3c">nec_gain_max</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
-<tr class="memdesc:a9309dfc8da521b3c86e59e282c31ae3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get statistics of the gains in dB.  <a href="#a9309dfc8da521b3c86e59e282c31ae3c">More...</a><br /></td></tr>
+<tr class="memdesc:a9309dfc8da521b3c86e59e282c31ae3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum gain from a radiation pattern.  <a href="#a9309dfc8da521b3c86e59e282c31ae3c">More...</a><br /></td></tr>
 <tr class="separator:a9309dfc8da521b3c86e59e282c31ae3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6cca3a905c26f57ca3a95792c0d7df8d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6cca3a905c26f57ca3a95792c0d7df8d"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>nec_gain_min</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
+<tr class="memitem:a6cca3a905c26f57ca3a95792c0d7df8d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a6cca3a905c26f57ca3a95792c0d7df8d">nec_gain_min</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
+<tr class="memdesc:a6cca3a905c26f57ca3a95792c0d7df8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the minimum gain from a radiation pattern.  <a href="#a6cca3a905c26f57ca3a95792c0d7df8d">More...</a><br /></td></tr>
 <tr class="separator:a6cca3a905c26f57ca3a95792c0d7df8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a176c1ca5a6a93390a96c89c4231ee4bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a176c1ca5a6a93390a96c89c4231ee4bc"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>nec_gain_mean</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
+<tr class="memitem:a176c1ca5a6a93390a96c89c4231ee4bc"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a176c1ca5a6a93390a96c89c4231ee4bc">nec_gain_mean</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
+<tr class="memdesc:a176c1ca5a6a93390a96c89c4231ee4bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the mean gain from a radiation pattern.  <a href="#a176c1ca5a6a93390a96c89c4231ee4bc">More...</a><br /></td></tr>
 <tr class="separator:a176c1ca5a6a93390a96c89c4231ee4bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f1dbdaf6bbc9937988a6a29185d915d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f1dbdaf6bbc9937988a6a29185d915d"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>nec_gain_sd</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
+<tr class="memitem:a3f1dbdaf6bbc9937988a6a29185d915d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a3f1dbdaf6bbc9937988a6a29185d915d">nec_gain_sd</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
+<tr class="memdesc:a3f1dbdaf6bbc9937988a6a29185d915d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the standard deviation of the gain from a radiation pattern.  <a href="#a3f1dbdaf6bbc9937988a6a29185d915d">More...</a><br /></td></tr>
 <tr class="separator:a3f1dbdaf6bbc9937988a6a29185d915d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a57015dc41fdccb726769b4e65efa898e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57015dc41fdccb726769b4e65efa898e"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>nec_gain_rhcp_max</b> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
@@ -218,11 +243,42 @@ How to use libNEC.</h1>
 </div><div class="memdoc">
 
 <p>Create an <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> and initialize it. </p>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">context*</td><td>An <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> pointer. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section user"><dt>Note: Do NOT delete or free the nec_context yourself, rather call nec_delete() to free memory associated with the nec simulation.</dt><dd></dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a1">test_nec.c</a>.</dd>
 </dl>
 <p>References <a class="el" href="classnec__context.html#a76cd515fd9bcca374e635947ca2c754d">nec_context::initialize()</a>.</p>
 
+</div>
+</div>
+<a class="anchor" id="abb9647688b07b4a3f96b4685236e6de5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_delete </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Delete an <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> object. </p>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a13">test_nec.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="af2feb3c8e848dc62e14a413b4ee03a26"></a>
@@ -260,9 +316,340 @@ How to use libNEC.</h1>
   </table>
   </dd>
 </dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a11">test_nec.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a14">test_nec.c</a>.</dd>
 </dl>
 <p>References <a class="el" href="classnec__context.html#a1a4857cb0459a4c55b8470fdc8a54591">nec_context::set_extended_thin_wire_kernel()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a0b9e6701ef3373fcaf187af5eb9bec06"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_ex_card </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>extype</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i3</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>i4</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tmp1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tmp2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tmp3</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tmp4</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tmp5</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>tmp6</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>EX card (Excitation) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
+    <tr><td class="paramname">extype</td><td>Type of excitation <ul>
+<li><code>O</code> - voltage source (applied-E-field source). </li>
+<li><code>1</code> - incident plane wave, linear polarization. </li>
+<li><code>2</code> - incident plane wave, right-hand (thumb along the incident k vector) elliptic polarization. </li>
+<li><code>3</code> - incident plane wave, left-hand elliptic polarization. </li>
+<li><code>4</code> - elementary current source. </li>
+<li><code>5</code> - voltage source (current-slope-discontinuity). </li>
+</ul>
+</td></tr>
+    <tr><td class="paramname">i2</td><td>Tag number the source segment. This tag number along with the number to be given in (i3), which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. <ul>
+<li><code>O</code> - Blank or zero in field (i2) implies that the Source segment will be identified by using the absolute segment number in the next field (i3). </li>
+</ul>
+</td></tr>
+    <tr><td class="paramname">i3</td><td>Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number set by the previous parameter. If the previous parameter is zero, the number in (i3) must be the absolute segment number of the source. </td></tr>
+    <tr><td class="paramname">i4</td><td>Meaning Depends on the extype parameter. See <a href="http://www.nec2.org/part_3/cards/ex.html">http://www.nec2.org/part_3/cards/ex.html</a></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Simpler versions of the function are provided for common uses. These are nec_voltage_excitation, nec_current_excitation and nec_planewave_excitation. </dd>
+<dd>
+The meaning of the floating point parameter depends on the excitation type. See <a href="http://www.nec2.org/part_3/cards/ex.html">http://www.nec2.org/part_3/cards/ex.html</a> for more details. </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a6">test_nec.c</a>.</dd>
+</dl>
+<p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7795e625022d5a39bb0909322ad4a90f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_excitation_current </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>z</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>beta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>moment</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Current Source Excitation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
+    <tr><td class="paramname">x</td><td>- X position in meters. </td></tr>
+    <tr><td class="paramname">y</td><td>- Y position in meters. </td></tr>
+    <tr><td class="paramname">z</td><td>- Z position in meters. </td></tr>
+    <tr><td class="paramname">a</td><td>- a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. </td></tr>
+    <tr><td class="paramname">beta</td><td>- beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. </td></tr>
+    <tr><td class="paramname">moment</td><td>- "Current moment" of the source. This parameter is equal to the product Il in amp meters.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Only one incident plane wave or one elementary current source is al- lowed at a time. Also plane-wave or current-source excitation is not allowed with voltage sources. If the excitation types are mixed, the program will use the last excitation type encountered. </dd></dl>
+
+<p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a166bd4f71d1be7344ece9b5ed10ea0b0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_excitation_planewave </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n_theta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n_phi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>theta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>phi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>eta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>dtheta</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>dphi</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>pol_ratio</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Planewave Excitation (Linear Polarization) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
+    <tr><td class="paramname">n_theta</td><td>- Number of theta angles desired for the incident plane wave . </td></tr>
+    <tr><td class="paramname">n_phi</td><td>- Number of phi angles desired for the incident plane wave. </td></tr>
+    <tr><td class="paramname">theta</td><td>- Theta in degrees. Theta 19 defined in standard spherical coordinates as illustrated </td></tr>
+    <tr><td class="paramname">phi</td><td>- Phi in degrees. Phi is the standard spherical angle defined lned in the XY plane. </td></tr>
+    <tr><td class="paramname">eta</td><td>- Eta in degrees. Eta is the polarization angle defined as the angle between the theta unit vector and the direction of the electric field for linear polarization or the major ellipse axis for elliptical polarization. </td></tr>
+    <tr><td class="paramname">dtheta</td><td>- Theta angle stepping increment in degrees. </td></tr>
+    <tr><td class="paramname">dphi</td><td>- Phi angle stepping increment in degrees. </td></tr>
+    <tr><td class="paramname">pol_ratio</td><td>- Ratio of minor axis to major axis for elliptic polarization (major axis field strength - 1 V/m).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Only one incident plane wave or one elementary current source is al- lowed at a time. Also plane-wave or current-source excitation is not allowed with voltage sources. If the excitation types are mixed, the program will use the last excitation type encountered. </dd></dl>
+
+<p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ad5ee6d5036af78c80d08db554432c7ab"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_excitation_voltage </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>tag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>segment</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>v_real</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>v_imag</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Voltage Source Excitation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
+    <tr><td class="paramname">tag</td><td>Tag number of the source segment. This tag number along with the number to be given in (segment), which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. <ul>
+<li><code>O</code> - Blank or zero in field (tag) implies that the Source segment will be identified by using the absolute segment number in the next field (segment). </li>
+</ul>
+</td></tr>
+    <tr><td class="paramname">segment</td><td>Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number set by the previous parameter. If the previous parameter is zero, the number in (segment) must be the absolute segment number of the source. </td></tr>
+    <tr><td class="paramname">v_real</td><td>real part of the voltage excitation (Volts) </td></tr>
+    <tr><td class="paramname">v_imag</td><td>imaginary part of the voltage excitation (Volts)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Only one incident plane wave or one elementary current source is al- lowed at a time. Also plane-wave or current-source excitation is not allowed with voltage sources. If the excitation types are mixed, the program will use the last excitation type encountered. </dd></dl>
+
+<p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>.</p>
 
 </div>
 </div>
@@ -315,16 +702,6 @@ How to use libNEC.</h1>
     <tr><td class="paramname">in_ifrq</td><td>0 is a linear range of frequencies, 1 is a log range. </td></tr>
     <tr><td class="paramname">in_nfrq</td><td>The number of frequencies </td></tr>
     <tr><td class="paramname">in_freq_mhz</td><td>The starting frequency in MHz. </td></tr>
-    <tr><td class="paramname">in_del_freq</td><td>The frequency step (in MHz for ifrq = 0)</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>FR crd </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
-    <tr><td class="paramname">in_ifrq</td><td>0 is a linear range of frequencies, 1 is a log range. </td></tr>
-    <tr><td class="paramname">in_nfrq</td><td>The number of frequencies </td></tr>
-    <tr><td class="paramname">in_freq_mhz</td><td>The starting frequency in MHz. </td></tr>
     <tr><td class="paramname">in_del_freq</td><td>The frequency step (in MHz for ifrq = 0) </td></tr>
   </table>
   </dd>
@@ -359,18 +736,133 @@ How to use libNEC.</h1>
       </table>
 </div><div class="memdoc">
 
-<p>Get statistics of the gains in dB. </p>
-<p>This function requires a previous rp_card() method to have been called (with the gain normalization set to 5) </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Get the maximum gain from a radiation pattern. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">index</td><td>The rp_card frequency index </td></tr>
+    <tr><td class="paramname">freq_index</td><td>The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent simulations will store their results at higher indices. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The maximum gain in dB or -999.0 if no radiation pattern had been previously requested. </dd></dl>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a9">test_nec.c</a>.</dd>
+<dl class="section return"><dt>Returns</dt><dd>The maximum gain in dB or -999.0 if no radiation pattern had been previously requested.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec" title="Standard radiation pattern parameters. ">nec_rp_card()</a> method to have been called (with the gain normalization set to 5) </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a10">test_nec.c</a>.</dd>
 </dl>
 <p>References <a class="el" href="classnec__context.html#ae4cd6125fc1b7d9e08f32a41d4c27399">nec_context::get_gain_max()</a>.</p>
 
+</div>
+</div>
+<a class="anchor" id="a176c1ca5a6a93390a96c89c4231ee4bc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double nec_gain_mean </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>freq_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the mean gain from a radiation pattern. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">freq_index</td><td>The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent simulations will store their results at higher indices. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The mean gain in dB or -999.0 if no radiation pattern had been previously requested.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>This function returns the mean over the sphere. </dd>
+<dd>
+This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec" title="Standard radiation pattern parameters. ">nec_rp_card()</a> method to have been called (with the gain normalization set to 5) </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a11">test_nec.c</a>.</dd>
+</dl>
+</div>
+</div>
+<a class="anchor" id="a6cca3a905c26f57ca3a95792c0d7df8d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double nec_gain_min </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>freq_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the minimum gain from a radiation pattern. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">freq_index</td><td>The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent simulations will store their results at higher indices. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The minimum gain in dB or -999.0 if no radiation pattern had been previously requested.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec" title="Standard radiation pattern parameters. ">nec_rp_card()</a> method to have been called (with the gain normalization set to 5) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3f1dbdaf6bbc9937988a6a29185d915d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double nec_gain_sd </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>freq_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the standard deviation of the gain from a radiation pattern. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">freq_index</td><td>The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent simulations will store their results at higher indices. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The standard deviation in dB or -999.0 if no radiation pattern had been previously requested.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>This function returns the standard deviation over the sphere. </dd>
+<dd>
+This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec" title="Standard radiation pattern parameters. ">nec_rp_card()</a> method to have been called (with the gain normalization set to 5) </dd></dl>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a12">test_nec.c</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a7b8d952ae97fde0b12668d9ee4032573"></a>
@@ -414,6 +906,12 @@ How to use libNEC.</h1>
 </ul>
 </td></tr>
     <tr><td class="paramname">card_int_2</td><td>Unused (set to zero) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
   </table>
   </dd>
 </dl>
@@ -507,6 +1005,12 @@ How to use libNEC.</h1>
     <tr><td class="paramname">YS</td><td>structure is translated with respect to </td></tr>
     <tr><td class="paramname">ZS</td><td>the coordinate system. </td></tr>
     <tr><td class="paramname">ITS</td><td>This number is input as a decimal number but is rounded to an integer before use. Tag numbers are searched sequentially until a segment having a tag of this segment through the end of the sequence of segments is moved by the card. If ITS is zero the entire structure is moved. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
   </table>
   </dd>
 </dl>
@@ -633,7 +1137,7 @@ How to use libNEC.</h1>
       </table>
 </div><div class="memdoc">
 
-<p>Parameters: Integers. </p>
+<p>Reflection in Coordinate Planes. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">i1</td><td>- Tag number increment. </td></tr>
@@ -644,6 +1148,12 @@ How to use libNEC.</h1>
 <dl class="section remark"><dt>Remarks</dt><dd>Any combination of reflections along the X, Y and Z axes may be used. For example, 101 for (I2) will cause reflection along axes X and Z, and 111 will cause reflection along axes X, Y and Z. When combinations of reflections are requested, the reflections are done in reverse alphabetical order. That is, if a structure is generated in a single octant of space and a GX card is then read with I2 equal to 111, the structure is first reflected along the Z-axis; the structure and its image are then reflected along the Y-axis; and, finally, these four structures are reflected along the X-axis to fill all octants. This order determines the position of a segment in the sequence and, hence, the absolute segment numbers.</dd>
 <dd>
 The tag increment I1 is used to avoid duplication of tag numbers in the image segments. All valid tags on the original structure are incremented by I1 on the image. When combinations of reflections are employed, the tag increment is doubled after each reflection. Thus, a tag increment greater than or equal to the largest tag an the original structure will ensure that no duplicate tags are generated. For example, if tags from 1 to 100 are used on the original structure with I2 equal to 011 and a tag increment of 100, the first reflection, along the Z-axis, will produce tags from 101 to 200; and the second reflection, along the Y-axis, will produce tags from 201 to 400, as a result of the increment being doubled to 200. </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -945,7 +1455,7 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
 <li>When both n_theta and n_phi are greater than one, the angle theta (or Z) will be stepped faster than phi. </li>
 <li>When a ground plane has been specified, field points should not be requested below the ground (theta greater than 90 degrees or Z less than zero.) </li>
 </ul>
-<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a6">test_nec.c</a>.</dd>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a7">test_nec.c</a>.</dd>
 </dl>
 <p>References <a class="el" href="classnec__context.html#a3824916fca4ec09417908a807478df94">nec_context::rp_card()</a>.</p>
 
@@ -1026,6 +1536,12 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
   </dd>
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>All co-ordinates are in meters. </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1110,6 +1626,12 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
   </dd>
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>All co-ordinates are in meters, except for arbitrary patches where the angles are in degrees </dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1197,7 +1719,7 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
       </table>
 </div><div class="memdoc">
 
-<p>Generates segment geometry for a straigt wire. </p>
+<p>Create a straigt wire. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
@@ -1212,6 +1734,12 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
     <tr><td class="paramname">rad</td><td>The wire radius (meters) </td></tr>
     <tr><td class="paramname">rdel</td><td>For tapered wires, the. Otherwise set to 1.0 </td></tr>
     <tr><td class="paramname">rrad</td><td>For tapered wires, the. Otherwise set to 1.0</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1264,7 +1792,7 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Mar 30 2015 15:23:09 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2015 11:25:01 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
