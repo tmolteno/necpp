@@ -100,9 +100,8 @@ Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Error Handling</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Functions for error handling and utility </p>
 </div></td></tr>
-<tr class="memitem:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d7e57c6016a9694cd788a3a1de45e9f"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a3d7e57c6016a9694cd788a3a1de45e9f">nec_benchmark</a> (void)</td></tr>
-<tr class="memdesc:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. <br /></td></tr>
+<tr class="memitem:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a3d7e57c6016a9694cd788a3a1de45e9f">nec_benchmark</a> (void)</td></tr>
+<tr class="memdesc:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800.  <a href="#a3d7e57c6016a9694cd788a3a1de45e9f">More...</a><br /></td></tr>
 <tr class="separator:a3d7e57c6016a9694cd788a3a1de45e9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6181b069555b93c36729ff71122b230b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6181b069555b93c36729ff71122b230b"></a>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b">nec_error_message</a> (void)</td></tr>
@@ -228,6 +227,33 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="li
 How to use libNEC.</h1>
 <p>Have a look at <a class="el" href="test_nec_8c-example.html">test_nec.c</a> </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a3d7e57c6016a9694cd788a3a1de45e9f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_benchmark </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. </p>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="classnec__context.html#a5ea86f18dfe6a6c00207067661ea387c">nec_context::benchmark()</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a03d9347b31b3558fb40130e490314ae0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -271,9 +297,10 @@ How to use libNEC.</h1>
 </div><div class="memdoc">
 
 <p>Delete an <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> object. </p>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -310,9 +337,16 @@ How to use libNEC.</h1>
   <table class="params">
     <tr><td class="paramname">itmp1</td><td><ul>
 <li><code>-1</code> Return to normal kernel </li>
-<li><code>0</code> Use Extended thin wire kernel </li>
+<li><code>0</code> Use Extended thin wire kernel</li>
 </ul>
 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -422,6 +456,13 @@ How to use libNEC.</h1>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Simpler versions of the function are provided for common uses. These are nec_voltage_excitation, nec_current_excitation and nec_planewave_excitation. </dd>
 <dd>
 The meaning of the floating point parameter depends on the excitation type. See <a href="http://www.nec2.org/part_3/cards/ex.html">http://www.nec2.org/part_3/cards/ex.html</a> for more details. </dd></dl>
@@ -495,6 +536,13 @@ The meaning of the floating point parameter depends on the excitation type. See 
     <tr><td class="paramname">a</td><td>- a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. </td></tr>
     <tr><td class="paramname">beta</td><td>- beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. </td></tr>
     <tr><td class="paramname">moment</td><td>- "Current moment" of the source. This parameter is equal to the product Il in amp meters.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -585,6 +633,13 @@ The meaning of the floating point parameter depends on the excitation type. See 
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message.</td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Only one incident plane wave or one elementary current source is al- lowed at a time. Also plane-wave or current-source excitation is not allowed with voltage sources. If the excitation types are mixed, the program will use the last excitation type encountered. </dd></dl>
 
 <p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>.</p>
@@ -647,6 +702,13 @@ The meaning of the floating point parameter depends on the excitation type. See 
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Only one incident plane wave or one elementary current source is al- lowed at a time. Also plane-wave or current-source excitation is not allowed with voltage sources. If the excitation types are mixed, the program will use the last excitation type encountered. </dd></dl>
 
 <p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>.</p>
@@ -702,7 +764,14 @@ The meaning of the floating point parameter depends on the excitation type. See 
     <tr><td class="paramname">in_ifrq</td><td>0 is a linear range of frequencies, 1 is a log range. </td></tr>
     <tr><td class="paramname">in_nfrq</td><td>The number of frequencies </td></tr>
     <tr><td class="paramname">in_freq_mhz</td><td>The starting frequency in MHz. </td></tr>
-    <tr><td class="paramname">in_del_freq</td><td>The frequency step (in MHz for ifrq = 0) </td></tr>
+    <tr><td class="paramname">in_del_freq</td><td>The frequency step (in MHz for ifrq = 0)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -905,13 +974,14 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
 <li><code>-1</code> - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. </li>
 </ul>
 </td></tr>
-    <tr><td class="paramname">card_int_2</td><td>Unused (set to zero) </td></tr>
+    <tr><td class="paramname">card_int_2</td><td>Unused (set to zero)</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1004,13 +1074,14 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
     <tr><td class="paramname">XS</td><td>X, Y. Z components of vector by which </td></tr>
     <tr><td class="paramname">YS</td><td>structure is translated with respect to </td></tr>
     <tr><td class="paramname">ZS</td><td>the coordinate system. </td></tr>
-    <tr><td class="paramname">ITS</td><td>This number is input as a decimal number but is rounded to an integer before use. Tag numbers are searched sequentially until a segment having a tag of this segment through the end of the sequence of segments is moved by the card. If ITS is zero the entire structure is moved. </td></tr>
+    <tr><td class="paramname">ITS</td><td>This number is input as a decimal number but is rounded to an integer before use. Tag numbers are searched sequentially until a segment having a tag of this segment through the end of the sequence of segments is moved by the card. If ITS is zero the entire structure is moved.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1097,7 +1168,14 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
 </td></tr>
     <tr><td class="paramname">nradl</td><td>Number of radial wires in the ground screen approximation, O implies no ground screen.</td></tr>
     <tr><td class="paramname">epse</td><td>Relative dielectric constant for ground in the vicinity of the antenna. Zero in the case of perfect ground. </td></tr>
-    <tr><td class="paramname">sig</td><td>Conductivity in mhos/meter of the ground in the vicinity of the antenna. Use zero in the case of a perfect ground. If SIG is input as a negative number, the complex dielectric constant Ec = Er -j sigma/omaga epslon is set to EPSR - |SIG|. </td></tr>
+    <tr><td class="paramname">sig</td><td>Conductivity in mhos/meter of the ground in the vicinity of the antenna. Use zero in the case of a perfect ground. If SIG is input as a negative number, the complex dielectric constant Ec = Er -j sigma/omaga epslon is set to EPSR - |SIG|.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1147,10 +1225,11 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
 </dl>
 <dl class="section remark"><dt>Remarks</dt><dd>Any combination of reflections along the X, Y and Z axes may be used. For example, 101 for (I2) will cause reflection along axes X and Z, and 111 will cause reflection along axes X, Y and Z. When combinations of reflections are requested, the reflections are done in reverse alphabetical order. That is, if a structure is generated in a single octant of space and a GX card is then read with I2 equal to 111, the structure is first reflected along the Z-axis; the structure and its image are then reflected along the Y-axis; and, finally, these four structures are reflected along the X-axis to fill all octants. This order determines the position of a segment in the sequence and, hence, the absolute segment numbers.</dd>
 <dd>
-The tag increment I1 is used to avoid duplication of tag numbers in the image segments. All valid tags on the original structure are incremented by I1 on the image. When combinations of reflections are employed, the tag increment is doubled after each reflection. Thus, a tag increment greater than or equal to the largest tag an the original structure will ensure that no duplicate tags are generated. For example, if tags from 1 to 100 are used on the original structure with I2 equal to 011 and a tag increment of 100, the first reflection, along the Z-axis, will produce tags from 101 to 200; and the second reflection, along the Y-axis, will produce tags from 201 to 400, as a result of the increment being doubled to 200. </dd></dl>
+The tag increment I1 is used to avoid duplication of tag numbers in the image segments. All valid tags on the original structure are incremented by I1 on the image. When combinations of reflections are employed, the tag increment is doubled after each reflection. Thus, a tag increment greater than or equal to the largest tag an the original structure will ensure that no duplicate tags are generated. For example, if tags from 1 to 100 are used on the original structure with I2 equal to 011 and a tag increment of 100, the first reflection, along the Z-axis, will produce tags from 101 to 200; and the second reflection, along the Y-axis, will produce tags from 201 to 400, as a result of the increment being doubled to 200.</dd></dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1224,7 +1303,14 @@ The tag increment I1 is used to avoid duplication of tag numbers in the image se
     <tr><td class="paramname">ldtyp</td><td>Type of loading (5 = segment conductivity) </td></tr>
     <tr><td class="paramname">ldtag</td><td>Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments) </td></tr>
     <tr><td class="paramname">ldtagf</td><td>Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. If both LDTAG and LDTAGF are zero, all segments will be loaded. </td></tr>
-    <tr><td class="paramname">ldtagt</td><td>Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous parameter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF). </td></tr>
+    <tr><td class="paramname">ldtagt</td><td>Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified in the parameter LDTAG. This parameter must be greater than or equal to the previous parameter. The loading specified is applied to each of the mth through nth segments of the set of segments having tags equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1290,7 +1376,14 @@ The tag increment I1 is used to avoid duplication of tag numbers in the image se
 </td></tr>
     <tr><td class="paramname">IPTAG</td><td>- Tag number of the segments for which currents will be printed.</td></tr>
     <tr><td class="paramname">IPTAGF</td><td>- Equal to m, specifies the mth segment of the set of segments having the tag numbers of IPTAG, at which printing of currents starts. If IPTAG is zero or blank, then IPTAGF refers to an absolute segment number. If IPTAGF is blank, the current is printed for all segments.</td></tr>
-    <tr><td class="paramname">IPTAGT</td><td>- Equal to n specifies the nth segment of the set of segments having tag numbers of IPTAG. Currents are printed for segments having tag number IPTAG starting at the m th segment in the set and ending at the nth segment. If IPTAG is zero or blank, then IPTAGF and IPTAGT refer to absoulte segment numbers. In IPTAGT is left blank, it is set to IPTAGF. </td></tr>
+    <tr><td class="paramname">IPTAGT</td><td>- Equal to n specifies the nth segment of the set of segments having tag numbers of IPTAG. Currents are printed for segments having tag number IPTAG starting at the m th segment in the set and ending at the nth segment. If IPTAG is zero or blank, then IPTAGF and IPTAGT refer to absoulte segment numbers. In IPTAGT is left blank, it is set to IPTAGF.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1444,6 +1537,13 @@ The tag increment I1 is used to avoid duplication of tag numbers in the image se
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section remark"><dt>Remarks</dt><dd>The field point is specified in spherical coordinates (R, sigma, theta), except when the surface wave is computed. For computing the surface wave field (calc_mode = l), cylindrical coordinates (phi, theta, z) are used to accurately define points near the ground plane at large radial distances.</dd>
 <dd>
 The rp_card() function allows automatic stepping of the field point to compute the field over a region about the antenna at uniformly spaced points. </dd>
@@ -1535,13 +1635,14 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
   </table>
   </dd>
 </dl>
-<dl class="section remark"><dt>Remarks</dt><dd>All co-ordinates are in meters. </dd></dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section remark"><dt>Remarks</dt><dd>All co-ordinates are in meters. </dd></dl>
 
 </div>
 </div>
@@ -1625,13 +1726,14 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
   </table>
   </dd>
 </dl>
-<dl class="section remark"><dt>Remarks</dt><dd>All co-ordinates are in meters, except for arbitrary patches where the angles are in degrees </dd></dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section remark"><dt>Remarks</dt><dd>All co-ordinates are in meters, except for arbitrary patches where the angles are in degrees </dd></dl>
 
 </div>
 </div>
@@ -1737,9 +1839,10 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
   </table>
   </dd>
 </dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
-    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. </td></tr>
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1780,7 +1883,14 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
 <p>Purpose: To cause program execution at points in the data stream where execution is not automatic. Options on the card also allow for automatic generation of radiation patterns in either of two vertical cuts. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">in_context</td><td>The <a class="el" href="classnec__context.html" title="Container for an nec2++ simulation. ">nec_context</a> created with <a class="el" href="libnecpp_8h.html#a03d9347b31b3558fb40130e490314ae0" title="Create an nec_context and initialize it. ">nec_create()</a> </td></tr>
-    <tr><td class="paramname">itmp1</td><td>Options controlled by (I1) are: 0 - no patterns requested (normal case). 1 - generates a pattern cut in the XZ plane, i.e., phi = 0 degrees and theta varies from 0 degrees to 90 degrees in 1 degree steps. 2 - generates a pattern cut in the YZ plane, i.e., phi = 90 degrees theta varies from 0 degrees to 90 degrees in 1 degree steps. 3 - generates both of the cuts described for the values 1 and 2. </td></tr>
+    <tr><td class="paramname">itmp1</td><td>Options controlled by (I1) are: 0 - no patterns requested (normal case). 1 - generates a pattern cut in the XZ plane, i.e., phi = 0 degrees and theta varies from 0 degrees to 90 degrees in 1 degree steps. 2 - generates a pattern cut in the YZ plane, i.e., phi = 90 degrees theta varies from 0 degrees to 90 degrees in 1 degree steps. 3 - generates both of the cuts described for the values 1 and 2.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1792,7 +1902,7 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2015 11:25:01 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2015 11:50:37 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
