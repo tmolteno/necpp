@@ -42,6 +42,10 @@ typedef struct nec_context nec_context;
 extern "C" {
 #endif
 
+/** @class error_return
+  * @par Example:
+  * \retval err \c 0 indicates that the result is successful and \c 1 indicates that an error occurred. Call nec_error_message() for a detailed message.
+*/
 
 /** @name Initialization and Cleanup
  * Functions dealing with antenna simulation contexts. The contexts should be created before
@@ -51,12 +55,13 @@ extern "C" {
 ///@{
 
 /*! \brief Create an nec_context and initialize it.
-
-\par Note: Do NOT delete or free the nec_context yourself, rather call nec_delete() to free memory associated with the nec simulation.
-*/
+ * \retval context* An nec_context pointer.
+ * \par Note: Do NOT delete or free the nec_context yourself, rather call nec_delete() to free memory associated with the nec simulation.
+ */
 nec_context* nec_create(void);
 
 /*!\brief Delete an nec_context object. 
+ * @copydoc error_return
  */
 long nec_delete(nec_context* in_context);
 
@@ -84,6 +89,7 @@ long nec_delete(nec_context* in_context);
     \param rdel For tapered wires, the. Otherwise set to 1.0
     \param rrad For tapered wires, the. Otherwise set to 1.0
     
+    \copydoc error_return
     \remark All co-ordinates are in meters.
 */
 long nec_wire(nec_context* in_context, int tag_id, int segment_count,
@@ -105,7 +111,7 @@ long nec_wire(nec_context* in_context, int tag_id, int segment_count,
     \param x2 The x coordinate of patch corner2.
     \param y2 The y coordinate of patch corner2.
     \param z2 The z coordinate of patch corner2.
-    
+    \copydoc error_return
     \remark All co-ordinates are in meters, except for arbitrary patches where the angles are in degrees
 */
 long nec_sp_card(nec_context* in_context, int ns,
@@ -121,7 +127,7 @@ long nec_sp_card(nec_context* in_context, int ns,
     \param x4 The x coordinate of patch corner 4.
     \param y4 The y coordinate of patch corner 4.
     \param z4 The z coordinate of patch corner 4.
-    
+    \copydoc error_return
     \remark All co-ordinates are in meters.
 */
 long nec_sc_card(nec_context* in_context, int i2,
@@ -144,6 +150,7 @@ long nec_sc_card(nec_context* in_context, int i2,
  *             until a segment having a tag of this segment through the end of
  *             the sequence of segments is moved by the card.  If ITS is zero 
  *             the entire structure is moved.
+ *   \copydoc error_return
 **/
 long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
                  double rox, double roy, double roz, double xs,
@@ -179,6 +186,7 @@ long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
    a tag increment of 100, the first reflection, along the Z-axis, will produce tags 
    from 101 to 200; and the second reflection, along the Y-axis, will produce tags 
    from 201 to 400, as a result of the increment being doubled to 200. 
+    \copydoc error_return
  */
 long nec_gx_card(nec_context* in_context, int i1, int i2);
 
@@ -190,7 +198,7 @@ long nec_gx_card(nec_context* in_context, int i1, int i2);
  *    \arg \c 1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
  *    \arg \c -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
  * \param card_int_2 Unused (set to zero)
- * \retval err \c 0 indicates that the result is successful and \c 1 indicates that an error occurred.
+    \copydoc error_return
  **/
 long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
 
@@ -203,6 +211,7 @@ long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
 ///@{
 
 /*!\brief Benchmark the libnecpp engine. A score of 1 is roughly an Athlon XP 1800. 
+    \copydoc error_return
  */
 long nec_benchmark(void);
 
@@ -240,6 +249,7 @@ const char* nec_error_message(void);
   
   \param epse Relative dielectric constant for ground in the vicinity of the antenna. Zero in the case of perfect ground.
   \param sig Conductivity in mhos/meter of the ground in the vicinity of the antenna. Use zero in the case of a perfect ground. If SIG is input as a negative number, the complex dielectric constant Ec = Er -j sigma/omaga epslon is set to EPSR - |SIG|. 
+    \copydoc error_return
 */
 long nec_gn_card(nec_context* in_context, int iperf, int nradl, double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6);
 
@@ -249,6 +259,7 @@ long nec_gn_card(nec_context* in_context, int iperf, int nradl, double epse, dou
  * \param in_nfrq The number of frequencies
  * \param in_freq_mhz The starting frequency in MHz.
  * \param in_del_freq The frequency step (in MHz for ifrq = 0)
+ * \copydoc error_return
  */
 long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq);
 
@@ -256,101 +267,107 @@ long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_fr
  * \param itmp1 
  * \arg \c -1 Return to normal kernel
  * \arg \c 0 Use Extended thin wire kernel
- * */
+ * \copydoc error_return
+ */
 long nec_ek_card(nec_context* in_context, int itmp1);
 
 
 /*! \brief LD card (Loading)
-* \param in_context The nec_context created with nec_create()
-* \param ldtyp Type of loading (5 = segment conductivity)
-* \param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
-* \param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number 
-* specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. 
-* If both LDTAG and LDTAGF are zero, all segments will be loaded. 
-* \param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified 
-* in the parameter LDTAG. This parameter must be greater than or equal to the previous parameter. 
-* The loading specified is applied to each of the mth through nth segments of the set of segments having tags 
-* equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. 
-* If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
-* \remark Floating Point Input for the Various Load Types:
-*/
+  * \param in_context The nec_context created with nec_create()
+  * \param ldtyp Type of loading (5 = segment conductivity)
+  * \param ldtag Tag (zero for absolute segment numbers, or in conjunction with 0 for next parameter, for all segments)
+  * \param ldtagf Equal to m specifies the mth segment of the set of segments whose tag numbers equal the tag number 
+  * specified in the previous parameter. If the previous parameter (LDTAG) is zero, LDTAGF then specifies an absolute segment number. 
+  * If both LDTAG and LDTAGF are zero, all segments will be loaded. 
+  * \param ldtagt Equal to n specifies the nth segment of the set of segments whose tag numbers equal the tag number specified 
+  * in the parameter LDTAG. This parameter must be greater than or equal to the previous parameter. 
+  * The loading specified is applied to each of the mth through nth segments of the set of segments having tags 
+  * equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. 
+  * If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
+  * \copydoc error_return
+  * \remark Floating Point Input for the Various Load Types:
+  */
 long nec_ld_card(nec_context* in_context, int ldtyp, int ldtag, int ldtagf, int ldtagt, double tmp1, double tmp2, double tmp3);
 
 
 /*! \brief EX card (Excitation)
-* \param in_context The nec_context created with nec_create()
-* \param extype Type of excitation
-*   \arg \c O - voltage source (applied-E-field source). 
-*   \arg \c 1 - incident plane wave, linear polarization. 
-*   \arg \c 2 - incident plane wave, right-hand (thumb along the incident k vector) elliptic polarization. 
-*   \arg \c 3 - incident plane wave, left-hand elliptic polarization. 
-*   \arg \c 4 - elementary current source. 
-*   \arg \c 5 - voltage source (current-slope-discontinuity). 
-* \param i2 Tag number the source segment. This tag number along with the number to be given in (i3), 
-*        which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. 
-*   \arg \c O - Blank or zero in field (i2) implies that the Source segment will be identified by using the absolute segment 
-*        number in the next field (i3). 
-* \param i3 Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number 
-*        set by the previous parameter. If the previous parameter is zero, the number in (i3) must be the absolute 
-*        segment number of the source. 
-* \param i4 Meaning Depends on the extype parameter. See http://www.nec2.org/part_3/cards/ex.html
-* 
-* \remark Simpler versions of the function are provided for common uses. These are nec_voltage_excitation, 
-*         nec_current_excitation and nec_planewave_excitation.
-* \remark The meaning of the floating point parameter depends on the excitation type. See http://www.nec2.org/part_3/cards/ex.html for
-*         more details.
-*/
-long nec_ex_card(nec_context* in_context, int extype, int i2, int i3, int i4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
+  * \param in_context The nec_context created with nec_create()
+  * \param extype Type of excitation
+  *   \arg \c O - voltage source (applied-E-field source). 
+  *   \arg \c 1 - incident plane wave, linear polarization. 
+  *   \arg \c 2 - incident plane wave, right-hand (thumb along the incident k vector) elliptic polarization. 
+  *   \arg \c 3 - incident plane wave, left-hand elliptic polarization. 
+  *   \arg \c 4 - elementary current source. 
+  *   \arg \c 5 - voltage source (current-slope-discontinuity). 
+  * \param i2 Tag number the source segment. This tag number along with the number to be given in (i3), 
+  *        which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. 
+  *   \arg \c O - Blank or zero in field (i2) implies that the Source segment will be identified by using the absolute segment 
+  *        number in the next field (i3). 
+  * \param i3 Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number 
+  *        set by the previous parameter. If the previous parameter is zero, the number in (i3) must be the absolute 
+  *        segment number of the source. 
+  * \param i4 Meaning Depends on the extype parameter. See http://www.nec2.org/part_3/cards/ex.html
+  * 
+  * \copydoc error_return
+  * \remark Simpler versions of the function are provided for common uses. These are nec_voltage_excitation, 
+  *         nec_current_excitation and nec_planewave_excitation.
+  * \remark The meaning of the floating point parameter depends on the excitation type. See http://www.nec2.org/part_3/cards/ex.html for
+  *         more details.
+  */
+  long nec_ex_card(nec_context* in_context, int extype, int i2, int i3, int i4, double tmp1, double tmp2, double tmp3, double tmp4, double tmp5, double tmp6);
 
-/*! \brief Voltage Source Excitation. 
-* \param in_context The nec_context created with nec_create()
-* \param tag Tag number of the source segment. This tag number along with the number to be given in (segment), 
-*        which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. 
-*   \arg \c O - Blank or zero in field (tag) implies that the Source segment will be identified by using the absolute segment 
-*        number in the next field (segment). 
-* \param segment Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number 
-*        set by the previous parameter. If the previous parameter is zero, the number in (segment) must be the absolute 
-*        segment number of the source. 
-* \param v_real real part of the voltage excitation (Volts)
-* \param v_imag imaginary part of the voltage excitation (Volts)
-* 
-* \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
-* Also plane-wave or current-source excitation is not allowed with voltage sources. 
-* If the excitation types are mixed, the program will use the last excitation type encountered. 
-*/
+  /*! \brief Voltage Source Excitation. 
+  * \param in_context The nec_context created with nec_create()
+  * \param tag Tag number of the source segment. This tag number along with the number to be given in (segment), 
+  *        which identifies the position of the segment in a set of equal tag numbers, uniquely definer the source segment. 
+  *   \arg \c O - Blank or zero in field (tag) implies that the Source segment will be identified by using the absolute segment 
+  *        number in the next field (segment). 
+  * \param segment Equal to m, specifies the mth segment of the set of segments whose tag numbers are equal to the number 
+  *        set by the previous parameter. If the previous parameter is zero, the number in (segment) must be the absolute 
+  *        segment number of the source. 
+  * \param v_real real part of the voltage excitation (Volts)
+  * \param v_imag imaginary part of the voltage excitation (Volts)
+  * 
+  * \copydoc error_return
+  * \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
+  * Also plane-wave or current-source excitation is not allowed with voltage sources. 
+  * If the excitation types are mixed, the program will use the last excitation type encountered. 
+  */
 long nec_excitation_voltage(nec_context* in_context, int tag, int segment, double v_real, double v_imag);
 
 /*! \brief Current Source Excitation. 
-* \param in_context The nec_context created with nec_create()
-* \param x - X position in meters. 
-* \param y - Y position in meters. 
-* \param z - Z position in meters. 
-* \param a - a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. 
-* \param beta - beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. 
-* \param moment - "Current moment" of the source. This parameter is equal to the product Il in amp meters.
-* 
-* \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
-* Also plane-wave or current-source excitation is not allowed with voltage sources. 
-* If the excitation types are mixed, the program will use the last excitation type encountered. 
-*/
+  * \param in_context The nec_context created with nec_create()
+  * \param x - X position in meters. 
+  * \param y - Y position in meters. 
+  * \param z - Z position in meters. 
+  * \param a - a in degrees. a is the angle the current source makes with the XY plane as illustrated on figure 15. 
+  * \param beta - beta in degrees. beta is the angle the projection of the current source on the XY plane makes with the X axis. 
+  * \param moment - "Current moment" of the source. This parameter is equal to the product Il in amp meters.
+  * 
+  * \copydoc error_return
+  * \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
+  * Also plane-wave or current-source excitation is not allowed with voltage sources. 
+  * If the excitation types are mixed, the program will use the last excitation type encountered. 
+  */
 long nec_excitation_current(nec_context* in_context, double x, double y, double z, double a, double beta, double moment);
 
 /*! \brief Planewave Excitation (Linear Polarization)
-* \param in_context The nec_context created with nec_create()
-* \param n_theta - Number of theta angles desired for the incident plane wave . 
-* \param n_phi - Number of phi angles desired for the incident plane wave. 
-* \param theta - Theta in degrees. Theta 19 defined in standard spherical coordinates as illustrated
-* \param phi - Phi in degrees. Phi is the standard spherical angle defined lned in the XY plane. 
-* \param eta - Eta in degrees. Eta is the polarization angle defined as the angle between the theta unit vector and the direction
-*              of the electric field for linear polarization or the major ellipse axis for elliptical polarization. 
-* \param dtheta - Theta angle stepping increment in degrees. 
-* \param dphi - Phi angle stepping increment in degrees. 
-* \param pol_ratio - Ratio of minor axis to major axis for elliptic polarization (major axis field strength - 1 V/m). 
-* 
-* \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
-* Also plane-wave or current-source excitation is not allowed with voltage sources. 
-* If the excitation types are mixed, the program will use the last excitation type encountered. 
-*/
+  * \param in_context The nec_context created with nec_create()
+  * \param n_theta - Number of theta angles desired for the incident plane wave . 
+  * \param n_phi - Number of phi angles desired for the incident plane wave. 
+  * \param theta - Theta in degrees. Theta 19 defined in standard spherical coordinates as illustrated
+  * \param phi - Phi in degrees. Phi is the standard spherical angle defined lned in the XY plane. 
+  * \param eta - Eta in degrees. Eta is the polarization angle defined as the angle between the theta unit vector and the direction
+  *              of the electric field for linear polarization or the major ellipse axis for elliptical polarization. 
+  * \param dtheta - Theta angle stepping increment in degrees. 
+  * \param dphi - Phi angle stepping increment in degrees. 
+  * \param pol_ratio - Ratio of minor axis to major axis for elliptic polarization (major axis field strength - 1 V/m). 
+  * \copydoc error_return
+  * 
+  * \remark Only one incident plane wave or one elementary current source is al- lowed at a time. 
+  * Also plane-wave or current-source excitation is not allowed with voltage sources. 
+  * If the excitation types are mixed, the program will use the last excitation type encountered. 
+  */
 long nec_excitation_planewave(nec_context* in_context, int n_theta, int n_phi, 
                               double theta, double phi, double eta, double dtheta, double dphi, double pol_ratio);
 
@@ -371,6 +388,7 @@ long nec_nt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int i
  *            2 - generates a pattern cut in the YZ plane, i.e., phi = 90 degrees
  *                theta varies from 0 degrees to 90 degrees in 1 degree steps.
  *            3 - generates both of the cuts described for the values 1 and 2.
+ * \copydoc error_return
  **/
 long nec_xq_card(nec_context* in_context, int itmp1);
 
@@ -434,6 +452,7 @@ long nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3,
 
   \param gain_norm - Determines the gain normalization factor if normalization has been requested in the normalization parameter. If gain_norm is zero, the gain will be normalized to its maximum value. If gain_norm is not zero, the gain wi11 be normalized to the value of gain_norm.
 
+  \copydoc error_return
   \remark
   The field point is specified in spherical coordinates (R, sigma, theta), except when the surface wave is computed. For computing the surface wave field (calc_mode = l), cylindrical coordinates (phi, theta, z) are used to accurately define points near the ground plane at large radial distances.
             
@@ -468,6 +487,7 @@ long nec_rp_card(nec_context* in_context,
     \param IPTAGF - Equal to m, specifies the mth segment of the set of segments having the tag numbers of IPTAG, at which printing of currents starts. If IPTAG is zero or blank, then IPTAGF refers to an absolute segment number. If IPTAGF is blank, the current is printed for all segments.
 
     \param IPTAGT - Equal to n specifies the nth segment of the set of segments having tag numbers of IPTAG. Currents are printed for segments having tag number IPTAG starting at the m th segment in the set and ending at the nth segment. If IPTAG is zero or blank, then IPTAGF and IPTAGT refer to absoulte segment numbers. In IPTAGT is left blank, it is set to IPTAGF.
+    \copydoc error_return
  */
 long nec_pt_card(nec_context* in_context, int itmp1, int itmp2, int itmp3, int itmp4);
 
