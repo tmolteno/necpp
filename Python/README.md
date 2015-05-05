@@ -42,8 +42,8 @@ module from a python interpreter :
 
 from PyNEC import * 
 
-Warning : to use PyNEC one must have the numarray module installed
-(http://www.stsci.edu/resources/software_hardware/numarray). The version used
+Warning : to use PyNEC one must have the numpy module installed
+(http://www.stsci.edu/resources/software_hardware/numpy). The version used
 for the tests is ver 1.3.3.
 
 Then you can start using the module.

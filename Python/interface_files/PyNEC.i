@@ -5,7 +5,7 @@
 
 %{
 #include "Python.h"
-#include "numarray/libnumarray.h"
+#include "numpy/libnumarray.h"
 #include "math_util.h"
 #include "nec_context.h"
 #include "c_geometry.h"
@@ -43,19 +43,19 @@
 %typemap (python, out) real_array {
 	int nd = 1;
 	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tFloat64, nd, size));
+	$result =(PyObject *)(NA_NewArray((void *)($1.data()), tFloat64, nd, size));
 }
 
 %typemap (python, out) int_array {
 	int nd = 1;
 	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tLong, nd, size));
+	$result =(PyObject *)(NA_NewArray((void *)($1.data()), tLong, nd, size));
 }
 
 %typemap (python, out) complex_array {
 	int nd = 1;
 	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tComplex64, nd, size));
+	$result =(PyObject *)(NA_NewArray((void *)($1.data()), tComplex64, nd, size));
 }
 
 %typemap (python, out) vector<nec_float> {
