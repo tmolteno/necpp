@@ -1,19 +1,19 @@
 /*
-	Copyright (C) 2004-2008, 2015  Timothy C.A. Molteno
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004-2008, 2015  Timothy C.A. Molteno
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #ifndef __nec_results__
 #define __nec_results__
@@ -213,67 +213,59 @@ public:
 
 /*!\brief Used to specify the kind of results we wish to pull out of the results database.
 */
-enum nec_result_type
-{
-	RESULT_NORMALIZED_RECEIVING_PATTERN = 1,
-	RESULT_STRUCTURE_EXCITATION = 2,
-	RESULT_ANTENNA_INPUT = 3,
-	RESULT_RADIATION_PATTERN = 4,
-	RESULT_NEAR_FIELD_PATTERN = 5,
-	RESULT_STRUCTURE_CURRENTS = 6
+enum nec_result_type {
+  RESULT_NORMALIZED_RECEIVING_PATTERN = 1,
+  RESULT_STRUCTURE_EXCITATION = 2,
+  RESULT_ANTENNA_INPUT = 3,
+  RESULT_RADIATION_PATTERN = 4,
+  RESULT_NEAR_FIELD_PATTERN = 5,
+  RESULT_STRUCTURE_CURRENTS = 6
 };
 
 /**
-	This class contains the results of the NEC analysis. Set methods
-	will store the results in this class, but will NOT print the results
-	to a file
+  This class contains the results of the NEC analysis. Set methods
+  will store the results in this class, but will NOT print the results
+  to a file
 */
-class nec_base_result
-{
+class nec_base_result {
 private:
-	bool _write_file;
-	nec_float _frequency;
-		
+  bool _write_file;
+  nec_float _frequency;
+          
 protected:
-	enum RESULT_FORMAT _result_format;
-	
+  enum RESULT_FORMAT _result_format;
+  
 public:
-	virtual void write_to_file(ostream& os) = 0;
-	virtual enum nec_result_type get_result_type() = 0;
-	
-	nec_base_result()
-		: _write_file(true), _result_format(RESULT_FORMAT_NEC)
-	{
-	}
-	
-	virtual ~nec_base_result()
-	{
-	}
+  virtual void write_to_file(ostream& os) = 0;
+  virtual enum nec_result_type get_result_type() = 0;
+  
+  nec_base_result()
+          : _write_file(true), _result_format(RESULT_FORMAT_NEC)
+  {
+  }
+  
+  virtual ~nec_base_result()  {
+  }
 
-	inline bool write_file() const
-	{
-		return _write_file;
-	}
-	
-	inline void set_write_file(bool f)
-	{
-		_write_file = f;
-	}
-	
-	inline void set_frequency(nec_float f)
-	{
-		_frequency = f;
-	}
-	
-	nec_float get_frequency()
-	{
-		return _frequency;
-	}
-	
-	inline void set_result_format(enum RESULT_FORMAT f)
-	{
-		_result_format = f;
-	}
+  inline bool write_file() const  {
+    return _write_file;
+  }
+  
+  inline void set_write_file(bool f)  {
+    _write_file = f;
+  }
+  
+  inline void set_frequency(nec_float f)  {
+    _frequency = f;
+  }
+  
+  nec_float get_frequency()  {
+    return _frequency;
+  }
+  
+  inline void set_result_format(enum RESULT_FORMAT f)  {
+    _result_format = f;
+  }
 };
 
 
@@ -281,177 +273,158 @@ public:
 */
 class nec_norm_rx_pattern : public nec_base_result
 {
-	// Receiving Pattern
-	nec_float _eta, _axial_ratio;
-	int _segment_number;
-	string _type;
-	
-	long n_theta;
-	long n_phi;
-	nec_float _theta0, _theta_step;
-	nec_float _phi0, _phi_step;
-	
-	real_array _mag;
-	
-public:
-	nec_norm_rx_pattern(
-		int in_n_theta, int in_n_phi,
-		real_matrix& in_mag,
-		nec_float theta0, nec_float theta_step,
-		nec_float phi0, nec_float phi_step,
-		nec_float in_eta, 
-		nec_float in_axial_ratio, 
-		int in_segment_number, 
-		string in_type)
-	{
-		n_theta = in_n_theta;
-		n_phi = in_n_phi;
-		
-		_mag = in_mag;
-		_mag.resize(n_theta, n_phi);
-		
-		_theta0 = theta0;
-		_theta_step = theta_step;
-		
-		_phi0 = phi0;
-		_phi_step = phi_step;
-		
-		_eta = in_eta;
-		_axial_ratio = in_axial_ratio;
-		_segment_number = in_segment_number;
-		_type = in_type;
-		
-		_mag.resize(n_theta, n_phi);
-	}
+  // Receiving Pattern
+  nec_float _eta, _axial_ratio;
+  int _segment_number;
+  string _type;
+  
+  long n_theta;
+  long n_phi;
+  nec_float _theta0, _theta_step;
+  nec_float _phi0, _phi_step;
+  
+  real_array _mag;
 
-	virtual ~nec_norm_rx_pattern()
-	{
-	}
-	
-	virtual enum nec_result_type get_result_type()
-	{
-		return RESULT_NORMALIZED_RECEIVING_PATTERN;
-	}
-			
-	void set_input(int theta_index, int phi_index, nec_float mag)
-	{
-		_mag(theta_index,phi_index) = mag;
-	}
-	
-	
-	/*Added for the python wrapping : some basic access functions...*/
-	
-	int get_n_theta()
-	{
-		return n_theta	;
-	}
-	
-	int get_n_phi()
-	{
-		return n_phi	;
-	}
-	
-	nec_float get_theta_start()
-	{
-		return _theta0;
-	}
-	
-	nec_float get_phi_start()
-	{
-		return _phi0;
-	}
-	
-	nec_float get_delta_theta()
-	{
-		return _theta_step;
-	}
-	
-	nec_float get_delta_phi()
-	{
-		return _phi_step;
-	}
-	
-	nec_float get_eta()
-	{
-		return _eta;
-	}
-	
-	nec_float get_axial_ratio()
-	{
-		return _axial_ratio;
-	}
-	
-	int get_segment_number()
-	{
-		return _segment_number;
-	}
-	
-	string get_type()
-	{
-		return _type;
-	}
-	
-	real_array get_mag()
-	{
-		return _mag;
-	}
-	
-	/*End of access functions added for the wrapping*/
-	
-	nec_float get_mag(int theta_index, int phi_index)
-	{
-		return _mag(theta_index, phi_index);
-	}
-	
-	nec_float get_norm_factor()
-	{
-		return _mag.maxCoeff();
-	}
-	
-	virtual void write_to_file(ostream& os)
-	{
-		if (n_theta == 0)
-			return;
-		if (n_phi == 0)
-			return;
-			
-		nec_float norm_factor = get_norm_factor();
-		
-		output_helper oh(os,_result_format);
-		
-		oh.section_start("NORMALIZED RECEIVING PATTERN");
-		os << "                      NORMALIZATION FACTOR: ";oh.real_out(11,4,norm_factor);os << endl;
-		os << "                      ETA: ";oh.real_out(7,2,_eta,false); os << " DEGREES" << endl;
-		os << "                      TYPE: " << _type << endl;
-		os << "                      AXIAL RATIO: "; oh.real_out(6,3,_axial_ratio,false); os << endl;
-		os << "                      SEGMENT No: ";oh.int_out( 5, _segment_number); os << endl << endl;
-		os << "                      THETA     PHI       ---- PATTERN ----" << endl;
-		os << "                      (DEG)    (DEG)       DB     MAGNITUDE" << endl;
-		
-		nec_float theta = _theta0;
-		
-		for (int t=0; t<n_theta; t++)
-		{
-			nec_float phi = _phi0;
-			
-			for (int p=0; p<n_phi;p++)
-			{
-				nec_float magnitude = _mag(t,p) / norm_factor;
-				nec_float gain = db20(magnitude);
-				
-				oh.start_record();
-				oh.padding("                    ");
-				oh.real_out(7,2, theta, false);	oh.separator();
-				oh.real_out(7,2, phi, false);	oh.separator();
-				oh.padding("  "); oh.real_out(7,2, gain, false);	oh.separator();
-				oh.padding("  "); oh.real_out(11,4, magnitude);
-				oh.end_record();
-				
-				phi += _phi_step;
-			}
-			theta += _theta_step;
-		}
-	}
+public:
+  nec_norm_rx_pattern(
+          int in_n_theta, int in_n_phi,
+          real_matrix& in_mag,
+          nec_float theta0, nec_float theta_step,
+          nec_float phi0, nec_float phi_step,
+          nec_float in_eta, 
+          nec_float in_axial_ratio, 
+          int in_segment_number, 
+          string in_type)
+  {
+    n_theta = in_n_theta;
+    n_phi = in_n_phi;
+    
+    _mag = in_mag;
+    _mag.resize(n_theta, n_phi);
+    
+    _theta0 = theta0;
+    _theta_step = theta_step;
+    
+    _phi0 = phi0;
+    _phi_step = phi_step;
+    
+    _eta = in_eta;
+    _axial_ratio = in_axial_ratio;
+    _segment_number = in_segment_number;
+    _type = in_type;
+    
+    _mag.resize(n_theta, n_phi);
+  }
+
+  virtual ~nec_norm_rx_pattern()  {
+  }
+  
+  virtual enum nec_result_type get_result_type()  {
+    return RESULT_NORMALIZED_RECEIVING_PATTERN;
+  }
+                  
+  void set_input(int theta_index, int phi_index, nec_float mag)  {
+    _mag(theta_index,phi_index) = mag;
+  }
+  
+  
+  /*Added for the python wrapping : some basic access functions...*/
+  
+  int get_n_theta()  {
+    return n_theta;
+  }
+  
+  int get_n_phi()  {
+    return n_phi;
+  }
+  
+  nec_float get_theta_start()  {
+    return _theta0;
+  }
+  
+  nec_float get_phi_start()  {
+    return _phi0;
+  }
+  
+  nec_float get_delta_theta()  {
+    return _theta_step;
+  }
+  
+  nec_float get_delta_phi()  {
+    return _phi_step;
+  }
+  
+  nec_float get_eta()  {
+    return _eta;
+  }
+  
+  nec_float get_axial_ratio()  {
+    return _axial_ratio;
+  }
+  
+  int get_segment_number()  {
+    return _segment_number;
+  }
+  
+  string get_type()  {
+    return _type;
+  }
+  
+  real_array get_mag()  {
+    return _mag;
+  }
+  
+  /*End of access functions added for the wrapping*/
+  
+  nec_float get_mag(int theta_index, int phi_index)  {
+    return _mag(theta_index, phi_index);
+  }
+  
+  nec_float get_norm_factor()  {
+    return _mag.maxCoeff();
+  }
+  
+  virtual void write_to_file(ostream& os)  {
+    if (n_theta == 0)
+      return;
+    if (n_phi == 0)
+      return;
+            
+    nec_float norm_factor = get_norm_factor();
+    
+    output_helper oh(os,_result_format);
+    
+    oh.section_start("NORMALIZED RECEIVING PATTERN");
+    os << "                      NORMALIZATION FACTOR: ";oh.real_out(11,4,norm_factor);os << endl;
+    os << "                      ETA: ";oh.real_out(7,2,_eta,false); os << " DEGREES" << endl;
+    os << "                      TYPE: " << _type << endl;
+    os << "                      AXIAL RATIO: "; oh.real_out(6,3,_axial_ratio,false); os << endl;
+    os << "                      SEGMENT No: ";oh.int_out( 5, _segment_number); os << endl << endl;
+    os << "                      THETA     PHI       ---- PATTERN ----" << endl;
+    os << "                      (DEG)    (DEG)       DB     MAGNITUDE" << endl;
+    
+    nec_float theta = _theta0;
+    
+    for (int t=0; t<n_theta; t++)  {
+      nec_float phi = _phi0;
+      
+      for (int p=0; p<n_phi;p++)  {
+        nec_float magnitude = _mag(t,p) / norm_factor;
+        nec_float gain = db20(magnitude);
+        
+        oh.start_record();
+        oh.padding("                    ");
+        oh.real_out(7,2, theta, false);	oh.separator();
+        oh.real_out(7,2, phi, false);	oh.separator();
+        oh.padding("  "); oh.real_out(7,2, gain, false);	oh.separator();
+        oh.padding("  "); oh.real_out(11,4, magnitude);
+        oh.end_record();
+        
+        phi += _phi_step;
+      }
+      theta += _theta_step;
+    }
+  }
 };
 
 /* No more used...*/
