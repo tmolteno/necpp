@@ -8,6 +8,7 @@
 *.o
 *.lo
 *.la
+*.trs
 src/nec2++
 src/nec2diff
 src/test_manager
