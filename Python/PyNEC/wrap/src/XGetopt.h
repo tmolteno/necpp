@@ -18,6 +18,6 @@
 extern int optind, opterr;
 extern char *optarg;
 
-int XGetopt(int argc, char *argv[], char *optstring);
+int XGetopt(int argc, char *argv[], const char *optstring);
 
 #endif //XGETOPT_H

@@ -1,6 +1,6 @@
 /***************************************************************************
- *   Copyright (C) 2004 by Tim Molteno,,,                                  *
- *   tim@cyberiad                                                          *
+ *   Copyright (C) 2004-2008 by Tim Molteno                                *
+ *   tim@physics.otago.ac.nz                                               *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 
+//#include "common.h"
 
 class nec_exception
 {
@@ -41,14 +42,9 @@ public:
 		m_message << message << code;
 	}
 	
-	void append(const char* message)
+	template <class T> void append(const T& message)
 	{
 		m_message << message;
-	}
-	
-	void append(const int i)
-	{
-		m_message << i;
 	}
 	
 	std::string get_message()

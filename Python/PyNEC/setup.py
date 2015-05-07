@@ -79,7 +79,7 @@ print('SUCCESS - Python include path found')
 print('\nLooking for the Numpy API path...')
 
 def test_api_path(str):
-	open(os.path.join(str, 'libnumarray.h'), 'rb')
+	open(os.path.join(str, 'arrayobject.h'), 'rb')
 	return 0
 
 def search_api_path(flag):
@@ -111,7 +111,7 @@ def search_api_path(flag):
 			print('The API path provided seems to be correct')
 
 
-numarray_api_path = search_api_path(False)
+numpy_api_path = search_api_path(False)
 print('SUCCESS - Numarray API path found')
 
 #==================================================================================================================================================================================
@@ -207,11 +207,11 @@ if platform == 'linux2' or platform == 'win32' :
 			
 			f.write("\nLDFLAGS=-shared -lstdc++\n") 
 
-			f.write("\nCXXFLAGS=-Wall\n")
+			f.write("\nCXXFLAGS=-Wall -fPIC\n")
 			
-			swigcxxflags = "\nSWIGCXXFLAGS=-c"
+			swigcxxflags = "\nSWIGCXXFLAGS=-c -fPIC"
 			swigcxxflags += " -I"+python_include_path
-			swigcxxflags += " -I"+numarray_api_path
+			swigcxxflags += " -I"+numpy_api_path
 			swigcxxflags += " -I"+python_lib_path
 			swigcxxflags += " -DHAVE_CONFIG_H"
 			f.write(swigcxxflags+"\n")

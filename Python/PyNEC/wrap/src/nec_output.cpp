@@ -46,9 +46,9 @@ void nec_output_file::do_output(const char* str)
 	if (NULL == m_output_fp)
 		return;
 	
-	fprintf(m_output_fp, str);
+	fprintf(m_output_fp, "%s", str);
 	if (m_error_mode)
-		fprintf(stderr,str);
+		fprintf(stderr, "%s", str);
 }
 
 void nec_output_file::endl(int n_lines)
@@ -160,7 +160,7 @@ void nec_output_file::nec_printf(const char* fmt, ...)
 		if (j)
 		{
 			format[j] = '\0';
-			count += fprintf(m_output_fp, format.get_ptr());    /* log it verbatim              */
+			count += fprintf(m_output_fp, "%s", format.data());    /* log it verbatim              */
 			fmt += j;
 		} 
 		else
@@ -180,22 +180,22 @@ void nec_output_file::nec_printf(const char* fmt, ...)
 				case 'd':
 				case 'i':                              /* many use identical actions   */
 					i = va_arg(ap, int);                 /* process the argument         */
-					count += fprintf(m_output_fp, format.get_ptr(), i); /* and log it                 */
+					count += fprintf(m_output_fp, format.data(), i); /* and log it                 */
 					break;
 				case 'o':
 				case 'x':
 				case 'X':
 				case 'u':
 					u = va_arg(ap, unsigned);
-					count += fprintf(m_output_fp, format.get_ptr(), u);
+					count += fprintf(m_output_fp, format.data(), u);
 					break;
 				case 'c':
 					c = (char) va_arg(ap, int);          /* must cast!                   */
-					count += fprintf(m_output_fp, format.get_ptr(), c);
+					count += fprintf(m_output_fp, format.data(), c);
 					break;
 				case 's':
 					s = va_arg(ap, char *);
-					count += fprintf(m_output_fp, format.get_ptr(), s);
+					count += fprintf(m_output_fp, format.data(), s);
 					break;
 				case 'f':
 				case 'e':
@@ -203,11 +203,11 @@ void nec_output_file::nec_printf(const char* fmt, ...)
 				case 'g':
 				case 'G':
 					d = va_arg(ap, double);
-					count += fprintf(m_output_fp, format.get_ptr(), d);
+					count += fprintf(m_output_fp, format.data(), d);
 					break;
 				case 'p':
 					v = va_arg(ap, void *);
-					count += fprintf(m_output_fp, format.get_ptr(), v);
+					count += fprintf(m_output_fp, format.data(), v);
 					break;
 				case 'n':
 					count += fprintf(m_output_fp, "%d", count);

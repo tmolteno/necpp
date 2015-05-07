@@ -4,7 +4,7 @@
 /*
 	Various Useful Electromagnetism Utilities for nec2cpp
 	
-	Copyright (C) 2004  Timothy C.A. Molteno
+	Copyright (C) 2004-2006  Timothy C.A. Molteno
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -29,11 +29,35 @@
 namespace em
 {
 
+class constants
+{
+public:
+	static nec_float permittivity;
+	static nec_float permeability;
+};
+
 // Calculate the power from a voltage and a current.
 inline nec_float power(nec_complex voltage, nec_complex current)
 {
 	return 0.5* real(voltage * conj(current));
 }
+
+// Electromagnetic Constants
+
+inline nec_float permittivity()
+{
+	return constants::permittivity;
+}
+
+inline nec_float permeability()
+{
+	return constants::permeability;
+}
+
+nec_float speed_of_light();
+nec_float impedance();
+nec_float inverse_impedance();
+nec_float impedance_over_2pi();
 
 }
 

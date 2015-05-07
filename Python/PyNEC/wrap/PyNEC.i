@@ -5,7 +5,7 @@
 
 %{
 #include "Python.h"
-#include "libnumarray.h"
+#include "numpy/arrayobject.h"
 #include "src/math_util.h"
 #include "src/nec_context.h"
 #include "src/c_geometry.h"
@@ -38,45 +38,45 @@
     	}	
 }
 
-/*! The following typemaps allow the automatic conversion of vectors and safe_arrays into numarrays */
+/*! The following typemaps allow the automatic conversion of vectors and safe_arrays into numpy arrays */
 
 %typemap (python, out) real_array {
 	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tFloat64, nd, size));
+	npy_intp size = $1.size();
+	$result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_FLOAT64, (void *)($1.data()) ));
 }
 
 %typemap (python, out) int_array {
 	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tInt32, nd, size));
+	npy_intp size = $1.size();
+	$result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_INT32, (void *)($1.data()) ));
 }
 
 %typemap (python, out) complex_array {
 	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tComplex64, nd, size));
+	npy_intp size = $1.size();
+	$result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_COMPLEX64, (void *)($1.data()) ));
 }
 
 %typemap (python, out) vector<nec_float> {
 	vector<double>::pointer ptr = &($1[0]);
 	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)ptr, tFloat64, nd, size));
+	npy_intp size = $1.size();
+	$result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_FLOAT64, (void *)($1.data()) ));
 }
 
 %typemap (python, out) vector<int> {
 	vector<int>::pointer ptr = &($1[0]);
 	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)ptr, tInt32, nd, size));
+	npy_intp size = $1.size();
+	$result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_INT32, (void *)($1.data()) ));
 }
 
 %typemap (python, out) vector<nec_complex> {
 	vector<nec_complex>::pointer ptr = &($1[0]);
 	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)ptr, tComplex64, nd, size));
+	npy_intp size = $1.size();
+	$result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_COMPLEX64, (void *)($1.data()) ));
 }
 
 /*! The two following interface files have only been created to avoid errors during the wrapping process. */
@@ -101,6 +101,6 @@
 /*The function below is added to the init function of the wrapped module.
 It's mandatory to do so before to use the numarray API*/
 %init %{
-import_libnumarray();
+import_array();
 %} 
 

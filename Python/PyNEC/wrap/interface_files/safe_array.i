@@ -3,5 +3,5 @@ class safe_array
 {
 public:
 
-	T* get_ptr() const;			
+	T* data() const;			
 };

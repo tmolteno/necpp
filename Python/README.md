@@ -3,6 +3,10 @@
 This module was contributed by Remi Sassolas. It wraps the C++ interface to nec2++. There is a more recent python module
 that wraps the C-style interface. It is in the directory ../python.
 
+## Prerequisites
+
+    sudo aptitude install python-dev python-numpy swig
+
 ## How one can build it ?
 
 To build it one must have Swig ver 1.3.25 installed

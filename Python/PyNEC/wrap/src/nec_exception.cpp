@@ -18,10 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
- 
+
+#include "safe_array.h"
 #include "nec_exception.h"
 #include "stdarg.h"
-#include "safe_array.h"
 
 using namespace std;
 
@@ -46,7 +46,7 @@ string nec_exception::string_printf(const char* fmt, ...)
 		if (j)
 		{
 			format[j] = '\0';
-			_sstream << format.get_ptr();    /* log it verbatim              */
+			_sstream << format.data();    /* log it verbatim              */
 			fmt += j;
 		} 
 		else

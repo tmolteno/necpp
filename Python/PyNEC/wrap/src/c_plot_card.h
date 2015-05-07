@@ -64,7 +64,7 @@ public:
 	
 	void plot_endl() const;
 	
-	void plot_double(double x) const;
+	void plot_double(nec_float x) const;
 
 	void plot_complex(nec_complex x) const;
 	
@@ -74,16 +74,16 @@ public:
 	
 	void plot_segments(int i,
 		real_array& x, real_array& y, real_array& z, real_array& si,
-		double xw2, double yw2,
+		nec_float xw2, nec_float yw2,
 		real_array& bi, int_array& icon1, int_array& icon2) const;
 		
 	void plot_fields(
 		nec_complex ex, nec_complex ey, nec_complex ez, 
-		double xob, double yob, double zob);
+		nec_float xob, nec_float yob, nec_float zob);
 
-	void plot_patterns(double theta, double phi,
+	void plot_patterns(nec_float theta, nec_float phi,
 		nec_complex e_theta, nec_complex e_phi,
-		double g_vert, double g_horiz, double g_tot);
+		nec_float g_vert, nec_float g_horiz, nec_float g_tot);
 private:
 	int p1, p2, p3, p4;
 	FILE* plot_fp;

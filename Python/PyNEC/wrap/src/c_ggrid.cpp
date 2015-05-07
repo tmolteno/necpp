@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004  Timothy C.A. Molteno
+	Copyright (C) 2004-2008  Timothy C.A. Molteno
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,11 +17,21 @@
 */
 #include "c_ggrid.h"
 #include "common.h"
+#include "electromag.h"
 #include "nec_output.h" // for DEBUG_TRACE()
 
-int    c_ggrid::m_nxa[3] = {11,17,9},    c_ggrid::m_nya[3] = {10,5,8};
-nec_float c_ggrid::m_dxa[3] = {.02,.05,.1}, c_ggrid::m_dya[3] = {.1745329252,.0872664626,.1745329252};
-nec_float c_ggrid::m_xsa[3] = {0.,.2,.2},   c_ggrid::m_ysa[3] = {0.,0.,.3490658504};
+#include <cstdlib>
+
+//#define	CONST4	nec_complex(0.0,em::impedance() / 2.0)
+
+int	c_ggrid::m_nxa[3] = {11,17,9};
+int	c_ggrid::m_nya[3] = {10,5,8};
+
+nec_float c_ggrid::m_dxa[3] = {.02,.05,.1}; 
+nec_float c_ggrid::m_dya[3] = {.1745329252,.0872664626,.1745329252};
+
+nec_float c_ggrid::m_xsa[3] = {0.,.2,.2};
+nec_float c_ggrid::m_ysa[3] = {0.,0.,.3490658504};
 
 /*! \brief interpolate (was intrp) uses bivariate cubic interpolation to obtain the values of 4 functions at the point (x,y).
 */
@@ -49,8 +59,8 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
 	/* as previous point, old values are reused. */
 	if( (ix < ixeg) ||
 		(iy < iyeg) ||
-		(abs(ix- ixs) >= 2) ||
-		(abs(iy- iys) >= 2) ||
+		(std::abs(ix - ixs) >= 2) ||
+		(std::abs(iy - iys) >= 2) ||
 		(skip_recalculation == false) )
 	{
 		/* determine correct grid and grid region */
@@ -192,23 +202,25 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
 	*f4=(( p1* yy+ p2)* yy+ p3)* yy*.16666666670+ fx2;
 }
 
+#include "electromag.h"
 
+/*! was SOMNEC in the original NEC-2 source code
+*/
 void c_ggrid::sommerfeld( nec_float epr, nec_float sig, nec_float freq_mhz )
 {
 	static nec_complex const1_neg = - nec_complex(0.0,4.771341189);
+	static nec_complex CONST4(0.0, em::impedance() / 2.0);
 	
-	nec_float tim, wavelength, tst, dr, dth, r, rk, thet, tfac1, tfac2;
+	nec_float wavelength, dr, dth, r, rk, thet, tfac1, tfac2;
 	nec_complex erv, ezv, erh, eph, cl1, cl2, con;
 	
 	if(sig >= 0.0)
 	{
-		wavelength=CVEL/freq_mhz;
-		m_epscf=nec_complex(epr,-sig*wavelength*59.96);
+		wavelength = em::speed_of_light() / (1.0e6 * freq_mhz);
+		m_epscf = nec_complex(epr,-sig*wavelength*em::impedance_over_2pi());
 	}
 	else
 		m_epscf=nec_complex(epr,sig);
-	
-	secnds(&tst);
 	
 	m_evlcom.m_ck2 = two_pi();
 	m_evlcom.m_ck2sq = m_evlcom.m_ck2*m_evlcom.m_ck2;
@@ -329,17 +341,16 @@ void c_ggrid::sommerfeld( nec_float epr, nec_float sig, nec_float freq_mhz )
 		m_ar1[0+ith*11+220]=erh;
 		m_ar1[0+ith*11+330]=eph;
 	}
-	
-	secnds(&tim);
-	tim -= tst;
 }
 
 
 
 /* fbar is the Sommerfeld attenuation function for numerical distance . */
-nec_complex  fbar( nec_complex p );
-nec_complex  fbar( nec_complex p )
+nec_complex  fbar(const nec_complex& p );
+nec_complex  fbar(const nec_complex& p )
 {
+	static nec_float TOSP = 2.0 / sqrt_pi();
+
 	int minus;
 	nec_float tms, sms;
 	nec_complex z, zs, sum, pow, term, fbar;
@@ -364,7 +375,7 @@ nec_complex  fbar( nec_complex p )
 				break;
 		}
 	
-		fbar=1.-(1.- sum* TOSP)* z* exp( zs)* SP;
+		fbar=1.-(1.- sum* TOSP)* z* exp( zs)* sqrt_pi();
 		return( fbar );
 	
 	} /* if ( abs( z) <= 3.) */
@@ -389,7 +400,7 @@ nec_complex  fbar( nec_complex p )
 	}
 	
 	if ( minus == 1)
-		sum -= 2.* SP* z* exp( z* z);
+		sum -= 2.0 * sqrt_pi() * z* exp( z* z);
 	fbar=- sum;
 	
 	return( fbar );
@@ -401,10 +412,12 @@ nec_complex  fbar( nec_complex p )
 /* current element over a ground plane using formulas of k.a. norton */
 /* (proc. ire, sept., 1937, pp.1203,1236.) */
 
-void gwave( nec_complex *erv, nec_complex *ezv,
-    nec_complex *erh, nec_complex *ezh, nec_complex *eph,
+void gwave(nec_complex& erv, nec_complex& ezv,
+	nec_complex& erh, nec_complex& ezh, nec_complex& eph,
 	c_ground_wave& ground_wave)
 {
+	static nec_complex CONST4(0.0,em::impedance() / 2.0);
+
 	nec_float sppp, sppp2, cppp2, cppp, spp, spp2, cpp2, cpp;
 	nec_complex rk1, rk2, t1, t2, t3, t4, p1, rv;
 	nec_complex omr, w, f, q1, rh, v, g, xr1, xr2;
@@ -451,7 +464,8 @@ void gwave( nec_complex *erv, nec_complex *ezv,
 	x4= ground_wave.u* t2* spp*2.* xr2/ rk2;
 	x5= xr1* t3*(1.-3.* sppp2);
 	x6= xr2* t4*(1.-3.* spp2);
-	*ezv=( x1+ x2+ x3- x4- x5- x6)* (-CONST4);
+	ezv=( x1+ x2+ x3- x4- x5- x6)* (-CONST4);
+
 	x1= sppp* cppp* xr1;
 	x2= rv* spp* cpp* xr2;
 	x3= cpp* omr* ground_wave.u* t2* f* xr2;
@@ -459,22 +473,25 @@ void gwave( nec_complex *erv, nec_complex *ezv,
 	x5=3.* sppp* cppp* t3* xr1;
 	x6= cpp* ground_wave.u* t2* omr* xr2/ rk2*.5;
 	x7=3.* spp* cpp* t4* xr2;
-	*erv=-( x1+ x2- x3+ x4- x5+ x6- x7)* (-CONST4);
-	*ezh=-( x1- x2+ x3- x4- x5- x6+ x7)* (-CONST4);
+	erv=-( x1+ x2- x3+ x4- x5+ x6- x7)* (-CONST4);
+
+	ezh=-( x1- x2+ x3- x4- x5- x6+ x7)* (-CONST4);
+
 	x1= sppp2* xr1;
 	x2= rv* spp2* xr2;
 	x4= ground_wave.u2* t1* omr* f* xr2;
 	x5= t3*(1.-3.* cppp2)* xr1;
 	x6= t4*(1.-3.* cpp2)*(1.- ground_wave.u2*(1.+ rv)- ground_wave.u2* omr* f)* xr2;
 	x7= ground_wave.u2* cpp2* omr*(1.-1./ rk2)*( f*( ground_wave.u2* t1- spp2-1./ rk2)+1./rk2)* xr2;
-	*erh=( x1- x2- x4- x5+ x6+ x7)* (-CONST4);
+	erh=( x1- x2- x4- x5+ x6+ x7)* (-CONST4);
+
 	x1= xr1;
 	x2= rh* xr2;
 	x3=( rh+1.)* g* xr2;
 	x4= t3* xr1;
 	x5= t4*(1.- ground_wave.u2*(1.+ rv)- ground_wave.u2* omr* f)* xr2;
 	x6=.5* ground_wave.u2* omr*( f*( ground_wave.u2* t1- spp2-1./ rk2)+1./ rk2)* xr2/ rk2;
-	*eph=-( x1- x2+ x3- x4+ x5+ x6)* (-CONST4);
+	eph=-( x1- x2+ x3- x4+ x5+ x6)* (-CONST4);
 }
 
 
