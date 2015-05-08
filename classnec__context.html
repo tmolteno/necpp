@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">nec2++
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">1.7.0</span>
    </div>
   </td>
  </tr>
@@ -73,8 +73,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a513d766bc74033f2f5941a59c1fbdef0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a513d766bc74033f2f5941a59c1fbdef0"></a>
 <a class="el" href="classc__geometry.html">c_geometry</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>get_geometry</b> ()</td></tr>
 <tr class="separator:a513d766bc74033f2f5941a59c1fbdef0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4cd6125fc1b7d9e08f32a41d4c27399"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnec__context.html#ae4cd6125fc1b7d9e08f32a41d4c27399">get_gain_max</a> (int freq_index=0)</td></tr>
-<tr class="memdesc:ae4cd6125fc1b7d9e08f32a41d4c27399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum gain in dB.  <a href="#ae4cd6125fc1b7d9e08f32a41d4c27399">More...</a><br /></td></tr>
+<tr class="memitem:aef8f878868e44283937e8a39f6209d51"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classnec__context.html#aef8f878868e44283937e8a39f6209d51">get_gain</a> (int freq_index, int theta_index, int phi_index)</td></tr>
+<tr class="memdesc:aef8f878868e44283937e8a39f6209d51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum gain in dB.  <a href="#aef8f878868e44283937e8a39f6209d51">More...</a><br /></td></tr>
+<tr class="separator:aef8f878868e44283937e8a39f6209d51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4cd6125fc1b7d9e08f32a41d4c27399"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4cd6125fc1b7d9e08f32a41d4c27399"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>get_gain_max</b> (int freq_index=0)</td></tr>
 <tr class="separator:ae4cd6125fc1b7d9e08f32a41d4c27399"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac53a827dae00088be65d52303167d32"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac53a827dae00088be65d52303167d32"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>get_gain_min</b> (int freq_index=0)</td></tr>
@@ -834,7 +837,7 @@ nec_float&#160;</td><td class="memItemRight" valign="bottom"><b>rhks</b></td></t
 <p>Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. </p>
 <p>Benchmark the libnecpp engine. A score of 1.0 is roughly an Athlon XP 1800. </p>
 
-<p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">ex_card()</a>, <a class="el" href="classnec__context.html#a34eee1efd79d8658470fcd400faa1d75">fr_card()</a>, <a class="el" href="classnec__context.html#ac99c8a76e2087387a195692aebb7182c">geometry_complete()</a>, <a class="el" href="classnec__context.html#ae4cd6125fc1b7d9e08f32a41d4c27399">get_gain_max()</a>, <a class="el" href="classnec__context.html#a124bb06c25d9aa47305ae75b53becb59">gn_card()</a>, <a class="el" href="classnec__context.html#a76cd515fd9bcca374e635947ca2c754d">initialize()</a>, <a class="el" href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">ld_card()</a>, <a class="el" href="classnec__context.html#a4e88e938d7f527c287a69c413fe33a3c">pt_card()</a>, <a class="el" href="classnec__context.html#a3824916fca4ec09417908a807478df94">rp_card()</a>, <a class="el" href="classc__geometry.html#a69094733aa436d3ebdee972a9d795eb7">c_geometry::wire()</a>, and <a class="el" href="classnec__context.html#a0bd676db26f9fd11f77c538395d7e544">xq_card()</a>.</p>
+<p>References <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">ex_card()</a>, <a class="el" href="classnec__context.html#a34eee1efd79d8658470fcd400faa1d75">fr_card()</a>, <a class="el" href="classnec__context.html#ac99c8a76e2087387a195692aebb7182c">geometry_complete()</a>, <a class="el" href="classnec__context.html#a124bb06c25d9aa47305ae75b53becb59">gn_card()</a>, <a class="el" href="classnec__context.html#a76cd515fd9bcca374e635947ca2c754d">initialize()</a>, <a class="el" href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">ld_card()</a>, <a class="el" href="classnec__context.html#a4e88e938d7f527c287a69c413fe33a3c">pt_card()</a>, <a class="el" href="classnec__context.html#a3824916fca4ec09417908a807478df94">rp_card()</a>, <a class="el" href="classc__geometry.html#a69094733aa436d3ebdee972a9d795eb7">c_geometry::wire()</a>, and <a class="el" href="classnec__context.html#a0bd676db26f9fd11f77c538395d7e544">xq_card()</a>.</p>
 
 <p>Referenced by <a class="el" href="libnecpp_8h.html#a3d7e57c6016a9694cd788a3a1de45e9f">nec_benchmark()</a>.</p>
 
@@ -1090,7 +1093,7 @@ F2- FREQ INCREMENT, ADD OR MULTIPLY
 
 </div>
 </div>
-<a class="anchor" id="ae4cd6125fc1b7d9e08f32a41d4c27399"></a>
+<a class="anchor" id="aef8f878868e44283937e8a39f6209d51"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -1098,11 +1101,27 @@ F2- FREQ INCREMENT, ADD OR MULTIPLY
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">double nec_context::get_gain_max </td>
+          <td class="memname">double nec_context::get_gain </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>freq_index</em> = <code>0</code></td><td>)</td>
+          <td class="paramname"><em>freq_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>theta_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>phi_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -1116,9 +1135,9 @@ F2- FREQ INCREMENT, ADD OR MULTIPLY
 <p>This function requires a previous <a class="el" href="classnec__context.html#a3824916fca4ec09417908a807478df94" title="Standard radiation pattern parameters. ">rp_card()</a> method to have been called (with gain normalization requested)</p>
 <dl class="section return"><dt>Returns</dt><dd>The maximum gain in dB or -999.0 if no radiation pattern had been previously requested. </dd></dl>
 
-<p>References <a class="el" href="classnec__context.html#a68e997c457e5cd0bb95fe0d0e5302469">get_radiation_pattern()</a>.</p>
+<p>References <a class="el" href="classnec__radiation__pattern.html#abdd0ec7a2d08cbcbf65d9099d31b216e">nec_radiation_pattern::get_power_gain()</a>, and <a class="el" href="classnec__context.html#a68e997c457e5cd0bb95fe0d0e5302469">get_radiation_pattern()</a>.</p>
 
-<p>Referenced by <a class="el" href="classnec__context.html#a5ea86f18dfe6a6c00207067661ea387c">benchmark()</a>, and <a class="el" href="libnecpp_8h.html#a9309dfc8da521b3c86e59e282c31ae3c">nec_gain_max()</a>.</p>
+<p>Referenced by <a class="el" href="libnecpp_8h.html#a1c1bb3f3a0e4f87ae54e66ae329ea59e">nec_gain()</a>.</p>
 
 </div>
 </div>
@@ -1267,7 +1286,7 @@ F2- FREQ INCREMENT, ADD OR MULTIPLY
 </dl>
 <p>References <a class="el" href="classnec__results.html#ab52f1c8597a18381adf16db6bb0facee">nec_results::get_radiation_pattern()</a>, and <a class="el" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>.</p>
 
-<p>Referenced by <a class="el" href="classnec__context.html#ae4cd6125fc1b7d9e08f32a41d4c27399">get_gain_max()</a>.</p>
+<p>Referenced by <a class="el" href="classnec__context.html#aef8f878868e44283937e8a39f6209d51">get_gain()</a>.</p>
 
 </div>
 </div>
@@ -2583,7 +2602,7 @@ A = 2 average gain computed, printing of gain at the field points used for avera
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2015 11:50:37 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 8 2015 16:40:29 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

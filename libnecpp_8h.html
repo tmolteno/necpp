@@ -18,7 +18,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">nec2++
-   &#160;<span id="projectnumber">1.6.0</span>
+   &#160;<span id="projectnumber">1.7.0</span>
    </div>
   </td>
  </tr>
@@ -176,6 +176,9 @@ long&#160;</td><td class="memItemRight" valign="bottom"><b>nec_pl_card</b> (<a c
 <tr><td colspan="2"><div class="groupHeader">Analysis of Output</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Functions for calculating statistics from simulation outputs. These are useful for automatic optimization. </p>
 </div></td></tr>
+<tr class="memitem:a1c1bb3f3a0e4f87ae54e66ae329ea59e"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a1c1bb3f3a0e4f87ae54e66ae329ea59e">nec_gain</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index, int theta_index, int phi_index)</td></tr>
+<tr class="memdesc:a1c1bb3f3a0e4f87ae54e66ae329ea59e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the gain from a radiation pattern.  <a href="#a1c1bb3f3a0e4f87ae54e66ae329ea59e">More...</a><br /></td></tr>
+<tr class="separator:a1c1bb3f3a0e4f87ae54e66ae329ea59e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9309dfc8da521b3c86e59e282c31ae3c"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a9309dfc8da521b3c86e59e282c31ae3c">nec_gain_max</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int freq_index)</td></tr>
 <tr class="memdesc:a9309dfc8da521b3c86e59e282c31ae3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the maximum gain from a radiation pattern.  <a href="#a9309dfc8da521b3c86e59e282c31ae3c">More...</a><br /></td></tr>
 <tr class="separator:a9309dfc8da521b3c86e59e282c31ae3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -781,6 +784,58 @@ The meaning of the floating point parameter depends on the excitation type. See 
 
 </div>
 </div>
+<a class="anchor" id="a1c1bb3f3a0e4f87ae54e66ae329ea59e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double nec_gain </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>freq_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>theta_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>phi_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the gain from a radiation pattern. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">freq_index</td><td>The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent simulations will store their results at higher indices. </td></tr>
+    <tr><td class="paramname">theta_index</td><td>The theta index (starting at zero) of the radiation pattern </td></tr>
+    <tr><td class="paramname">phi_index</td><td>The phi index (starting at zero) of the radiation pattern </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The gain in dB or -999.0 if no radiation pattern had been previously requested.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec" title="Standard radiation pattern parameters. ">nec_rp_card()</a> method to have been called (with the gain normalization set to 5) </dd></dl>
+
+<p>References <a class="el" href="classnec__context.html#aef8f878868e44283937e8a39f6209d51">nec_context::get_gain()</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a9309dfc8da521b3c86e59e282c31ae3c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -816,8 +871,6 @@ The meaning of the floating point parameter depends on the excitation type. See 
 <dl class="section remark"><dt>Remarks</dt><dd>This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44633c3a5b33e95b56d3c9fcec" title="Standard radiation pattern parameters. ">nec_rp_card()</a> method to have been called (with the gain normalization set to 5) </dd></dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a10">test_nec.c</a>.</dd>
 </dl>
-<p>References <a class="el" href="classnec__context.html#ae4cd6125fc1b7d9e08f32a41d4c27399">nec_context::get_gain_max()</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="a176c1ca5a6a93390a96c89c4231ee4bc"></a>
@@ -1902,7 +1955,7 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2015 11:50:37 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 8 2015 16:40:29 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
