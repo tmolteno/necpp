@@ -45,7 +45,7 @@ wrap/PyNEC_wrap.cxx: wrap/PyNEC.i
 
 install:
 	@rm -fr /usr/lib/python2.7/site-packages/PyNEC
-	@mkdir /usr/lib/python2.7/site-packages/PyNEC
+	@mkdir -p /usr/lib/python2.7/site-packages/PyNEC
 	cp python_module/*.* /usr/lib/python2.7/site-packages/PyNEC/
 
 clean:

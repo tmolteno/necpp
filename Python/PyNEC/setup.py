@@ -241,7 +241,7 @@ if platform == 'linux2' or platform == 'win32' :
 			
 			install = "\ninstall:\n"
 			install += "	@rm -fr " + python_lib_path + "/site-packages/PyNEC\n"
-			install += "	@mkdir " + python_lib_path + "/site-packages/PyNEC\n"
+			install += "	@mkdir -p " + python_lib_path + "/site-packages/PyNEC\n"
 			install += "	cp python_module/*.* " + python_lib_path + "/site-packages/PyNEC/\n"
 			f.write(install)
 			
