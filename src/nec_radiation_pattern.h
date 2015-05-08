@@ -267,7 +267,7 @@ public:
 
 
 private:
-	nec_float mean(real_array& pattern) const
+	nec_float mean(const real_array& pattern) const
 	{
 		nec_float sum = 0.0;
 		long len = pattern.size();
@@ -278,7 +278,7 @@ private:
 		return sum/(len*2.0 / pi());
 	}
 
-	nec_float sd(real_array& pattern, nec_float _mean) const
+	nec_float sd(const real_array& pattern, nec_float _mean) const
 	{
 		nec_float sum = 0.0;
 		long len = pattern.size();
@@ -292,66 +292,66 @@ private:
 
 
 public:
-	nec_float get_gain_max()
+	nec_float get_gain_max() const
 	{
 		return _power_gain_tot.maxCoeff();
 	}
 
-	nec_float get_gain_min()
+	nec_float get_gain_min() const
 	{
 		return _power_gain_tot.minCoeff();
 	}
 
-	nec_float get_gain_mean()
+	nec_float get_gain_mean() const
 	{
 		return mean(_power_gain_tot);
 	}
 	
-	nec_float get_gain_sd()
+	nec_float get_gain_sd() const
 	{
 		nec_float _mean = get_gain_mean();
 		return sd(_power_gain_tot, _mean);
 	}
 	
 	/********************** RHCP ********************************/
-	nec_float get_gain_rhcp_max()
+	nec_float get_gain_rhcp_max() const
 	{
 		return _power_gain_rhcp.maxCoeff();
 	}
 
-	nec_float get_gain_rhcp_min()
+	nec_float get_gain_rhcp_min() const
 	{
 		return _power_gain_rhcp.minCoeff();
 	}
 
-	nec_float get_gain_rhcp_mean()
+	nec_float get_gain_rhcp_mean() const
 	{
 		return mean(_power_gain_rhcp);
 	}
 	
-	nec_float get_gain_rhcp_sd()
+	nec_float get_gain_rhcp_sd() const
 	{
 		nec_float _mean = get_gain_rhcp_mean();
 		return sd(_power_gain_rhcp, _mean);
 	}
 	
 	/********************** LHCP ********************************/
-	nec_float get_gain_lhcp_max()
+	nec_float get_gain_lhcp_max() const
 	{
 		return _power_gain_lhcp.maxCoeff();
 	}
 
-	nec_float get_gain_lhcp_min()
+	nec_float get_gain_lhcp_min() const
 	{
 		return _power_gain_lhcp.minCoeff();
 	}
 
-	nec_float get_gain_lhcp_mean()
+	nec_float get_gain_lhcp_mean() const
 	{
 		return mean(_power_gain_lhcp);
 	}
 	
-	nec_float get_gain_lhcp_sd()
+	nec_float get_gain_lhcp_sd() const
 	{
 		nec_float _mean = get_gain_lhcp_mean();
 		return sd(_power_gain_lhcp, _mean);
