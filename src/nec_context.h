@@ -60,190 +60,175 @@ enum excitation_return
 class nec_context
 {
 public:
-	nec_context();
-	virtual ~nec_context();
-	
-	// Called after construction...
-	void initialize();
-	
+  nec_context();
+  virtual ~nec_context();
+  
+  // Called after construction...
+  void initialize();
+  
 
-	void calc_prepare();
-	
-	inline c_geometry* get_geometry()
-	{
-		return m_geometry;
-	}
-	
-	/*! \brief Get the maximum gain in dB.
-	
-	This function requires a previous rp_card() method to have been called (with gain normalization requested)
-	
-	\return The maximum gain in dB or -999.0 if no radiation pattern had been previously requested.
-	*/
-	double get_gain_max(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_max();
-	}
+  void calc_prepare();
+  
+  inline c_geometry* get_geometry()  {
+          return m_geometry;
+  }
+  
+  /*! \brief Get the maximum gain in dB.
+  
+  This function requires a previous rp_card() method to have been called (with gain normalization requested)
+  
+  \return The maximum gain in dB or -999.0 if no radiation pattern had been previously requested.
+  */
+  double get_gain(int freq_index, int theta_index, int phi_index)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)       return -999.0;  
+          return rp->get_power_gain(theta_index, phi_index);
+  }
 
-	double get_gain_min(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_min();
-	}
+  double get_gain_max(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)       return -999.0;  
+          return rp->get_gain_max();
+  }
 
-	double get_gain_mean(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_mean();
-	}
-	
-	double get_gain_sd(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_sd();
-	}
-	
-	/********************** RHCP ********************************/
-	double get_gain_rhcp_max(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_rhcp_max();
-	}
+  double get_gain_min(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_min();
+  }
 
-	double get_gain_rhcp_min(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_rhcp_min();
-	}
+  double get_gain_mean(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_mean();
+  }
+  
+  double get_gain_sd(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_sd();
+  }
+  
+  /********************** RHCP ********************************/
+  double get_gain_rhcp_max(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_rhcp_max();
+  }
 
-	double get_gain_rhcp_mean(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_rhcp_mean();
-	}
-	
-	double get_gain_rhcp_sd(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_rhcp_sd();
-	}
-	
-	/********************** LHCP ********************************/
-	double get_gain_lhcp_max(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_lhcp_max();
-	}
+  double get_gain_rhcp_min(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_rhcp_min();
+  }
 
-	double get_gain_lhcp_min(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_lhcp_min();
-	}
+  double get_gain_rhcp_mean(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_rhcp_mean();
+  }
+  
+  double get_gain_rhcp_sd(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_rhcp_sd();
+  }
+  
+  /********************** LHCP ********************************/
+  double get_gain_lhcp_max(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_lhcp_max();
+  }
 
-	double get_gain_lhcp_mean(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_lhcp_mean();
-	}
-	
-	double get_gain_lhcp_sd(int freq_index = 0)
-	{
-		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
-		if (NULL == rp)	return -999.0;	
-		return rp->get_gain_lhcp_sd();
-	}
-	
-	/****************** IMPEDANCE CHARACTERISTICS *********************/
-	
-	/*! \brief Impedance: Real Part */
-	double get_impedance_real(int freq_index = 0)
-	{
-		nec_antenna_input* ipt = get_input_parameters(freq_index);
-		if (NULL == ipt) return -999.0;
-		vector<nec_complex>& imp(ipt->get_impedance());
-		return imp.back().real();
-	}
-	/*! \brief Impedance: Imaginary Part */
-	double get_impedance_imag(int freq_index = 0)
-	{
-		nec_antenna_input* ipt = get_input_parameters(freq_index);
-		if (NULL == ipt) return -999.0;	
-		vector<nec_complex>& imp(ipt->get_impedance());
-		return imp.back().imag();
-	}
-		
-	/*! \brief Get Antenna Input Parameter Results
-	\param index The zero-based index for the result (simulations can return more than one set of results).
-	\return The requested antenna input parameter data (or NULL if the result does not exist).
-	\note You must NOT delete the nec_antenna_input object when finished with it.
-	*/
-	inline nec_antenna_input* get_input_parameters(int index)
-	{
-		return m_results.get_antenna_input(index);
-	}
-	
-	/*! \brief Get Normalized Receiving Pattern Results
-	\param index The zero-based index for the result (simulations can return more than one set of results).
-	\return The requested radiation pattern data (or NULL if the result does not exist).
-	\note You must NOT delete the nec_norm_rx_pattern object when finished with it.
-	*/
-	inline nec_norm_rx_pattern* get_norm_rx_pattern(int index)
-	{
-		return m_results.get_norm_rx_pattern(index);
-	}
-	
-	/*! \brief Get Radiation Pattern results
-	\param index The zero-based index for the result (simulations can return more than one set of results).
-	\return The requested radiation pattern data (or NULL if the result does not exist).
-	\note You must NOT delete the results object when finished with it.
-	*/
-	inline nec_radiation_pattern* get_radiation_pattern(int index)
-	{
-		return m_results.get_radiation_pattern(index);
-	}
-		
-	/*! \brief Get structure excitation results
-	\param index The zero-based index for the result (simulations can return more than one set of results).
-	\return The requested radiation pattern data (or NULL if the result does not exist).
-	\note You must NOT delete the results object when finished with it.
-	*/
-	inline nec_structure_excitation* get_structure_excitation(int index)
-	{
-		return m_results.get_structure_excitation(index);
-	}
-	
-	/*! \brief Get near field pattern results
-	\param index The zero-based index for the result (simulations can return more than one set of results).
-	\return The requested radiation pattern data (or NULL if the result does not exist).
-	\note You must NOT delete the results object when finished with it.
-	*/	
-	inline nec_near_field_pattern* get_near_field_pattern(int index)
-	{
-		return m_results.get_near_field_pattern(index);
-	}
-	
-	/*! \brief Get structure currents results
-	\param index The zero-based index for the result (simulations can return more than one set of results).
-	\return The requested radiation pattern data (or NULL if the result does not exist).
-	\note You must NOT delete the results object when finished with it.
-	*/	
-	inline nec_structure_currents* get_structure_currents(int index)
-	{
-		return m_results.get_structure_currents(index);
-	}
+  double get_gain_lhcp_min(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_lhcp_min();
+  }
+
+  double get_gain_lhcp_mean(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_lhcp_mean();
+  }
+  
+  double get_gain_lhcp_sd(int freq_index = 0)  {
+          nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+          if (NULL == rp)	return -999.0;	
+          return rp->get_gain_lhcp_sd();
+  }
+  
+  /****************** IMPEDANCE CHARACTERISTICS *********************/
+  
+  /*! \brief Impedance: Real Part */
+  double get_impedance_real(int freq_index = 0)  {
+          nec_antenna_input* ipt = get_input_parameters(freq_index);
+          if (NULL == ipt) return -999.0;
+          vector<nec_complex>& imp(ipt->get_impedance());
+          return imp.back().real();
+  }
+  /*! \brief Impedance: Imaginary Part */
+  double get_impedance_imag(int freq_index = 0)  {
+          nec_antenna_input* ipt = get_input_parameters(freq_index);
+          if (NULL == ipt) return -999.0;	
+          vector<nec_complex>& imp(ipt->get_impedance());
+          return imp.back().imag();
+  }
+          
+  /*! \brief Get Antenna Input Parameter Results
+  \param index The zero-based index for the result (simulations can return more than one set of results).
+  \return The requested antenna input parameter data (or NULL if the result does not exist).
+  \note You must NOT delete the nec_antenna_input object when finished with it.
+  */
+  inline nec_antenna_input* get_input_parameters(int index)  {
+          return m_results.get_antenna_input(index);
+  }
+  
+  /*! \brief Get Normalized Receiving Pattern Results
+  \param index The zero-based index for the result (simulations can return more than one set of results).
+  \return The requested radiation pattern data (or NULL if the result does not exist).
+  \note You must NOT delete the nec_norm_rx_pattern object when finished with it.
+  */
+  inline nec_norm_rx_pattern* get_norm_rx_pattern(int index)  {
+          return m_results.get_norm_rx_pattern(index);
+  }
+  
+  /*! \brief Get Radiation Pattern results
+  \param index The zero-based index for the result (simulations can return more than one set of results).
+  \return The requested radiation pattern data (or NULL if the result does not exist).
+  \note You must NOT delete the results object when finished with it.
+  */
+  inline nec_radiation_pattern* get_radiation_pattern(int index)  {
+          return m_results.get_radiation_pattern(index);
+  }
+          
+  /*! \brief Get structure excitation results
+  \param index The zero-based index for the result (simulations can return more than one set of results).
+  \return The requested radiation pattern data (or NULL if the result does not exist).
+  \note You must NOT delete the results object when finished with it.
+  */
+  inline nec_structure_excitation* get_structure_excitation(int index)  {
+          return m_results.get_structure_excitation(index);
+  }
+  
+  /*! \brief Get near field pattern results
+  \param index The zero-based index for the result (simulations can return more than one set of results).
+  \return The requested radiation pattern data (or NULL if the result does not exist).
+  \note You must NOT delete the results object when finished with it.
+  */	
+  inline nec_near_field_pattern* get_near_field_pattern(int index)  {
+          return m_results.get_near_field_pattern(index);
+  }
+  
+  /*! \brief Get structure currents results
+  \param index The zero-based index for the result (simulations can return more than one set of results).
+  \return The requested radiation pattern data (or NULL if the result does not exist).
+  \note You must NOT delete the results object when finished with it.
+  */	
+  inline nec_structure_currents* get_structure_currents(int index)  {
+          return m_results.get_structure_currents(index);
+  }
 	
 	/* added for the python wrapping : some access functions */
 	

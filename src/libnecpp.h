@@ -511,6 +511,18 @@ long nec_pl_card(nec_context* in_context, char* ploutput_filename, int itmp1, in
  */
 ///@{
 
+/*! \brief Get the gain from a radiation pattern.
+
+\param freq_index The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent
+ simulations will store their results at higher indices.
+\param theta_index The theta index (starting at zero) of the radiation pattern
+\param phi_index The phi index (starting at zero) of the radiation pattern
+\return The gain in dB or -999.0 if no radiation pattern had been previously requested.
+
+\remark This function requires a previous nec_rp_card() method to have been called (with the gain normalization set to 5)
+*/
+double nec_gain(nec_context* in_context, int freq_index, int theta_index, int phi_index);
+
 /*! \brief Get the maximum gain from a radiation pattern.
 
 \param freq_index The rp_card frequency index. If this parameter is 0, then the first simulation results are used. Subsequent

@@ -86,67 +86,59 @@ const char* nec_error_message(void) {
   return _err_message.c_str();
 }
 
+double nec_gain(nec_context* in_context, int freq_index, int theta_index, int phi_index) {
+  return in_context->get_gain(freq_index, theta_index, phi_index);
+}
+
 /* Statistics about the Gain distribution */
-double nec_gain_max(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_max(freq_index);
+double nec_gain_max(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_max(freq_index);
 }
 
-double nec_gain_min(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_min(freq_index);
+double nec_gain_min(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_min(freq_index);
 }
 
-double nec_gain_mean(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_mean(freq_index);
+double nec_gain_mean(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_mean(freq_index);
 }
 
-double nec_gain_sd(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_sd(freq_index);
+double nec_gain_sd(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_sd(freq_index);
 }
 
 /********************** RHCP ********************************/
-double nec_gain_rhcp_max(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_rhcp_max(freq_index);
+double nec_gain_rhcp_max(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_rhcp_max(freq_index);
 }
 
-double nec_gain_rhcp_min(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_rhcp_min(freq_index);
+double nec_gain_rhcp_min(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_rhcp_min(freq_index);
 }
 
-double nec_gain_rhcp_mean(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_rhcp_mean(freq_index);
+double nec_gain_rhcp_mean(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_rhcp_mean(freq_index);
 }
 
-double nec_gain_rhcp_sd(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_rhcp_sd(freq_index);
+double nec_gain_rhcp_sd(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_rhcp_sd(freq_index);
 }
 
 /********************** LHCP ********************************/
-double nec_gain_lhcp_max(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_lhcp_max(freq_index);
+double nec_gain_lhcp_max(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_lhcp_max(freq_index);
 }
 
-double nec_gain_lhcp_min(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_lhcp_min(freq_index);
+double nec_gain_lhcp_min(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_lhcp_min(freq_index);
 }
 
-double nec_gain_lhcp_mean(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_lhcp_mean(freq_index);
+double nec_gain_lhcp_mean(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_lhcp_mean(freq_index);
 }
 
-double nec_gain_lhcp_sd(nec_context* in_context, int freq_index)
-{
-	return in_context->get_gain_lhcp_sd(freq_index);
+double nec_gain_lhcp_sd(nec_context* in_context, int freq_index)  {
+  return in_context->get_gain_lhcp_sd(freq_index);
 }
 
 /****************** IMPEDANCE CHARACTERISTICS *********************/
