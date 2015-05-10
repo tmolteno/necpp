@@ -25,11 +25,6 @@ print('SUCCESS - Numpy seems to be installed.')
 print('\nDetecting Python version number...')
 print(sys.version)
 python_version = sys.version[:3]
-if python_version != '2.3' and python_version != '2.4' :
-	print('WARNING - This python version has not yet been tested. Try and move to Python version 2.3 or 2.4 if you encounter problems')
-api_version = sys.api_version
-if api_version != 1012 :
-	print('WARNING - This api version has not yet been tested. Try and move to API version 1012 if you encounter problems')
 
 #==================================================================================================================================================================================
 #Looks for the python "include path"
@@ -246,7 +241,7 @@ if platform == 'linux2' or platform == 'win32' :
 			
 			install = "\ninstall:\n"
 			install += "	@rm -fr " + python_lib_path + "/site-packages/PyNEC\n"
-			install += "	@mkdir " + python_lib_path + "/site-packages/PyNEC\n"
+			install += "	@mkdir -p " + python_lib_path + "/site-packages/PyNEC\n"
 			install += "	cp python_module/*.* " + python_lib_path + "/site-packages/PyNEC/\n"
 			f.write(install)
 			
