@@ -258,7 +258,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 		/* "ge" card, terminate structure geometry input. */
 		else if (card_id == "GE")
 		{
-			geometry_complete(in_context, card_int_1, card_int_2);
+			geometry_complete(in_context, card_int_1);
 			return;
 		}
 
@@ -476,16 +476,10 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 	We have finished with the geometry description, now connect 
 	things up.
 */
-void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int card_int_2)
+void c_geometry::geometry_complete(nec_context* in_context, int gpflag)
 {
 	if (0 == np + mp)
 		throw new nec_exception("Geometry has no wires or patches.");
-		
-	/* TCAM: The following does not make sense for the semantics of the plot
-	card. I have left this in, I hope someone will tell me why it is required.
-	*/
-	if (card_int_2 != 0)
-		in_context->plot_card.set_plot_real_imag_currents();
 		
 	/* Check to see whether any wires intersect with one another */
 	for (uint32_t i=0; i<m_wires.size(); i++)
@@ -530,7 +524,7 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 		the surface as a wire grid.
 	*/
 
- 	connect_segments( card_int_1);
+ 	connect_segments( gpflag);
 
 	if ( n_segments != 0)
 	{

@@ -77,8 +77,8 @@ long nec_gx_card(nec_context* in_context, int i1, int i2) {
 }
 
 
-long nec_geometry_complete(nec_context* in_context, int card_int_1, int card_int_2) {
-  NEC_ERROR_HANDLE(in_context->geometry_complete(card_int_1, card_int_2));
+long nec_geometry_complete(nec_context* in_context, int gpflag) {
+  NEC_ERROR_HANDLE(in_context->geometry_complete(gpflag));
 }
 
 

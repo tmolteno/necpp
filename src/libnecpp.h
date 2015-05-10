@@ -197,10 +197,9 @@ long nec_gx_card(nec_context* in_context, int i1, int i2);
  *    \arg \c 0 - no ground plane is present.
  *    \arg \c 1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
  *    \arg \c -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
- * \param card_int_2 Unused (set to zero)
-    \copydoc error_return
+   \copydoc error_return
  **/
-long nec_geometry_complete(nec_context* in_context, int gpflag, int card_int_2);
+long nec_geometry_complete(nec_context* in_context, int gpflag);
 
 ///@}
 
@@ -468,10 +467,10 @@ long nec_gd_card(nec_context* in_context, double tmp1, double tmp2, double tmp3,
 
 */
 long nec_rp_card(nec_context* in_context,
-	int calc_mode, int n_theta, int n_phi,
-	int output_format, int normalization, int D, int A,	
-	double theta0, double phi0, double delta_theta, double delta_phi,
-	double radial_distance, double gain_norm);
+    int calc_mode, int n_theta, int n_phi,
+    int output_format, int normalization, int D, int A,	
+    double theta0, double phi0, double delta_theta, double delta_phi,
+    double radial_distance, double gain_norm);
 
 /*! \brief Print Flag (Printing of Currents
  * \param IPTFLG Print control flag, specifies the type of format used in printing segment currents. The options are:

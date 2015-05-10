@@ -229,74 +229,73 @@ public:
   inline nec_structure_currents* get_structure_currents(int index)  {
           return m_results.get_structure_currents(index);
   }
-	
-	/* added for the python wrapping : some access functions */
-	
-	void set_isave(int in_isave)
-	{
-		isave = in_isave;
-	}
-	
-	int get_inc()
-	{
-		return inc;
-	}
-	
-	nec_float get_xpr1()
-	{
-		return xpr1;
-	}
-	
-	nec_float get_xpr2()
-	{
-		return xpr2;
-	}
-	
-	/* end of functions added for the python wrapping */
-	
-	inline void set_output(nec_output_file in_output, nec_output_flags in_output_flags)
-	{
-		m_output = in_output;
-		m_output_flags = in_output_flags;
-		
-		m_output_fp = m_output.get_fp();
-	}
-	
-	inline void set_results_format(enum RESULT_FORMAT result_format)
-	{
-		m_results.m_result_format = result_format;
-	}
-	
-	inline void set_gain_only(bool flag)
-	{
-		m_output_flags.set_gain_only(flag);
-	}
-	
-	
-	/*!\brief Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. */
-	static nec_float benchmark();
-	
-	/*! \brief Signal the end of a geometry description.
-	
-	This function prepares for a calculation by calling calc_prepare().
-	*/
-	void geometry_complete(int card_int_1, int card_int_2);
+  
+  /* added for the python wrapping : some access functions */
+  
+  void set_isave(int in_isave)
+  {
+          isave = in_isave;
+  }
+  
+  int get_inc()
+  {
+          return inc;
+  }
+  
+  nec_float get_xpr1()
+  {
+          return xpr1;
+  }
+  
+  nec_float get_xpr2()
+  {
+          return xpr2;
+  }
+  
+  /* end of functions added for the python wrapping */
+  
+  inline void set_output(nec_output_file in_output, nec_output_flags in_output_flags)
+  {
+          m_output = in_output;
+          m_output_flags = in_output_flags;
+          
+          m_output_fp = m_output.get_fp();
+  }
+  
+  inline void set_results_format(enum RESULT_FORMAT result_format)
+  {
+          m_results.m_result_format = result_format;
+  }
+  
+  inline void set_gain_only(bool flag)
+  {
+          m_output_flags.set_gain_only(flag);
+  }
+  
+  
+  /*!\brief Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. */
+  static nec_float benchmark();
+  
+  /*! \brief Signal the end of a geometry description.
+  
+  This function prepares for a calculation by calling calc_prepare().
+  */
+  void geometry_complete(int gpflag);
 
-	
-	/*! Set the prameters of the medium (permittivity and permeability)
-	
-		\param permittivity The electric permittivity of the medium (in farads per meter)
-		\param permeability The magnetic permeability of the medium (in henries per meter)
+  
+  /*! Set the prameters of the medium (permittivity and permeability)
+  
+          \param permittivity The electric permittivity of the medium (in farads per meter)
+          \param permeability The magnetic permeability of the medium (in henries per meter)
 
-		From these parameters a speed of light is chosen.
-	*/
-	void medium_parameters(nec_float permittivity, nec_float permeability)
-	{
-		em::constants::permittivity = permittivity;
-		em::constants::permeability = permeability;
-	}
-	
-	
+          From these parameters a speed of light is chosen.
+  */
+  void medium_parameters(nec_float permittivity, nec_float permeability)  {
+    em::constants::permittivity = permittivity;
+    em::constants::permeability = permeability;
+  }
+  
+  
   /*! Add a wire to the geometry,
 
   All co-ordinates are in meters.

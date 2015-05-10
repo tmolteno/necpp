@@ -1,6 +1,10 @@
-## Version 1.6.2
+## Version 1.7.0
+* Added new functions for nec_get_gain() to get the radiation pattern elements.
+
+## Version 1.6.2 [April 2015]
 * Added new functions for nec_excitation_voltage, nec_excitation_current and nec_excitation_planewave to simplfy C-style API calls
 * More documentation
+* Published python-necpp as a separate project.
 
 ## Version 1.6.1 [March 29 2015]
 * Added python library for the c-stye API.

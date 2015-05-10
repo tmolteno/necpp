@@ -45,9 +45,8 @@ nec_context::nec_context() : fnorm(0,0), current_vector(0) {
   ggrid.initialize();
 }
 
-nec_context::~nec_context()
-{
-	delete m_geometry;
+nec_context::~nec_context() {
+  delete m_geometry;
 }
 
 /*! \brief
@@ -55,41 +54,39 @@ Initialize everything, called after construction so that we
 can tell the geometry object what nec_context object to
 point to.
 */
-void nec_context::initialize()
-{
-	DEBUG_TRACE("initialize()");
-	nthi=0;
-	nphi=0;
-	iflow = 1;
-	thetis=0.0;
-	phiss=0.0;
-	
-	iptag=0;
-	iptagf=0;
-	iptagt=0;
-	iptaq=0;
-	iptaqf=0;
-	iptaqt=0;
-	
-	init_voltage_sources();
-	m_geometry->set_context(this);
+void nec_context::initialize() {
+  DEBUG_TRACE("initialize()");
+  nthi=0;
+  nphi=0;
+  iflow = 1;
+  thetis=0.0;
+  phiss=0.0;
+  
+  iptag=0;
+  iptagf=0;
+  iptagt=0;
+  iptaq=0;
+  iptaqf=0;
+  iptaqt=0;
+  
+  init_voltage_sources();
+  m_geometry->set_context(this);
 }
 
 /*! \brief Private method to initialize the voltage source buffers
 */
-void nec_context::init_voltage_sources()
-{
-	/* Free vsource buffers */
-	ivqd.resize(0);
-	iqds.resize(0);
-	vqd.resize(0);
-	vqds.resize(0);
-	source_segment_array.resize(0);
-	source_voltage_array.resize(0);
+void nec_context::init_voltage_sources() {
+  /* Free vsource buffers */
+  ivqd.resize(0);
+  iqds.resize(0);
+  vqd.resize(0);
+  vqds.resize(0);
+  source_segment_array.resize(0);
+  source_voltage_array.resize(0);
 
-	voltage_source_count=0;
-	nvqd=0;
-	iped=0;
+  voltage_source_count=0;
+  nvqd=0;
+  iped=0;
 }
 
 /*! \brief After the geometry has been specified, this function prepares for calculations
@@ -175,7 +172,7 @@ nec_float nec_context::benchmark()
 					0.00001,
 					1.0, 1.0);
 					
-			nec.geometry_complete(0,0);
+			nec.geometry_complete(0);
 			
 			nec.fr_card(0, 3, 200.0, 50.0);
 			nec.ex_card(EXCITATION_VOLTAGE_DISC, 0, 5, 1, 1.0, 0.0, 50.0, 0.0, 0.0, 0.0);
@@ -234,7 +231,7 @@ nec_float nec_context::benchmark()
 			geo->wire(0, 47, 0.046, -0.01, 0.028, -0.013, -0.005, 0.031, 0.001, 1.0, 1.0);
 			geo->wire(0, 70, 0.027, 0.015, 0.014, -0.078, 0.038, -0.04, 0.001, 1.0, 1.0);
 			geo->wire(0, 77, 0.078, -0.038, 0.04, 0.049, 0.065, 0.04, 0.001, 1.0, 1.0);
-			nec.geometry_complete(0,0);
+			nec.geometry_complete(0);
 			
 			nec.gn_card(-1,0,0.0, 0.0, 0.0,0.0, 0.0, 0.0);
 			nec.ld_card(5,0,0,0,3.72e7,0.0,0.0);
@@ -261,11 +258,10 @@ nec_float nec_context::benchmark()
 
 This function prepares for a calculation by calling calc_prepare().
 */
-void nec_context::geometry_complete(int card_int_1, int card_int_2)
-{
-	DEBUG_TRACE("geometry_complete()");
-	m_geometry->geometry_complete(this, card_int_1, card_int_2);
-	calc_prepare();
+void nec_context::geometry_complete(int gpflag) {
+  DEBUG_TRACE("geometry_complete()");
+  m_geometry->geometry_complete(this, gpflag);
+  calc_prepare();
 }
 
 /*! Add a wire to the geometry,

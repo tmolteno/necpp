@@ -54,7 +54,7 @@ TEST_CASE( "Geometry", "[surface_patch]") {
     HANDLE_NEC(nec_gm_card(nec, 0, 4, 0.000000, 0.000000, 8.571429, 0,0,0,0));
     HANDLE_NEC(nec_wire(nec, 1,15,0.000000,0.005829,0.004961,0.000000,-0.005829,0.004961,0.000248,1,1));
     HANDLE_NEC(nec_gm_card(nec, 0,  0, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, -0.078830, 0));
-    HANDLE_NEC(nec_geometry_complete(nec, 0, 0));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
     
     HANDLE_NEC(nec_fr_card(nec, 0,1, 10450.000000, 0));
     HANDLE_NEC(nec_ex_card(nec,0,1,8,0,1.000000,0.000000, 0, 0, 0, 0));
