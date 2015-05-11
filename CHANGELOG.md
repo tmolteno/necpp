@@ -1,6 +1,7 @@
 ## Version 1.7.0
 * Added new functions for nec_get_gain() to get the radiation pattern elements.
 * added nec_medium_parameters to the C-style API. The user can now alter the permittivity and permeability of the environment via the API.
+* Added accessor methods to the radiation pattern to get all the theta and phi angles
 
 ## Version 1.6.2 [April 2015]
 * Added new functions for nec_excitation_voltage, nec_excitation_current and nec_excitation_planewave to simplfy C-style API calls
