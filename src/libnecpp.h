@@ -229,6 +229,18 @@ const char* nec_error_message(void);
  */
 ///@{
 
+
+/*! \brief Set the prameters of the medium (permittivity and permeability)
+
+    \param permittivity The electric permittivity of the medium (in farads per meter)
+    \param permeability The magnetic permeability of the medium (in henries per meter)
+
+    \remark From these parameters a speed of light is chosen.
+    \copydoc error_return
+*/
+long nec_medium_parameters(nec_context* in_context, double permittivity, double permeability);
+  
+
 /*!\brief Ground Card
   Examples:
 

@@ -150,6 +150,9 @@ double nec_impedance_imag(nec_context* in_context, int freq_index) {
   return in_context->get_impedance_imag(freq_index);
 }
 
+long nec_medium_parameters(nec_context* in_context, double permittivity, double permeability) {
+  NEC_ERROR_HANDLE(in_context->medium_parameters(permittivity, permeability));
+}
 
 
 long nec_fr_card(nec_context* in_context, int in_ifrq, int in_nfrq, double in_freq_mhz, double in_del_freq) {
