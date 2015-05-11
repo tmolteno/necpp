@@ -43,6 +43,7 @@ nec_context::nec_context() : fnorm(0,0), current_vector(0) {
           
   // allocate the ground grid
   ggrid.initialize();
+  initialize();
 }
 
 nec_context::~nec_context() {

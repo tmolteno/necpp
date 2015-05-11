@@ -25,38 +25,36 @@
 #include <stdint.h>
 
 c_geometry::c_geometry() 
-    : patch_x1(0,0,0), patch_x2(0,0,0), patch_x3(0,0,0), patch_x4(0,0,0)
-{
-	n_segments = 0;
-	np = 0; 	// n_segments is the number of segments
-	
-	m = 0;
-	mp = 0;		// m is the number of patches
-	
-	m_ipsym = 0;
-	
-	n_plus_2m = 0;
-	n_plus_3m = 0;
-	
-	jsno = 0;
-	nscon = 0;
-	maxcon = 0;
-	
-	m_context = NULL;
-	m_output = NULL;
+    : patch_x1(0,0,0), patch_x2(0,0,0), patch_x3(0,0,0), patch_x4(0,0,0)  {
+  n_segments = 0;
+  np = 0; 	// n_segments is the number of segments
+  
+  m = 0;
+  mp = 0;		// m is the number of patches
+  
+  m_ipsym = 0;
+  
+  n_plus_2m = 0;
+  n_plus_3m = 0;
+  
+  jsno = 0;
+  nscon = 0;
+  maxcon = 0;
+  
+  m_context = NULL;
+  m_output = NULL;
 }
 
-void c_geometry::set_context(nec_context* in_context)
-{
-	m_context = in_context;
-	m_output = &m_context->m_output;
+void c_geometry::set_context(nec_context* in_context)  {
+  m_context = in_context;
+  m_output = &m_context->m_output;
 }
 
 /*! \brief Get a segment number for a specified tag.
-	\param in_tag The tag
-	\param in_m The mth segment with the specified tag will be returned.
-	\return The segment number of the mth segment having the
-	tag number in_tag.  if in_tag=0 segment number m is returned.
+  \param in_tag The tag
+  \param in_m The mth segment with the specified tag will be returned.
+  \return The segment number of the mth segment having the
+  tag number in_tag.  if in_tag=0 segment number m is returned.
 */
 int c_geometry::get_segment_number( int in_tag, int in_m)
 {

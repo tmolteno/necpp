@@ -70,7 +70,7 @@ public:
   void calc_prepare();
   
   inline c_geometry* get_geometry()  {
-          return m_geometry;
+      return m_geometry;
   }
   
   /*! \brief Get the maximum gain in dB.
