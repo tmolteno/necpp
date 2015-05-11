@@ -198,8 +198,20 @@ public:
     return data_[check(row*col_dim + col)];
   }
   
-  T& operator()(int32_t row, int32_t col)  {
+  
+  /**
+   * \remark This is an accessor function that is useful for wrapping.
+   * */
+  T& getItem(int32_t row, int32_t col) {
     return data_[check(row,col)];
+  }
+
+  
+  /**
+   * \remark We use round brackets for indexing into 2D arrays.
+   * */
+  T& operator()(int32_t row, int32_t col)  {
+    return getItem(row, col);
   }
   
   const T& operator()(int32_t row, int32_t col) const  {
