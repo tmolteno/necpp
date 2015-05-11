@@ -8,12 +8,13 @@
 PYTHON=python2.7
 PYDIR=/usr/
 NEC_SRC=../src
-BUILD=build
+BUILD=build_files
 rm -rf ${BUILD}
 mkdir -p ${BUILD}
-cp ${NEC_SRC}/* ${BUILD}
+cp ${NEC_SRC} ${BUILD}
 cp ../config.h ${BUILD}
 cp interface_files/* ${BUILD}
-cd ${BUILD}
-swig -c++ -python PyNEC.i
-g++ -c nec_context.cpp PyNEC_wrap.cxx -I/usr/lib/python2.7/dist-packages/numpy/numarray/include/ -I/usr/include/python2.7 -I/usr/lib/python2.7/config -DHAVE_CONFIG_H
+cp setup.py ${BUILD}
+pushd ${BUILD}
+swig -v -c++ -python PyNEC.i
+python python setup.py build
