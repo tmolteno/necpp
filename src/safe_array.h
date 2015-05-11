@@ -198,7 +198,7 @@ public:
   * into other languages (like python, ruby)
   */
   T& getItem(int64_t i) {
-    return data_(check(i));
+    return data_[check(i)];
   }
   
   const T& operator[](int64_t i) const  {
