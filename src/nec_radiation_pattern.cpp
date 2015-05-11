@@ -62,7 +62,7 @@ nec_radiation_pattern::nec_radiation_pattern(int in_n_theta, int in_n_phi,
   
   int n_angles = n_theta * n_phi;
   
-  _gain.resize(n_angles);
+  _gain.resize(n_theta, n_phi);
   _power_gain_vert.resize(n_angles);
   _power_gain_horiz.resize(n_angles);
   _power_gain_tot.resize(n_angles);
@@ -393,7 +393,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
             throw new nec_exception("Unknown Gain Normalization Encountered.");
           }
         
-          _gain[result_counter] = temp_gain;
+          _gain(kth-1, kph-1) = temp_gain;
         
         } /* if ( m_rp_normalization > 0) */
       
@@ -539,7 +539,7 @@ void nec_radiation_pattern::write_normalized_gain(ostream& os)
     for (int t=0;t<n_theta;t++)  {
 
       nec_float theta = m_theta_start + t * delta_theta;
-      nec_float norm_gain = _gain[item_count++] - normalization_factor;
+      nec_float norm_gain = _gain(t,p) - normalization_factor;
       
       oh.start_record();
       oh.padding(" ");

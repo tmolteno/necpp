@@ -101,7 +101,7 @@ class TestSurfacePatches(unittest.TestCase):
     self.handle_nec(nec_gm_card(nec, 0,41,0.000000,0.000000,8.571429, 0,0,0,0))
     self.handle_nec(nec_wire(nec, 1,15,0.000000,0.005829,0.004961,0.000000,-0.005829,0.004961,0.000248,1,1))
     self.handle_nec(nec_gm_card(nec, 0,0, 0.000000,0.000000,0.000000, 0.000000,0.000000,-0.078830, 0))
-    self.handle_nec(nec_geometry_complete(nec, 0, 0)) # GE
+    self.handle_nec(nec_geometry_complete(nec, 0)) # GE
     self.handle_nec(nec_fr_card(nec, 0,1, 10450.000000, 0))
     self.handle_nec(nec_ex_card(nec,0,1,8,0,1.000000,0.000000, 0, 0, 0, 0))
     self.handle_nec(nec_ld_card(nec,5,0,0,0,3.720000E+07, 0, 0))

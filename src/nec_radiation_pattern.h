@@ -81,7 +81,7 @@ public:
   
   /*Added for the python wrapping : some basic access functions...*/
   
-  real_array get_gain()  {
+  real_matrix get_gain()  {
     return _gain;
   }
   
@@ -355,7 +355,7 @@ public:
   /*! \brief Get a total power gain from the radiation pattern
   */
   nec_float get_power_gain(int theta_index, int phi_index) const  {
-    return _gain[get_index(theta_index, phi_index)];
+    return _gain(theta_index, phi_index);
   }
 
   /*! \brief Get  a power gain (vertical) from the radiation pattern
@@ -430,7 +430,7 @@ private:
   
   nec_float m_rp_gnor;
   
-  real_array  _gain;
+  real_matrix  _gain;
   real_array  _power_gain_lhcp;
   real_array  _power_gain_rhcp;
   real_array  _power_gain_vert;

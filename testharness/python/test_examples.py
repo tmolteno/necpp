@@ -25,7 +25,7 @@ class TestDipoleGain(unittest.TestCase):
     EN    
     '''
     self.handle_nec(nec_wire(nec, 0, 7, 0., 0., .75, 0., 0., 1.25, .001, 1.0, 1.0))
-    self.handle_nec(nec_geometry_complete(nec, 1, 0))
+    self.handle_nec(nec_geometry_complete(nec, 1))
     self.handle_nec(nec_ex_card(nec, 0, 0, 4,0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     self.handle_nec(nec_xq_card(nec, 0))
     self.handle_nec(nec_ld_card(nec, 0, 0, 4, 4, 10., 3.000E-09, 5.300E-11))
@@ -55,7 +55,7 @@ class TestDipoleGain(unittest.TestCase):
     '''
     nec = nec_create()
     self.handle_nec(nec_wire(nec,  0, 8, 0., 0., -.25, 0., 0., .25, .00001, 1.0, 1.0))
-    self.handle_nec(nec_geometry_complete(nec, 0, 0))
+    self.handle_nec(nec_geometry_complete(nec, 0))
     self.handle_nec(nec_fr_card(nec, 0, 3, 200., 50 ))
     self.handle_nec(nec_ex_card(nec, 5, 0, 5, 1, 1.0, 0.0, 50.0, 0.0, 0.0, 0.0))
     self.handle_nec(nec_xq_card(nec,0))
@@ -109,7 +109,7 @@ class TestDipoleGain(unittest.TestCase):
     '''
     nec = nec_create()
     self.handle_nec(nec_wire(nec, 0, 9, 0., 0.0, 2.0, 0.0, 0.0, 7.0, 0.03, 1.0, 1.0))
-    self.handle_nec(nec_geometry_complete(nec, 1, 0))
+    self.handle_nec(nec_geometry_complete(nec, 1))
     self.handle_nec(nec_ek_card(nec, 0))
     self.handle_nec(nec_fr_card(nec, 0, 1, 30., 0 ))
     self.handle_nec(nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))
@@ -163,7 +163,7 @@ class TestDipoleGain(unittest.TestCase):
     self.handle_nec(nec_wire(nec, 2, 2, 0., 0.0, 0.3, 0.15, 0.0, 0.3, .001, 1.0, 1.0))
     self.handle_nec(nec_wire(nec, 3, 2, 0., 0.0, 0.3, -.15, 0.0, 0.3, .001, 1.0, 1.0))
 
-    self.handle_nec(nec_geometry_complete(nec, 1, 0))
+    self.handle_nec(nec_geometry_complete(nec, 1))
     self.handle_nec(nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0))
     
     self.handle_nec(nec_ex_card(nec, 0, 1, 1, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))

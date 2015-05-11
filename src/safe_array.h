@@ -202,6 +202,10 @@ public:
     return data_[check(row,col)];
   }
   
+  const T& operator()(int32_t row, int32_t col) const  {
+    return data_[check(row,col)];
+  }
+  
   /* \brief An accessor method to help with wrapping the C++ objects
   * into other languages (like python, ruby)
   */
@@ -311,6 +315,8 @@ public:
   safe_matrix(int32_t _rows, int32_t _cols) : safe_array<T>(_rows*_cols) {
     this->resize(_rows, _cols);
   }
+  safe_matrix() : safe_array<T>()
+  { }
 
 
 private:

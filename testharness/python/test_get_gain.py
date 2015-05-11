@@ -36,7 +36,7 @@ class TestDipoleGain(unittest.TestCase):
     self.handle_nec(nec_wire(nec, 2, 2, 0., 0.0, 0.3, 0.15, 0.0, 0.3, .001, 1.0, 1.0))
     self.handle_nec(nec_wire(nec, 3, 2, 0., 0.0, 0.3, -.15, 0.0, 0.3, .001, 1.0, 1.0))
 
-    self.handle_nec(nec_geometry_complete(nec, 1, 0))
+    self.handle_nec(nec_geometry_complete(nec, 1))
     self.handle_nec(nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0))
     
     self.handle_nec(nec_ex_card(nec, 0, 1, 1, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))
