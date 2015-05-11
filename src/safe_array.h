@@ -75,6 +75,14 @@ public:
     return len_;
   }
 
+  int32_t rows() const {
+    return rows_;
+  }
+
+  int32_t cols() const {
+    return cols_;
+  }
+
   int64_t capacity() const {
     return data_size_;
   }
@@ -239,7 +247,7 @@ public:
   }
           
 
-private:
+protected:
   int64_t len_;
   int32_t rows_;
   int32_t cols_;
@@ -300,9 +308,10 @@ private:
 template<typename T>
 class safe_matrix : public safe_array<T> {
 public:
-  safe_matrix(int32_t rows, int32_t cols) : safe_array<T>(rows*cols) {
-    this->resize(rows, cols);
+  safe_matrix(int32_t _rows, int32_t _cols) : safe_array<T>(_rows*_cols) {
+    this->resize(_rows, _cols);
   }
+
 
 private:
   using safe_array<T>::operator[]; /* Stop folk from using square bracket indexing */
