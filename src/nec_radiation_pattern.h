@@ -62,7 +62,7 @@ public:
           c_plot_card& in_plot_card);
           
   virtual void write_to_file(ostream& os)  {
-          write_to_file_aux(os);
+    write_to_file_aux(os);
   }
 
   virtual enum nec_result_type get_result_type()  {
@@ -242,193 +242,162 @@ public:
   /*End of access functions added for the wrapping*/
   
                                   
-  nec_float get_maximum_gain_db()
-  {
-          return get_gain_normalization_factor(0);
+  nec_float get_maximum_gain_db()  {
+    return get_gain_normalization_factor(0);
   }
   
   /****************** STATISTICS ********************/
 
 
 private:
-  nec_float mean(const real_array& pattern) const
-  {
-          nec_float sum = 0.0;
-          long len = pattern.size();
-          for (long i=0;i<len;i++)
-          {
-                  sum += pattern[i] * _averaging_scales[i];
-          }
-          return sum/(len*2.0 / pi());
+  nec_float mean(const real_array& pattern) const  {
+    nec_float sum = 0.0;
+    long len = pattern.size();
+    for (long i=0;i<len;i++) {
+      sum += pattern[i] * _averaging_scales[i];
+    }
+    return sum/(len*2.0 / pi());
   }
 
-  nec_float sd(const real_array& pattern, nec_float _mean) const
-  {
-          nec_float sum = 0.0;
-          long len = pattern.size();
-          for (long i=0;i<len;i++)
-          {
-                  nec_float diff = pattern[i] - _mean;
-                  sum += diff*diff * _averaging_scales[i];
-          }
-          return std::sqrt(sum/(len*2.0 / pi()));
+  nec_float sd(const real_array& pattern, nec_float _mean) const  {
+    nec_float sum = 0.0;
+    long len = pattern.size();
+    for (long i=0;i<len;i++) {
+      nec_float diff = pattern[i] - _mean;
+      sum += diff*diff * _averaging_scales[i];
+    }
+    return std::sqrt(sum/(len*2.0 / pi()));
   }
 
 
 public:
-  nec_float get_gain_max() const
-  {
-          return _power_gain_tot.maxCoeff();
+  nec_float get_gain_max() const  {
+    return _power_gain_tot.maxCoeff();
   }
 
-  nec_float get_gain_min() const
-  {
-          return _power_gain_tot.minCoeff();
+  nec_float get_gain_min() const  {
+    return _power_gain_tot.minCoeff();
   }
 
-  nec_float get_gain_mean() const
-  {
-          return mean(_power_gain_tot);
+  nec_float get_gain_mean() const  {
+    return mean(_power_gain_tot);
   }
   
-  nec_float get_gain_sd() const
-  {
-          nec_float _mean = get_gain_mean();
-          return sd(_power_gain_tot, _mean);
+  nec_float get_gain_sd() const  {
+    nec_float _mean = get_gain_mean();
+    return sd(_power_gain_tot, _mean);
   }
   
   /********************** RHCP ********************************/
-  nec_float get_gain_rhcp_max() const
-  {
-          return _power_gain_rhcp.maxCoeff();
+  nec_float get_gain_rhcp_max() const  {
+    return _power_gain_rhcp.maxCoeff();
   }
 
-  nec_float get_gain_rhcp_min() const
-  {
-          return _power_gain_rhcp.minCoeff();
+  nec_float get_gain_rhcp_min() const  {
+    return _power_gain_rhcp.minCoeff();
   }
 
-  nec_float get_gain_rhcp_mean() const
-  {
-          return mean(_power_gain_rhcp);
+  nec_float get_gain_rhcp_mean() const  {
+    return mean(_power_gain_rhcp);
   }
   
-  nec_float get_gain_rhcp_sd() const
-  {
-          nec_float _mean = get_gain_rhcp_mean();
-          return sd(_power_gain_rhcp, _mean);
+  nec_float get_gain_rhcp_sd() const  {
+    nec_float _mean = get_gain_rhcp_mean();
+    return sd(_power_gain_rhcp, _mean);
   }
   
   /********************** LHCP ********************************/
-  nec_float get_gain_lhcp_max() const
-  {
-          return _power_gain_lhcp.maxCoeff();
+  nec_float get_gain_lhcp_max() const  {
+    return _power_gain_lhcp.maxCoeff();
   }
 
-  nec_float get_gain_lhcp_min() const
-  {
-          return _power_gain_lhcp.minCoeff();
+  nec_float get_gain_lhcp_min() const  {
+    return _power_gain_lhcp.minCoeff();
   }
 
-  nec_float get_gain_lhcp_mean() const
-  {
-          return mean(_power_gain_lhcp);
+  nec_float get_gain_lhcp_mean() const  {
+    return mean(_power_gain_lhcp);
   }
   
-  nec_float get_gain_lhcp_sd() const
-  {
-          nec_float _mean = get_gain_lhcp_mean();
-          return sd(_power_gain_lhcp, _mean);
+  nec_float get_gain_lhcp_sd() const  {
+    nec_float _mean = get_gain_lhcp_mean();
+    return sd(_power_gain_lhcp, _mean);
   }
-
 
   /* End of Statistics functions for the C interface */
 
 
 
-
-
-
   /*! \brief Get the theta angle corresponding to the theta_index
   */
-  nec_float get_theta(int theta_index) const
-  {
-          return (m_theta_start + delta_theta*theta_index);
+  nec_float get_theta(int theta_index) const  {
+    return (m_theta_start + delta_theta*theta_index);
   }
 
   /*! \brief Get the number of theta angles
   */
-  int get_ntheta() const
-  {
-          return (n_theta);
+  int get_ntheta() const  {
+    return (n_theta);
   }
 
   /*! \brief Get the phi angle corresponding to the phi_index
   */
-  nec_float get_phi(int phi_index) const
-  {
-          return (m_phi_start + delta_phi*phi_index);
+  nec_float get_phi(int phi_index) const  {
+    return (m_phi_start + delta_phi*phi_index);
   }
 
   /*! \brief Get the number of phi angles
   */
-  int get_nphi() const
-  {
-          return (n_phi);
+  int get_nphi() const  {
+    return (n_phi);
   }
 
   /*! \brief Get a total power gain from the radiation pattern
   */
-  nec_float get_power_gain(int theta_index, int phi_index) const
-  {
-          return _gain[get_index(theta_index, phi_index)];
+  nec_float get_power_gain(int theta_index, int phi_index) const  {
+    return _gain[get_index(theta_index, phi_index)];
   }
 
   /*! \brief Get  a power gain (vertical) from the radiation pattern
   */
-  nec_float get_power_gain_vert(int theta_index, int phi_index) const
-  {
-          return _power_gain_vert[get_index(theta_index, phi_index)];
+  nec_float get_power_gain_vert(int theta_index, int phi_index) const  {
+    return _power_gain_vert[get_index(theta_index, phi_index)];
   }
 
   /*! \brief Get  a power gain (horizontal) from the radiation pattern
   */
-  nec_float get_power_gain_horiz(int theta_index, int phi_index) const
-  {
-          return _power_gain_horiz[get_index(theta_index, phi_index)];
+  nec_float get_power_gain_horiz(int theta_index, int phi_index) const  {
+    return _power_gain_horiz[get_index(theta_index, phi_index)];
   }
 
   /*! \brief Get  a power gain (total dBi) from the radiation pattern
   */
-  nec_float get_power_gain_tot(int theta_index, int phi_index) const
-  {
-          return _power_gain_tot[get_index(theta_index, phi_index)];
+  nec_float get_power_gain_tot(int theta_index, int phi_index) const  {
+    return _power_gain_tot[get_index(theta_index, phi_index)];
   }
 
   /*! \brief Get the power gain if the antenna were receiving RHCP signals
   */
-  nec_float get_power_gain_rhcp(int theta_index, int phi_index) const
-  {
-          nec_float a = get_pol_axial_ratio(theta_index, phi_index);
-          nec_float dbi = get_power_gain_tot(theta_index, phi_index);
-          if (get_pol_sense(theta_index, phi_index) == POL_RIGHT)
-                  a = -a;
+  nec_float get_power_gain_rhcp(int theta_index, int phi_index) const  {
+    nec_float a = get_pol_axial_ratio(theta_index, phi_index);
+    nec_float dbi = get_power_gain_tot(theta_index, phi_index);
+    if (get_pol_sense(theta_index, phi_index) == POL_RIGHT)
+      a = -a;
 
-          nec_float f = (1-2*a+a*a)/(2*(1+a*a));
-          return dbi + 10*log10(f);
+    nec_float f = (1-2*a+a*a)/(2*(1+a*a));
+    return dbi + 10*log10(f);
   }
 
   /*! \brief Get the power gain if the antenna were receiving LHCP signals
   */
-  nec_float get_power_gain_lhcp(int theta_index, int phi_index) const
-  {
-          nec_float a = get_pol_axial_ratio(theta_index, phi_index);
-          nec_float dbi = get_power_gain_tot(theta_index, phi_index);
-          if (get_pol_sense(theta_index, phi_index) == POL_RIGHT)
-                  a = -a;
+  nec_float get_power_gain_lhcp(int theta_index, int phi_index) const  {
+    nec_float a = get_pol_axial_ratio(theta_index, phi_index);
+    nec_float dbi = get_power_gain_tot(theta_index, phi_index);
+    if (get_pol_sense(theta_index, phi_index) == POL_RIGHT)
+      a = -a;
 
-          nec_float f = (1+2*a+a*a)/(2*(1+a*a));
-          return dbi + 10*log10(f);
+    nec_float f = (1+2*a+a*a)/(2*(1+a*a));
+    return dbi + 10*log10(f);
   }
 
 private:
@@ -461,20 +430,20 @@ private:
   
   nec_float m_rp_gnor;
   
-  real_array	_gain;
-  real_array	_power_gain_lhcp;
-  real_array	_power_gain_rhcp;
-  real_array	_power_gain_vert;
-  real_array	_power_gain_horiz;
-  real_array	_power_gain_tot;
-  real_array	_polarization_axial_ratio;
-  real_array	_polarization_tilt;
-  real_array	_averaging_scales;
-  int_array	_polarization_sense_index;
+  real_array  _gain;
+  real_array  _power_gain_lhcp;
+  real_array  _power_gain_rhcp;
+  real_array  _power_gain_vert;
+  real_array  _power_gain_horiz;
+  real_array  _power_gain_tot;
+  real_array  _polarization_axial_ratio;
+  real_array  _polarization_tilt;
+  real_array  _averaging_scales;
+  int_array   _polarization_sense_index;
                           
-  complex_array	_e_theta;
-  complex_array	_e_phi;
-  complex_array	_e_r;
+  complex_array  _e_theta;
+  complex_array  _e_phi;
+  complex_array  _e_r;
   
   void write_to_file_aux(ostream& os);
   
@@ -486,6 +455,4 @@ private:
   c_plot_card m_plot_card;
 };
 
-
 #endif /* __nec_radiation_pattern__ */
-
