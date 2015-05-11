@@ -194,12 +194,19 @@ public:
     return data_[check(row,col)];
   }
   
+  /* \brief An accessor method to help with wrapping the C++ objects
+  * into other languages (like python, ruby)
+  */
+  T& getItem(int64_t i) {
+    return data_(check(i));
+  }
+  
   const T& operator[](int64_t i) const  {
     return data_[check(i)];
   }
   
   T& operator[](int64_t i)  {
-    return data_[check(i)];
+    return getItem(i);
   }
   
   /*!\brief Return a representation of a subset of this array
