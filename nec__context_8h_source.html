@@ -107,7 +107,7 @@
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a0762a9e4589ef260c9ee0e884c16dffa">calc_prepare</a>();</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  </div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keyword">inline</span> <a class="code" href="classc__geometry.html">c_geometry</a>* get_geometry()  {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;          <span class="keywordflow">return</span> m_geometry;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;      <span class="keywordflow">return</span> m_geometry;</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  }</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  </div>
 <div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classnec__context.html#aef8f878868e44283937e8a39f6209d51">   82</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classnec__context.html#aef8f878868e44283937e8a39f6209d51">get_gain</a>(<span class="keywordtype">int</span> freq_index, <span class="keywordtype">int</span> theta_index, <span class="keywordtype">int</span> phi_index)  {</div>
@@ -228,469 +228,468 @@
 <div class="line"><a name="l00229"></a><span class="lineno"><a class="line" href="classnec__context.html#a7620b1bbebb6893b6fd3c727ccc476f1">  229</a></span>&#160;  <span class="keyword">inline</span> <a class="code" href="classnec__structure__currents.html">nec_structure_currents</a>* <a class="code" href="classnec__context.html#a7620b1bbebb6893b6fd3c727ccc476f1">get_structure_currents</a>(<span class="keywordtype">int</span> index)  {</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;          <span class="keywordflow">return</span> <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>.<a class="code" href="classnec__results.html#a4da1873d7a69332af8f4ba2770272eb0">get_structure_currents</a>(index);</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;  }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        </div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="comment">/* added for the python wrapping : some access functions */</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        <span class="keywordtype">void</span> set_isave(<span class="keywordtype">int</span> in_isave)</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                isave = in_isave;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        }</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        </div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;        <span class="keywordtype">int</span> get_inc()</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;        {</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                <span class="keywordflow">return</span> inc;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        }</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;        </div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        nec_float get_xpr1()</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;                <span class="keywordflow">return</span> xpr1;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        }</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        </div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        nec_float get_xpr2()</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        {</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                <span class="keywordflow">return</span> xpr2;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        }</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        </div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="comment">/* end of functions added for the python wrapping */</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;        </div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> set_output(<a class="code" href="classnec__output__file.html">nec_output_file</a> in_output, <a class="code" href="classnec__output__flags.html">nec_output_flags</a> in_output_flags)</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;        {</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                <a class="code" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">m_output</a> = in_output;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                <a class="code" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">m_output_flags</a> = in_output_flags;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                </div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                m_output_fp = <a class="code" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">m_output</a>.get_fp();</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        }</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        </div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> set_results_format(<span class="keyword">enum</span> RESULT_FORMAT result_format)</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        {</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>.m_result_format = result_format;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        }</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        </div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <span class="keyword">inline</span> <span class="keywordtype">void</span> set_gain_only(<span class="keywordtype">bool</span> flag)</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        {</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                <a class="code" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">m_output_flags</a>.set_gain_only(flag);</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;        }</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        </div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;        </div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;        <span class="keyword">static</span> nec_float <a class="code" href="classnec__context.html#a5ea86f18dfe6a6c00207067661ea387c">benchmark</a>();</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;        </div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ac99c8a76e2087387a195692aebb7182c">geometry_complete</a>(<span class="keywordtype">int</span> card_int_1, <span class="keywordtype">int</span> card_int_2);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;  </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;  <span class="comment">/* added for the python wrapping : some access functions */</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;  </div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;  <span class="keywordtype">void</span> set_isave(<span class="keywordtype">int</span> in_isave)</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;  {</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;          isave = in_isave;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;  }</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;  </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;  <span class="keywordtype">int</span> get_inc()</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;  {</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;          <span class="keywordflow">return</span> inc;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;  }</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;  </div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  nec_float get_xpr1()</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;  {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;          <span class="keywordflow">return</span> xpr1;</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;  }</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;  </div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;  nec_float get_xpr2()</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;  {</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;          <span class="keywordflow">return</span> xpr2;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;  }</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  </div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;  <span class="comment">/* end of functions added for the python wrapping */</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  </div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> set_output(<a class="code" href="classnec__output__file.html">nec_output_file</a> in_output, <a class="code" href="classnec__output__flags.html">nec_output_flags</a> in_output_flags)</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;  {</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;          <a class="code" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">m_output</a> = in_output;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;          <a class="code" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">m_output_flags</a> = in_output_flags;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;          </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;          m_output_fp = <a class="code" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">m_output</a>.get_fp();</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;  }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;  </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> set_results_format(<span class="keyword">enum</span> RESULT_FORMAT result_format)</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;  {</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;          <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>.m_result_format = result_format;</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;  }</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;  </div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;  <span class="keyword">inline</span> <span class="keywordtype">void</span> set_gain_only(<span class="keywordtype">bool</span> flag)</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;  {</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;          <a class="code" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">m_output_flags</a>.set_gain_only(flag);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;  }</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;  </div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;  </div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;  <span class="keyword">static</span> nec_float <a class="code" href="classnec__context.html#a5ea86f18dfe6a6c00207067661ea387c">benchmark</a>();</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ac8cc5570c60507e978c6e34b0dfb3430">geometry_complete</a>(<span class="keywordtype">int</span> gpflag);</div>
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        </div>
-<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="classnec__context.html#ad3dbbc8c41c0a47726473c7f1cbd7d6a">  293</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ad3dbbc8c41c0a47726473c7f1cbd7d6a">medium_parameters</a>(nec_float permittivity, nec_float permeability)</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;        {</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                em::constants::permittivity = permittivity;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                em::constants::permeability = permeability;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        }</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        </div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        </div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a5922ac8993b9ce8a689f40f4253e2c15">wire</a>(<span class="keywordtype">int</span> tag_id, <span class="keywordtype">int</span> segment_count,</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  nec_float xw1, nec_float yw1, nec_float zw1,</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  nec_float xw2, nec_float yw2, nec_float zw2,</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;  nec_float rad, nec_float rdel, nec_float rrad);</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;  <span class="keywordtype">void</span> sp_card(<span class="keywordtype">int</span> ns,</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      nec_float x1, nec_float y1, nec_float z1,</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;      nec_float x2, nec_float y2, nec_float z2);</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;  <span class="keywordtype">void</span> sc_card( <span class="keywordtype">int</span> i2,</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      nec_float x3, nec_float y3, nec_float z3,</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;      nec_float x4, nec_float y4, nec_float z4);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;  <span class="keywordtype">void</span> gx_card(<span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2);</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;  <span class="keywordtype">void</span> move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                        nec_float ys, nec_float zs, <span class="keywordtype">int</span> its, <span class="keywordtype">int</span> nrpt, <span class="keywordtype">int</span> itgi );</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a1c518e51aa430229b425b1761327c902">arc</a>( <span class="keywordtype">int</span> tag_id, <span class="keywordtype">int</span> segment_count, nec_float rada,</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                        nec_float ang1, nec_float ang2, nec_float rad );</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;                        </div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        </div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a5a4737c67aaf82a90aff08b306226ef7">helix</a>(<span class="keywordtype">int</span> tag_id, <span class="keywordtype">int</span> segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1,</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;                        nec_float a2, nec_float b2, nec_float rad);</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;  </div>
+<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="classnec__context.html#ad3dbbc8c41c0a47726473c7f1cbd7d6a">  293</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ad3dbbc8c41c0a47726473c7f1cbd7d6a">medium_parameters</a>(nec_float permittivity, nec_float permeability)  {</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    em::constants::permittivity = permittivity;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    em::constants::permeability = permeability;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;  }</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;  </div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;  </div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a5922ac8993b9ce8a689f40f4253e2c15">wire</a>(<span class="keywordtype">int</span> tag_id, <span class="keywordtype">int</span> segment_count,</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;  nec_float xw1, nec_float yw1, nec_float zw1,</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;  nec_float xw2, nec_float yw2, nec_float zw2,</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;  nec_float rad, nec_float rdel, nec_float rrad);</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;  <span class="keywordtype">void</span> sp_card(<span class="keywordtype">int</span> ns,</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;      nec_float x1, nec_float y1, nec_float z1,</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;      nec_float x2, nec_float y2, nec_float z2);</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;  <span class="keywordtype">void</span> sc_card( <span class="keywordtype">int</span> i2,</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;      nec_float x3, nec_float y3, nec_float z3,</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;      nec_float x4, nec_float y4, nec_float z4);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;  <span class="keywordtype">void</span> gx_card(<span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2);</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;  <span class="keywordtype">void</span> move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                        nec_float ys, nec_float zs, <span class="keywordtype">int</span> its, <span class="keywordtype">int</span> nrpt, <span class="keywordtype">int</span> itgi );</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a1c518e51aa430229b425b1761327c902">arc</a>( <span class="keywordtype">int</span> tag_id, <span class="keywordtype">int</span> segment_count, nec_float rada,</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;                        nec_float ang1, nec_float ang2, nec_float rad );</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                        </div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        </div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a5a4737c67aaf82a90aff08b306226ef7">helix</a>(<span class="keywordtype">int</span> tag_id, <span class="keywordtype">int</span> segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1,</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;                        nec_float a2, nec_float b2, nec_float rad);</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        </div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        </div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;        </div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a34eee1efd79d8658470fcd400faa1d75">fr_card</a>(<span class="keywordtype">int</span> in_ifrq, <span class="keywordtype">int</span> in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq);</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;        </div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">ld_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3);</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        </div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a124bb06c25d9aa47305ae75b53becb59">gn_card</a>(<span class="keywordtype">int</span> ground_type, <span class="keywordtype">int</span> rad_wire_count, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a34eee1efd79d8658470fcd400faa1d75">fr_card</a>(<span class="keywordtype">int</span> in_ifrq, <span class="keywordtype">int</span> in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq);</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;        </div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">ld_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3);</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        </div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a124bb06c25d9aa47305ae75b53becb59">gn_card</a>(<span class="keywordtype">int</span> ground_type, <span class="keywordtype">int</span> rad_wire_count, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        </div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        </div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        </div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">ex_card</a>(<span class="keyword">enum</span> excitation_type itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">ex_card</a>(<span class="keyword">enum</span> excitation_type itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;        </div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;        </div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;        </div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;        </div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a37c44cb57a4250e62e93cb4462c3ebb1">tl_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;        </div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae180e6dbb18f88af76f1735c7fcd8369">nt_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;        </div>
-<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a0bd676db26f9fd11f77c538395d7e544">xq_card</a>(<span class="keywordtype">int</span> itmp1);</div>
-<div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;        </div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a9d983c07377a7228ff4f9214718f7728">gd_card</a>(nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4);</div>
-<div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;        </div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a3824916fca4ec09417908a807478df94">rp_card</a>(<span class="keywordtype">int</span> calc_mode,</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;                <span class="keywordtype">int</span> n_theta, <span class="keywordtype">int</span> n_phi,</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;                <span class="keywordtype">int</span> output_format, <span class="keywordtype">int</span> normalization, <span class="keywordtype">int</span> D, <span class="keywordtype">int</span> A,</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;                nec_float theta0, nec_float phi0, nec_float delta_theta, nec_float delta_phi,</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;                nec_float radial_distance, nec_float gain_norm);</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        </div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a4e88e938d7f527c287a69c413fe33a3c">pt_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a37c44cb57a4250e62e93cb4462c3ebb1">tl_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        </div>
+<div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae180e6dbb18f88af76f1735c7fcd8369">nt_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;        </div>
+<div class="line"><a name="l00498"></a><span class="lineno">  498</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a0bd676db26f9fd11f77c538395d7e544">xq_card</a>(<span class="keywordtype">int</span> itmp1);</div>
+<div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;        </div>
+<div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a9d983c07377a7228ff4f9214718f7728">gd_card</a>(nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4);</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;        </div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a3824916fca4ec09417908a807478df94">rp_card</a>(<span class="keywordtype">int</span> calc_mode,</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;                <span class="keywordtype">int</span> n_theta, <span class="keywordtype">int</span> n_phi,</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;                <span class="keywordtype">int</span> output_format, <span class="keywordtype">int</span> normalization, <span class="keywordtype">int</span> D, <span class="keywordtype">int</span> A,</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;                nec_float theta0, nec_float phi0, nec_float delta_theta, nec_float delta_phi,</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;                nec_float radial_distance, nec_float gain_norm);</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;        </div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a4e88e938d7f527c287a69c413fe33a3c">pt_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;        </div>
 <div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        </div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;        </div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a0d6aa9a7a02a1b3de2a1a8cae34a3d17">pq_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a0d6aa9a7a02a1b3de2a1a8cae34a3d17">pq_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;        </div>
 <div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        </div>
 <div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        </div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;        </div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae07d221fc6f283b4cebcfe0f02952299">kh_card</a>(nec_float tmp1);</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae07d221fc6f283b4cebcfe0f02952299">kh_card</a>(nec_float tmp1);</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;        </div>
 <div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;        </div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;        </div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a1a4d81e39397ccbfcd88b7e9a8d1bf6f">ne_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;        </div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#aec472fd8b56936829ac843dfab51d3f1">nh_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        </div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a1a4857cb0459a4c55b8470fdc8a54591">set_extended_thin_wire_kernel</a>(<span class="keywordtype">bool</span> ekflag);</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a1a4d81e39397ccbfcd88b7e9a8d1bf6f">ne_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;        </div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#aec472fd8b56936829ac843dfab51d3f1">nh_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;        </div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a1a4857cb0459a4c55b8470fdc8a54591">set_extended_thin_wire_kernel</a>(<span class="keywordtype">bool</span> ekflag);</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        </div>
 <div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;        </div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;        </div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a6f7197cbf2b823cfcffa7ab551cfe10e">cp_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a6f7197cbf2b823cfcffa7ab551cfe10e">cp_card</a>(<span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;        </div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;        </div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;        </div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a8b7a317840370edf6da4c0e0aea7b25b">pl_card</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* ploutput_filename, <span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a8b7a317840370edf6da4c0e0aea7b25b">pl_card</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* ploutput_filename, <span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4);</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        </div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        </div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        </div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;        <span class="comment">/*!****************************************************</span></div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;<span class="comment">        *** normal exit of nec2++ when all jobs complete ok ***</span></div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;<span class="comment">        ******************************************************/</span></div>
-<div class="line"><a name="l00620"></a><span class="lineno"><a class="line" href="classnec__context.html#aff5de04b0628e0297a452eb798ab8cbd">  620</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#aff5de04b0628e0297a452eb798ab8cbd">all_jobs_completed</a>()</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        {</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;        }</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;        </div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;        <span class="keywordtype">void</span> write_results(ostream&amp; os)</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;        {</div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;                <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>.write(os);</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;        }</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;        <span class="comment">/*!****************************************************</span></div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;<span class="comment">        *** normal exit of nec2++ when all jobs complete ok ***</span></div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;<span class="comment">        ******************************************************/</span></div>
+<div class="line"><a name="l00619"></a><span class="lineno"><a class="line" href="classnec__context.html#aff5de04b0628e0297a452eb798ab8cbd">  619</a></span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#aff5de04b0628e0297a452eb798ab8cbd">all_jobs_completed</a>()</div>
+<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        {</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        }</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;        </div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;        <span class="keywordtype">void</span> write_results(ostream&amp; os)</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;        {</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;                <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>.write(os);</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;        }</div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;        </div>
 <div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;        </div>
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;        </div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;        </div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a4738884b86f8092d724b87ed5a69d9cf">simulate</a>(<span class="keywordtype">bool</span> far_field_flag = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;</div>
-<div class="line"><a name="l00645"></a><span class="lineno"><a class="line" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">  645</a></span>&#160;        <a class="code" href="classnec__output__file.html">nec_output_file</a> <a class="code" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">m_output</a>;</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        <a class="code" href="classnec__ground.html">nec_ground</a> ground;</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        <a class="code" href="classc__geometry.html">c_geometry</a>* m_geometry;</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        <a class="code" href="classc__plot__card.html">c_plot_card</a> plot_card;</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;        </div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        <a class="code" href="classc__ggrid.html">c_ggrid</a> ggrid;</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;        <a class="code" href="classc__ground__wave.html">c_ground_wave</a> ground_wave;</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;        </div>
-<div class="line"><a name="l00655"></a><span class="lineno"><a class="line" href="classnec__context.html#a9c3c55b2c071c5f0da9b2672284a73b3">  655</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#a9c3c55b2c071c5f0da9b2672284a73b3">iptflq</a>;</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        <span class="keywordtype">int</span> iptaq, iptaqf, iptaqt;</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#a4738884b86f8092d724b87ed5a69d9cf">simulate</a>(<span class="keywordtype">bool</span> far_field_flag = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;</div>
+<div class="line"><a name="l00644"></a><span class="lineno"><a class="line" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">  644</a></span>&#160;        <a class="code" href="classnec__output__file.html">nec_output_file</a> <a class="code" href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">m_output</a>;</div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;        <a class="code" href="classnec__ground.html">nec_ground</a> ground;</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        <a class="code" href="classc__geometry.html">c_geometry</a>* m_geometry;</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        <a class="code" href="classc__plot__card.html">c_plot_card</a> plot_card;</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;        </div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;        <a class="code" href="classc__ggrid.html">c_ggrid</a> ggrid;</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        <a class="code" href="classc__ground__wave.html">c_ground_wave</a> ground_wave;</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;        </div>
+<div class="line"><a name="l00654"></a><span class="lineno"><a class="line" href="classnec__context.html#a9c3c55b2c071c5f0da9b2672284a73b3">  654</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#a9c3c55b2c071c5f0da9b2672284a73b3">iptflq</a>;</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;        <span class="keywordtype">int</span> iptaq, iptaqf, iptaqt;</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        </div>
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;        </div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;        </div>
-<div class="line"><a name="l00660"></a><span class="lineno"><a class="line" href="classnec__context.html#a858b0f158bd81de81c74e2831731c541">  660</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#a858b0f158bd81de81c74e2831731c541">iptflg</a>;</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;        <span class="keywordtype">int</span> iptag, iptagf, iptagt;</div>
+<div class="line"><a name="l00659"></a><span class="lineno"><a class="line" href="classnec__context.html#a858b0f158bd81de81c74e2831731c541">  659</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#a858b0f158bd81de81c74e2831731c541">iptflg</a>;</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;        <span class="keywordtype">int</span> iptag, iptagf, iptagt;</div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;        </div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;        </div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;        </div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        <span class="keywordtype">int</span> iflow;</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;        <span class="keywordtype">int</span> ifrq, nfrq;</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;        nec_float delfrq;</div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;        </div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <span class="comment">// strcture loading</span></div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> ldtyp, ldtag, ldtagf, ldtagt;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> zlr, zli, zlc;</div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;        </div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;        <span class="comment">// normalized receiving pattern</span></div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;        <a class="code" href="classsafe__matrix.html">real_matrix</a> fnorm;</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;        </div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;        <span class="keywordtype">int</span> nthi, nphi;</div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        nec_float thetis, phiss;</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;        <span class="keywordtype">int</span> iflow;</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        <span class="keywordtype">int</span> ifrq, nfrq;</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;        nec_float delfrq;</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;        </div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;        <span class="comment">// strcture loading</span></div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> ldtyp, ldtag, ldtagf, ldtagt;</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> zlr, zli, zlc;</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        </div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;        <span class="comment">// normalized receiving pattern</span></div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;        <a class="code" href="classsafe__matrix.html">real_matrix</a> fnorm;</div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;        </div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;        <span class="keywordtype">int</span> nthi, nphi;</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;        nec_float thetis, phiss;</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        </div>
 <div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;        </div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;        </div>
-<div class="line"><a name="l00681"></a><span class="lineno"><a class="line" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">  681</a></span>&#160;        <a class="code" href="classnec__results.html">nec_results</a> <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>;</div>
+<div class="line"><a name="l00680"></a><span class="lineno"><a class="line" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">  680</a></span>&#160;        <a class="code" href="classnec__results.html">nec_results</a> <a class="code" href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">m_results</a>;</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;        </div>
 <div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;        </div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;        </div>
-<div class="line"><a name="l00685"></a><span class="lineno"><a class="line" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">  685</a></span>&#160;        <a class="code" href="classnec__output__flags.html">nec_output_flags</a> <a class="code" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">m_output_flags</a>;</div>
+<div class="line"><a name="l00684"></a><span class="lineno"><a class="line" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">  684</a></span>&#160;        <a class="code" href="classnec__output__flags.html">nec_output_flags</a> <a class="code" href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">m_output_flags</a>;</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;        </div>
 <div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;        </div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;        </div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;        nec_float wavelength;</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;        </div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        <span class="comment">/* common  /cmb/ */</span></div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> cm;       <span class="comment">// primary interaction matrix</span></div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        </div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;        <span class="comment">/* common  /matpar/ */</span></div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        <span class="keywordtype">int</span> icase, npblk, nlast;</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        <span class="keywordtype">int</span> nbbx, npbx, nlbx, nbbl, npbl, nlbl;</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        </div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <span class="comment">/* common  /save/ */</span></div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> ip;</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;        nec_float freq_mhz;</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;        </div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;        <span class="comment">/* common  /crnt/ */</span></div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> air, aii; </div>
-<div class="line"><a name="l00703"></a><span class="lineno"><a class="line" href="classnec__context.html#aa6bfccb18921caed28e287e18af54c40">  703</a></span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> <a class="code" href="classnec__context.html#aa6bfccb18921caed28e287e18af54c40">bir</a>, bii; </div>
-<div class="line"><a name="l00704"></a><span class="lineno"><a class="line" href="classnec__context.html#a6e99cbb0e53ccb06868a55d25c3afd6b">  704</a></span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> <a class="code" href="classnec__context.html#a6e99cbb0e53ccb06868a55d25c3afd6b">cir</a>, cii; </div>
-<div class="line"><a name="l00705"></a><span class="lineno"><a class="line" href="classnec__context.html#a7c1790e2fa7cd5c016eef6db9eaa425a">  705</a></span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> <a class="code" href="classnec__context.html#a7c1790e2fa7cd5c016eef6db9eaa425a">current_vector</a>;   </div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;        </div>
-<div class="line"><a name="l00707"></a><span class="lineno"><a class="line" href="classnec__context.html#a397b586c51ed3ed558c3c78a0b38ce2a">  707</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#a397b586c51ed3ed558c3c78a0b38ce2a">ifar</a>; </div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;                </div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;        <span class="comment">/* common  /zload/ */</span></div>
-<div class="line"><a name="l00710"></a><span class="lineno"><a class="line" href="classnec__context.html#ab612c63cb6f44b33162568f19140bd0d">  710</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#ab612c63cb6f44b33162568f19140bd0d">nload</a>;</div>
-<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> zarray;</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;        </div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;        <span class="comment">/* common  /yparm/ */</span></div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;        <span class="keywordtype">int</span> ncoup, icoup;</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> nctag, ncseg;</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> y11a, y12a;</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;        </div>
-<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;        <span class="comment">/* common  /vsorc/ */</span></div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> ivqd, source_segment_array, iqds;</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;        <span class="keywordtype">int</span> nvqd, voltage_source_count, nqds;</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> vqd, vqds, source_voltage_array;</div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;        </div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;        <span class="comment">/* common  /netcx/ */</span></div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        <span class="keywordtype">int</span> masym, neq, npeq, neq2, network_count, ntsol, nprint;</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> iseg1, iseg2, ntyp;</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> x11r, x11i, x12r;</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> x12i, x22r, x22i;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        nec_float input_power, network_power_loss;</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;        nec_complex zped;</div>
-<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        </div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        <span class="comment">/* common  /fpat/ */</span></div>
-<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;        <span class="keyword">enum</span> excitation_type m_excitation_type;</div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;        </div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        <span class="keywordtype">int</span> m_rp_output_format;</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;        <span class="keywordtype">int</span> m_rp_normalization;</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        </div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        <span class="keywordtype">int</span> m_near, nfeh, nrx, nry, nrz, nth, nph, ipd, iavp;</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        nec_float thets, phis, dth, dph, rfld, gnor; </div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        nec_float xpr6, structure_power_loss, xnr, ynr, znr, dxnr, dynr, dznr;</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;        nec_float wavelength;</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;        </div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;        <span class="comment">/* common  /cmb/ */</span></div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> cm;       <span class="comment">// primary interaction matrix</span></div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        </div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        <span class="comment">/* common  /matpar/ */</span></div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;        <span class="keywordtype">int</span> icase, npblk, nlast;</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        <span class="keywordtype">int</span> nbbx, npbx, nlbx, nbbl, npbl, nlbl;</div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        </div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;        <span class="comment">/* common  /save/ */</span></div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> ip;</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;        nec_float freq_mhz;</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;        </div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;        <span class="comment">/* common  /crnt/ */</span></div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> air, aii; </div>
+<div class="line"><a name="l00702"></a><span class="lineno"><a class="line" href="classnec__context.html#aa6bfccb18921caed28e287e18af54c40">  702</a></span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> <a class="code" href="classnec__context.html#aa6bfccb18921caed28e287e18af54c40">bir</a>, bii; </div>
+<div class="line"><a name="l00703"></a><span class="lineno"><a class="line" href="classnec__context.html#a6e99cbb0e53ccb06868a55d25c3afd6b">  703</a></span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> <a class="code" href="classnec__context.html#a6e99cbb0e53ccb06868a55d25c3afd6b">cir</a>, cii; </div>
+<div class="line"><a name="l00704"></a><span class="lineno"><a class="line" href="classnec__context.html#a7c1790e2fa7cd5c016eef6db9eaa425a">  704</a></span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> <a class="code" href="classnec__context.html#a7c1790e2fa7cd5c016eef6db9eaa425a">current_vector</a>;   </div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;        </div>
+<div class="line"><a name="l00706"></a><span class="lineno"><a class="line" href="classnec__context.html#a397b586c51ed3ed558c3c78a0b38ce2a">  706</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#a397b586c51ed3ed558c3c78a0b38ce2a">ifar</a>; </div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;                </div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;        <span class="comment">/* common  /zload/ */</span></div>
+<div class="line"><a name="l00709"></a><span class="lineno"><a class="line" href="classnec__context.html#ab612c63cb6f44b33162568f19140bd0d">  709</a></span>&#160;        <span class="keywordtype">int</span> <a class="code" href="classnec__context.html#ab612c63cb6f44b33162568f19140bd0d">nload</a>;</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> zarray;</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;        </div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;        <span class="comment">/* common  /yparm/ */</span></div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;        <span class="keywordtype">int</span> ncoup, icoup;</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> nctag, ncseg;</div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> y11a, y12a;</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;        </div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;        <span class="comment">/* common  /vsorc/ */</span></div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> ivqd, source_segment_array, iqds;</div>
+<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;        <span class="keywordtype">int</span> nvqd, voltage_source_count, nqds;</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> vqd, vqds, source_voltage_array;</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;        </div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;        <span class="comment">/* common  /netcx/ */</span></div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;        <span class="keywordtype">int</span> masym, neq, npeq, neq2, network_count, ntsol, nprint;</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        <a class="code" href="classsafe__array.html">int_array</a> iseg1, iseg2, ntyp;</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> x11r, x11i, x12r;</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        <a class="code" href="classsafe__array.html">real_array</a> x12i, x22r, x22i;</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        nec_float input_power, network_power_loss;</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;        nec_complex zped;</div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;        </div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;        <span class="comment">/* common  /fpat/ */</span></div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        <span class="keyword">enum</span> excitation_type m_excitation_type;</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;        </div>
+<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;        <span class="keywordtype">int</span> m_rp_output_format;</div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        <span class="keywordtype">int</span> m_rp_normalization;</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;        </div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        <span class="keywordtype">int</span> m_near, nfeh, nrx, nry, nrz, nth, nph, ipd, iavp;</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        nec_float thets, phis, dth, dph, rfld, gnor; </div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        nec_float xpr6, structure_power_loss, xnr, ynr, znr, dxnr, dynr, dznr;</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        </div>
 <div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;        </div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        </div>
-<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;        <span class="comment">/* common  /dataj/ */</span></div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;        <span class="keywordtype">int</span> ind1, indd1, ind2, indd2;</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;        <span class="keywordtype">bool</span> m_use_exk; <span class="comment">/* Was iexk */</span></div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;        </div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        nec_float m_s, m_b, xj, yj, zj, cabj, sabj, salpj;</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;        nec_float rkh; <span class="comment">/* matrix integration limit */</span></div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        nec_float t1xj, t1yj, t1zj, t2xj, t2yj, t2zj;</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;        nec_complex  exk, eyk, ezk, exs, eys, ezs, exc, eyc, ezc;</div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        </div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="comment">/* common  /smat/ */</span></div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        <span class="keywordtype">int</span> nop; <span class="comment">/* My addition */</span></div>
-<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> symmetry_array;</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;        </div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;        <span class="comment">/* common  /incom/ */</span></div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;        <span class="keywordtype">int</span> isnor;</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;        nec_float xo, yo, zo, sn, xsn, ysn;</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;        </div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;        <span class="comment">/* common  /tmi/ */</span></div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;        <span class="keywordtype">int</span> ija; <span class="comment">/* changed to ija to avoid conflict */</span></div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;        nec_float zpk, rkb2;</div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;        </div>
-<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;        <span class="comment">/*common  /tmh/ */</span></div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;        nec_float zpka, rhks;</div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;</div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;        </div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;        <span class="comment">// some auxiliary functions to be made private once</span></div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;        <span class="comment">// the radiation pattern calculation is done entirely</span></div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;        <span class="comment">// inside this class...</span></div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae2ff9e8e2287a452afeff2701bba6858">gfld</a>(nec_float rho, nec_float phi, nec_float rz,</div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;                nec_complex *eth, nec_complex *epi,</div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;                nec_complex *erd, <span class="keywordtype">bool</span> space_only, nec_float _wavelength  );</div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;        </div>
-<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;        <span class="keywordtype">void</span> ffld(nec_float thet, nec_float phi,</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;                nec_complex *eth, nec_complex *eph, nec_float _wavelength  );</div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;        </div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;</div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;        <span class="keywordtype">void</span> ne_nh_card(<span class="keywordtype">int</span> in_nfeh, <span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        <span class="comment">/* common  /dataj/ */</span></div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;        <span class="keywordtype">int</span> ind1, indd1, ind2, indd2;</div>
+<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;        <span class="keywordtype">bool</span> m_use_exk; <span class="comment">/* Was iexk */</span></div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;        </div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;        nec_float m_s, m_b, xj, yj, zj, cabj, sabj, salpj;</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;        nec_float rkh; <span class="comment">/* matrix integration limit */</span></div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;        nec_float t1xj, t1yj, t1zj, t2xj, t2yj, t2zj;</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;        nec_complex  exk, eyk, ezk, exs, eys, ezs, exc, eyc, ezc;</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;        </div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;        <span class="comment">/* common  /smat/ */</span></div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        <span class="keywordtype">int</span> nop; <span class="comment">/* My addition */</span></div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        <a class="code" href="classsafe__array.html">complex_array</a> symmetry_array;</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;        </div>
+<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;        <span class="comment">/* common  /incom/ */</span></div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;        <span class="keywordtype">int</span> isnor;</div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;        nec_float xo, yo, zo, sn, xsn, ysn;</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;        </div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;        <span class="comment">/* common  /tmi/ */</span></div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;        <span class="keywordtype">int</span> ija; <span class="comment">/* changed to ija to avoid conflict */</span></div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;        nec_float zpk, rkb2;</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;        </div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;        <span class="comment">/*common  /tmh/ */</span></div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;        nec_float zpka, rhks;</div>
+<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;</div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;        </div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;        <span class="comment">// some auxiliary functions to be made private once</span></div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;        <span class="comment">// the radiation pattern calculation is done entirely</span></div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;        <span class="comment">// inside this class...</span></div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;        <span class="keywordtype">void</span> <a class="code" href="classnec__context.html#ae2ff9e8e2287a452afeff2701bba6858">gfld</a>(nec_float rho, nec_float phi, nec_float rz,</div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;                nec_complex *eth, nec_complex *epi,</div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;                nec_complex *erd, <span class="keywordtype">bool</span> space_only, nec_float _wavelength  );</div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;        </div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;        <span class="keywordtype">void</span> ffld(nec_float thet, nec_float phi,</div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;                nec_complex *eth, nec_complex *eph, nec_float _wavelength  );</div>
+<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;        </div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;</div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;        <span class="keywordtype">void</span> ne_nh_card(<span class="keywordtype">int</span> in_nfeh, <span class="keywordtype">int</span> itmp1, <span class="keywordtype">int</span> itmp2, <span class="keywordtype">int</span> itmp3, <span class="keywordtype">int</span> itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;        </div>
 <div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;        </div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;        </div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;        <span class="keywordtype">void</span> print_freq_int_krnl(</div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;                nec_float f, </div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;                nec_float lambda, </div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;                nec_float int_dist, </div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;                <span class="keywordtype">bool</span> using_extended_kernel);</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;                </div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        <span class="keywordtype">void</span>    antenna_env(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;        </div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        <span class="comment">/*no more used */</span></div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;        <span class="keywordtype">void</span>    print_structure_currents(<span class="keywordtype">char</span> *pattype, <span class="keywordtype">int</span> iptflg, <span class="keywordtype">int</span> iptflq, <span class="keywordtype">int</span> iptag, <span class="keywordtype">int</span> iptagf, <span class="keywordtype">int</span> iptagt, <span class="keywordtype">int</span> iptaq, </div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;                <span class="keywordtype">int</span> iptaqf, <span class="keywordtype">int</span> iptaqt);</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;                </div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;        <span class="keywordtype">void</span>    calculate_network_data(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        <span class="keywordtype">void</span>    print_network_data(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;        <span class="keywordtype">void</span>    print_norm_rx_pattern();</div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        <span class="keywordtype">void</span>    print_input_impedance();</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        <span class="keywordtype">void</span>    print_power_budget(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        <span class="keywordtype">void</span>    structure_segment_loading();</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;                </div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;        </div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;        <span class="keyword">enum</span> excitation_return</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;                excitation_loop(<span class="keywordtype">int</span> in_freq_loop_state, <span class="keywordtype">int</span> mhz);</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;                        </div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        <span class="keywordtype">void</span>    setup_excitation();</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;        </div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;        <span class="comment">/* pointers to output files */</span></div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;        FILE *m_output_fp;</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;        </div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        <span class="keywordtype">int</span> inc, processing_state, isave;</div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;        <span class="keywordtype">int</span> nthic, nphic;</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;        <span class="keywordtype">int</span> iped;</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;        </div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;        nec_float impedance_norm_factor; <span class="comment">// was zpnorm</span></div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;        </div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        nec_float xpr1, xpr2, xpr3, xpr4, xpr5, xpr7;</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;        </div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        <a class="code" href="classnec__structure__currents.html">nec_structure_currents</a>* structure_currents;</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        </div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;        <span class="keywordtype">void</span> load();</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;        <span class="keywordtype">void</span> cmset(int64_t nrow, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, nec_float rkhx);</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;        <span class="keywordtype">void</span> compute_matrix_ss(<span class="keywordtype">int</span> j1, <span class="keywordtype">int</span> j2, <span class="keywordtype">int</span> im1, <span class="keywordtype">int</span> im2,</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;                        <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, int64_t nrow, <span class="keywordtype">int</span> itrp);</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        <span class="keywordtype">void</span> cmsw(<span class="keywordtype">int</span> j1, <span class="keywordtype">int</span> j2, <span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm,</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;                        <a class="code" href="classsafe__array.html">complex_array</a>&amp; cw, int64_t ncw, int64_t nrow, <span class="keywordtype">int</span> itrp);</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;        <span class="keywordtype">void</span> cmws( <span class="keywordtype">int</span> j, <span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm,</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;                        int64_t nr, <a class="code" href="classsafe__array.html">complex_array</a>&amp; cw, int64_t nw, <span class="keywordtype">int</span> itrp );</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        </div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        <span class="keywordtype">void</span> cmww(<span class="keywordtype">int</span> j, <span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, int64_t nr,</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;                        <a class="code" href="classsafe__array.html">complex_array</a>&amp; cw, int64_t nw, <span class="keywordtype">int</span> itrp);</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;        <span class="keywordtype">void</span> couple(<a class="code" href="classsafe__array.html">complex_array</a>&amp; cur, nec_float wlam);</div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;</div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;        <span class="keywordtype">void</span> efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, <span class="keywordtype">bool</span> on_source_segment);</div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;        <span class="keywordtype">void</span> eksc(nec_float s, nec_float z, nec_float rh, nec_float xk, <span class="keywordtype">int</span> ij,</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;                        nec_complex *ezs, nec_complex *ers, nec_complex *ezc,</div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;                        nec_complex *erc, nec_complex *ezk, nec_complex *erk);</div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;        <span class="keywordtype">void</span> ekscx(nec_float bx, nec_float s, nec_float z, nec_float rhx, nec_float xk,</div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;                        <span class="keywordtype">int</span> ij, <span class="keywordtype">int</span> inx1, <span class="keywordtype">int</span> inx2, nec_complex *ezs,</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;                        nec_complex *ers, nec_complex *ezc, nec_complex *erc,</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;                        nec_complex *ezk, nec_complex *erk);</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;        <span class="keywordtype">void</span> etmns(nec_float p1, nec_float p2, nec_float p3, nec_float p4, nec_float p5,</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;                        nec_float p6, nec_float incident_amplitude, <span class="keyword">enum</span> excitation_type excite_type, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;        <span class="keywordtype">void</span> fblock( <span class="keywordtype">int</span> nrow, <span class="keywordtype">int</span> ncol, <span class="keywordtype">int</span> imax, <span class="keywordtype">int</span> ipsym );</div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;        <span class="keywordtype">void</span> gf(nec_float zk, nec_float *co, nec_float *si);</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;        <span class="keywordtype">void</span> gh(nec_float zk, nec_float *hr, nec_float *hi);</div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;        <span class="keywordtype">void</span> gx(nec_float zz, nec_float rh, nec_float xk,</div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;                        nec_complex *gz, nec_complex *gzp);</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;        <span class="keywordtype">void</span> gxx(nec_float zz, nec_float rh, nec_float a, nec_float a2, nec_float xk,</div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;                        <span class="keywordtype">int</span> ira, nec_complex *g1, nec_complex *g1p, nec_complex *g2,</div>
-<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;                        nec_complex *g2p, nec_complex *g3, nec_complex *gzp);</div>
-<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;        <span class="keywordtype">void</span> hfk(nec_float el1, nec_float el2, nec_float rhk,</div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;                        nec_float zpkx, nec_float *sgr, nec_float *sgi);</div>
-<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;        <span class="keywordtype">void</span> hintg(nec_float xi, nec_float yi, nec_float zi);</div>
-<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;        <span class="keywordtype">void</span> hsfld(nec_float xi, nec_float yi, nec_float zi, nec_float ai);</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;        <span class="keywordtype">void</span> hsflx(nec_float s, nec_float rh, nec_float zpx, nec_complex *hpk,</div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;                        nec_complex *hps, nec_complex *hpc);</div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;</div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;        <span class="keywordtype">void</span> intx(nec_float el1, nec_float el2, nec_float b, <span class="keywordtype">int</span> ij,</div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;                        nec_float *sgr, nec_float *sgi);</div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;</div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;        <span class="keywordtype">void</span> nefld(nec_float xob, nec_float yob, nec_float zob, nec_complex *ex,</div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;                        nec_complex *ey, nec_complex *ez);</div>
-<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;        <span class="keywordtype">void</span> netwk(<a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, <a class="code" href="classsafe__array.html">int_array</a>&amp; in_ip, <a class="code" href="classsafe__array.html">complex_array</a>&amp; einc);</div>
-<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;        <span class="keywordtype">void</span> nfpat(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;        <span class="keywordtype">void</span> nhfld(nec_float xob, nec_float yob, nec_float zob, nec_complex *hx,</div>
-<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;                        nec_complex *hy, nec_complex *hz);</div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;        <span class="keywordtype">void</span> pcint(nec_float xi, nec_float yi, nec_float zi, nec_float cabi,</div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;                        nec_float sabi, nec_float salpi, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;        <span class="keywordtype">void</span> impedance_print(<span class="keywordtype">int</span> in1, <span class="keywordtype">int</span> in2, <span class="keywordtype">int</span> in3, nec_float fl1, nec_float fl2,</div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;                        nec_float fl3, nec_float fl4, nec_float fl5, nec_float fl6, <span class="keyword">const</span> <span class="keywordtype">char</span> *ia);</div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;        <span class="keywordtype">void</span> qdsrc(<span class="keywordtype">int</span> is, nec_complex v, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;</div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;        </div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;        <span class="keywordtype">void</span> rom2(nec_float a, nec_float b, <a class="code" href="classsafe__array.html">complex_array</a>&amp; sum, nec_float dmin);</div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;        <span class="keywordtype">void</span> sflds(<span class="keyword">const</span> nec_float t, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
-<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;        <span class="keywordtype">void</span> solgf(nec_complex *a, nec_complex *b, nec_complex *c,</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;                        nec_complex *d, nec_complex *xy, <span class="keywordtype">int</span> *ip, <span class="keywordtype">int</span> np, <span class="keywordtype">int</span> n1,</div>
-<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;                        <span class="keywordtype">int</span> n, <span class="keywordtype">int</span> mp, <span class="keywordtype">int</span> m1, <span class="keywordtype">int</span> m, <span class="keywordtype">int</span> n1c, <span class="keywordtype">int</span> n2c, <span class="keywordtype">int</span> n2cz);</div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;        <span class="keywordtype">void</span> unere(nec_float xob, nec_float yob, nec_float zob, <span class="keywordtype">bool</span> ground_reflection);</div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;        nec_complex zint(nec_float sigl, nec_float rolam);</div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;        </div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;        <span class="keywordtype">void</span> init_voltage_sources();</div>
-<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;</div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;}; <span class="comment">/* nec_context */</span></div>
-<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;</div>
-<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __nec_context__ */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;</div>
-<div class="ttc" id="classnec__context_html_a2ea5f4988966753f7597dbb9a6ecc0b9"><div class="ttname"><a href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">nec_context::m_output</a></div><div class="ttdeci">nec_output_file m_output</div><div class="ttdoc">an object to pipe output through... </div><div class="ttdef"><b>Definition:</b> nec_context.h:645</div></div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;        <span class="keywordtype">void</span> print_freq_int_krnl(</div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;                nec_float f, </div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;                nec_float lambda, </div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;                nec_float int_dist, </div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;                <span class="keywordtype">bool</span> using_extended_kernel);</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;                </div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;        <span class="keywordtype">void</span>    antenna_env(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        </div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;        <span class="comment">/*no more used */</span></div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;        <span class="keywordtype">void</span>    print_structure_currents(<span class="keywordtype">char</span> *pattype, <span class="keywordtype">int</span> iptflg, <span class="keywordtype">int</span> iptflq, <span class="keywordtype">int</span> iptag, <span class="keywordtype">int</span> iptagf, <span class="keywordtype">int</span> iptagt, <span class="keywordtype">int</span> iptaq, </div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;                <span class="keywordtype">int</span> iptaqf, <span class="keywordtype">int</span> iptaqt);</div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;                </div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;        <span class="keywordtype">void</span>    calculate_network_data(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;        <span class="keywordtype">void</span>    print_network_data(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;        <span class="keywordtype">void</span>    print_norm_rx_pattern();</div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;        <span class="keywordtype">void</span>    print_input_impedance();</div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;        <span class="keywordtype">void</span>    print_power_budget(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;        <span class="keywordtype">void</span>    structure_segment_loading();</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;                </div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        </div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;        <span class="keyword">enum</span> excitation_return</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;                excitation_loop(<span class="keywordtype">int</span> in_freq_loop_state, <span class="keywordtype">int</span> mhz);</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;                        </div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;        <span class="keywordtype">void</span>    setup_excitation();</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        </div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;        <span class="comment">/* pointers to output files */</span></div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;        FILE *m_output_fp;</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;        </div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;        <span class="keywordtype">int</span> inc, processing_state, isave;</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;        <span class="keywordtype">int</span> nthic, nphic;</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;        <span class="keywordtype">int</span> iped;</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;        </div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;        nec_float impedance_norm_factor; <span class="comment">// was zpnorm</span></div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;        </div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;        nec_float xpr1, xpr2, xpr3, xpr4, xpr5, xpr7;</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;        </div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;        <a class="code" href="classnec__structure__currents.html">nec_structure_currents</a>* structure_currents;</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        </div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        <span class="keywordtype">void</span> load();</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;</div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;        <span class="keywordtype">void</span> cmset(int64_t nrow, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, nec_float rkhx);</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;        <span class="keywordtype">void</span> compute_matrix_ss(<span class="keywordtype">int</span> j1, <span class="keywordtype">int</span> j2, <span class="keywordtype">int</span> im1, <span class="keywordtype">int</span> im2,</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;                        <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, int64_t nrow, <span class="keywordtype">int</span> itrp);</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        <span class="keywordtype">void</span> cmsw(<span class="keywordtype">int</span> j1, <span class="keywordtype">int</span> j2, <span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm,</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;                        <a class="code" href="classsafe__array.html">complex_array</a>&amp; cw, int64_t ncw, int64_t nrow, <span class="keywordtype">int</span> itrp);</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;        <span class="keywordtype">void</span> cmws( <span class="keywordtype">int</span> j, <span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm,</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;                        int64_t nr, <a class="code" href="classsafe__array.html">complex_array</a>&amp; cw, int64_t nw, <span class="keywordtype">int</span> itrp );</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;        </div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        <span class="keywordtype">void</span> cmww(<span class="keywordtype">int</span> j, <span class="keywordtype">int</span> i1, <span class="keywordtype">int</span> i2, <a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, int64_t nr,</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;                        <a class="code" href="classsafe__array.html">complex_array</a>&amp; cw, int64_t nw, <span class="keywordtype">int</span> itrp);</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;        <span class="keywordtype">void</span> couple(<a class="code" href="classsafe__array.html">complex_array</a>&amp; cur, nec_float wlam);</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;        <span class="keywordtype">void</span> efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, <span class="keywordtype">bool</span> on_source_segment);</div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;        <span class="keywordtype">void</span> eksc(nec_float s, nec_float z, nec_float rh, nec_float xk, <span class="keywordtype">int</span> ij,</div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;                        nec_complex *ezs, nec_complex *ers, nec_complex *ezc,</div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;                        nec_complex *erc, nec_complex *ezk, nec_complex *erk);</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        <span class="keywordtype">void</span> ekscx(nec_float bx, nec_float s, nec_float z, nec_float rhx, nec_float xk,</div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;                        <span class="keywordtype">int</span> ij, <span class="keywordtype">int</span> inx1, <span class="keywordtype">int</span> inx2, nec_complex *ezs,</div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;                        nec_complex *ers, nec_complex *ezc, nec_complex *erc,</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;                        nec_complex *ezk, nec_complex *erk);</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;        <span class="keywordtype">void</span> etmns(nec_float p1, nec_float p2, nec_float p3, nec_float p4, nec_float p5,</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;                        nec_float p6, nec_float incident_amplitude, <span class="keyword">enum</span> excitation_type excite_type, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;        <span class="keywordtype">void</span> fblock( <span class="keywordtype">int</span> nrow, <span class="keywordtype">int</span> ncol, <span class="keywordtype">int</span> imax, <span class="keywordtype">int</span> ipsym );</div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;        <span class="keywordtype">void</span> gf(nec_float zk, nec_float *co, nec_float *si);</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;        <span class="keywordtype">void</span> gh(nec_float zk, nec_float *hr, nec_float *hi);</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;        <span class="keywordtype">void</span> gx(nec_float zz, nec_float rh, nec_float xk,</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;                        nec_complex *gz, nec_complex *gzp);</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;        <span class="keywordtype">void</span> gxx(nec_float zz, nec_float rh, nec_float a, nec_float a2, nec_float xk,</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;                        <span class="keywordtype">int</span> ira, nec_complex *g1, nec_complex *g1p, nec_complex *g2,</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;                        nec_complex *g2p, nec_complex *g3, nec_complex *gzp);</div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;        <span class="keywordtype">void</span> hfk(nec_float el1, nec_float el2, nec_float rhk,</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;                        nec_float zpkx, nec_float *sgr, nec_float *sgi);</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;        <span class="keywordtype">void</span> hintg(nec_float xi, nec_float yi, nec_float zi);</div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;        <span class="keywordtype">void</span> hsfld(nec_float xi, nec_float yi, nec_float zi, nec_float ai);</div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;        <span class="keywordtype">void</span> hsflx(nec_float s, nec_float rh, nec_float zpx, nec_complex *hpk,</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;                        nec_complex *hps, nec_complex *hpc);</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;</div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;        <span class="keywordtype">void</span> intx(nec_float el1, nec_float el2, nec_float b, <span class="keywordtype">int</span> ij,</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;                        nec_float *sgr, nec_float *sgi);</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;        <span class="keywordtype">void</span> nefld(nec_float xob, nec_float yob, nec_float zob, nec_complex *ex,</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;                        nec_complex *ey, nec_complex *ez);</div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;        <span class="keywordtype">void</span> netwk(<a class="code" href="classsafe__array.html">complex_array</a>&amp; in_cm, <a class="code" href="classsafe__array.html">int_array</a>&amp; in_ip, <a class="code" href="classsafe__array.html">complex_array</a>&amp; einc);</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;        <span class="keywordtype">void</span> nfpat(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;        <span class="keywordtype">void</span> nhfld(nec_float xob, nec_float yob, nec_float zob, nec_complex *hx,</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;                        nec_complex *hy, nec_complex *hz);</div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;        <span class="keywordtype">void</span> pcint(nec_float xi, nec_float yi, nec_float zi, nec_float cabi,</div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;                        nec_float sabi, nec_float salpi, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;        <span class="keywordtype">void</span> impedance_print(<span class="keywordtype">int</span> in1, <span class="keywordtype">int</span> in2, <span class="keywordtype">int</span> in3, nec_float fl1, nec_float fl2,</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;                        nec_float fl3, nec_float fl4, nec_float fl5, nec_float fl6, <span class="keyword">const</span> <span class="keywordtype">char</span> *ia);</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;        <span class="keywordtype">void</span> qdsrc(<span class="keywordtype">int</span> is, nec_complex v, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;</div>
+<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;        </div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;        <span class="keywordtype">void</span> rom2(nec_float a, nec_float b, <a class="code" href="classsafe__array.html">complex_array</a>&amp; sum, nec_float dmin);</div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;        <span class="keywordtype">void</span> sflds(<span class="keyword">const</span> nec_float t, <a class="code" href="classsafe__array.html">complex_array</a>&amp; e);</div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;        <span class="keywordtype">void</span> solgf(nec_complex *a, nec_complex *b, nec_complex *c,</div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;                        nec_complex *d, nec_complex *xy, <span class="keywordtype">int</span> *ip, <span class="keywordtype">int</span> np, <span class="keywordtype">int</span> n1,</div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;                        <span class="keywordtype">int</span> n, <span class="keywordtype">int</span> mp, <span class="keywordtype">int</span> m1, <span class="keywordtype">int</span> m, <span class="keywordtype">int</span> n1c, <span class="keywordtype">int</span> n2c, <span class="keywordtype">int</span> n2cz);</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;        <span class="keywordtype">void</span> unere(nec_float xob, nec_float yob, nec_float zob, <span class="keywordtype">bool</span> ground_reflection);</div>
+<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;        nec_complex zint(nec_float sigl, nec_float rolam);</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;        </div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;        <span class="keywordtype">void</span> init_voltage_sources();</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;</div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;}; <span class="comment">/* nec_context */</span></div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;</div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __nec_context__ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;</div>
+<div class="ttc" id="classnec__context_html_a2ea5f4988966753f7597dbb9a6ecc0b9"><div class="ttname"><a href="classnec__context.html#a2ea5f4988966753f7597dbb9a6ecc0b9">nec_context::m_output</a></div><div class="ttdeci">nec_output_file m_output</div><div class="ttdoc">an object to pipe output through... </div><div class="ttdef"><b>Definition:</b> nec_context.h:644</div></div>
 <div class="ttc" id="classnec__results_html_a5524102f368ce18b767f9e023c446e25"><div class="ttname"><a href="classnec__results.html#a5524102f368ce18b767f9e023c446e25">nec_results::get_near_field_pattern</a></div><div class="ttdeci">nec_near_field_pattern * get_near_field_pattern(const long index)</div><div class="ttdoc">Get near field pattern results. </div><div class="ttdef"><b>Definition:</b> nec_results.h:900</div></div>
 <div class="ttc" id="classnec__context_html_a257aba38b71bff167eefab39979b45b4"><div class="ttname"><a href="classnec__context.html#a257aba38b71bff167eefab39979b45b4">nec_context::get_input_parameters</a></div><div class="ttdeci">nec_antenna_input * get_input_parameters(int index)</div><div class="ttdoc">Get Antenna Input Parameter Results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:184</div></div>
-<div class="ttc" id="classnec__context_html_a5ea86f18dfe6a6c00207067661ea387c"><div class="ttname"><a href="classnec__context.html#a5ea86f18dfe6a6c00207067661ea387c">nec_context::benchmark</a></div><div class="ttdeci">static nec_float benchmark()</div><div class="ttdoc">Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:142</div></div>
+<div class="ttc" id="classnec__context_html_a5ea86f18dfe6a6c00207067661ea387c"><div class="ttname"><a href="classnec__context.html#a5ea86f18dfe6a6c00207067661ea387c">nec_context::benchmark</a></div><div class="ttdeci">static nec_float benchmark()</div><div class="ttdoc">Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:140</div></div>
 <div class="ttc" id="classc__ggrid_html"><div class="ttname"><a href="classc__ggrid.html">c_ggrid</a></div><div class="ttdef"><b>Definition:</b> c_ggrid.h:34</div></div>
 <div class="ttc" id="classnec__results_html_ab52f1c8597a18381adf16db6bb0facee"><div class="ttname"><a href="classnec__results.html#ab52f1c8597a18381adf16db6bb0facee">nec_results::get_radiation_pattern</a></div><div class="ttdeci">nec_radiation_pattern * get_radiation_pattern(const long index)</div><div class="ttdoc">Get radiation pattern results. </div><div class="ttdef"><b>Definition:</b> nec_results.h:870</div></div>
-<div class="ttc" id="classnec__context_html_a4738884b86f8092d724b87ed5a69d9cf"><div class="ttname"><a href="classnec__context.html#a4738884b86f8092d724b87ed5a69d9cf">nec_context::simulate</a></div><div class="ttdeci">void simulate(bool far_field_flag=false)</div><div class="ttdoc">Start a simulation. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:993</div></div>
-<div class="ttc" id="classnec__context_html_aec472fd8b56936829ac843dfab51d3f1"><div class="ttname"><a href="classnec__context.html#aec472fd8b56936829ac843dfab51d3f1">nec_context::nh_card</a></div><div class="ttdeci">void nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:894</div></div>
-<div class="ttc" id="classnec__context_html_a3824916fca4ec09417908a807478df94"><div class="ttname"><a href="classnec__context.html#a3824916fca4ec09417908a807478df94">nec_context::rp_card</a></div><div class="ttdeci">void rp_card(int calc_mode, int n_theta, int n_phi, int output_format, int normalization, int D, int A, nec_float theta0, nec_float phi0, nec_float delta_theta, nec_float delta_phi, nec_float radial_distance, nec_float gain_norm)</div><div class="ttdoc">Standard radiation pattern parameters. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:808</div></div>
-<div class="ttc" id="classnec__context_html_a0bd676db26f9fd11f77c538395d7e544"><div class="ttname"><a href="classnec__context.html#a0bd676db26f9fd11f77c538395d7e544">nec_context::xq_card</a></div><div class="ttdeci">void xq_card(int itmp1)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:717</div></div>
-<div class="ttc" id="classnec__context_html_a9d983c07377a7228ff4f9214718f7728"><div class="ttname"><a href="classnec__context.html#a9d983c07377a7228ff4f9214718f7728">nec_context::gd_card</a></div><div class="ttdeci">void gd_card(nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:761</div></div>
+<div class="ttc" id="classnec__context_html_a4738884b86f8092d724b87ed5a69d9cf"><div class="ttname"><a href="classnec__context.html#a4738884b86f8092d724b87ed5a69d9cf">nec_context::simulate</a></div><div class="ttdeci">void simulate(bool far_field_flag=false)</div><div class="ttdoc">Start a simulation. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:990</div></div>
+<div class="ttc" id="classnec__context_html_aec472fd8b56936829ac843dfab51d3f1"><div class="ttname"><a href="classnec__context.html#aec472fd8b56936829ac843dfab51d3f1">nec_context::nh_card</a></div><div class="ttdeci">void nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:891</div></div>
+<div class="ttc" id="classnec__context_html_a3824916fca4ec09417908a807478df94"><div class="ttname"><a href="classnec__context.html#a3824916fca4ec09417908a807478df94">nec_context::rp_card</a></div><div class="ttdeci">void rp_card(int calc_mode, int n_theta, int n_phi, int output_format, int normalization, int D, int A, nec_float theta0, nec_float phi0, nec_float delta_theta, nec_float delta_phi, nec_float radial_distance, nec_float gain_norm)</div><div class="ttdoc">Standard radiation pattern parameters. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:805</div></div>
+<div class="ttc" id="classnec__context_html_a0bd676db26f9fd11f77c538395d7e544"><div class="ttname"><a href="classnec__context.html#a0bd676db26f9fd11f77c538395d7e544">nec_context::xq_card</a></div><div class="ttdeci">void xq_card(int itmp1)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:714</div></div>
+<div class="ttc" id="classnec__context_html_a9d983c07377a7228ff4f9214718f7728"><div class="ttname"><a href="classnec__context.html#a9d983c07377a7228ff4f9214718f7728">nec_context::gd_card</a></div><div class="ttdeci">void gd_card(nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:758</div></div>
 <div class="ttc" id="classnec__results_html_a666f61985c6b7dd21e5fd12699801e1b"><div class="ttname"><a href="classnec__results.html#a666f61985c6b7dd21e5fd12699801e1b">nec_results::get_structure_excitation</a></div><div class="ttdeci">nec_structure_excitation * get_structure_excitation(const long index)</div><div class="ttdoc">Get structure excitation results. </div><div class="ttdef"><b>Definition:</b> nec_results.h:890</div></div>
-<div class="ttc" id="classnec__context_html_aff5de04b0628e0297a452eb798ab8cbd"><div class="ttname"><a href="classnec__context.html#aff5de04b0628e0297a452eb798ab8cbd">nec_context::all_jobs_completed</a></div><div class="ttdeci">void all_jobs_completed()</div><div class="ttdef"><b>Definition:</b> nec_context.h:620</div></div>
+<div class="ttc" id="classnec__context_html_aff5de04b0628e0297a452eb798ab8cbd"><div class="ttname"><a href="classnec__context.html#aff5de04b0628e0297a452eb798ab8cbd">nec_context::all_jobs_completed</a></div><div class="ttdeci">void all_jobs_completed()</div><div class="ttdef"><b>Definition:</b> nec_context.h:619</div></div>
 <div class="ttc" id="classc__ground__wave_html"><div class="ttname"><a href="classc__ground__wave.html">c_ground_wave</a></div><div class="ttdef"><b>Definition:</b> c_ggrid.h:61</div></div>
-<div class="ttc" id="classnec__context_html_a0762a9e4589ef260c9ee0e884c16dffa"><div class="ttname"><a href="classnec__context.html#a0762a9e4589ef260c9ee0e884c16dffa">nec_context::calc_prepare</a></div><div class="ttdeci">void calc_prepare()</div><div class="ttdoc">After the geometry has been specified, this function prepares for calculations. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:97</div></div>
-<div class="ttc" id="classnec__context_html_a5a4737c67aaf82a90aff08b306226ef7"><div class="ttname"><a href="classnec__context.html#a5a4737c67aaf82a90aff08b306226ef7">nec_context::helix</a></div><div class="ttdeci">void helix(int tag_id, int segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1, nec_float a2, nec_float b2, nec_float rad)</div><div class="ttdoc">Add an helix to the geometry,. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:357</div></div>
+<div class="ttc" id="classnec__context_html_a0762a9e4589ef260c9ee0e884c16dffa"><div class="ttname"><a href="classnec__context.html#a0762a9e4589ef260c9ee0e884c16dffa">nec_context::calc_prepare</a></div><div class="ttdeci">void calc_prepare()</div><div class="ttdoc">After the geometry has been specified, this function prepares for calculations. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:95</div></div>
+<div class="ttc" id="classnec__context_html_a5a4737c67aaf82a90aff08b306226ef7"><div class="ttname"><a href="classnec__context.html#a5a4737c67aaf82a90aff08b306226ef7">nec_context::helix</a></div><div class="ttdeci">void helix(int tag_id, int segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1, nec_float a2, nec_float b2, nec_float rad)</div><div class="ttdoc">Add an helix to the geometry,. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:354</div></div>
 <div class="ttc" id="classnec__results_html_af975c4ee9d270e7525c353770bf7e966"><div class="ttname"><a href="classnec__results.html#af975c4ee9d270e7525c353770bf7e966">nec_results::get_norm_rx_pattern</a></div><div class="ttdeci">nec_norm_rx_pattern * get_norm_rx_pattern(const long index)</div><div class="ttdoc">Get normalized receiving pattern results. </div><div class="ttdef"><b>Definition:</b> nec_results.h:860</div></div>
-<div class="ttc" id="classnec__context_html_a0d6aa9a7a02a1b3de2a1a8cae34a3d17"><div class="ttname"><a href="classnec__context.html#a0d6aa9a7a02a1b3de2a1a8cae34a3d17">nec_context::pq_card</a></div><div class="ttdeci">void pq_card(int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:867</div></div>
-<div class="ttc" id="classnec__context_html_a5922ac8993b9ce8a689f40f4253e2c15"><div class="ttname"><a href="classnec__context.html#a5922ac8993b9ce8a689f40f4253e2c15">nec_context::wire</a></div><div class="ttdeci">void wire(int tag_id, int segment_count, nec_float xw1, nec_float yw1, nec_float zw1, nec_float xw2, nec_float yw2, nec_float zw2, nec_float rad, nec_float rdel, nec_float rrad)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:287</div></div>
-<div class="ttc" id="classnec__context_html_ae2ff9e8e2287a452afeff2701bba6858"><div class="ttname"><a href="classnec__context.html#ae2ff9e8e2287a452afeff2701bba6858">nec_context::gfld</a></div><div class="ttdeci">void gfld(nec_float rho, nec_float phi, nec_float rz, nec_complex *eth, nec_complex *epi, nec_complex *erd, bool space_only, nec_float _wavelength)</div><div class="ttdoc">gfld computes the radiated field including ground wave. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:6890</div></div>
-<div class="ttc" id="classnec__context_html_a6e99cbb0e53ccb06868a55d25c3afd6b"><div class="ttname"><a href="classnec__context.html#a6e99cbb0e53ccb06868a55d25c3afd6b">nec_context::cir</a></div><div class="ttdeci">real_array cir</div><div class="ttdoc">coefficients of the sine terms in the current interpolation functions </div><div class="ttdef"><b>Definition:</b> nec_context.h:704</div></div>
+<div class="ttc" id="classnec__context_html_a0d6aa9a7a02a1b3de2a1a8cae34a3d17"><div class="ttname"><a href="classnec__context.html#a0d6aa9a7a02a1b3de2a1a8cae34a3d17">nec_context::pq_card</a></div><div class="ttdeci">void pq_card(int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:864</div></div>
+<div class="ttc" id="classnec__context_html_a5922ac8993b9ce8a689f40f4253e2c15"><div class="ttname"><a href="classnec__context.html#a5922ac8993b9ce8a689f40f4253e2c15">nec_context::wire</a></div><div class="ttdeci">void wire(int tag_id, int segment_count, nec_float xw1, nec_float yw1, nec_float zw1, nec_float xw2, nec_float yw2, nec_float zw2, nec_float rad, nec_float rdel, nec_float rrad)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:284</div></div>
+<div class="ttc" id="classnec__context_html_ae2ff9e8e2287a452afeff2701bba6858"><div class="ttname"><a href="classnec__context.html#ae2ff9e8e2287a452afeff2701bba6858">nec_context::gfld</a></div><div class="ttdeci">void gfld(nec_float rho, nec_float phi, nec_float rz, nec_complex *eth, nec_complex *epi, nec_complex *erd, bool space_only, nec_float _wavelength)</div><div class="ttdoc">gfld computes the radiated field including ground wave. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:6887</div></div>
+<div class="ttc" id="classnec__context_html_a6e99cbb0e53ccb06868a55d25c3afd6b"><div class="ttname"><a href="classnec__context.html#a6e99cbb0e53ccb06868a55d25c3afd6b">nec_context::cir</a></div><div class="ttdeci">real_array cir</div><div class="ttdoc">coefficients of the sine terms in the current interpolation functions </div><div class="ttdef"><b>Definition:</b> nec_context.h:703</div></div>
 <div class="ttc" id="classnec__context_html_a4ce001c5388621f8d43dc2f318d39e9f"><div class="ttname"><a href="classnec__context.html#a4ce001c5388621f8d43dc2f318d39e9f">nec_context::get_impedance_imag</a></div><div class="ttdeci">double get_impedance_imag(int freq_index=0)</div><div class="ttdoc">Impedance: Imaginary Part. </div><div class="ttdef"><b>Definition:</b> nec_context.h:172</div></div>
 <div class="ttc" id="classnec__structure__currents_html"><div class="ttname"><a href="classnec__structure__currents.html">nec_structure_currents</a></div><div class="ttdef"><b>Definition:</b> nec_structure_currents.h:30</div></div>
-<div class="ttc" id="classnec__radiation__pattern_html_abdd0ec7a2d08cbcbf65d9099d31b216e"><div class="ttname"><a href="classnec__radiation__pattern.html#abdd0ec7a2d08cbcbf65d9099d31b216e">nec_radiation_pattern::get_power_gain</a></div><div class="ttdeci">nec_float get_power_gain(int theta_index, int phi_index) const </div><div class="ttdoc">Get a total power gain from the radiation pattern. </div><div class="ttdef"><b>Definition:</b> nec_radiation_pattern.h:398</div></div>
+<div class="ttc" id="classnec__radiation__pattern_html_abdd0ec7a2d08cbcbf65d9099d31b216e"><div class="ttname"><a href="classnec__radiation__pattern.html#abdd0ec7a2d08cbcbf65d9099d31b216e">nec_radiation_pattern::get_power_gain</a></div><div class="ttdeci">nec_float get_power_gain(int theta_index, int phi_index) const </div><div class="ttdoc">Get a total power gain from the radiation pattern. </div><div class="ttdef"><b>Definition:</b> nec_radiation_pattern.h:366</div></div>
 <div class="ttc" id="classnec__output__file_html"><div class="ttname"><a href="classnec__output__file.html">nec_output_file</a></div><div class="ttdef"><b>Definition:</b> nec_output.h:56</div></div>
-<div class="ttc" id="classnec__context_html_a124bb06c25d9aa47305ae75b53becb59"><div class="ttname"><a href="classnec__context.html#a124bb06c25d9aa47305ae75b53becb59">nec_context::gn_card</a></div><div class="ttdeci">void gn_card(int ground_type, int rad_wire_count, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdoc">Ground parameters under the antenna. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:457</div></div>
+<div class="ttc" id="classnec__context_html_a124bb06c25d9aa47305ae75b53becb59"><div class="ttname"><a href="classnec__context.html#a124bb06c25d9aa47305ae75b53becb59">nec_context::gn_card</a></div><div class="ttdeci">void gn_card(int ground_type, int rad_wire_count, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdoc">Ground parameters under the antenna. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:454</div></div>
 <div class="ttc" id="classnec__context_html_aef8f878868e44283937e8a39f6209d51"><div class="ttname"><a href="classnec__context.html#aef8f878868e44283937e8a39f6209d51">nec_context::get_gain</a></div><div class="ttdeci">double get_gain(int freq_index, int theta_index, int phi_index)</div><div class="ttdoc">Get the maximum gain in dB. </div><div class="ttdef"><b>Definition:</b> nec_context.h:82</div></div>
 <div class="ttc" id="classnec__results_html_a4da1873d7a69332af8f4ba2770272eb0"><div class="ttname"><a href="classnec__results.html#a4da1873d7a69332af8f4ba2770272eb0">nec_results::get_structure_currents</a></div><div class="ttdeci">nec_structure_currents * get_structure_currents(const long index)</div><div class="ttdoc">Get structure currents results. </div><div class="ttdef"><b>Definition:</b> nec_results.h:910</div></div>
-<div class="ttc" id="classnec__context_html_ac99c8a76e2087387a195692aebb7182c"><div class="ttname"><a href="classnec__context.html#ac99c8a76e2087387a195692aebb7182c">nec_context::geometry_complete</a></div><div class="ttdeci">void geometry_complete(int card_int_1, int card_int_2)</div><div class="ttdoc">Signal the end of a geometry description. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:264</div></div>
 <div class="ttc" id="classnec__context_html_ad3dbbc8c41c0a47726473c7f1cbd7d6a"><div class="ttname"><a href="classnec__context.html#ad3dbbc8c41c0a47726473c7f1cbd7d6a">nec_context::medium_parameters</a></div><div class="ttdeci">void medium_parameters(nec_float permittivity, nec_float permeability)</div><div class="ttdef"><b>Definition:</b> nec_context.h:293</div></div>
 <div class="ttc" id="classnec__context_html_a4dbb5beaf7c7e53d16d81bd3afd745ef"><div class="ttname"><a href="classnec__context.html#a4dbb5beaf7c7e53d16d81bd3afd745ef">nec_context::get_structure_excitation</a></div><div class="ttdeci">nec_structure_excitation * get_structure_excitation(int index)</div><div class="ttdoc">Get structure excitation results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:211</div></div>
 <div class="ttc" id="classnec__context_html_a7620b1bbebb6893b6fd3c727ccc476f1"><div class="ttname"><a href="classnec__context.html#a7620b1bbebb6893b6fd3c727ccc476f1">nec_context::get_structure_currents</a></div><div class="ttdeci">nec_structure_currents * get_structure_currents(int index)</div><div class="ttdoc">Get structure currents results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:229</div></div>
-<div class="ttc" id="classnec__context_html_a4e88e938d7f527c287a69c413fe33a3c"><div class="ttname"><a href="classnec__context.html#a4e88e938d7f527c287a69c413fe33a3c">nec_context::pt_card</a></div><div class="ttdeci">void pt_card(int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:851</div></div>
-<div class="ttc" id="classnec__context_html_a34eee1efd79d8658470fcd400faa1d75"><div class="ttname"><a href="classnec__context.html#a34eee1efd79d8658470fcd400faa1d75">nec_context::fr_card</a></div><div class="ttdeci">void fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:372</div></div>
-<div class="ttc" id="classnec__context_html_ae3bc2cfa92d14dfa02028ca88fbfad19"><div class="ttname"><a href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card</a></div><div class="ttdeci">void ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:486</div></div>
+<div class="ttc" id="classnec__context_html_a4e88e938d7f527c287a69c413fe33a3c"><div class="ttname"><a href="classnec__context.html#a4e88e938d7f527c287a69c413fe33a3c">nec_context::pt_card</a></div><div class="ttdeci">void pt_card(int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:848</div></div>
+<div class="ttc" id="classnec__context_html_a34eee1efd79d8658470fcd400faa1d75"><div class="ttname"><a href="classnec__context.html#a34eee1efd79d8658470fcd400faa1d75">nec_context::fr_card</a></div><div class="ttdeci">void fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:369</div></div>
+<div class="ttc" id="classnec__context_html_ae3bc2cfa92d14dfa02028ca88fbfad19"><div class="ttname"><a href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card</a></div><div class="ttdeci">void ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:483</div></div>
 <div class="ttc" id="classsafe__matrix_html"><div class="ttname"><a href="classsafe__matrix.html">safe_matrix&lt; nec_float &gt;</a></div></div>
-<div class="ttc" id="classnec__context_html_a8b7a317840370edf6da4c0e0aea7b25b"><div class="ttname"><a href="classnec__context.html#a8b7a317840370edf6da4c0e0aea7b25b">nec_context::pl_card</a></div><div class="ttdeci">void pl_card(const char *ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:975</div></div>
-<div class="ttc" id="classnec__context_html_a1a4d81e39397ccbfcd88b7e9a8d1bf6f"><div class="ttname"><a href="classnec__context.html#a1a4d81e39397ccbfcd88b7e9a8d1bf6f">nec_context::ne_card</a></div><div class="ttdeci">void ne_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:889</div></div>
+<div class="ttc" id="classnec__context_html_a8b7a317840370edf6da4c0e0aea7b25b"><div class="ttname"><a href="classnec__context.html#a8b7a317840370edf6da4c0e0aea7b25b">nec_context::pl_card</a></div><div class="ttdeci">void pl_card(const char *ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:972</div></div>
+<div class="ttc" id="classnec__context_html_a1a4d81e39397ccbfcd88b7e9a8d1bf6f"><div class="ttname"><a href="classnec__context.html#a1a4d81e39397ccbfcd88b7e9a8d1bf6f">nec_context::ne_card</a></div><div class="ttdeci">void ne_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:886</div></div>
 <div class="ttc" id="classnec__results_html"><div class="ttname"><a href="classnec__results.html">nec_results</a></div><div class="ttdef"><b>Definition:</b> nec_results.h:797</div></div>
-<div class="ttc" id="classnec__context_html_a37c44cb57a4250e62e93cb4462c3ebb1"><div class="ttname"><a href="classnec__context.html#a37c44cb57a4250e62e93cb4462c3ebb1">nec_context::tl_card</a></div><div class="ttdeci">void tl_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:601</div></div>
+<div class="ttc" id="classnec__context_html_a37c44cb57a4250e62e93cb4462c3ebb1"><div class="ttname"><a href="classnec__context.html#a37c44cb57a4250e62e93cb4462c3ebb1">nec_context::tl_card</a></div><div class="ttdeci">void tl_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:598</div></div>
 <div class="ttc" id="classnec__results_html_ad7e2705b7380d826a9ed1040318a9807"><div class="ttname"><a href="classnec__results.html#ad7e2705b7380d826a9ed1040318a9807">nec_results::get_antenna_input</a></div><div class="ttdeci">nec_antenna_input * get_antenna_input(const long index)</div><div class="ttdoc">Get antenna input parameter results. </div><div class="ttdef"><b>Definition:</b> nec_results.h:880</div></div>
 <div class="ttc" id="classnec__near__field__pattern_html"><div class="ttname"><a href="classnec__near__field__pattern.html">nec_near_field_pattern</a></div><div class="ttdef"><b>Definition:</b> nec_results.h:671</div></div>
-<div class="ttc" id="classnec__context_html_a8e3690b43a90a9b947ffda3727732017"><div class="ttname"><a href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">nec_context::ld_card</a></div><div class="ttdeci">void ld_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:390</div></div>
-<div class="ttc" id="classnec__context_html_a858b0f158bd81de81c74e2831731c541"><div class="ttname"><a href="classnec__context.html#a858b0f158bd81de81c74e2831731c541">nec_context::iptflg</a></div><div class="ttdeci">int iptflg</div><div class="ttdoc">pt card flags... </div><div class="ttdef"><b>Definition:</b> nec_context.h:660</div></div>
+<div class="ttc" id="classnec__context_html_a8e3690b43a90a9b947ffda3727732017"><div class="ttname"><a href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">nec_context::ld_card</a></div><div class="ttdeci">void ld_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:387</div></div>
+<div class="ttc" id="classnec__context_html_a858b0f158bd81de81c74e2831731c541"><div class="ttname"><a href="classnec__context.html#a858b0f158bd81de81c74e2831731c541">nec_context::iptflg</a></div><div class="ttdeci">int iptflg</div><div class="ttdoc">pt card flags... </div><div class="ttdef"><b>Definition:</b> nec_context.h:659</div></div>
 <div class="ttc" id="classc__plot__card_html"><div class="ttname"><a href="classc__plot__card.html">c_plot_card</a></div><div class="ttdef"><b>Definition:</b> c_plot_card.h:44</div></div>
-<div class="ttc" id="classnec__context_html_a7c1790e2fa7cd5c016eef6db9eaa425a"><div class="ttname"><a href="classnec__context.html#a7c1790e2fa7cd5c016eef6db9eaa425a">nec_context::current_vector</a></div><div class="ttdeci">complex_array current_vector</div><div class="ttdoc">coefficients of the cosine terms in the current interpolation functions </div><div class="ttdef"><b>Definition:</b> nec_context.h:705</div></div>
-<div class="ttc" id="classnec__context_html_a1c518e51aa430229b425b1761327c902"><div class="ttname"><a href="classnec__context.html#a1c518e51aa430229b425b1761327c902">nec_context::arc</a></div><div class="ttdeci">void arc(int tag_id, int segment_count, nec_float rada, nec_float ang1, nec_float ang2, nec_float rad)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:335</div></div>
-<div class="ttc" id="classnec__context_html_a1a4857cb0459a4c55b8470fdc8a54591"><div class="ttname"><a href="classnec__context.html#a1a4857cb0459a4c55b8470fdc8a54591">nec_context::set_extended_thin_wire_kernel</a></div><div class="ttdeci">void set_extended_thin_wire_kernel(bool ekflag)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:930</div></div>
+<div class="ttc" id="classnec__context_html_a7c1790e2fa7cd5c016eef6db9eaa425a"><div class="ttname"><a href="classnec__context.html#a7c1790e2fa7cd5c016eef6db9eaa425a">nec_context::current_vector</a></div><div class="ttdeci">complex_array current_vector</div><div class="ttdoc">coefficients of the cosine terms in the current interpolation functions </div><div class="ttdef"><b>Definition:</b> nec_context.h:704</div></div>
+<div class="ttc" id="classnec__context_html_a1c518e51aa430229b425b1761327c902"><div class="ttname"><a href="classnec__context.html#a1c518e51aa430229b425b1761327c902">nec_context::arc</a></div><div class="ttdeci">void arc(int tag_id, int segment_count, nec_float rada, nec_float ang1, nec_float ang2, nec_float rad)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:332</div></div>
+<div class="ttc" id="classnec__context_html_a1a4857cb0459a4c55b8470fdc8a54591"><div class="ttname"><a href="classnec__context.html#a1a4857cb0459a4c55b8470fdc8a54591">nec_context::set_extended_thin_wire_kernel</a></div><div class="ttdeci">void set_extended_thin_wire_kernel(bool ekflag)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:927</div></div>
 <div class="ttc" id="classnec__norm__rx__pattern_html"><div class="ttname"><a href="classnec__norm__rx__pattern.html">nec_norm_rx_pattern</a></div><div class="ttdef"><b>Definition:</b> nec_results.h:274</div></div>
 <div class="ttc" id="classc__geometry_html"><div class="ttname"><a href="classc__geometry.html">c_geometry</a></div><div class="ttdef"><b>Definition:</b> c_geometry.h:51</div></div>
 <div class="ttc" id="classnec__radiation__pattern_html"><div class="ttname"><a href="classnec__radiation__pattern.html">nec_radiation_pattern</a></div><div class="ttdef"><b>Definition:</b> nec_radiation_pattern.h:49</div></div>
 <div class="ttc" id="classnec__context_html_a5eb5f619d7cfccf505e1c4bd6f8df40b"><div class="ttname"><a href="classnec__context.html#a5eb5f619d7cfccf505e1c4bd6f8df40b">nec_context::get_near_field_pattern</a></div><div class="ttdeci">nec_near_field_pattern * get_near_field_pattern(int index)</div><div class="ttdoc">Get near field pattern results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:220</div></div>
-<div class="ttc" id="classnec__context_html_ae180e6dbb18f88af76f1735c7fcd8369"><div class="ttname"><a href="classnec__context.html#ae180e6dbb18f88af76f1735c7fcd8369">nec_context::nt_card</a></div><div class="ttdeci">void nt_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:664</div></div>
-<div class="ttc" id="classnec__context_html_ab612c63cb6f44b33162568f19140bd0d"><div class="ttname"><a href="classnec__context.html#ab612c63cb6f44b33162568f19140bd0d">nec_context::nload</a></div><div class="ttdeci">int nload</div><div class="ttdoc">input integer flag (from RP card) specifies type of field computation, or type of ground system for f...</div><div class="ttdef"><b>Definition:</b> nec_context.h:710</div></div>
+<div class="ttc" id="classnec__context_html_ae180e6dbb18f88af76f1735c7fcd8369"><div class="ttname"><a href="classnec__context.html#ae180e6dbb18f88af76f1735c7fcd8369">nec_context::nt_card</a></div><div class="ttdeci">void nt_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:661</div></div>
+<div class="ttc" id="classnec__context_html_ab612c63cb6f44b33162568f19140bd0d"><div class="ttname"><a href="classnec__context.html#ab612c63cb6f44b33162568f19140bd0d">nec_context::nload</a></div><div class="ttdeci">int nload</div><div class="ttdoc">input integer flag (from RP card) specifies type of field computation, or type of ground system for f...</div><div class="ttdef"><b>Definition:</b> nec_context.h:709</div></div>
 <div class="ttc" id="classnec__context_html_a76cd515fd9bcca374e635947ca2c754d"><div class="ttname"><a href="classnec__context.html#a76cd515fd9bcca374e635947ca2c754d">nec_context::initialize</a></div><div class="ttdeci">void initialize()</div><div class="ttdoc">Initialize everything, called after construction so that we can tell the geometry object what nec_con...</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:58</div></div>
-<div class="ttc" id="classsafe__array_html"><div class="ttname"><a href="classsafe__array.html">safe_array&lt; int &gt;</a></div></div>
+<div class="ttc" id="classsafe__array_html"><div class="ttname"><a href="classsafe__array.html">safe_array&lt; int32_t &gt;</a></div></div>
 <div class="ttc" id="classnec__structure__excitation_html"><div class="ttname"><a href="classnec__structure__excitation.html">nec_structure_excitation</a></div><div class="ttdoc">Holds structure excitation data at network connection points. </div><div class="ttdef"><b>Definition:</b> nec_results.h:474</div></div>
-<div class="ttc" id="classnec__context_html_ae07d221fc6f283b4cebcfe0f02952299"><div class="ttname"><a href="classnec__context.html#ae07d221fc6f283b4cebcfe0f02952299">nec_context::kh_card</a></div><div class="ttdeci">void kh_card(nec_float tmp1)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:882</div></div>
-<div class="ttc" id="classnec__context_html_aa6bfccb18921caed28e287e18af54c40"><div class="ttname"><a href="classnec__context.html#aa6bfccb18921caed28e287e18af54c40">nec_context::bir</a></div><div class="ttdeci">real_array bir</div><div class="ttdoc">coefficients of the constant terms in the current interpolation functions for the current vector ...</div><div class="ttdef"><b>Definition:</b> nec_context.h:703</div></div>
-<div class="ttc" id="classnec__context_html_a24c9f2996889e68ce48e1ed2d1cb0aac"><div class="ttname"><a href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">nec_context::m_results</a></div><div class="ttdeci">nec_results m_results</div><div class="ttdoc">The results object that holds all the specific results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:681</div></div>
-<div class="ttc" id="classnec__context_html_a6f7197cbf2b823cfcffa7ab551cfe10e"><div class="ttname"><a href="classnec__context.html#a6f7197cbf2b823cfcffa7ab551cfe10e">nec_context::cp_card</a></div><div class="ttdeci">void cp_card(int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:940</div></div>
-<div class="ttc" id="classnec__context_html_a9c3c55b2c071c5f0da9b2672284a73b3"><div class="ttname"><a href="classnec__context.html#a9c3c55b2c071c5f0da9b2672284a73b3">nec_context::iptflq</a></div><div class="ttdeci">int iptflq</div><div class="ttdoc">pq card flags </div><div class="ttdef"><b>Definition:</b> nec_context.h:655</div></div>
+<div class="ttc" id="classnec__context_html_ae07d221fc6f283b4cebcfe0f02952299"><div class="ttname"><a href="classnec__context.html#ae07d221fc6f283b4cebcfe0f02952299">nec_context::kh_card</a></div><div class="ttdeci">void kh_card(nec_float tmp1)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:879</div></div>
+<div class="ttc" id="classnec__context_html_aa6bfccb18921caed28e287e18af54c40"><div class="ttname"><a href="classnec__context.html#aa6bfccb18921caed28e287e18af54c40">nec_context::bir</a></div><div class="ttdeci">real_array bir</div><div class="ttdoc">coefficients of the constant terms in the current interpolation functions for the current vector ...</div><div class="ttdef"><b>Definition:</b> nec_context.h:702</div></div>
+<div class="ttc" id="classnec__context_html_a24c9f2996889e68ce48e1ed2d1cb0aac"><div class="ttname"><a href="classnec__context.html#a24c9f2996889e68ce48e1ed2d1cb0aac">nec_context::m_results</a></div><div class="ttdeci">nec_results m_results</div><div class="ttdoc">The results object that holds all the specific results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:680</div></div>
+<div class="ttc" id="classnec__context_html_a6f7197cbf2b823cfcffa7ab551cfe10e"><div class="ttname"><a href="classnec__context.html#a6f7197cbf2b823cfcffa7ab551cfe10e">nec_context::cp_card</a></div><div class="ttdeci">void cp_card(int itmp1, int itmp2, int itmp3, int itmp4)</div><div class="ttdef"><b>Definition:</b> nec_context.cpp:937</div></div>
+<div class="ttc" id="classnec__context_html_a9c3c55b2c071c5f0da9b2672284a73b3"><div class="ttname"><a href="classnec__context.html#a9c3c55b2c071c5f0da9b2672284a73b3">nec_context::iptflq</a></div><div class="ttdeci">int iptflq</div><div class="ttdoc">pq card flags </div><div class="ttdef"><b>Definition:</b> nec_context.h:654</div></div>
 <div class="ttc" id="classnec__output__flags_html"><div class="ttname"><a href="classnec__output__flags.html">nec_output_flags</a></div><div class="ttdef"><b>Definition:</b> nec_output.h:26</div></div>
 <div class="ttc" id="classnec__context_html"><div class="ttname"><a href="classnec__context.html">nec_context</a></div><div class="ttdoc">Container for an nec2++ simulation. </div><div class="ttdef"><b>Definition:</b> nec_context.h:60</div></div>
+<div class="ttc" id="classnec__context_html_ac8cc5570c60507e978c6e34b0dfb3430"><div class="ttname"><a href="classnec__context.html#ac8cc5570c60507e978c6e34b0dfb3430">nec_context::geometry_complete</a></div><div class="ttdeci">void geometry_complete(int gpflag)</div><div class="ttdoc">Signal the end of a geometry description. </div><div class="ttdef"><b>Definition:</b> nec_context.cpp:262</div></div>
 <div class="ttc" id="classnec__context_html_abfe3a94ad13386779d381ff17d5f2c3c"><div class="ttname"><a href="classnec__context.html#abfe3a94ad13386779d381ff17d5f2c3c">nec_context::get_impedance_real</a></div><div class="ttdeci">double get_impedance_real(int freq_index=0)</div><div class="ttdoc">Impedance: Real Part. </div><div class="ttdef"><b>Definition:</b> nec_context.h:165</div></div>
 <div class="ttc" id="classnec__antenna__input_html"><div class="ttname"><a href="classnec__antenna__input.html">nec_antenna_input</a></div><div class="ttdef"><b>Definition:</b> nec_results.h:588</div></div>
 <div class="ttc" id="classnec__context_html_a68e997c457e5cd0bb95fe0d0e5302469"><div class="ttname"><a href="classnec__context.html#a68e997c457e5cd0bb95fe0d0e5302469">nec_context::get_radiation_pattern</a></div><div class="ttdeci">nec_radiation_pattern * get_radiation_pattern(int index)</div><div class="ttdoc">Get Radiation Pattern results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:202</div></div>
-<div class="ttc" id="classnec__context_html_a3eb413168b8b75feae361a85663bee83"><div class="ttname"><a href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">nec_context::m_output_flags</a></div><div class="ttdeci">nec_output_flags m_output_flags</div><div class="ttdoc">an object to pipe output through... </div><div class="ttdef"><b>Definition:</b> nec_context.h:685</div></div>
+<div class="ttc" id="classnec__context_html_a3eb413168b8b75feae361a85663bee83"><div class="ttname"><a href="classnec__context.html#a3eb413168b8b75feae361a85663bee83">nec_context::m_output_flags</a></div><div class="ttdeci">nec_output_flags m_output_flags</div><div class="ttdoc">an object to pipe output through... </div><div class="ttdef"><b>Definition:</b> nec_context.h:684</div></div>
 <div class="ttc" id="classnec__context_html_a2ceddb80c31f560fc78b897c7cb0c898"><div class="ttname"><a href="classnec__context.html#a2ceddb80c31f560fc78b897c7cb0c898">nec_context::get_norm_rx_pattern</a></div><div class="ttdeci">nec_norm_rx_pattern * get_norm_rx_pattern(int index)</div><div class="ttdoc">Get Normalized Receiving Pattern Results. </div><div class="ttdef"><b>Definition:</b> nec_context.h:193</div></div>
-<div class="ttc" id="classnec__context_html_a397b586c51ed3ed558c3c78a0b38ce2a"><div class="ttname"><a href="classnec__context.html#a397b586c51ed3ed558c3c78a0b38ce2a">nec_context::ifar</a></div><div class="ttdeci">int ifar</div><div class="ttdoc">the current vector </div><div class="ttdef"><b>Definition:</b> nec_context.h:707</div></div>
+<div class="ttc" id="classnec__context_html_a397b586c51ed3ed558c3c78a0b38ce2a"><div class="ttname"><a href="classnec__context.html#a397b586c51ed3ed558c3c78a0b38ce2a">nec_context::ifar</a></div><div class="ttdeci">int ifar</div><div class="ttdoc">the current vector </div><div class="ttdef"><b>Definition:</b> nec_context.h:706</div></div>
 <div class="ttc" id="classnec__ground_html"><div class="ttname"><a href="classnec__ground.html">nec_ground</a></div><div class="ttdef"><b>Definition:</b> nec_ground.h:59</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 8 2015 16:52:38 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 12 2015 13:22:02 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

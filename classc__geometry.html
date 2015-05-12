@@ -94,15 +94,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>sc_multiple_card</b> 
 <tr class="memitem:a7d8d1a66f396422a5fbd88cbbda4adde"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d8d1a66f396422a5fbd88cbbda4adde"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>gx_card</b> (int card_int_1, int card_int_2)</td></tr>
 <tr class="separator:a7d8d1a66f396422a5fbd88cbbda4adde"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6c9c68fb68b4c06603677966eeb36a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classc__geometry.html#ac6c9c68fb68b4c06603677966eeb36a4">geometry_complete</a> (<a class="el" href="classnec__context.html">nec_context</a> *m_context, int card_int_1, int card_int_2)</td></tr>
-<tr class="memdesc:ac6c9c68fb68b4c06603677966eeb36a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geometry is complete </p><dl class="exception"><dt>Exceptions</dt><dd>
+<tr class="memitem:ab3cd98518dcfc42f9b6c5b8b5b0b0d3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classc__geometry.html#ab3cd98518dcfc42f9b6c5b8b5b0b0d3a">geometry_complete</a> (<a class="el" href="classnec__context.html">nec_context</a> *m_context, int gpflag)</td></tr>
+<tr class="memdesc:ab3cd98518dcfc42f9b6c5b8b5b0b0d3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Geometry is complete </p><dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">nec_exception*</td><td>If there is an error with the geometry. </td></tr>
   </table>
   </dd>
 </dl>
- <a href="#ac6c9c68fb68b4c06603677966eeb36a4">More...</a><br /></td></tr>
-<tr class="separator:ac6c9c68fb68b4c06603677966eeb36a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+ <a href="#ab3cd98518dcfc42f9b6c5b8b5b0b0d3a">More...</a><br /></td></tr>
+<tr class="separator:ab3cd98518dcfc42f9b6c5b8b5b0b0d3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aceba2ccbadcd5946a8d1710b20ccc2f8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aceba2ccbadcd5946a8d1710b20ccc2f8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classc__geometry.html#aceba2ccbadcd5946a8d1710b20ccc2f8">parse_geometry</a> (<a class="el" href="classnec__context.html">nec_context</a> *m_context, FILE *input_fp)</td></tr>
 <tr class="memdesc:aceba2ccbadcd5946a8d1710b20ccc2f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse an NEC geometry description contained in the file input_fp. <br /></td></tr>
@@ -260,7 +260,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_cpp_8cpp-example.html#_a2">test_cpp.cpp</a>.</dd>
 </dl></div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ac6c9c68fb68b4c06603677966eeb36a4"></a>
+<a class="anchor" id="ab3cd98518dcfc42f9b6c5b8b5b0b0d3a"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -274,13 +274,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>card_int_1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>card_int_2</em>&#160;</td>
+          <td class="paramname"><em>gpflag</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -301,7 +295,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
 
 <p>References <a class="el" href="classnec__wire.html#aed52a9b3654985c98e0c52b6be69b44e">nec_wire::intersect()</a>.</p>
 
-<p>Referenced by <a class="el" href="classnec__context.html#ac99c8a76e2087387a195692aebb7182c">nec_context::geometry_complete()</a>, and <a class="el" href="classc__geometry.html#aceba2ccbadcd5946a8d1710b20ccc2f8">parse_geometry()</a>.</p>
+<p>Referenced by <a class="el" href="classnec__context.html#ac8cc5570c60507e978c6e34b0dfb3430">nec_context::geometry_complete()</a>, and <a class="el" href="classc__geometry.html#aceba2ccbadcd5946a8d1710b20ccc2f8">parse_geometry()</a>.</p>
 
 </div>
 </div>
@@ -447,7 +441,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 8 2015 16:52:38 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 12 2015 13:22:03 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

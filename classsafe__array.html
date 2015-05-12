@@ -47,6 +47,8 @@
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classsafe__array-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">safe_array&lt; T &gt; Class Template Reference</div>  </div>
@@ -78,6 +80,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af553a9167f3ce483ee03353024056176"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af553a9167f3ce483ee03353024056176"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>size</b> () const </td></tr>
 <tr class="separator:af553a9167f3ce483ee03353024056176"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab88e412ffaff993acb6fbf6e8870c82"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab88e412ffaff993acb6fbf6e8870c82"></a>
+int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>rows</b> () const </td></tr>
+<tr class="separator:aab88e412ffaff993acb6fbf6e8870c82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aab0bee3909965a8140bd86ee143692"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0aab0bee3909965a8140bd86ee143692"></a>
+int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>cols</b> () const </td></tr>
+<tr class="separator:a0aab0bee3909965a8140bd86ee143692"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0f1488fe4585f6ba3163d6368cf19c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0f1488fe4585f6ba3163d6368cf19c8"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>capacity</b> () const </td></tr>
 <tr class="separator:ab0f1488fe4585f6ba3163d6368cf19c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,9 +128,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsafe__array.html#af90a01fb6acf1497b9da75a3d3da33d9">get_col_major</a> (int32_t col_dim, int32_t col, int32_t row)</td></tr>
 <tr class="memdesc:af90a01fb6acf1497b9da75a3d3da33d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an element assuming that the data is stored in column major form. <br /></td></tr>
 <tr class="separator:af90a01fb6acf1497b9da75a3d3da33d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdf5ea813cbe1e3ed991c83e7e56b1c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abdf5ea813cbe1e3ed991c83e7e56b1c7"></a>
-T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator()</b> (int32_t row, int32_t col)</td></tr>
+<tr class="memitem:a50d3a56536c1cedafc315354bcec500e"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsafe__array.html#a50d3a56536c1cedafc315354bcec500e">getItem</a> (int32_t row, int32_t col)</td></tr>
+<tr class="separator:a50d3a56536c1cedafc315354bcec500e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdf5ea813cbe1e3ed991c83e7e56b1c7"><td class="memItemLeft" align="right" valign="top">T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsafe__array.html#abdf5ea813cbe1e3ed991c83e7e56b1c7">operator()</a> (int32_t row, int32_t col)</td></tr>
 <tr class="separator:abdf5ea813cbe1e3ed991c83e7e56b1c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6a24fe76ff5876bfffe7175f2d139d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6a24fe76ff5876bfffe7175f2d139d7"></a>
+const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator()</b> (int32_t row, int32_t col) const </td></tr>
+<tr class="separator:ab6a24fe76ff5876bfffe7175f2d139d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a805f50e58bcd60d011d035342abdc3d0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a805f50e58bcd60d011d035342abdc3d0"></a>
+T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getItem</b> (int64_t i)</td></tr>
+<tr class="separator:a805f50e58bcd60d011d035342abdc3d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa33473cec48eb0f92453caa128f1ffc6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa33473cec48eb0f92453caa128f1ffc6"></a>
 const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator[]</b> (int64_t i) const </td></tr>
 <tr class="separator:aa33473cec48eb0f92453caa128f1ffc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,6 +156,42 @@ T *&#160;</td><td class="memItemRight" valign="bottom"><b>data</b> () const </td
 <tr class="memitem:acfd0f12c86db130f5beb094a979889a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfd0f12c86db130f5beb094a979889a3"></a>
 <a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt; &amp;in_array)</td></tr>
 <tr class="separator:acfd0f12c86db130f5beb094a979889a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:adaa167ec2c0b3484835b04d633ab0222"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsafe__array.html#adaa167ec2c0b3484835b04d633ab0222">safe_array</a> (const <a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt; &amp;in_array, int64_t start_index, int64_t end_index, bool in_copy_data)</td></tr>
+<tr class="memdesc:adaa167ec2c0b3484835b04d633ab0222"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor only used to construct segment.  <a href="#adaa167ec2c0b3484835b04d633ab0222">More...</a><br /></td></tr>
+<tr class="separator:adaa167ec2c0b3484835b04d633ab0222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91743eb9b85067e6e8089678ecd28a26"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91743eb9b85067e6e8089678ecd28a26"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>check</b> (int64_t i) const </td></tr>
+<tr class="separator:a91743eb9b85067e6e8089678ecd28a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a062c3425bdbe3099585167f56df258f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a062c3425bdbe3099585167f56df258f7"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>check</b> (int32_t row, int32_t col) const </td></tr>
+<tr class="separator:a062c3425bdbe3099585167f56df258f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:ad3ac7815786f9aba0473fb6ad15dbcfc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3ac7815786f9aba0473fb6ad15dbcfc"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>len_</b></td></tr>
+<tr class="separator:ad3ac7815786f9aba0473fb6ad15dbcfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0914bfa12ad66183da195b55d1407e8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad0914bfa12ad66183da195b55d1407e8"></a>
+int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>rows_</b></td></tr>
+<tr class="separator:ad0914bfa12ad66183da195b55d1407e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a473b47bcb2c9575f2fe0f059888af21d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a473b47bcb2c9575f2fe0f059888af21d"></a>
+int32_t&#160;</td><td class="memItemRight" valign="bottom"><b>cols_</b></td></tr>
+<tr class="separator:a473b47bcb2c9575f2fe0f059888af21d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34fdcf8f8d152c0f9d2a1e0b8e59457f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34fdcf8f8d152c0f9d2a1e0b8e59457f"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>resize_chunk_</b></td></tr>
+<tr class="separator:a34fdcf8f8d152c0f9d2a1e0b8e59457f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91dd4c40b189326b44292c4a818bf9c0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91dd4c40b189326b44292c4a818bf9c0"></a>
+T *&#160;</td><td class="memItemRight" valign="bottom"><b>data_</b></td></tr>
+<tr class="separator:a91dd4c40b189326b44292c4a818bf9c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6de28b3faeccbc9a79e4eb68e9318dd0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6de28b3faeccbc9a79e4eb68e9318dd0"></a>
+int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>data_size_</b></td></tr>
+<tr class="separator:a6de28b3faeccbc9a79e4eb68e9318dd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4457aaeb32faf2434c2246be69002cf7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4457aaeb32faf2434c2246be69002cf7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>own_data_</b></td></tr>
+<tr class="separator:a4457aaeb32faf2434c2246be69002cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T&gt;<br />
@@ -149,7 +200,66 @@ class safe_array&lt; T &gt;</h3>
 <p>A Safe Array class for nec2++ that performs bounds checking. </p>
 <p>Bounds checking is done if the macro NEC_ERROR_CHECK is defined at compile time.</p>
 <p>This class also includes some utility functions for handling common vector operations. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="adaa167ec2c0b3484835b04d633ab0222"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt;::<a class="el" href="classsafe__array.html">safe_array</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>in_array</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>start_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int64_t&#160;</td>
+          <td class="paramname"><em>end_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>in_copy_data</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor only used to construct segment. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">start_index</td><td>The first element of in_array to copy. </td></tr>
+    <tr><td class="paramname">end_index</td><td>The last element of in_array to copy. </td></tr>
+    <tr><td class="paramname">in_copy_data</td><td>True if we create a copy of data from in_array. False - just reference the data in in_array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a27a518db76a721950a2efecb2e78496c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -192,6 +302,82 @@ template&lt;typename T&gt; </div>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a50d3a56536c1cedafc315354bcec500e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; <a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt;::getItem </td>
+          <td>(</td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section remark"><dt>Remarks</dt><dd>This is an accessor function that is useful for wrapping. </dd></dl>
+
+<p>Referenced by <a class="el" href="classsafe__array.html#abdf5ea813cbe1e3ed991c83e7e56b1c7">safe_array&lt; int32_t &gt;::operator()()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abdf5ea813cbe1e3ed991c83e7e56b1c7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">T&amp; <a class="el" href="classsafe__array.html">safe_array</a>&lt; T &gt;::operator() </td>
+          <td>(</td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&#160;</td>
+          <td class="paramname"><em>col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section remark"><dt>Remarks</dt><dd>We use round brackets for indexing into 2D arrays. </dd></dl>
 
 </div>
 </div>
@@ -246,7 +432,7 @@ template&lt;typename T&gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 8 2015 16:52:38 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 12 2015 13:22:03 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>

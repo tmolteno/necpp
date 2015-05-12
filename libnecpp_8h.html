@@ -94,9 +94,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#ab46bfa6c6c11167bff5dc143ec6b0ae8">nec_gx_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int i1, int i2)</td></tr>
 <tr class="memdesc:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reflection in Coordinate Planes.  <a href="#ab46bfa6c6c11167bff5dc143ec6b0ae8">More...</a><br /></td></tr>
 <tr class="separator:ab46bfa6c6c11167bff5dc143ec6b0ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b8d952ae97fde0b12668d9ee4032573"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a7b8d952ae97fde0b12668d9ee4032573">nec_geometry_complete</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int gpflag, int card_int_2)</td></tr>
-<tr class="memdesc:a7b8d952ae97fde0b12668d9ee4032573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicate that the geometry is complete (GE card)  <a href="#a7b8d952ae97fde0b12668d9ee4032573">More...</a><br /></td></tr>
-<tr class="separator:a7b8d952ae97fde0b12668d9ee4032573"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b6825e0707240cb673bd5ad9166a6ba"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a8b6825e0707240cb673bd5ad9166a6ba">nec_geometry_complete</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int gpflag)</td></tr>
+<tr class="memdesc:a8b6825e0707240cb673bd5ad9166a6ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indicate that the geometry is complete (GE card)  <a href="#a8b6825e0707240cb673bd5ad9166a6ba">More...</a><br /></td></tr>
+<tr class="separator:a8b6825e0707240cb673bd5ad9166a6ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Error Handling</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Functions for error handling and utility </p>
 </div></td></tr>
@@ -110,6 +110,9 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td colspan="2"><div class="groupHeader">Antenna Environment</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Functions for specifying the ground and antenna excitation, frequency and loading. </p>
 </div></td></tr>
+<tr class="memitem:a58ea44c541fc6dd0ede9ced71d697057"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a58ea44c541fc6dd0ede9ced71d697057">nec_medium_parameters</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, double permittivity, double permeability)</td></tr>
+<tr class="memdesc:a58ea44c541fc6dd0ede9ced71d697057"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the prameters of the medium (permittivity and permeability)  <a href="#a58ea44c541fc6dd0ede9ced71d697057">More...</a><br /></td></tr>
+<tr class="separator:a58ea44c541fc6dd0ede9ced71d697057"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cf02620e0d0365cbdd24071a7ebeae9"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libnecpp_8h.html#a9cf02620e0d0365cbdd24071a7ebeae9">nec_gn_card</a> (<a class="el" href="classnec__context.html">nec_context</a> *in_context, int iperf, int nradl, double epse, double sig, double tmp3, double tmp4, double tmp5, double tmp6)</td></tr>
 <tr class="memdesc:a9cf02620e0d0365cbdd24071a7ebeae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ground Card Examples:  <a href="#a9cf02620e0d0365cbdd24071a7ebeae9">More...</a><br /></td></tr>
 <tr class="separator:a9cf02620e0d0365cbdd24071a7ebeae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -987,7 +990,7 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
 </dl>
 </div>
 </div>
-<a class="anchor" id="a7b8d952ae97fde0b12668d9ee4032573"></a>
+<a class="anchor" id="a8b6825e0707240cb673bd5ad9166a6ba"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1001,13 +1004,7 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>gpflag</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>card_int_2</em>&#160;</td>
+          <td class="paramname"><em>gpflag</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1024,10 +1021,9 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
     <tr><td class="paramname">gpflag</td><td>Geometry ground plain flag. <ul>
 <li><code>0</code> - no ground plane is present. </li>
 <li><code>1</code> - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero) </li>
-<li><code>-1</code> - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. </li>
+<li><code>-1</code> - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground.</li>
 </ul>
 </td></tr>
-    <tr><td class="paramname">card_int_2</td><td>Unused (set to zero)</td></tr>
   </table>
   </dd>
 </dl>
@@ -1040,7 +1036,7 @@ This function requires a previous <a class="el" href="libnecpp_8h.html#a6c6b8b44
 </dl>
 <dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_nec_8c-example.html#a3">test_nec.c</a>.</dd>
 </dl>
-<p>References <a class="el" href="classnec__context.html#ac99c8a76e2087387a195692aebb7182c">nec_context::geometry_complete()</a>.</p>
+<p>References <a class="el" href="classnec__context.html#ac8cc5570c60507e978c6e34b0dfb3430">nec_context::geometry_complete()</a>.</p>
 
 </div>
 </div>
@@ -1370,6 +1366,57 @@ The tag increment I1 is used to avoid duplication of tag numbers in the image se
 <dl class="section remark"><dt>Remarks</dt><dd>Floating Point Input for the Various Load Types: </dd></dl>
 
 <p>References <a class="el" href="classnec__context.html#a8e3690b43a90a9b947ffda3727732017">nec_context::ld_card()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a58ea44c541fc6dd0ede9ced71d697057"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long nec_medium_parameters </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classnec__context.html">nec_context</a> *&#160;</td>
+          <td class="paramname"><em>in_context</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>permittivity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>permeability</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set the prameters of the medium (permittivity and permeability) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">permittivity</td><td>The electric permittivity of the medium (in farads per meter) </td></tr>
+    <tr><td class="paramname">permeability</td><td>The magnetic permeability of the medium (in henries per meter)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section remark"><dt>Remarks</dt><dd>From these parameters a speed of light is chosen.</dd></dl>
+<dl class="section user"><dt>Example:</dt><dd></dd></dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">err</td><td><code>0</code> indicates that the result is successful and <code>1</code> indicates that an error occurred. Call <a class="el" href="libnecpp_8h.html#a6181b069555b93c36729ff71122b230b" title="Get the last error message All functions return a long. If this is != 0. Then an error has occurred...">nec_error_message()</a> for a detailed message. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="classnec__context.html#ad3dbbc8c41c0a47726473c7f1cbd7d6a">nec_context::medium_parameters()</a>.</p>
 
 </div>
 </div>
@@ -1955,7 +2002,7 @@ The integers n_theta and n_phi and floating point numbers theta0, phi0, delta_th
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri May 8 2015 16:52:38 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 12 2015 13:22:03 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
