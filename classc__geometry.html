@@ -71,6 +71,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>helix</b> (nec_float 
 <tr class="memitem:a07c91992372212398469b2fef838b8a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07c91992372212398469b2fef838b8a7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>move</b> (nec_float rox, nec_float roy, nec_float roz, nec_float xs, nec_float ys, nec_float zs, int its, int nrpt, int itgi)</td></tr>
 <tr class="separator:a07c91992372212398469b2fef838b8a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a358881b1122dceb1a9ed5cc716dbe472"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classc__geometry.html#a358881b1122dceb1a9ed5cc716dbe472">reflect</a> (int ix, int iy, int iz, int itx)</td></tr>
+<tr class="memdesc:a358881b1122dceb1a9ed5cc716dbe472"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reflects partial structure along x,y, or z axes.  <a href="#a358881b1122dceb1a9ed5cc716dbe472">More...</a><br /></td></tr>
+<tr class="separator:a358881b1122dceb1a9ed5cc716dbe472"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac77a76b66c9c11276790025b6d75874c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classc__geometry.html#ac77a76b66c9c11276790025b6d75874c">generate_cylindrical_structure</a> (int itx, int nop)</td></tr>
+<tr class="memdesc:ac77a76b66c9c11276790025b6d75874c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rotates structure along Z-axis to generate a copies in a cylindrical array.  <a href="#ac77a76b66c9c11276790025b6d75874c">More...</a><br /></td></tr>
+<tr class="separator:ac77a76b66c9c11276790025b6d75874c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07c6c9d501b5b5a2cf823745fee02c17"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07c6c9d501b5b5a2cf823745fee02c17"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>reflect</b> (int ix, int iy, int iz, int itx, int nop)</td></tr>
 <tr class="separator:a07c6c9d501b5b5a2cf823745fee02c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -260,6 +266,49 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl><dt><b>Examples: </b></dt><dd><a class="el" href="test_cpp_8cpp-example.html#_a2">test_cpp.cpp</a>.</dd>
 </dl></div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ac77a76b66c9c11276790025b6d75874c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void c_geometry::generate_cylindrical_structure </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>itx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nop</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Rotates structure along Z-axis to generate a copies in a cylindrical array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">itx</td><td>The tag number increment. </td></tr>
+    <tr><td class="paramname">nop</td><td>The total number of times that the structure is to occur in the cylindrical array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="ab3cd98518dcfc42f9b6c5b8b5b0b0d3a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -334,6 +383,65 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
 <dl class="section return"><dt>Returns</dt><dd>The segment number of the mth segment having the tag number in_tag. if in_tag=0 segment number m is returned. </dd></dl>
 
 <p>Referenced by <a class="el" href="classnec__context.html#ae3bc2cfa92d14dfa02028ca88fbfad19">nec_context::ex_card()</a>, <a class="el" href="classnec__context.html#ae180e6dbb18f88af76f1735c7fcd8369">nec_context::nt_card()</a>, and <a class="el" href="classnec__context.html#a37c44cb57a4250e62e93cb4462c3ebb1">nec_context::tl_card()</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a358881b1122dceb1a9ed5cc716dbe472"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void c_geometry::reflect </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iy</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>itx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reflects partial structure along x,y, or z axes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ix</td><td>If ix = 1 then the structure is reflected along X axis. </td></tr>
+    <tr><td class="paramname">iy</td><td>If iy = 1 then the structure is reflected along Y axis. </td></tr>
+    <tr><td class="paramname">iz</td><td>If iz = 1 then the structure is reflected along Z axis. </td></tr>
+    <tr><td class="paramname">itx</td><td>The tag number increment. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Referenced by <a class="el" href="classc__geometry.html#aceba2ccbadcd5946a8d1710b20ccc2f8">parse_geometry()</a>.</p>
 
 </div>
 </div>
@@ -441,7 +549,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>n_plus_3m</b></td></tr
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 12 2015 13:22:03 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 12 2015 13:30:45 for nec2++ by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.8
 </small></address>
