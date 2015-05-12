@@ -495,8 +495,8 @@ public:
   void ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int itmp4, int itmp5,
                   nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
   {
-          int itmp45 = 10*itmp4 + itmp5;
-          return this->ex_card( itmp1, itmp2, itmp3, itmp45, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6 );  
+    int itmp45 = 10*itmp4 + itmp5;
+    return this->ex_card( itmp1, itmp2, itmp3, itmp45, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6 );  
   }
   
   

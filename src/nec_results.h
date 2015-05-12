@@ -41,173 +41,152 @@ This class will handle format changes between various output formats.
 class output_helper
 {
 private:
-	ostream& os;
-	enum RESULT_FORMAT m_format;
-	bool m_in_section;
-	
+  ostream& os;
+  enum RESULT_FORMAT m_format;
+  bool m_in_section;
+  
 public:
 
-	output_helper(ostream& in_os, enum RESULT_FORMAT in_format)
-		: os(in_os), m_format(in_format), m_in_section(false)
-	{
-	}
+  output_helper(ostream& in_os, enum RESULT_FORMAT in_format)
+    : os(in_os), m_format(in_format), m_in_section(false)
+  {
+  }
 
-	~output_helper()
-	{
-		section_end();
-	}
+  ~output_helper()  {
+    section_end();
+  }
 
 
-	inline void separator()
-	{
-		switch (m_format)
-		{
-			case RESULT_FORMAT_CSV:
-				os << ",";
-				break;
-			
-			case RESULT_FORMAT_NEC:
-			default:
-				os << " ";
-				break;
-		}
-	}
-	
-	inline void start_record()
-	{
-		switch (m_format)
-		{
-			case RESULT_FORMAT_XML:
-				os << "<record>";
-				break;
-			
-			default:
-				break;
-		}
-	}
+  inline void separator()  {
+    switch (m_format)  {
+      case RESULT_FORMAT_CSV:
+        os << ",";
+        break;
+      
+      case RESULT_FORMAT_NEC:
+      default:
+        os << " ";
+        break;
+    }
+  }
+  
+  inline void start_record()  {
+    switch (m_format)  {
+      case RESULT_FORMAT_XML:
+        os << "<record>";
+        break;
+      
+      default:
+        break;
+    }
+  }
 
-	inline void end_record()
-	{
-		switch (m_format)
-		{
-			case RESULT_FORMAT_XML:
-				os << "</record>" << endl;
-				break;
-			
-			default:
-				os << endl;
-				break;
-		}
-	}
-	
-	inline void padding(const char* s)
-	{
-		switch (m_format)
-		{
-			case RESULT_FORMAT_NEC:
-				os << s;
-				break;
-			
-			default:
-				break;
-		}
-	}
-	
-	void center_text(const std::string& text, const string& border)
-	{
-		size_t len = text.length() + 2*(border.length() + 1);
-		size_t offset = 40 - len/2;
-		for (size_t i=0;i<offset;i++)
-			os << " ";
-		os << border << " " << text << " " << border << endl;
-	}
+  inline void end_record()  {
+    switch (m_format)  {
+      case RESULT_FORMAT_XML:
+        os << "</record>" << endl;
+        break;
+      
+      default:
+        os << endl;
+        break;
+    }
+  }
+  
+  inline void padding(const char* s)  {
+    switch (m_format)  {
+      case RESULT_FORMAT_NEC:
+        os << s;
+        break;
+      
+      default:
+        break;
+    }
+  }
+  
+  void center_text(const std::string& text, const string& border)  {
+    size_t len = text.length() + 2*(border.length() + 1);
+    size_t offset = 40 - len/2;
+    for (size_t i=0;i<offset;i++)
+      os << " ";
+    os << border << " " << text << " " << border << endl;
+  }
 
-	inline void section_start(const std::string& section_name)
-	{
-		if (m_in_section)
-			section_end();
+  inline void section_start(const std::string& section_name)  {
+    if (m_in_section)
+      section_end();
 
-		switch (m_format)
-		{
-			case RESULT_FORMAT_NEC:
-				os << endl << endl << endl;
-				center_text(section_name, "-----");
-				break;
+    switch (m_format)  {
+      case RESULT_FORMAT_NEC:
+        os << endl << endl << endl;
+        center_text(section_name, "-----");
+        break;
 
-			case RESULT_FORMAT_XML:
-				os << "<section name=\"" << section_name << "\">" << endl;
-				break;
-			
-			default:
-				os << endl << endl << endl;
-				break;
-		}
-		m_in_section = true;
-	}
+      case RESULT_FORMAT_XML:
+        os << "<section name=\"" << section_name << "\">" << endl;
+        break;
+      
+      default:
+        os << endl << endl << endl;
+        break;
+    }
+    m_in_section = true;
+  }
 
-	inline void section_end()
-	{
-		m_in_section = false;
+  inline void section_end()  {
+    m_in_section = false;
 
-		switch (m_format)
-		{
-			case RESULT_FORMAT_NEC:
-				os << endl << endl << endl;
-				break;
+    switch (m_format)  {
+      case RESULT_FORMAT_NEC:
+        os << endl << endl << endl;
+        break;
 
-			case RESULT_FORMAT_XML:
-				os << "</section>" << endl;
-				break;
-			
-			default:
-				os << endl << endl << endl;
-				break;
-		}
-	}
-	
-	inline void int_out(int w, int i)
-	{
-		os << setw(w) << i;
-	}
-	
-	inline void string_out(int w, const std::string& s)
-	{
-		os << right << setw(w) << s;
-	}
-	inline void string_out(int w, const char* s)
-	{
-		os << right << setw(w) << s;
-	}
-	
-	inline void real_out(int w, int p, nec_float f, bool sci = true)
-	{
-		ios::fmtflags flags = ios::showpoint | ios::uppercase | ios::right;
-		if (sci)
-			flags |= ios::scientific;
-		else
-			flags |= ios::fixed;
-		
-		os.unsetf(ios::adjustfield | ios::basefield | ios::floatfield);
-		os.setf(flags);
-		os.precision(p);
-		os.width(w);
-		os << f;
-	}
-	
-	inline void complex_out(int w, int p, nec_complex c, bool sci = true)
-	{
-		real_out(w,p,real(c),sci);
-		separator();
-		real_out(w,p,imag(c),sci);
-	}
+      case RESULT_FORMAT_XML:
+        os << "</section>" << endl;
+        break;
+      
+      default:
+        os << endl << endl << endl;
+        break;
+    }
+  }
+  
+  inline void int_out(int w, int i)  {
+    os << setw(w) << i;
+  }
+  
+  inline void string_out(int w, const std::string& s)  {
+    os << right << setw(w) << s;
+  }
+  inline void string_out(int w, const char* s)  {
+    os << right << setw(w) << s;
+  }
+  
+  inline void real_out(int w, int p, nec_float f, bool sci = true)  {
+    ios::fmtflags flags = ios::showpoint | ios::uppercase | ios::right;
+    if (sci)
+      flags |= ios::scientific;
+    else
+      flags |= ios::fixed;
+    
+    os.unsetf(ios::adjustfield | ios::basefield | ios::floatfield);
+    os.setf(flags);
+    os.precision(p);
+    os.width(w);
+    os << f;
+  }
+  
+  inline void complex_out(int w, int p, nec_complex c, bool sci = true)  {
+    real_out(w,p,real(c),sci);
+    separator();
+    real_out(w,p,imag(c),sci);
+  }
 
-	inline void polar_out(int w, int p, nec_complex c, bool sci = true)
-	{
-		real_out(w,p,abs(c),sci);
-		separator();
-		real_out(w,p,arg_degrees(c),sci);
-	}
-	
+  inline void polar_out(int w, int p, nec_complex c, bool sci = true)  {
+    real_out(w,p,abs(c),sci);
+    separator();
+    real_out(w,p,arg_degrees(c),sci);
+  }
 };
 
 
@@ -414,9 +393,9 @@ public:
         
         oh.start_record();
         oh.padding("                    ");
-        oh.real_out(7,2, theta, false);	oh.separator();
-        oh.real_out(7,2, phi, false);	oh.separator();
-        oh.padding("  "); oh.real_out(7,2, gain, false);	oh.separator();
+        oh.real_out(7,2, theta, false);  oh.separator();
+        oh.real_out(7,2, phi, false);  oh.separator();
+        oh.padding("  "); oh.real_out(7,2, gain, false);  oh.separator();
         oh.padding("  "); oh.real_out(11,4, magnitude);
         oh.end_record();
         
@@ -432,348 +411,306 @@ public:
 class structure_excitation_data
 {
 private:
-	int m_segment_number, m_segment_tag;
-	nec_complex m_voltage, m_current;
-	nec_float m_power;
-	
+  int m_segment_number, m_segment_tag;
+  nec_complex m_voltage, m_current;
+  nec_float m_power;
+  
 public:
-	structure_excitation_data(int segment_number, int segment_tag, nec_complex voltage, nec_complex current, nec_float power)
-	{
-		m_segment_number = segment_number;
-		m_segment_tag = segment_tag;
-		m_voltage = voltage;
-		m_current = current;
-		m_power = power;
-	}
-	
-	void write(output_helper& oh)
-	{
-		nec_complex admittance = m_current / m_voltage;
-		nec_complex impedance = m_voltage / m_current;
-		
-/*		o.nec_printf(" %4d %5d %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E",
-			segment_tag, m_segment_number, real(m_voltage), imag(m_voltage), real(m_current), imag(m_current),
-			real(impedance), imag(impedance), real(admittance), imag(admittance), m_power);
-*/			
-		oh.start_record();
-		oh.int_out(4, m_segment_tag);			oh.separator();
-		oh.int_out(5, m_segment_number);		oh.separator();
-		oh.complex_out(11,4, m_voltage);		oh.separator();
-		oh.complex_out(11,4, m_current);		oh.separator();
-		oh.complex_out(11,4, impedance);		oh.separator();
-		oh.complex_out(11,4, admittance);		oh.separator();
-		oh.real_out(11,4, m_power);
-		oh.end_record();
-	}
+  structure_excitation_data(int segment_number, int segment_tag, nec_complex voltage, nec_complex current, nec_float power)  {
+    m_segment_number = segment_number;
+    m_segment_tag = segment_tag;
+    m_voltage = voltage;
+    m_current = current;
+    m_power = power;
+  }
+  
+  void write(output_helper& oh)  {
+    nec_complex admittance = m_current / m_voltage;
+    nec_complex impedance = m_voltage / m_current;
+    
+/*    o.nec_printf(" %4d %5d %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E",
+      segment_tag, m_segment_number, real(m_voltage), imag(m_voltage), real(m_current), imag(m_current),
+      real(impedance), imag(impedance), real(admittance), imag(admittance), m_power);
+*/      
+    oh.start_record();
+    oh.int_out(4, m_segment_tag);      oh.separator();
+    oh.int_out(5, m_segment_number);    oh.separator();
+    oh.complex_out(11,4, m_voltage);    oh.separator();
+    oh.complex_out(11,4, m_current);    oh.separator();
+    oh.complex_out(11,4, impedance);    oh.separator();
+    oh.complex_out(11,4, admittance);    oh.separator();
+    oh.real_out(11,4, m_power);
+    oh.end_record();
+  }
 };
 
 
 
 /*!\brief Holds structure excitation data at network connection points
 */
-class nec_structure_excitation : public nec_base_result
-{
+class nec_structure_excitation : public nec_base_result {
 private:
-	vector<int> _tag, _segment;
-	vector<nec_complex> _voltage, _current, _impedance, _admittance;
-	vector<nec_float> _power;
-	long n_items;
-	nec_complex voli, curi;
-	
+  vector<int> _tag, _segment;
+  vector<nec_complex> _voltage, _current, _impedance, _admittance;
+  vector<nec_float> _power;
+  long n_items;
+  nec_complex voli, curi;
+  
 public:
 
-	nec_structure_excitation()
-	{
-		n_items = 0;
-	}
-	
-	virtual ~nec_structure_excitation()	{ }
-	
-	
-	virtual enum nec_result_type get_result_type()
-	{
-		return RESULT_STRUCTURE_EXCITATION;
-	}
-	
-	/*The two methods bellow have been modified to get rid of "nec_structure_excitation_data" */
-		
-	/*void add(int segment_number, int segment_tag, nec_complex voltage, nec_complex current, nec_float power)
-	{
-		structure_excitation_data sed(segment_number, segment_tag, voltage, current, power);
-		m_data.push_back(sed);
-		n_items++;
-	}
-	
-	virtual void write_to_file(ostream& os)
-	{
-		output_helper oh(os,_result_format);
-		oh.section_start();
-		os << "                          --------- STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS --------" << endl;
-		os << "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)         IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER" << endl;
-		os << "  No:   No:     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY   (WATTS)" << endl;
-			
-		for (int i = 0; i < n_items; i++ )
-		{
-			m_data[i].write(oh);
-		}
-	}*/
-		
-	void add(int segment, int tag, nec_complex voltage, nec_complex current, nec_float power)
-	{
-		n_items++;
-		_tag.push_back(tag);
-		_segment.push_back(segment);
-		_voltage.push_back(voltage);
-		_current.push_back(current);		
-		_impedance.push_back(voltage/current);
-		_admittance.push_back(current/voltage);
-		_power.push_back(power);
-		
-	}
-	
-	virtual void write_to_file(ostream& os)
-	{
-		output_helper oh(os,_result_format);
-		oh.section_start("STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS");
-		os << "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)         IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER" << endl;
-		os << "  No:   No:     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY   (WATTS)" << endl;
-			
-		for (int i=0; i<n_items; i++)
-		{
-			oh.start_record();
-			oh.int_out(4, _tag[i]);					oh.separator();
-			oh.int_out(5, _segment[i]);				oh.separator();
-			oh.complex_out(11,4, _voltage[i]);		oh.separator();
-			oh.complex_out(11,4, _current[i]);		oh.separator();
-			oh.complex_out(11,4, _impedance[i]);	oh.separator();
-			oh.complex_out(11,4, _admittance[i]);	oh.separator();
-			oh.real_out(11,4, _power[i]);
-			oh.end_record();
-		}		
-	}	
-	
-	/*Added for the python wrapping : some basic access functions...*/
-	
-	vector<int> get_tag()
-	{
-		return _tag;
-	}
-	
-	vector<int> get_segment()
-	{
-		return _segment;
-	}
-		
-	vector<nec_complex> get_current()
-	{
-		return _current;
-	}
-	 
-	vector<nec_complex> get_voltage()
-	{
-		return _voltage;
-	}
-	
-	vector<nec_float> get_power()
-	{
-		return _power;
-	}
-			
-	/*End of access functions added for the wrapping*/
-	
+  nec_structure_excitation()  {
+    n_items = 0;
+  }
+  
+  virtual ~nec_structure_excitation()  { }
+  
+  
+  virtual enum nec_result_type get_result_type()  {
+    return RESULT_STRUCTURE_EXCITATION;
+  }
+  
+  /*The two methods bellow have been modified to get rid of "nec_structure_excitation_data" */
+    
+  /*void add(int segment_number, int segment_tag, nec_complex voltage, nec_complex current, nec_float power)
+  {
+    structure_excitation_data sed(segment_number, segment_tag, voltage, current, power);
+    m_data.push_back(sed);
+    n_items++;
+  }
+  
+  virtual void write_to_file(ostream& os)
+  {
+    output_helper oh(os,_result_format);
+    oh.section_start();
+    os << "                          --------- STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS --------" << endl;
+    os << "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)         IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER" << endl;
+    os << "  No:   No:     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY   (WATTS)" << endl;
+      
+    for (int i = 0; i < n_items; i++ )
+    {
+      m_data[i].write(oh);
+    }
+  }*/
+    
+  void add(int segment, int tag, nec_complex voltage, nec_complex current, nec_float power)  {
+    n_items++;
+    _tag.push_back(tag);
+    _segment.push_back(segment);
+    _voltage.push_back(voltage);
+    _current.push_back(current);    
+    _impedance.push_back(voltage/current);
+    _admittance.push_back(current/voltage);
+    _power.push_back(power);
+    
+  }
+  
+  virtual void write_to_file(ostream& os)  {
+    output_helper oh(os,_result_format);
+    oh.section_start("STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS");
+    os << "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)         IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER" << endl;
+    os << "  No:   No:     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY   (WATTS)" << endl;
+      
+    for (int i=0; i<n_items; i++)  {
+      oh.start_record();
+      oh.int_out(4, _tag[i]);          oh.separator();
+      oh.int_out(5, _segment[i]);        oh.separator();
+      oh.complex_out(11,4, _voltage[i]);    oh.separator();
+      oh.complex_out(11,4, _current[i]);    oh.separator();
+      oh.complex_out(11,4, _impedance[i]);  oh.separator();
+      oh.complex_out(11,4, _admittance[i]);  oh.separator();
+      oh.real_out(11,4, _power[i]);
+      oh.end_record();
+    }    
+  }  
+  
+  /*Added for the python wrapping : some basic access functions...*/
+  
+  vector<int> get_tag()  {
+    return _tag;
+  }
+  
+  vector<int> get_segment()  {
+    return _segment;
+  }
+    
+  vector<nec_complex> get_current()  {
+    return _current;
+  }
+   
+  vector<nec_complex> get_voltage()  {
+    return _voltage;
+  }
+  
+  vector<nec_float> get_power()  {
+    return _power;
+  }
+      
+  /*End of access functions added for the wrapping*/
+  
 };
-		
+    
 /** Antenna Input Parameters 
 */
-class nec_antenna_input : public nec_base_result
-{
-	// Antenna Input Parameters
-	vector<int> _tag, _segment;
-	vector<nec_float> _power;
-	vector<nec_complex> _voltage, _current, _impedance, _admittance;
-	long n_items;
-	
+class nec_antenna_input : public nec_base_result {
+  // Antenna Input Parameters
+  vector<int> _tag, _segment;
+  vector<nec_float> _power;
+  vector<nec_complex> _voltage, _current, _impedance, _admittance;
+  long n_items;
+  
 public:
-	nec_antenna_input()
-	{
-		n_items = 0;
-	}
+  nec_antenna_input()  {
+    n_items = 0;
+  }
 
-	virtual ~nec_antenna_input()
-	{
-	}
-	
-	virtual enum nec_result_type get_result_type()
-	{
-		return RESULT_ANTENNA_INPUT;
-	}
-	
-	void set_input(int tag, int segment, nec_complex voltage, nec_complex current, nec_complex impedance, nec_complex admittance, nec_float power);
-	
-	virtual void write_to_file(ostream& os)
-	{
-		if (n_items == 0)
-			return;
-			
-		output_helper oh(os,_result_format);
-		oh.section_start("ANTENNA INPUT PARAMETERS");
-		os << "  TAG   SEG       VOLTAGE (VOLTS)         CURRENT (AMPS)         IMPEDANCE (OHMS)        ADMITTANCE (MHOS)     POWER" << endl;
-		os << "  NO.   NO.     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY    REAL       IMAGINARY   (WATTS)" << endl;
-		for (int i=0; i<n_items; i++)
-		{
-			oh.start_record();
-			oh.int_out(4, _tag[i]);					oh.separator();
-			oh.int_out(5, _segment[i]);				oh.separator();
-			oh.complex_out(11,4, _voltage[i]);		oh.separator();
-			oh.complex_out(11,4, _current[i]);		oh.separator();
-			oh.complex_out(11,4, _impedance[i]);	oh.separator();
-			oh.complex_out(11,4, _admittance[i]);	oh.separator();
-			oh.real_out(11,4, _power[i]);
-			oh.end_record();
-		}
-	}
-	
-	/*Added for the python wrapping : some basic access functions...*/
-	
-	vector<int> get_tag()
-	{
-		return _tag;
-	}
-	
-	vector<int> get_segment()
-	{
-		return _segment;
-	}
-		
-	vector<nec_complex> get_current()
-	{
-		return _current;
-	}
-	 
-	vector<nec_complex> get_voltage()
-	{
-		return _voltage;
-	}
-		
-	vector<nec_complex>& get_impedance();
-		
-	vector<nec_float> get_power()
-	{
-		return _power;
-	}
-			
-	/*End of access functions added for the wrapping*/
-	
-	
+  virtual ~nec_antenna_input()  {
+  }
+  
+  virtual enum nec_result_type get_result_type()  {
+    return RESULT_ANTENNA_INPUT;
+  }
+  
+  void set_input(int tag, int segment, nec_complex voltage, nec_complex current, nec_complex impedance, nec_complex admittance, nec_float power);
+  
+  virtual void write_to_file(ostream& os)  {
+    if (n_items == 0)
+      return;
+      
+    output_helper oh(os,_result_format);
+    oh.section_start("ANTENNA INPUT PARAMETERS");
+    os << "  TAG   SEG       VOLTAGE (VOLTS)         CURRENT (AMPS)         IMPEDANCE (OHMS)        ADMITTANCE (MHOS)     POWER" << endl;
+    os << "  NO.   NO.     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY    REAL       IMAGINARY   (WATTS)" << endl;
+    for (int i=0; i<n_items; i++)  {
+      oh.start_record();
+      oh.int_out(4, _tag[i]);          oh.separator();
+      oh.int_out(5, _segment[i]);        oh.separator();
+      oh.complex_out(11,4, _voltage[i]);    oh.separator();
+      oh.complex_out(11,4, _current[i]);    oh.separator();
+      oh.complex_out(11,4, _impedance[i]);  oh.separator();
+      oh.complex_out(11,4, _admittance[i]);  oh.separator();
+      oh.real_out(11,4, _power[i]);
+      oh.end_record();
+    }
+  }
+  
+  /*Added for the python wrapping : some basic access functions...*/
+  
+  vector<int> get_tag()  {
+    return _tag;
+  }
+  
+  vector<int> get_segment()  {
+    return _segment;
+  }
+    
+  vector<nec_complex> get_current()  {
+    return _current;
+  }
+   
+  vector<nec_complex> get_voltage()  {
+    return _voltage;
+  }
+    
+  vector<nec_complex>& get_impedance();
+    
+  vector<nec_float> get_power()  {
+    return _power;
+  }
+      
+  /*End of access functions added for the wrapping*/
 };
 
 
-class nec_near_field_pattern : public nec_base_result
-{
+class nec_near_field_pattern : public nec_base_result  {
 private:
-	/*Near field pattern*/
-	int nfeh;
-	vector<nec_float> _x, _y, _z;
-	vector<nec_complex> _field_x, _field_y, _field_z;
-	long n_items;
+  /*Near field pattern*/
+  int nfeh;
+  vector<nec_float> _x, _y, _z;
+  vector<nec_complex> _field_x, _field_y, _field_z;
+  long n_items;
 
 public:
-	nec_near_field_pattern(int in_nfeh)
-	{
-		nfeh = in_nfeh;		
-		n_items = 0;
-	}
-			
-	virtual ~nec_near_field_pattern()
-	{
-	}
-		
-	virtual enum nec_result_type get_result_type()
-	{
-		return RESULT_NEAR_FIELD_PATTERN;
-	}
-	
-	void set_input(nec_float x, nec_float y, nec_float z, nec_complex field_x, nec_complex field_y, nec_complex field_z);
-	
-	virtual void write_to_file(ostream& os)
-	{
-		if (n_items == 0)
-			return;
-			
-		output_helper oh(os,_result_format);
-		
-		if ( nfeh != 1)
-  		{
-			oh.section_start("NEAR ELECTRIC FIELDS");
-			os << "     ------- LOCATION -------     ------- EX ------    ------- EY ------    ------- EZ ------" << endl;
-			os << "      X         Y         Z       MAGNITUDE   PHASE    MAGNITUDE   PHASE    MAGNITUDE   PHASE" << endl;
-			os << "    METERS    METERS    METERS     VOLTS/M  DEGREES    VOLTS/M   DEGREES     VOLTS/M  DEGREES" << endl;
-  		}
-  		else
-  		{
-			oh.section_start("NEAR MAGNETIC FIELDS");
-			os << "     ------- LOCATION -------     ------- HX ------    ------- HY ------    ------- HZ ------" << endl;
-			os << "      X         Y         Z       MAGNITUDE   PHASE    MAGNITUDE   PHASE    MAGNITUDE   PHASE" << endl;
-			os << "    METERS    METERS    METERS      AMPS/M  DEGREES      AMPS/M  DEGREES      AMPS/M  DEGREES" << endl;
-  		}
-		for (int i=0; i<n_items; i++)
-		{
-			oh.start_record();
-			oh.padding(" ");
-			oh.real_out(9, 4, _x[i], false); oh.separator();
-			oh.real_out(9, 4, _y[i], false); oh.separator();
-			oh.real_out(9, 4, _z[i], false); oh.separator();
-			oh.padding(" ");
-			oh.real_out(11, 4, abs(_field_x[i]), true); oh.separator();
-			oh.real_out(7, 2, arg_degrees(_field_x[i]), false); oh.separator();
-			oh.padding(" ");
-			oh.real_out(11, 4, abs(_field_y[i]), true); oh.separator();
-			oh.real_out(7, 2, arg_degrees(_field_y[i]), false); oh.separator();
-			oh.padding(" ");
-			oh.real_out(11, 4, abs(_field_z[i]), true); oh.separator();
-			oh.real_out(7, 2, arg_degrees(_field_z[i]), false); oh.separator();
-			oh.end_record();
-		}	
-	}
-		
-	/*Added for the python wrapping : some basic access functions...*/
-		
-	int get_nfeh()
-	{
-		return nfeh;
-	}
-		
-	vector<nec_float> get_x()
-	{
-		return _x;
-	}
-		
-	vector<nec_float> get_y()
-	{
-		return _y;
-	}
-		
-	vector<nec_float> get_z()
-	{
-		return _z;
-	}
-		
-	vector<nec_complex> get_field_x()
-	{
-		return _field_x;
-	}
-		
-	vector<nec_complex> get_field_y()
-	{
-		return _field_y;
-	}
-		
-	vector<nec_complex> get_field_z()
-	{
-		return _field_z;
-	}
-	
-	/*End of access functions added for the wrapping*/	
+  nec_near_field_pattern(int in_nfeh)  {
+    nfeh = in_nfeh;    
+    n_items = 0;
+  }
+      
+  virtual ~nec_near_field_pattern()  {
+  }
+    
+  virtual enum nec_result_type get_result_type()  {
+    return RESULT_NEAR_FIELD_PATTERN;
+  }
+  
+  void set_input(nec_float x, nec_float y, nec_float z, nec_complex field_x, nec_complex field_y, nec_complex field_z);
+  
+  virtual void write_to_file(ostream& os)  {
+    if (n_items == 0)
+      return;
+      
+    output_helper oh(os,_result_format);
+    
+    if ( nfeh != 1)  {
+      oh.section_start("NEAR ELECTRIC FIELDS");
+      os << "     ------- LOCATION -------     ------- EX ------    ------- EY ------    ------- EZ ------" << endl;
+      os << "      X         Y         Z       MAGNITUDE   PHASE    MAGNITUDE   PHASE    MAGNITUDE   PHASE" << endl;
+      os << "    METERS    METERS    METERS     VOLTS/M  DEGREES    VOLTS/M   DEGREES     VOLTS/M  DEGREES" << endl;
+    } else {
+      oh.section_start("NEAR MAGNETIC FIELDS");
+      os << "     ------- LOCATION -------     ------- HX ------    ------- HY ------    ------- HZ ------" << endl;
+      os << "      X         Y         Z       MAGNITUDE   PHASE    MAGNITUDE   PHASE    MAGNITUDE   PHASE" << endl;
+      os << "    METERS    METERS    METERS      AMPS/M  DEGREES      AMPS/M  DEGREES      AMPS/M  DEGREES" << endl;
+    }
+    for (int i=0; i<n_items; i++)  {
+      oh.start_record();
+      oh.padding(" ");
+      oh.real_out(9, 4, _x[i], false); oh.separator();
+      oh.real_out(9, 4, _y[i], false); oh.separator();
+      oh.real_out(9, 4, _z[i], false); oh.separator();
+      oh.padding(" ");
+      oh.real_out(11, 4, abs(_field_x[i]), true); oh.separator();
+      oh.real_out(7, 2, arg_degrees(_field_x[i]), false); oh.separator();
+      oh.padding(" ");
+      oh.real_out(11, 4, abs(_field_y[i]), true); oh.separator();
+      oh.real_out(7, 2, arg_degrees(_field_y[i]), false); oh.separator();
+      oh.padding(" ");
+      oh.real_out(11, 4, abs(_field_z[i]), true); oh.separator();
+      oh.real_out(7, 2, arg_degrees(_field_z[i]), false); oh.separator();
+      oh.end_record();
+    }  
+  }
+    
+  /*Added for the python wrapping : some basic access functions...*/
+    
+  int get_nfeh()  {
+    return nfeh;
+  }
+    
+  vector<nec_float> get_x()  {
+    return _x;
+  }
+    
+  vector<nec_float> get_y()  {
+    return _y;
+  }
+    
+  vector<nec_float> get_z()  {
+    return _z;
+  }
+    
+  vector<nec_complex> get_field_x()  {
+    return _field_x;
+  }
+    
+  vector<nec_complex> get_field_y()  {
+    return _field_y;
+  }
+    
+  vector<nec_complex> get_field_z()  {
+    return _field_z;
+  }
+  
+  /*End of access functions added for the wrapping*/  
 };
 
 
@@ -782,147 +719,130 @@ class nec_radiation_pattern;
 class nec_structure_currents;
 
 /**
-	Stores a whole lot of nec_result objects. This class is effectively
-	a database of the simulation results.
-	
-	Usage
-	
-		nec_antenna_input* ai = new nec_antenna_input();
-		s_results.add(ai);
-		ai->set_intput(tag, segment, voltage, current, impedance, admittance, power);
-		ai->set_intput(tag, segment, voltage, current, impedance, admittance, power);
-		ai->set_intput(tag, segment, voltage, current, impedance, admittance, power);
-	
+  Stores a whole lot of nec_result objects. This class is effectively
+  a database of the simulation results.
+  
+  Usage
+  
+    nec_antenna_input* ai = new nec_antenna_input();
+    s_results.add(ai);
+    ai->set_intput(tag, segment, voltage, current, impedance, admittance, power);
+    ai->set_intput(tag, segment, voltage, current, impedance, admittance, power);
+    ai->set_intput(tag, segment, voltage, current, impedance, admittance, power);
+  
 */
-class nec_results
-{
-	vector<nec_base_result*> _results;
-	int _n;
-	bool _file_out;
-	
-	
+class nec_results  {
+  vector<nec_base_result*> _results;
+  int _n;
+  bool _file_out;
+  
+  
 public:
-	enum RESULT_FORMAT m_result_format;
+  enum RESULT_FORMAT m_result_format;
 
-	nec_results()
-	{
-		m_result_format = RESULT_FORMAT_NEC;
-		
-		_n = 0;
-		_file_out = false;
-	}
+  nec_results()  {
+    m_result_format = RESULT_FORMAT_NEC;
+    
+    _n = 0;
+    _file_out = false;
+  }
 
-	// On destruction we write to a file.
-	~nec_results()
-	{
-		// write_to_file();
-		for (int i=0;i<_n;i++)
-		{
-			delete _results[i];
-			_results[i] = NULL;
-		}
-	}
-	
-	void add(nec_base_result* br)
-	{
-		br->set_result_format(m_result_format);
-		_results.push_back(br);
-		_n++;
-	}
-	
-	/*!\brief Get the nth result that matches the specified result type
-		\param index The zero-based index for the result
-		\param result_type The requested result type
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_norm_rx_pattern object when finished with it.
-	*/
-	nec_base_result* get_result(const long index, const enum nec_result_type result_type)
-	{
-		long counter = 0;
-		
-		for (int i=0;i<_n;i++)
-		{
-			if (_results[i]->get_result_type() == result_type)
-			{
-				if (index == counter++)
-					return _results[i];
-			}
-		}
-		
-		return NULL;
-	}
-	
-	/*!\brief Get normalized receiving pattern results
-		\param index The zero-based index for the normalized receiving pattern.
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_norm_rx_pattern object when finished with it.
-	*/
-	nec_norm_rx_pattern* get_norm_rx_pattern(const long index)
-	{
-		return (nec_norm_rx_pattern*)get_result(index, RESULT_NORMALIZED_RECEIVING_PATTERN);
-	}
-	
-	/*!\brief Get radiation pattern results
-		\param index The zero-based index for the radiation pattern.
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_radiation_pattern object when finished with it.
-	*/
-	nec_radiation_pattern* get_radiation_pattern(const long index)
-	{
-		return (nec_radiation_pattern*)get_result(index, RESULT_RADIATION_PATTERN);
-	}
-	
-	/*!\brief Get antenna input parameter results
-		\param index The zero-based index for the antenna input.
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_antenna_input object when finished with it.
-	*/
-	nec_antenna_input* get_antenna_input(const long index)
-	{
-		return (nec_antenna_input*)get_result(index, RESULT_ANTENNA_INPUT);
-	}
+  // On destruction we write to a file.
+  ~nec_results()  {
+    // write_to_file();
+    for (int i=0;i<_n;i++)  {
+      delete _results[i];
+      _results[i] = NULL;
+    }
+  }
+  
+  void add(nec_base_result* br)  {
+    br->set_result_format(m_result_format);
+    _results.push_back(br);
+    _n++;
+  }
+  
+  /*!\brief Get the nth result that matches the specified result type
+    \param index The zero-based index for the result
+    \param result_type The requested result type
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_norm_rx_pattern object when finished with it.
+  */
+  nec_base_result* get_result(const long index, const enum nec_result_type result_type)  {
+    long counter = 0;
+    
+    for (int i=0;i<_n;i++)  {
+      if (_results[i]->get_result_type() == result_type) {
+        if (index == counter++)
+          return _results[i];
+      }
+    }
+    
+    return NULL;
+  }
+  
+  /*!\brief Get normalized receiving pattern results
+    \param index The zero-based index for the normalized receiving pattern.
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_norm_rx_pattern object when finished with it.
+  */
+  nec_norm_rx_pattern* get_norm_rx_pattern(const long index)  {
+    return (nec_norm_rx_pattern*)get_result(index, RESULT_NORMALIZED_RECEIVING_PATTERN);
+  }
+  
+  /*!\brief Get radiation pattern results
+    \param index The zero-based index for the radiation pattern.
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_radiation_pattern object when finished with it.
+  */
+  nec_radiation_pattern* get_radiation_pattern(const long index)  {
+    return (nec_radiation_pattern*)get_result(index, RESULT_RADIATION_PATTERN);
+  }
+  
+  /*!\brief Get antenna input parameter results
+    \param index The zero-based index for the antenna input.
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_antenna_input object when finished with it.
+  */
+  nec_antenna_input* get_antenna_input(const long index)  {
+    return (nec_antenna_input*)get_result(index, RESULT_ANTENNA_INPUT);
+  }
 
-	/*!\brief Get structure excitation results
-		\param index The zero-based index for the nec_structure_excitation.
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_structure_excitation object when finished with it.
-	*/
-	nec_structure_excitation* get_structure_excitation(const long index)
-	{
-		return (nec_structure_excitation*)get_result(index, RESULT_STRUCTURE_EXCITATION);
-	}
-	
-	/*!\brief Get near field pattern results
-		\param index The zero-based index for the nec_structure_excitation.
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_structure_excitation object when finished with it.
-	*/	
-	nec_near_field_pattern* get_near_field_pattern(const long index)
-	{
-		return (nec_near_field_pattern*)get_result(index, RESULT_NEAR_FIELD_PATTERN);
-	}
-	
-	/*!\brief Get structure currents results
-		\param index The zero-based index for the nec_structure_excitation.
-		\return NULL if the result does not exist. 
-		\note You must NOT delete the nec_structure_excitation object when finished with it.
-	*/
-	nec_structure_currents* get_structure_currents(const long index)
-	{
-		return (nec_structure_currents*)get_result(index, RESULT_STRUCTURE_CURRENTS);
-	}
-		
-	void write(ostream& os)
-	{
-		for (int i=0;i<_n;i++)
-		{
-			if (_results[i]->write_file())
-			{
-				_results[i]->write_to_file(os);
-				_results[i]->set_write_file(false);
-			}
-		}
-	}
+  /*!\brief Get structure excitation results
+    \param index The zero-based index for the nec_structure_excitation.
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_structure_excitation object when finished with it.
+  */
+  nec_structure_excitation* get_structure_excitation(const long index)  {
+    return (nec_structure_excitation*)get_result(index, RESULT_STRUCTURE_EXCITATION);
+  }
+  
+  /*!\brief Get near field pattern results
+    \param index The zero-based index for the nec_structure_excitation.
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_structure_excitation object when finished with it.
+  */  
+  nec_near_field_pattern* get_near_field_pattern(const long index)  {
+    return (nec_near_field_pattern*)get_result(index, RESULT_NEAR_FIELD_PATTERN);
+  }
+  
+  /*!\brief Get structure currents results
+    \param index The zero-based index for the nec_structure_excitation.
+    \return NULL if the result does not exist. 
+    \note You must NOT delete the nec_structure_excitation object when finished with it.
+  */
+  nec_structure_currents* get_structure_currents(const long index)  {
+    return (nec_structure_currents*)get_result(index, RESULT_STRUCTURE_CURRENTS);
+  }
+    
+  void write(ostream& os)  {
+    for (int i=0;i<_n;i++)    {
+      if (_results[i]->write_file())      {
+        _results[i]->write_to_file(os);
+        _results[i]->set_write_file(false);
+      }
+    }
+  }
 };
 
 #endif /* __nec_results__ */
