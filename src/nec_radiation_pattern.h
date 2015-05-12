@@ -104,7 +104,7 @@ public:
   /*! \brief Get the polarization axial ratio
   */
   nec_float get_pol_axial_ratio(int theta_index, int phi_index) const  {
-    return _polarization_axial_ratio[get_index(theta_index, phi_index)];
+    return _polarization_axial_ratio(theta_index, phi_index);
   }
   
   real_array get_pol_tilt()  {
@@ -119,19 +119,19 @@ public:
   \return enum polarization_sense POL_LINEAR, POL_RIGHT, POL_LEFT
   */
   int get_pol_sense(int theta_index, int phi_index) const  {
-    return _polarization_sense_index[get_index(theta_index, phi_index)];
+    return _polarization_sense_index(theta_index, phi_index);
   }
   
   /*! \brief Get the magnitude of E(THETA)
   */
   nec_float get_etheta_magnitude(int theta_index, int phi_index)  {
-    return abs(_e_theta[get_index(theta_index, phi_index)]);
+    return abs(_e_theta(theta_index, phi_index));
   }
   
   /*! \brief Get the phase (in degrees) of E(THETA)
   */
   nec_float get_etheta_phase(int theta_index, int phi_index)  {
-    return arg_degrees(_e_theta[get_index(theta_index, phi_index)]);
+    return arg_degrees(_e_theta(theta_index, phi_index));
   }
   
   /*! \brief Return a complex array for the electric field E(THETA)
@@ -143,13 +143,13 @@ public:
   /*! \brief Get the magnitude of E(PHI)
   */
   nec_float get_ephi_magnitude(int theta_index, int phi_index)  {
-    return abs(_e_phi[get_index(theta_index, phi_index)]);
+    return abs(_e_phi(theta_index, phi_index));
   }
   
   /*! \brief Get the phase (in degrees) of E(PHI)
   */
   nec_float get_ephi_phase(int theta_index, int phi_index)  {
-    return arg_degrees(_e_phi[get_index(theta_index, phi_index)]);
+    return arg_degrees(_e_phi(theta_index, phi_index));
   }
   
   /*! \brief Return a complex array for the electric field E(PHI)
@@ -250,22 +250,31 @@ public:
 
 
 private:
-  nec_float mean(const real_array& pattern) const  {
+  nec_float mean(const real_matrix& pattern) const  {
     nec_float sum = 0.0;
-    long len = pattern.size();
-    for (long i=0;i<len;i++) {
-      sum += pattern[i] * _averaging_scales[i];
+    long rows = pattern.rows();
+    long cols = pattern.cols();
+    for (long i=0;i<rows;i++) {
+      for (long j=0;j<cols;j++) {
+        sum += pattern(i,j) * _averaging_scales(i,j);
+      }
     }
+    long len = rows*cols;
     return sum/(len*2.0 / pi());
   }
 
-  nec_float sd(const real_array& pattern, nec_float _mean) const  {
+  nec_float sd(const real_matrix& pattern, nec_float _mean) const  {
     nec_float sum = 0.0;
-    long len = pattern.size();
-    for (long i=0;i<len;i++) {
-      nec_float diff = pattern[i] - _mean;
-      sum += diff*diff * _averaging_scales[i];
+    long rows = pattern.rows();
+    long cols = pattern.cols();
+    
+    for (long i=0;i<rows;i++) {
+      for (long j=0;j<cols;j++) {
+        nec_float diff = pattern(i,j) - _mean;
+        sum += diff*diff * _averaging_scales(i,j);
+      }
     }
+    long len = rows*cols;
     return std::sqrt(sum/(len*2.0 / pi()));
   }
 
@@ -361,19 +370,19 @@ public:
   /*! \brief Get  a power gain (vertical) from the radiation pattern
   */
   nec_float get_power_gain_vert(int theta_index, int phi_index) const  {
-    return _power_gain_vert[get_index(theta_index, phi_index)];
+    return _power_gain_vert(theta_index, phi_index);
   }
 
   /*! \brief Get  a power gain (horizontal) from the radiation pattern
   */
   nec_float get_power_gain_horiz(int theta_index, int phi_index) const  {
-    return _power_gain_horiz[get_index(theta_index, phi_index)];
+    return _power_gain_horiz(theta_index, phi_index);
   }
 
   /*! \brief Get  a power gain (total dBi) from the radiation pattern
   */
   nec_float get_power_gain_tot(int theta_index, int phi_index) const  {
-    return _power_gain_tot[get_index(theta_index, phi_index)];
+    return _power_gain_tot(theta_index, phi_index);
   }
 
   /*! \brief Get the power gain if the antenna were receiving RHCP signals
@@ -431,19 +440,19 @@ private:
   nec_float m_rp_gnor;
   
   real_matrix  _gain;
-  real_array  _power_gain_lhcp;
-  real_array  _power_gain_rhcp;
-  real_array  _power_gain_vert;
-  real_array  _power_gain_horiz;
-  real_array  _power_gain_tot;
-  real_array  _polarization_axial_ratio;
-  real_array  _polarization_tilt;
-  real_array  _averaging_scales;
-  int_array   _polarization_sense_index;
+  real_matrix  _power_gain_lhcp;
+  real_matrix  _power_gain_rhcp;
+  real_matrix  _power_gain_vert;
+  real_matrix  _power_gain_horiz;
+  real_matrix  _power_gain_tot;
+  real_matrix  _polarization_axial_ratio;
+  real_matrix  _polarization_tilt;
+  real_matrix  _averaging_scales;
+  int_matrix   _polarization_sense_index;
                           
-  complex_array  _e_theta;
-  complex_array  _e_phi;
-  complex_array  _e_r;
+  complex_matrix  _e_theta;
+  complex_matrix  _e_phi;
+  complex_matrix  _e_r;
   
   void write_to_file_aux(ostream& os);
   

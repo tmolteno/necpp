@@ -44,6 +44,7 @@
   typedef safe_array<nec_float>  real_array;
   typedef safe_array<nec_complex>  complex_array;
 
+  typedef safe_matrix<int32_t>  int_matrix;
   typedef safe_matrix<nec_float>  real_matrix;
   typedef safe_matrix<nec_complex>  complex_matrix;
 #endif

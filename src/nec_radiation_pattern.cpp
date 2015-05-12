@@ -60,22 +60,20 @@ nec_radiation_pattern::nec_radiation_pattern(int in_n_theta, int in_n_phi,
   
   m_rp_gnor = in_gnor;
   
-  int n_angles = n_theta * n_phi;
-  
   _gain.resize(n_theta, n_phi);
-  _power_gain_vert.resize(n_angles);
-  _power_gain_horiz.resize(n_angles);
-  _power_gain_tot.resize(n_angles);
-  _power_gain_rhcp.resize(n_angles);
-  _power_gain_lhcp.resize(n_angles);
-  _polarization_axial_ratio.resize(n_angles);
-  _polarization_tilt.resize(n_angles);
-  _polarization_sense_index.resize(n_angles);
-  _averaging_scales.resize(n_angles);
+  _power_gain_vert.resize(n_theta, n_phi);
+  _power_gain_horiz.resize(n_theta, n_phi);
+  _power_gain_tot.resize(n_theta, n_phi);
+  _power_gain_rhcp.resize(n_theta, n_phi);
+  _power_gain_lhcp.resize(n_theta, n_phi);
+  _polarization_axial_ratio.resize(n_theta, n_phi);
+  _polarization_tilt.resize(n_theta, n_phi);
+  _polarization_sense_index.resize(n_theta, n_phi);
+  _averaging_scales.resize(n_theta, n_phi);
 
-  _e_theta.resize(n_angles);
-  _e_phi.resize(n_angles);
-  _e_r.resize(n_angles);
+  _e_theta.resize(n_theta, n_phi);
+  _e_phi.resize(n_theta, n_phi);
+  _e_r.resize(n_theta, n_phi);
   
   _ifar = in_ifar;
   _wavelength = in_wavelength;
@@ -97,8 +95,6 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
   static const char  *hpol[4] = { "LINEAR", "RIGHT ", "LEFT  ", " " };
   static const char  *gain_type[2] = { "----- POWER GAINS ----- ", "--- DIRECTIVE GAINS ---" };
   static const char  *igax[4] = { " MAJOR", " MINOR", " VERTC", " HORIZ" };
-  
-  int i;
   
   output_helper oh(os,_result_format);
           
@@ -157,23 +153,22 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
   } /* if ( _ifar == 1) */
 
 
-  i=0;
   nec_float phi = m_phi_start- delta_phi;
 
-  for (int kph = 1; kph <= n_phi; kph++ )  {
+  for (int kph = 0; kph < n_phi; kph++ )  {
     phi += delta_phi;
     nec_float thet= m_theta_start- delta_theta;
     
-    for (int kth = 1; kth <= n_theta; kth++ ) {
+    for (int kth = 0; kth < n_theta; kth++ ) {
       thet += delta_theta;
       if ( m_ground.present() && (thet > 90.01) && (_ifar != 1) )
         continue;
 
       /* elliptical polarization */
       if ( _ifar == 1)  {
-        nec_complex e_theta = _e_theta[i];
-        nec_complex e_phi = _e_phi[i];
-        nec_complex e_r = _e_r[i];
+        nec_complex e_theta = _e_theta(kth, kph);
+        nec_complex e_phi = _e_phi(kth, kph);
+        nec_complex e_r = _e_r(kth, kph);
         
         oh.start_record();
         oh.padding(" ");
@@ -188,20 +183,20 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
         oh.separator(); oh.real_out(7,2,arg_degrees(e_r),false);
         oh.end_record();
       }  else  {
-        nec_complex e_theta = _e_theta[i];
-        nec_complex e_phi = _e_phi[i];
+        nec_complex e_theta = _e_theta(kth, kph);
+        nec_complex e_phi = _e_phi(kth, kph);
         
-        const char* pol_sense = hpol[_polarization_sense_index[i]];
+        const char* pol_sense = hpol[_polarization_sense_index(kth, kph)];
         
         oh.start_record();
         oh.padding(" ");
         oh.real_out(7,2,thet,false); oh.separator(); oh.real_out(9,2,phi,false); oh.separator();
         oh.padding(" ");
-        oh.real_out(8,2,_power_gain_vert[i],false);
-        oh.separator(); oh.real_out(8,2,_power_gain_horiz[i],false);
-        oh.separator(); oh.real_out(8,2,_power_gain_tot[i],false);
-        oh.separator(); oh.real_out(11,4,_polarization_axial_ratio[i],false);
-        oh.separator(); oh.real_out(9,2,_polarization_tilt[i],false);
+        oh.real_out(8,2,_power_gain_vert(kth, kph),false);
+        oh.separator(); oh.real_out(8,2,_power_gain_horiz(kth, kph),false);
+        oh.separator(); oh.real_out(8,2,_power_gain_tot(kth, kph),false);
+        oh.separator(); oh.real_out(11,4,_polarization_axial_ratio(kth, kph),false);
+        oh.separator(); oh.real_out(9,2,_polarization_tilt(kth, kph),false);
         oh.separator(); oh.string_out(6,pol_sense);
         oh.separator(); oh.real_out(11,4,abs(e_theta));
         oh.separator(); oh.real_out(9,2,arg_degrees(e_theta),false);
@@ -211,9 +206,8 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
         
         m_plot_card.plot_patterns(thet, phi,
                 e_theta, e_phi,
-                _power_gain_vert[i], _power_gain_horiz[i], _power_gain_tot[i]);
+                _power_gain_vert(kth, kph), _power_gain_horiz(kth, kph), _power_gain_tot(kth, kph));
       } /* if ( _ifar != 1) */
-      i++;
     } /* for( kth = 1; kth <= n_theta; kth++ ) */
 
   } /* for( kph = 1; kph <= n_phi; kph++ ) */
@@ -274,18 +268,17 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
     exra=-360.*( exra- floor( exra));
   }
   
-  int result_counter=0;
   nec_float pint = 0.0;
   nec_float delta_phi_rad = degrees_to_rad(delta_phi);
   nec_float tmp2 = 0.5 * degrees_to_rad(delta_theta);
   phi= m_phi_start- delta_phi;
 
-  for (int kph = 1; kph <= n_phi; kph++ )  {
+  for (int kph = 0; kph < n_phi; kph++ )  {
     phi += delta_phi;
     nec_float pha = degrees_to_rad(phi);
     thet= m_theta_start- delta_theta;
     
-    for (int kth = 1; kth <= n_theta; kth++ )  {
+    for (int kth = 0; kth < n_theta; kth++ )  {
       thet += delta_theta;
       if ( m_ground.present() && (thet > 90.01) && (_ifar != 1) )
         continue;
@@ -300,9 +293,9 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
         m_context->gfld(m_range/_wavelength, pha, thet/_wavelength,
           &eth, &eph, &erd, space_wave_only, _wavelength );
       
-        _e_theta[result_counter] = eth;
-        _e_phi[result_counter] = eph;
-        _e_r[result_counter] = erd;
+        _e_theta(kth, kph) = eth;
+        _e_phi(kth, kph) = eph;
+        _e_r(kth, kph) = erd;
       } else {
         m_context->ffld(tha, pha, &eth, &eph, _wavelength);
     
@@ -393,7 +386,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
             throw new nec_exception("Unknown Gain Normalization Encountered.");
           }
         
-          _gain(kth-1, kph-1) = temp_gain;
+          _gain(kth, kph) = temp_gain;
         
         } /* if ( m_rp_normalization > 0) */
       
@@ -418,11 +411,11 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
         }
       
         if ( m_rp_output_format != 1)  {
-          _power_gain_vert[result_counter] = gnmj;
-          _power_gain_horiz[result_counter] = gnmn;
+          _power_gain_vert(kth, kph) = gnmj;
+          _power_gain_horiz(kth, kph) = gnmn;
         }  else  {
-          _power_gain_vert[result_counter] = gnv;
-          _power_gain_horiz[result_counter] = gnh;
+          _power_gain_vert(kth, kph) = gnv;
+          _power_gain_horiz(kth, kph) = gnh;
         }
       
         ethm *= _wavelength;
@@ -435,10 +428,10 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
           epha= epha+ exra;
         }
       
-        _e_theta[result_counter] = deg_polar(ethm, etha);
-        _e_phi[result_counter] = deg_polar(ephm, epha);
+        _e_theta(kth, kph) = deg_polar(ethm, etha);
+        _e_phi(kth, kph) = deg_polar(ephm, epha);
         
-        _power_gain_tot[result_counter] = gtot;
+        _power_gain_tot(kth, kph) = gtot;
         
         {
           nec_float a = pol_axial_ratio;
@@ -447,15 +440,14 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
           nec_float gain = from_db10(gtot);
           nec_float lhcp_f =(1+2*a+a*a)/(2*(1+a*a));
           nec_float rhcp_f =(1-2*a+a*a)/(2*(1+a*a));
-          _power_gain_rhcp[result_counter] = db10(gain * rhcp_f);
-          _power_gain_lhcp[result_counter] = db10(gain * lhcp_f);
+          _power_gain_rhcp(kth, kph) = db10(gain * rhcp_f);
+          _power_gain_lhcp(kth, kph) = db10(gain * lhcp_f);
         }
-        _polarization_axial_ratio[result_counter] = pol_axial_ratio;
-        _polarization_tilt[result_counter] = tilta;
-        _polarization_sense_index[result_counter] = pol_sense_index;
-        _averaging_scales[result_counter] = (sin(tha) * (n_theta - 1) / n_theta) + 1.0/n_theta;
+        _polarization_axial_ratio(kth, kph) = pol_axial_ratio;
+        _polarization_tilt(kth, kph) = tilta;
+        _polarization_sense_index(kth, kph) = pol_sense_index;
+        _averaging_scales(kth, kph) = (sin(tha) * (n_theta - 1) / n_theta) + 1.0/n_theta;
       } /* if ( _ifar == 1) */
-      result_counter++;
     } /* for( kth = 1; kth <= n_theta; kth++ ) */
   
   } /* for( kph = 1; kph <= n_phi; kph++ ) */
