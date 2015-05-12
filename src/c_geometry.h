@@ -65,7 +65,7 @@ public:
   void wire( 	int tag_id, int segment_count,
                   nec_float xw1, nec_float yw1, nec_float zw1,	// first co-ordinate
                   nec_float xw2, nec_float yw2, nec_float zw2,	// second co-ordinate
-                  nec_float rad,					
+                  nec_float rad,
                   nec_float rdel, nec_float rrad);
                   
                   
@@ -77,6 +77,28 @@ public:
   
   void move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
                   nec_float ys, nec_float zs, int its, int nrpt, int itgi );
+
+  /*! \brief Reflects partial structure along x,y, or z axes.
+          
+    \param ix If ix = 1 then the structure is reflected along X axis. 
+    \param iy If iy = 1 then the structure is reflected along Y axis.
+    \param iz If iz = 1 then the structure is reflected along Z axis.
+    \param itx The tag number increment.    
+  */
+  void reflect(int ix, int iy, int iz, int itx)  {
+    int nop = 100*ix + 10*iy + iz;
+    this->reflect(ix, iy, iz, itx, nop);
+  }
+
+  /*! \brief Rotates structure along Z-axis to generate a copies in a cylindrical array.
+
+    \param itx The tag number increment.
+    \param nop The total number of times that the structure is to occur in the cylindrical array.  
+  */
+  void generate_cylindrical_structure(int itx, int nop)
+  {
+    this->reflect(-1, 0, 0, itx, nop);
+  }
 
   void reflect( int ix, int iy, int iz, int itx, int nop );
 
@@ -193,8 +215,6 @@ private:
   nec_3vector patch_x1, patch_x2, patch_x3, patch_x4;
   bool   _prev_sc;
 };
-
-
 
 
 #endif /* __c_geometry__ */
