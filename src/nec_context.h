@@ -365,18 +365,15 @@ public:
 			nec_float a2, nec_float b2, nec_float rad);
 	
 	
-	/*! "fr" card, frequency parameters
-	\verbatim	
-	FREQUENCY
-	I1- O= LINEAR STEP, 1=MULTIPLICATIVE
-	I2- NO. STEPS, BLANK=1
-	F1- FREQUENCY OR START FREQUENCY
-	F2- FREQ INCREMENT, ADD OR MULTIPLY
-	\endverbatim
+	/*! \brief "fr" card, frequency parameters
+	 \param ifrq \c O= LINEAR STEP \c 1=MULTIPLICATIVE
+	 \param nfrq Number of steps, for a single frequency use nfrq=1
+	 \param freq_mhz Frequency or Starting frequency (in MHz)
+	 \param del_freq Frequency increment, (ADD if ifrq=0, OR MULTIPLY if ifrq=1)
 	*/
-	void fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq);
+	void fr_card(int ifrq, int nfrq, nec_float freq_mhz, nec_float del_freq);
 	
-	/*! 1: "ld" card, loading parameters
+	/*! \brief "ld" card, loading parameters
 	\verbatim
 	LD	LOADING
 		itmp1- 	-1 CANCEL LOADS,
