@@ -24,25 +24,25 @@ nec_float em::constants::permeability = four_pi() * 1.0e-7;
 
 nec_float em::speed_of_light() // was (CVEL in old nec2) but we have changed it to be in meters per second
 {
-  static nec_float ret = 1.0 / sqrt(permeability() * permittivity());
+  nec_float ret = 1.0 / sqrt(permeability() * permittivity());
   return ret; // 299.8e6;
 }
 
 nec_float em::impedance()	// was (ETA in old nec2)
 {
-  static nec_float ret = sqrt(permeability() / permittivity());
+  nec_float ret = sqrt(permeability() / permittivity());
   return ret; // 376.8
 }
 
 nec_float em::inverse_impedance()	// was (RETA in old nec2)
 {
-  static nec_float ret = 1.0 / em::impedance();
+  nec_float ret = 1.0 / em::impedance();
   return ret; // 2.654420938E-3;
 }
 
 nec_float em::impedance_over_2pi()	// was (59.958 in old nec2)
 {
-  static nec_float ret = em::impedance() / two_pi();
+  nec_float ret = em::impedance() / two_pi();
   return ret; // 59.958
 }
 

@@ -29,35 +29,38 @@
 namespace em
 {
 
-class constants
-{
-public:
-	static nec_float permittivity;
-	static nec_float permeability;
-};
+  class constants
+  {
+  public:
+    static nec_float permittivity;
+    static nec_float permeability;
+  };
 
-// Calculate the power from a voltage and a current.
-inline nec_float power(nec_complex voltage, nec_complex current)
-{
-	return 0.5* real(voltage * conj(current));
-}
+  // Calculate the power from a voltage and a current.
+  inline nec_float power(nec_complex voltage, nec_complex current)  {
+    return 0.5* real(voltage * conj(current));
+  }
 
-// Electromagnetic Constants
+  // Electromagnetic Constants
 
-inline nec_float permittivity()
-{
-	return constants::permittivity;
-}
+  inline nec_float permittivity()  {
+    return constants::permittivity;
+  }
 
-inline nec_float permeability()
-{
-	return constants::permeability;
-}
+  inline nec_float permeability()  {
+    return constants::permeability;
+  }
 
-nec_float speed_of_light();
-nec_float impedance();
-nec_float inverse_impedance();
-nec_float impedance_over_2pi();
+  nec_float speed_of_light();
+  nec_float impedance();
+  nec_float inverse_impedance();
+  nec_float impedance_over_2pi();
+  
+  /*! \brief return the wavelength at a given frequency */
+  inline nec_float get_wavelength(const nec_float& frequency) {
+    return speed_of_light() / frequency;
+  }
+  
 
 }
 

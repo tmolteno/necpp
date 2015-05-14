@@ -6,6 +6,8 @@
 * nec_geometry_complete() now takes only one parameter. The second parameter was unused.
 * New c_geometry->reflect and c_geometry->generate_cylindrical_structure(int itx, int nop) helper functions to generate symmetric structures.
 * New c_ground methods for finding out the ground parameters
+* Split the ground enviroment computation from the output code. 
+
 
 ## Version 1.6.2 [April 2015]
 * Added new functions for nec_excitation_voltage, nec_excitation_current and nec_excitation_planewave to simplfy C-style API calls

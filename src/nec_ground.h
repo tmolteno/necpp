@@ -18,9 +18,13 @@
 #ifndef __nec_ground__
 #define __nec_ground__
 
+#include <ostream>
 #include "common.h"
 #include "math_util.h"
+#include "nec_output.h"
 #include "nec_debug.h"
+#include "nec_results.h"
+#include "c_ggrid.h"
 
 /*
   \section{NEC Ground Specification}
@@ -60,13 +64,12 @@ class nec_ground
 {
 public:
 
-  nec_ground()
-  {
+  nec_ground() {
+    _ggrid.initialize();
     default_values();
   }
   
-  nec_ground(const nec_ground& in_ground)
-  {
+  nec_ground(const nec_ground& in_ground) {
     iperf = in_ground.iperf;
     ksymp = in_ground.ksymp;
     epsr = in_ground.epsr;  // relative dielectric constant
@@ -84,8 +87,7 @@ public:
     sig2 = in_ground.sig2;    // Conductivity in mhos/meter
   }
   
-  void default_values()
-  {
+  void default_values() {
     zrati=cplx_10();
     ksymp=1;
     radial_wire_count = 0;
@@ -113,9 +115,7 @@ public:
     nec_float in_sig2,
     nec_float clt, nec_float cht);
   
-  nec_complex get_zrati2(nec_float wavelength);
-  
-
+  nec_complex get_zrati2(nec_float _wavelength);
 
 
   /*! \brief Returns the relative dielectric constant (no units) of the ground medium 1. */
@@ -136,21 +136,29 @@ public:
   }
   
   
-  /* \brief Returnsthe length of radial wires used in the ground screen approximation - provided this approximation has been used. */
+  /*! \brief Returns the length of radial wires used in the ground screen approximation - provided this approximation has been used. */
   nec_float get_radial_wire_length() const {
     return this->radial_wire_count;
   }
   
   
-  /* \brief Returnsthe radius of radial wires in the ground screen approximation - provided this approximation has been used. */
+  /*! \brief Returns the radius of radial wires in the ground screen approximation - provided this approximation has been used. */
   nec_float get_radial_wire_radius() const {
     return this->radial_wire_radius;
   }
   
   
-  /*! If there's a cliff problem, returns the distance from the origin of the coordinate system to join between medium 1 and 2.
-    This distance is either  the radius of the circle where the two media join or the distance from the X axis to where
-    the two media join in a line parallel to the Y axis. Specification of the circular or linear option is on the RP card.
+  /*! \brief Returns the length of radial wires used in the ground screen approximation - provided this approximation has been used. */
+  nec_float get_radial_wire_length_wavelengths() const {
+    return this->scrwl;
+  }
+  
+  
+  /*! \brief Return cliff edge distance (meters)
+   * 
+   * \remark If there's a cliff problem, returns the distance from the origin of the coordinate system to join between medium 1 and 2.
+   * This distance is either  the radius of the circle where the two media join or the distance from the X axis to where
+   * the two media join in a line parallel to the Y axis. Specification of the circular or linear option is on the RP card.
   */    
   nec_float get_cliff_edge_distance() const {
     return this->cliff_edge_distance;
@@ -175,19 +183,16 @@ public:
   }    
 
 
-
-
-
   /*! \brief Cliff edge in wavelengths, 
    * */
-  nec_float get_cl(nec_float wavelength) const {
-    return cliff_edge_distance / wavelength;
+  nec_float get_cl(nec_float _wavelength) const {
+    return cliff_edge_distance / _wavelength;
   }
   
   /*! \brief Cliff Height in wavelengths.
    * */
-  nec_float get_ch(nec_float wavelength) const {
-    return cliff_height / wavelength;
+  nec_float get_ch(nec_float _wavelength) const {
+    return cliff_height / _wavelength;
   }
   
   nec_complex get_zrati_sqr() const {
@@ -200,8 +205,7 @@ public:
   inline bool type_sommerfeld_norton()  {  return (2 == iperf); }
   
   
-  bool is_valid() const
-  {
+  bool is_valid() const {
     if (iperf < 0) return false;
     if (iperf > 2) return false;
     
@@ -212,8 +216,7 @@ public:
   }
   
   /*! \brief Return true if a ground is present */
-  bool present() const
-  {
+  bool present() const {
     ASSERT(is_valid());
     
     if (2 == ksymp)
@@ -221,7 +224,38 @@ public:
       
     return false;
   }
+
+  void ggrid_interpolate( nec_float x, nec_float y, 
+          nec_complex *f1, nec_complex *f2,
+          nec_complex *f3, nec_complex *f4 ) {
+    _ggrid.interpolate(x, y, f1, f2, f3, f4);
+  }
+
+  void write_to_file_aux(std::ostream& os, output_helper& oh, int _ifar);
   
+  void output_antenna_environment(nec_output_file& _output);
+  void calculate_antenna_environment(c_ground_wave& ground_wave, nec_float freq_mhz);
+
+  
+  nec_complex zrati, frati;
+  
+  nec_complex m_t1; // constants for the radial-wire ground-screen impedance
+  nec_float t2;  // constants for the radial-wire ground-screen impedance
+  
+  /** Ground Flag. ==1 no ground, =2 ground present */
+  int ksymp;
+private:
+  /* iperf: Ground-type flag. The options are: 
+    -1 - nullifies ground parameters previously used and sets free- space condition. The remainder of the card is left blank in this case. 
+    O - finite ground, reflection-coefficient approximation. 
+    1 - perfectly conducting ground. 
+    2 - finite ground, Sommerfeld/Norton method.
+  */
+  int iperf;
+  
+  c_ggrid _ggrid;
+
+  // first medium parameters
   nec_float epsr;  // relative dielectric constant
   nec_float sig;  // Conductivity
   
@@ -236,28 +270,14 @@ public:
   nec_float epsr2;  // Relative dielectric constant
   nec_float sig2;    // Conductivity in mhos/meter
 
+  nec_complex _epsc; // should be the same as _ggrid.m_epscf
+  
 //  MOVE THESE TO THE GROUND
   
   nec_float scrwl;  // length of wires in radial-wire ground-screen in wavelengths
   nec_float scrwr;  // radius of wires in radial-wire ground-screen in wavelengths
   
-  nec_complex m_t1;
-  nec_float t2;  // constants for the radial-wire ground-screen impedance
-  
-  nec_complex zrati, frati;
-  
-  nec_float t1;  // constants for the radial-wire ground-screen impedance
-  
-  /** Ground Flag. ==1 no ground, =2 ground present */
-  int ksymp;
-private:
-  /* iperf: Ground-type flag. The options are: 
-    -1 - nullifies ground parameters previously used and sets free- space condition. The remainder of the card is left blank in this case. 
-    O - finite ground, reflection-coefficient approximation. 
-    1 - perfectly conducting ground. 
-    2 - finite ground, Sommerfeld/Norton method.
-  */
-  int iperf;
+
 };
 
 #endif /* __nec_ground__ */

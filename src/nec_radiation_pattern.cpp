@@ -99,32 +99,8 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
   output_helper oh(os,_result_format);
           
   if ( _ifar >= 2)  {
-    oh.section_start("FAR FIELD GROUND PARAMETERS");
-    
-    if ( _ifar > 3) {
-      os << endl;
-      os << "                                        RADIAL WIRE GROUND SCREEN" << endl;
-      os << "                                        "; oh.int_out(5, m_ground.radial_wire_count); os << " WIRES" << endl;
-      os << "                                        WIRE LENGTH= "; oh.real_out(8,2, m_ground.radial_wire_length,false); os << " METERS" << endl;
-      os << "                                        WIRE RADIUS= "; oh.real_out(10,3, m_ground.radial_wire_radius); os << " METERS" << endl;
-    } /* if ( _ifar > 3) */
-    
-    if ( _ifar != 4 )  {
-      std::string hclif;
-      if ( (_ifar == 2) || (_ifar == 5) )
-        hclif = "LINEAR";
-      if ( (_ifar == 3) || (_ifar == 6) )
-        hclif= "CIRCLE";
-
-      os << endl;
-      os << "                                        " << hclif << " CLIFF" << endl;
-      os << "                                        EDGE DISTANCE= "; oh.real_out(9,2,m_ground.cliff_edge_distance,false); os << " METERS" << endl;
-      os << "                                        HEIGHT= "; oh.real_out(8,2,m_ground.cliff_height,false); os << " METERS" << endl;
-      os << "                                        SECOND MEDIUM -" << endl;
-      os << "                                        RELATIVE DIELECTRIC CONST.= "; oh.real_out(7,3,m_ground.epsr2, false); os << endl;
-      os << "                                        CONDUCTIVITY= "; oh.real_out(10,3,m_ground.sig2,false); os << " MHOS" << endl;
-    } /* if ( _ifar != 4 ) */
-  } /* if ( _ifar >= 2) */
+    m_ground.write_to_file_aux(os, oh, _ifar);
+  }
 
   if ( _ifar == 1)  {
     oh.section_start("RADIATED FIELDS NEAR GROUND");

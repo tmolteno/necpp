@@ -701,7 +701,6 @@ public:
   c_geometry* m_geometry;
   c_plot_card plot_card;
   
-  c_ggrid ggrid;
   c_ground_wave ground_wave;
 
   
@@ -739,7 +738,7 @@ public:
   nec_output_flags m_output_flags;
   
   
-  nec_float wavelength;
+  nec_float _wavelength;
   
   /* common  /cmb/ */
   complex_array cm;  // primary interaction matrix
@@ -823,10 +822,10 @@ public:
   // inside this class...
   void gfld(nec_float rho, nec_float phi, nec_float rz,
     nec_complex *eth, nec_complex *epi,
-    nec_complex *erd, bool space_only, nec_float _wavelength  );
+    nec_complex *erd, bool space_only, nec_float in_wavelength  );
   
   void ffld(nec_float thet, nec_float phi,
-    nec_complex *eth, nec_complex *eph, nec_float _wavelength  );
+    nec_complex *eth, nec_complex *eph, nec_float in_wavelength  );
   
 
 private:

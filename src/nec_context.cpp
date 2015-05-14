@@ -42,7 +42,6 @@ nec_context::nec_context() : fnorm(0,0), current_vector(0) {
   structure_currents = NULL;
           
   // allocate the ground grid
-  ggrid.initialize();
   initialize();
 }
 
@@ -1008,21 +1007,18 @@ void nec_context::simulate(bool far_field_flag) {
     igox = processing_state;
   
   
-  try
-  {
+  try  {
   int64_t iresrv = 0;
   bool in_freq_loop = false;
   
-  do
-  {  
+  do {  
     switch( igox )
     {
     case 1: /* Memory allocation for primary interacton matrix. */
 
-      if (false == in_freq_loop)
-      {
+      if (false == in_freq_loop)  {
         // TODO fix up the following (changed 2* to 3*)
-                                iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
+        iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
         cm.resize(iresrv);
       
         /* Memory allocation for symmetry array */
@@ -1035,17 +1031,16 @@ void nec_context::simulate(bool far_field_flag) {
         in_freq_loop = true;
       }
       
-      if ( mhz != 1)
-      {
+      if ( mhz != 1) {
         if ( ifrq == 1)
           freq_mhz *= delfrq;
         else
           freq_mhz += delfrq;
       }
 
-      wavelength = em::speed_of_light() / (1.0e6 * freq_mhz);
+      _wavelength = em::get_wavelength(1.0e6 * freq_mhz);
 
-      print_freq_int_krnl(freq_mhz, wavelength, rkh, m_use_exk);
+      print_freq_int_krnl(freq_mhz, _wavelength, rkh, m_use_exk);
         
       m_geometry->frequency_scale(freq_mhz);
       processing_state = 2;
@@ -1134,310 +1129,10 @@ void nec_context::print_freq_int_krnl(
   m_output.set_indent(0);
 }
 
-void nec_context::antenna_env(void)
-{
-  m_output.end_section();
-  m_output.line("                            -------- ANTENNA ENVIRONMENT --------" );
-  
-  if ( false == ground.present())
-  {
-        m_output.line("                            FREE SPACE" );
-      return;
-  }
-  
-  ground.frati=cplx_10();
-
-  if (false == ground.type_perfect()) // if ( ground.iperf != 1)
-  {
-    if ( ground.sig < 0.)
-      ground.sig=- ground.sig/(em::impedance_over_2pi()*wavelength);
-
-    nec_complex epsc = nec_complex( ground.epsr, -ground.sig*wavelength*em::impedance_over_2pi());
-    ground.zrati = 1.0/ sqrt( epsc);
-    
-    ground_wave.set_u(ground.zrati);
-
-    if (  ground.radial_wire_count != 0)
-    {
-      ground.scrwl=  ground.radial_wire_length/ wavelength;
-      ground.scrwr=  ground.radial_wire_radius/ wavelength;
-      ground.m_t1 = cplx_01()*2367.067/ (nec_float) ground.radial_wire_count;
-      ground.t2 = ground.scrwr * (nec_float) ground.radial_wire_count;
-
-      m_output.line(
-          "                            RADIAL WIRE GROUND SCREEN");
-      m_output.nec_printf(
-          "                            %d WIRES\n"
-          "                            WIRE LENGTH: %8.2f METERS\n"
-          "                            WIRE RADIUS: %10.3E METERS",
-          ground.radial_wire_count,  ground.radial_wire_length,  ground.radial_wire_radius );
-
-      m_output.endl();
-      m_output.line("                            MEDIUM UNDER SCREEN -" );
-    }
-
-    if (false == ground.type_sommerfeld_norton())
-    {
-      m_output.line("                            FINITE GROUND - REFLECTION COEFFICIENT APPROXIMATION" );
-    } 
-    else
-    {
-      // calculate the Sommerfeld Norton ground stuff.
-      ggrid.sommerfeld( ground.epsr, ground.sig, freq_mhz );
-      
-      ground.frati = (epsc-1.0)/(epsc+1.0);
-      if ( abs(( ggrid.m_epscf- epsc)/ epsc) >= 1.0e-3 )
-      {
-        nec_stop("ERROR IN GROUND PARAMETERS -"
-          "\n COMPLEX DIELECTRIC CONSTANT FROM FILE IS: %12.5E%+12.5Ej"
-          "\n REQUESTED: %12.5E%+12.5Ej",
-          real(ggrid.m_epscf), imag(ggrid.m_epscf), 
-          real(epsc), imag(epsc) );
-      }
-
-      m_output.line("                            FINITE GROUND - SOMMERFELD SOLUTION" );
-
-    } /* if (  ground.type_sommerfeld_norton() ) */
-
-    m_output.endl();
-    m_output.nec_printf(
-        "                            "
-        "RELATIVE DIELECTRIC CONST: %.3f\n"
-        "                            "
-        "CONDUCTIVITY: %10.3E MHOS/METER\n"
-        "                            "
-        "COMPLEX DIELECTRIC CONSTANT: %11.4E%+11.4Ej",
-        ground.epsr, ground.sig, real(epsc), imag(epsc) );
-  }
-  else
-  {
-    m_output.nec_printf("                            PERFECT GROUND" );
-  }
+void nec_context::antenna_env(void) {
+  ground.calculate_antenna_environment(ground_wave, freq_mhz);
+  ground.output_antenna_environment(m_output);
 }
-
-#if 0
-/*No more used...*/
-void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq,
-   int iptag, int iptagf, int iptagt, int iptaq, int iptaqf, int iptaqt)
-{
-    
-  int jump;
-  nec_float cmag, ph;
-  nec_complex curi;
-  nec_float fr;
-  nec_float etha, ethm, ephm, epha;
-  nec_complex eth, eph, ex, ey, ez;
-
-  if ( m_geometry->n_segments != 0)
-  {
-    if ( iptflg != -1)
-    {
-      if ( iptflg <= 0)
-      {
-        m_output.endl(3);
-        m_output.line(  "                           -------- CURRENTS AND LOCATION --------");
-        m_output.line(  "                                  DISTANCES IN WAVELENGTHS" );
-        m_output.endl();
-        m_output.line(  "   SEG  TAG    COORDINATES OF SEGM CENTER     SEGM    ------------- CURRENT (AMPS) -------------");
-        m_output.line(  "   No:  No:       X         Y         Z      LENGTH     REAL      IMAGINARY    MAGN        PHASE");
-      }
-      else if ( (iptflg != 3) && (inc <= 1) )
-      {
-        m_output.endl(3);
-        m_output.nec_printf(
-            "             -------- RECEIVING PATTERN PARAMETERS --------\n"
-            "                      ETA: %7.2f DEGREES\n"
-            "                      TYPE: %s\n"
-            "                      AXIAL RATIO: %6.3f\n\n"
-            "            THETA     PHI      ----- CURRENT ----    SEG\n"
-            "            (DEG)    (DEG)     MAGNITUDE    PHASE    No:",
-            xpr3, pattype, xpr6 );
-      } /* if ( iptflg <= 0) */
-    } /* if ( iptflg != -1) */
-
-    structure_power_loss=0.;
-    int itmp1=0;
-    jump= iptflg+1;
-
-    for (int i = 0; i < m_geometry->n_segments; i++ )
-    {
-      curi= current_vector[i]* wavelength;
-      cmag= abs( curi);
-      ph= arg_degrees( curi);
-
-      if ( (nload != 0) && (fabs(real(zarray[i])) >= 1.e-20) )
-        structure_power_loss += 0.5*cmag*cmag*real(zarray[i]) * m_geometry->segment_length[i];
-
-      if ( jump == 0)
-        continue;
-
-      if ( jump > 0 )
-      {
-        if ( (iptag != 0) && (m_geometry->segment_tags[i] != iptag) )
-          continue;
-
-        itmp1++;
-        if ( (itmp1 < iptagf) || (itmp1 > iptagt) )
-          continue;
-
-        if ( iptflg != 0)
-        {
-          if ( iptflg >= 2 )
-          {
-            fnorm[inc-1]= cmag;
-            isave = i+1;
-          }
-
-          if ( iptflg != 3)
-          {
-            m_output.endl();
-            m_output.nec_printf("          %7.2f  %7.2f   %11.4E  %7.2f  %5d",
-              xpr1, xpr2, cmag, ph, i+1 );
-
-            continue;
-          }
-        } /* if ( iptflg != 0) */
-        
-        else /*iptflg = 0, only the currents specified are printed*/
-        {
-          m_output.endl();
-          m_output.nec_printf(
-          " %5d %4d %9.4f %9.4f %9.4f %9.5f"
-          " %11.4E %11.4E %11.4E %8.3f",
-          i+1, m_geometry->segment_tags[i],
-          m_geometry->x[i], m_geometry->y[i], m_geometry->z[i], m_geometry->segment_length[i],
-          real(curi), imag(curi), cmag, ph );
-
-          // added test for plot_card.is_valid()
-          if (plot_card.is_valid() && plot_card.currents())
-          {
-            plot_card.plot_complex(curi);
-            plot_card.plot_endl();
-          }
-        }
-      }
-      else /*iptflg = -2, all currents are printed*/
-      {
-        m_output.endl();
-        m_output.nec_printf(
-          " %5d %4d %9.4f %9.4f %9.4f %9.5f"
-          " %11.4E %11.4E %11.4E %8.3f",
-          i+1, m_geometry->segment_tags[i],
-          m_geometry->x[i], m_geometry->y[i], m_geometry->z[i], m_geometry->segment_length[i],
-          real(curi), imag(curi), cmag, ph );
-
-        // added test for plot_card.is_valid()
-        if (plot_card.is_valid() && plot_card.currents())
-        {
-          plot_card.plot_complex(curi);
-          plot_card.plot_endl();
-        }
-      }
-
-    } /* for( i = 0; i < n; i++ ) */
-
-    if ( iptflq != -1)
-    {
-      m_output.endl(3);
-      m_output.nec_printf(
-          "                                  "
-          "------ CHARGE DENSITIES ------\n"
-          "                                  "
-          "   DISTANCES IN WAVELENGTHS\n\n"
-          "   SEG   TAG    COORDINATES OF SEG CENTER     SEG"
-          "        "
-          "  CHARGE DENSITY (COULOMBS/METER)\n"
-          "   NO:   NO:     X         Y         Z       LENGTH"
-          "   "
-          "  REAL      IMAGINARY     MAGN        PHASE" );
-
-      itmp1 = 0;
-      fr = 1.e-6/freq_mhz;
-
-      for(int i = 0; i < m_geometry->n_segments; i++ )
-      {
-        if ( iptflq != -2 )
-        {
-          if ( (iptaq != 0) && (m_geometry->segment_tags[i] != iptaq) )
-            continue;
-
-          itmp1++;
-          if ( (itmp1 < iptaqf) || (itmp1 > iptaqt) )
-            continue;
-
-        } /* if ( iptflq == -2) */
-
-        curi = fr * nec_complex(- bii[i], bir[i]);
-        cmag = abs( curi);
-        ph = arg_degrees( curi);
-
-        m_output.endl();
-        m_output.nec_printf(
-            " %5d %4d %9.4f %9.4f %9.4f %9.5f"
-            " %11.4E %11.4E %11.4E %9.3f",
-            i+1, m_geometry->segment_tags[i], m_geometry->x[i], m_geometry->y[i], m_geometry->z[i], m_geometry->segment_length[i],
-            real(curi), imag(curi), cmag, ph );
-
-      } /* for( i = 0; i < n; i++ ) */
-
-    } /* if ( iptflq != -1) */
-
-  } /* if ( n != 0) */
-
-  if ( m_geometry->m != 0)
-  {
-    m_output.endl(3);
-    m_output.nec_printf(
-        "                                      "
-        " --------- SURFACE PATCH CURRENTS ---------\n"
-        "                                                "
-        " DISTANCE IN WAVELENGTHS\n"
-        "                                                "
-        " CURRENT IN AMPS/METER\n\n"
-        "                                 ---------"
-        " SURFACE COMPONENTS --------    "
-        "---------------- RECTANGULAR COMPONENTS ----------------\n"
-        "  PCH   --- PATCH CENTER ---     TANGENT VECTOR 1    "
-        " TANGENT VECTOR 2    ------- X ------    ------- Y ------"
-        "   "
-        " ------- Z ------\n  No:    X       Y       Z       MAG."
-        "       "
-        "PHASE     MAG.       PHASE    REAL   IMAGINARY    REAL  "
-        " IMAGINARY    REAL   IMAGINARY" );
-
-    int j = m_geometry->n_segments-3;
-    int itmp1 = -1;
-
-    for(int i = 0; i < m_geometry->m; i++ )
-    {
-      j += 3;
-      itmp1++;
-      ASSERT(itmp1 == i);
-      
-      ex= current_vector[j];
-      ey= current_vector[j+1];
-      ez= current_vector[j+2];
-      eth= ex* m_geometry->t1x[itmp1]+ ey* m_geometry->t1y[itmp1]+ ez* m_geometry->t1z[itmp1];
-      eph= ex* m_geometry->t2x[itmp1]+ ey* m_geometry->t2y[itmp1]+ ez* m_geometry->t2z[itmp1];
-      ethm= abs( eth);
-      etha= arg_degrees( eth);
-      ephm= abs( eph);
-      epha= arg_degrees( eph);
-
-      m_output.endl();
-      m_output.nec_printf(
-            " %4d %7.3f %7.3f %7.3f %11.4E "
-            "%8.2f %11.4E %8.2f"
-            " %9.2E %9.2E %9.2E %9.2E %9.2E %9.2E",
-            i+1, m_geometry->px[itmp1], m_geometry->py[itmp1], m_geometry->pz[itmp1],
-            ethm, etha, ephm, epha, real(ex), imag(ex),
-            real(ey), imag(ey), real(ez), imag(ez));
-
-        plot_card.plot_currents(ex,ey,ez);
-    } /* for( i=0; i<m; i++ ) */
-  } /* if ( m != 0) */
-} /* print_structure_currents */
-#endif
 
 
 /*!\brief Calculate network data such as the lengths of transmission lines.
@@ -1463,21 +1158,15 @@ void nec_context::calculate_network_data(void)
   int itmp3 = 0;
   int net_type = ntyp[0];
 
-  for (int i = 0; i < 2; i++ )
-  {
+  for (int i = 0; i < 2; i++ ) {
     if ( net_type == 3)
       net_type = 2;
 
-    for (int j = 0; j < network_count; j++)
-    {
-      if ( (ntyp[j]/net_type) != 1 )
-      {
+    for (int j = 0; j < network_count; j++) {
+      if ( (ntyp[j]/net_type) != 1 ) {
         itmp3 = ntyp[j]; // can never be zero
-      }
-      else
-      {
-        if ( (ntyp[j] >= 2) && (x11i[j] <= 0.0) )
-        {
+      } else {
+        if ( (ntyp[j] >= 2) && (x11i[j] <= 0.0) ) {
           int idx4 = iseg1[j]-1;
           int idx5 = iseg2[j]-1;
           nec_float xx = m_geometry->x[idx5]- m_geometry->x[idx4];
@@ -1486,7 +1175,7 @@ void nec_context::calculate_network_data(void)
           
           // set the length of the transmission line to be the 
           // straight line distance.
-          x11i[j] = wavelength*sqrt(xx*xx + yy*yy + zz*zz);
+          x11i[j] = _wavelength*sqrt(xx*xx + yy*yy + zz*zz);
         }
       }
     }
@@ -1499,7 +1188,6 @@ void nec_context::calculate_network_data(void)
 
 void nec_context::print_network_data(void)
 {
-//  int i, j;
   int itmp1, itmp2, itmp3, itmp4, itmp5;
   const char *pnet[3] = { "        ", "STRAIGHT", " CROSSED" };
   
@@ -1532,9 +1220,7 @@ void nec_context::print_network_data(void)
             "  No:   No:  No:   No:         OHMS      "
             "METERS      REAL      IMAGINARY      "
             "REAL      IMAGINARY" );
-      }
-      else if (itmp1 == 1)
-      {
+      } else if (itmp1 == 1) {
         m_output.endl();
         m_output.nec_printf(
             "  -- FROM -  --- TO --            "
@@ -1550,46 +1236,27 @@ void nec_context::print_network_data(void)
             " REAL     IMAGINARY       REAL      "
             "IMAGINARY" );
       }
-      for (int j = 0; j < network_count; j++)
-      {
+      for (int j = 0; j < network_count; j++) {
         itmp2= ntyp[j];
 
-        if ( (itmp2/itmp1) != 1 )
+        if ( (itmp2/itmp1) != 1 ) {
           itmp3 = itmp2;
-        else
-        {
+        } else {
           int idx4, idx5;
 
           itmp4= iseg1[j];
           itmp5= iseg2[j];
           idx4 = itmp4-1;
           idx5 = itmp5-1;
-
-#if 0
-          This code has moved to calculate_network_data()
-          
-          if ( (itmp2 >= 2) && (x11i[j] <= 0.0) )
-          {
-            nec_float xx = m_geometry->x[idx5]- m_geometry->x[idx4];
-            nec_float yy = m_geometry->y[idx5]- m_geometry->y[idx4];
-            nec_float zz = m_geometry->z[idx5]- m_geometry->z[idx4];
-            
-            // set the length of the transmission line to be the 
-            // straight line distance.
-            x11i[j]= wavelength*sqrt(xx*xx+yy*yy+zz*zz);
-          }
-#endif
           m_output.endl();
           m_output.nec_printf(
             " %4d %5d %4d %5d  "
             "%11.4E %11.4E  %11.4E %11.4E  "
             "%11.4E %11.4E %s",
             m_geometry->segment_tags[idx4], itmp4, m_geometry->segment_tags[idx5], itmp5,
-            x11r[j], x11i[j], x12r[j], x12i[j],
-            x22r[j], x22i[j], pnet[itmp2-1] );
-
+              x11r[j], x11i[j], x12r[j], x12i[j],
+              x22r[j], x22i[j], pnet[itmp2-1] );
         } /* if (( itmp2/ itmp1) == 1) */
-
       } /* for( j = 0; j < network_count; j++) */
       if ( itmp3 == 0)
         break;
@@ -1821,10 +1488,10 @@ void nec_context::setup_excitation()
 
     if ( m_excitation_type == 4)
     {
-      tmp1= xpr1/ wavelength;
-      tmp2= xpr2/ wavelength;
-      tmp3= xpr3/ wavelength;
-      tmp6= xpr6/( wavelength* wavelength);
+      tmp1= xpr1/ _wavelength;
+      tmp2= xpr2/ _wavelength;
+      tmp3= xpr3/ _wavelength;
+      tmp6= xpr6/( _wavelength* _wavelength);
 
       m_output.endl();
       m_output.line(    "                                      CURRENT SOURCE");
@@ -1958,7 +1625,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
       processing_state = 4;
 
       if ( ncoup > 0)
-        couple( current_vector, wavelength );
+        couple( current_vector, _wavelength );
 
       if ( iflow == 7)
       {
@@ -2025,7 +1692,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
         new nec_radiation_pattern(nth, nph,
             thets, phis, dth, dph,
             rfld, ground,
-            ifar, wavelength,
+            ifar, _wavelength,
             input_power, network_power_loss,
             m_rp_output_format, m_rp_normalization, ipd, iavp,
             gnor, plot_card);
@@ -2227,22 +1894,22 @@ void nec_context::load()
       switch( jump )
       {
         case 1:
-          zt= zlr[istepx]/ seg_length+ tpcj* zli[istepx]/( seg_length*wavelength);
+          zt= zlr[istepx]/ seg_length+ tpcj* zli[istepx]/( seg_length*_wavelength);
           if ( fabs( zlc[istepx]) > 1.0e-20)
-            zt += wavelength/( tpcj* seg_length* zlc[istepx]);
+            zt += _wavelength/( tpcj* seg_length* zlc[istepx]);
           break;
       
         case 2:
-          zt= tpcj* seg_length* zlc[istepx]/ wavelength;
+          zt= tpcj* seg_length* zlc[istepx]/ _wavelength;
           if ( fabs( zli[istepx]) > 1.0e-20)
-            zt += seg_length* wavelength/( tpcj* zli[istepx]);
+            zt += seg_length* _wavelength/( tpcj* zli[istepx]);
           if ( fabs( zlr[istepx]) > 1.0e-20)
             zt += seg_length/ zlr[istepx];
           zt=1./ zt;
           break;
       
         case 3:
-          zt= zlr[istepx]* wavelength+ tpcj* zli[istepx];
+          zt= zlr[istepx]* _wavelength+ tpcj* zli[istepx];
           if ( fabs( zlc[istepx]) > 1.0e-20)
             zt += 1./( tpcj* seg_length* seg_length* zlc[istepx]);
           break;
@@ -2252,7 +1919,7 @@ void nec_context::load()
           if ( fabs( zli[istepx]) > 1.0e-20)
             zt += 1./( tpcj* zli[istepx]);
           if ( fabs( zlr[istepx]) > 1.0e-20)
-            zt += 1./( zlr[istepx]* wavelength);
+            zt += 1./( zlr[istepx]* _wavelength);
           zt=1./ zt;
           break;
       
@@ -2262,7 +1929,7 @@ void nec_context::load()
       
         case 6:
         {
-          zt= zint( zlr[istepx]* wavelength, m_geometry->segment_radius[i]);
+          zt= zint( zlr[istepx]* _wavelength, m_geometry->segment_radius[i]);
         }
       
       } /* switch( jump ) */
@@ -3193,18 +2860,18 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
       xymag= sqrt( xij* xij+ yij* yij);
     
       /* set parameters for radial wire ground screen. */
-      if (  ground.radial_wire_count != 0)
+      if (  ground.get_radial_wire_count() != 0)
       {
         xspec=( xi* zj+ zi* xj)/( zi+ zj);
         yspec=( yi* zj+ zi* yj)/( zi+ zj);
         rhospc= sqrt( xspec*xspec + yspec*yspec + ground.t2*ground.t2);
       
-        if ( rhospc <= ground.scrwl)
+        if ( rhospc <= ground.get_radial_wire_length_wavelengths())
         {
           zscrn= ground.m_t1* rhospc* log( rhospc/ ground.t2);
           zratx=( zscrn* ground.zrati)/( em::impedance() * ground.zrati+ zscrn);
         }
-      } /* if (  ground.radial_wire_count != 0) */
+      } /* if (  ground.get_radial_wire_count() != 0) */
     
       /* Calculation of reflection coefficients when ground is specified. */
       if ( xymag <= 1.0e-6)
@@ -3255,21 +2922,17 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
     exc -= txc* ground.frati;
     eyc -= tyc* ground.frati;
     ezc -= tzc* ground.frati;
-    
   }
   
-  if (false == ground.type_sommerfeld_norton()) // (ground.iperf != 2)
+  if (false == ground.type_sommerfeld_norton())
     return;
   
   /* field due to ground using Sommerfeld/Norton */
   sn = norm(cabj, sabj);
-  if ( sn >= 1.0e-5)
-  {
+  if ( sn >= 1.0e-5) {
     xsn= cabj/ sn;
     ysn= sabj/ sn;
-  }
-  else
-  {
+  } else {
     sn=0.0;
     xsn=1.0;
     ysn=0.0;
@@ -3283,27 +2946,22 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
   rhoz= cabj* yij- sabj* xij;
   rh = norm(rhox, rhoy, rhoz); // rhox* rhox+ rhoy* rhoy+ rhoz* rhoz;
   
-  if ( rh <= 1.e-10)
-  {
+  if ( rh <= 1.e-10) {
     xo= xi- ai* ysn;
     yo= yi+ ai* xsn;
     zo= zi;
-  }
-  else
-  {
+  } else {
     rh= ai/ sqrt( rh);
     if ( rhoz < 0.0)
       rh=- rh;
     xo= xi+ rh* rhox;
     yo= yi+ rh* rhoy;
     zo= zi+ rh* rhoz;
-  
   } /* if ( rh <= 1.e-10) */
   
   r = xij*xij + yij*yij + zij*zij;
   
-  if ( r <= .95)
-  {
+  if ( r <= .95) {
     /* Field from interpolation is integrated over segment */
     isnor=1;
     dmin = norm(exk) + norm(eyk) + norm(ezk);
@@ -3311,16 +2969,13 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
     dmin = 0.01* sqrt(dmin);
     shaf = 0.5* m_s;
     rom2(-shaf, shaf, egnd, dmin);
-  }
-  else
-  {
+  } else {
     /* Norton field equations and lumped current element approximation */
     isnor=2;
     sflds(0., egnd);
   } /* if ( r <= .95) */
   
-  if ( r > .95)
-  {
+  if ( r > .95) {
     zp= xij* cabj+ yij* sabj+ zij* salpr;
     rh= r- zp* zp;
     if ( rh <= 1.e-10)
@@ -3328,8 +2983,7 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
     else
       dmin = sqrt( rh/( rh+ ai* ai));
   
-    if ( dmin <= .95)
-    {
+    if ( dmin <= .95) {
       px=1.- dmin;
       terk=( txk* cabj+ tyk* sabj+ tzk* salpr)* px;
       txk= dmin* txk+ terk* cabj;
@@ -3529,7 +3183,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     for (int i = 0; i < voltage_source_count; i++ )
     {
       int source_index = source_segment_array[i]-1;
-      e[source_index] = -source_voltage_array[i]/(m_geometry->segment_length[source_index]* wavelength);
+      e[source_index] = -source_voltage_array[i]/(m_geometry->segment_length[source_index]* _wavelength);
     }
   
     if ( nvqd == 0)
@@ -4270,13 +3924,13 @@ void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai 
         xymag= sqrt( xij* xij+ yij* yij);
       
         /* set parameters for radial wire ground screen. */
-        if (  ground.radial_wire_count != 0)
+        if (  ground.get_radial_wire_count() != 0)
         {
           xspec=( xi* zj+ zi* xj)/( zi+ zj);
           yspec=( yi* zj+ zi* yj)/( zi+ zj);
           rhospc= sqrt( xspec*xspec + yspec*yspec + ground.t2*ground.t2);
         
-          if ( rhospc <= ground.scrwl)
+          if ( rhospc <= ground.get_radial_wire_length_wavelengths())
           {
             rrv = ground.m_t1 * rhospc* log(rhospc/ ground.t2);
             zratx = ( rrv* ground.zrati)/( em::impedance() * ground.zrati + rrv);
@@ -4894,7 +4548,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         
           rhs[isc1] = cplx_10();
           solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-          m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+          m_geometry->get_current_coefficients(_wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
         
           for (int j = 0; j < irow1; j++ )
           {
@@ -4961,7 +4615,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         }
         else
         {
-          y22r= two_pi() * x11i[j]/ wavelength;
+          y22r= two_pi() * x11i[j]/ _wavelength;
           y12r=0.;
           y12i=1./( x11r[j]* sin( y22r));
           y11r= x12r[j];
@@ -5097,8 +4751,8 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         }
         else
         {
-          rhnx[irow1] += nec_complex( y11r, y11i)* source_voltage_array[isc1]/wavelength;
-          rhnx[irow2] += nec_complex( y12r, y12i)* source_voltage_array[isc1]/wavelength;
+          rhnx[irow1] += nec_complex( y11r, y11i)* source_voltage_array[isc1]/_wavelength;
+          rhnx[irow2] += nec_complex( y12r, y12i)* source_voltage_array[isc1]/_wavelength;
         }
       
         if ( isc2 == -1)
@@ -5108,8 +4762,8 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         }
         else
         {
-          rhnx[irow1] += nec_complex( y12r, y12i)* source_voltage_array[isc2]/wavelength;
-          rhnx[irow2] += nec_complex( y22r, y22i)* source_voltage_array[isc2]/wavelength;
+          rhnx[irow1] += nec_complex( y12r, y12i)* source_voltage_array[isc2]/_wavelength;
+          rhnx[irow2] += nec_complex( y22r, y22i)* source_voltage_array[isc2]/_wavelength;
         }
       } /* for( j = 0; j < network_count; j++ ) */
   
@@ -5122,7 +4776,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         irow1= nteqa[i]-1;
         rhs[irow1]=cplx_10();
         solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-        m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+        m_geometry->get_current_coefficients(_wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
         
         for (int j = 0; j < nteq; j++ )
         {
@@ -5141,7 +4795,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
   {
     /* solve for currents when no networks are present */
     solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-    m_geometry->get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+    m_geometry->get_current_coefficients(_wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
     ntsc=0;
   }
   else // if ( network_count != 0)
@@ -5154,7 +4808,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
       rhs[i]= einc[i];
   
     solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-    m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+    m_geometry->get_current_coefficients(_wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
   
     for( i = 0; i < nteq; i++ )
     {
@@ -5176,7 +4830,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
     }
   
     solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-    m_geometry->get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+    m_geometry->get_current_coefficients(_wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 
 
     nec_structure_excitation* seo = new nec_structure_excitation();
@@ -5185,8 +4839,8 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
     {
       int segment_number = nteqa[i];
       int segment_index = segment_number-1;
-      nec_complex voltage = rhnt[i]* m_geometry->segment_length[segment_index]* wavelength;
-      nec_complex current = einc[segment_index]* wavelength;
+      nec_complex voltage = rhnt[i]* m_geometry->segment_length[segment_index]* _wavelength;
+      nec_complex current = einc[segment_index]* _wavelength;
       nec_float power = em::power(voltage,current);
       network_power_loss = network_power_loss - power;
       
@@ -5199,7 +4853,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
       int segment_number = ntsca[i];
       int segment_index = segment_number-1;
       nec_complex voltage = vsrc[i];
-      nec_complex current = einc[segment_index]* wavelength;
+      nec_complex current = einc[segment_index]* _wavelength;
       nec_float power = em::power(voltage,current);
       network_power_loss = network_power_loss - power;
       
@@ -5235,8 +4889,8 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
     {
       int segment_number = nteqa[i];
       int segment_index = segment_number-1;
-      nec_complex voltage = rhnt[i]* m_geometry->segment_length[segment_index]* wavelength;
-      nec_complex current = einc[segment_index]* wavelength;
+      nec_complex voltage = rhnt[i]* m_geometry->segment_length[segment_index]* _wavelength;
+      nec_complex current = einc[segment_index]* _wavelength;
       nec_complex admittance = current / voltage;
       nec_complex impedance = voltage / current;
       int segment_tag = m_geometry->segment_tags[segment_number];
@@ -5255,7 +4909,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
     {
       irow1= ntsca[i]-1;
       vlt= vsrc[i];
-      cux= einc[irow1]* wavelength;
+      cux= einc[irow1]* _wavelength;
       ymit= cux/ vlt;
       zped= vlt/ cux;
       irow2= m_geometry->segment_tags[irow1];
@@ -5299,7 +4953,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
   {
     int segment_index = source_segment_array[i]-1;
     nec_complex voltage = source_voltage_array[i];
-    nec_complex current = einc[segment_index] * wavelength;
+    nec_complex current = einc[segment_index] * _wavelength;
     
     bool add_as_network_loss = false;
     
@@ -5317,7 +4971,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
       for (int k = 0; k < nteq; k++ )
         temp -= cmn[k+row_offset]*rhnt[k];
         
-      current = (einc[segment_index] + temp) * wavelength;
+      current = (einc[segment_index] + temp) * _wavelength;
       add_as_network_loss = true;
     }
     
@@ -5362,7 +5016,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         for (int k = 0; k < nteq; k++ )
           temp -= cmn[k + row_offset]*rhnt[k];
           
-        current = (temp + einc[segment_index])* wavelength;
+        current = (temp + einc[segment_index])* _wavelength;
         add_as_network_loss = true;
           
 #warning "This loop is messed up. The j is inside another j loop"
@@ -5429,7 +5083,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
     // multiplied by pi().// TCAM CHANGED TO pi() (from TP*.5)!!
     nec_float segment_length_phase = m_geometry->segment_length[segment_index] * pi(); 
     
-    nec_complex current = (_ai - _bi* sin(segment_length_phase) + _ci * cos(segment_length_phase)) * wavelength;
+    nec_complex current = (_ai - _bi* sin(segment_length_phase) + _ci * cos(segment_length_phase)) * _wavelength;
     
     nec_complex admittance = current / voltage;
     nec_complex impedance = voltage / current;
@@ -5533,9 +5187,9 @@ void nec_context::nfpat( void )
     zob= znrt;
   }
 
-  tmp1= xob/ wavelength;
-  tmp2= yob/ wavelength;
-  tmp3= zob/ wavelength;
+  tmp1= xob/ _wavelength;
+  tmp2= yob/ _wavelength;
+  tmp3= zob/ _wavelength;
 
   if ( nfeh != 1)
     nefld( tmp1, tmp2, tmp3, &ex, &ey, &ez);
@@ -5826,7 +5480,7 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
   m_geometry->icon1[is]= i;
   m_s = m_geometry->segment_length[is]*.5;
   curd= s_CCJ * v/(( log(2.* m_s/ m_geometry->segment_radius[is])-1.)*( m_geometry->bx[m_geometry->jsno-1]*
-    cos( two_pi() * m_s)+ m_geometry->cx[m_geometry->jsno-1]* sin( two_pi() * m_s))* wavelength);
+    cos( two_pi() * m_s)+ m_geometry->cx[m_geometry->jsno-1]* sin( two_pi() * m_s))* _wavelength);
   vqds[nqds]= v;
   iqds[nqds]= is+1;
   nqds++;
@@ -6414,7 +6068,6 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   the source segment at t relative to the segment center.
 */
 void nec_context::sflds(const nec_float t, complex_array& e )
-
 {
   static nec_complex __const1(0.0,4.771341189);
 
@@ -6430,15 +6083,12 @@ void nec_context::sflds(const nec_float t, complex_array& e )
   rhs= rhx* rhx+ rhy* rhy;
   rho= sqrt( rhs);
 
-  if ( rho <= 0.0)
-  {
+  if ( rho <= 0.0) {
     rhx=1.0;
     rhy=0.0;
     phx=0.0;
     phy=1.0;
-  }
-  else
-  {
+  } else {
     rhx= rhx/ rho;
     rhy= rhy/ rho;
     phx= -rhy;
@@ -6463,8 +6113,7 @@ void nec_context::sflds(const nec_float t, complex_array& e )
   /*  Use Norton approximation for field due to ground.  Current is
     lumped at segment center with current moment for constant, sine,
     or cosine distribution. */
-  if ( isnor != 1)
-  {
+  if ( isnor != 1) {
     ground_wave.zmh=1.0;
     ground_wave.r1=1.;
     ground_wave.xx1=0.;
@@ -6511,7 +6160,7 @@ void nec_context::sflds(const nec_float t, complex_array& e )
   /*  Combine vertical and horizontal components and convert
     to x,y,z components. multiply by exp(-jkr)/r.
   */
-  ggrid.interpolate( ground_wave.r2, thet, &erv, &ezv, &erh, &eph );
+  ground.ggrid_interpolate( ground_wave.r2, thet, &erv, &ezv, &erh, &eph );
   ground_wave.xx2= ground_wave.xx2 / ground_wave.r2;
   sfac= sn* cph;
   erh= ground_wave.xx2*( salpj* erv+ sfac* erh);
@@ -6865,7 +6514,7 @@ void nec_context::fblock( int nrow, int ncol, int imax, int ipsym ) {
 */
 void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
     nec_complex *eth, nec_complex *epi,
-    nec_complex *erd, bool space_only, nec_float _wavelength )
+    nec_complex *erd, bool space_only, nec_float in_wavelength )
 {
   int i, k;
   nec_float b, r, thet, arg, phx, phy, rx, ry, dx, dy, dz, rix, riy, rhs, rhp;
@@ -6882,7 +6531,7 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
     else
       thet= pi()*.5;
   
-    ffld(thet, phi, eth, epi, _wavelength);
+    ffld(thet, phi, eth, epi, in_wavelength);
     arg= -two_pi() * r;
     exa= nec_complex( cos( arg), sin( arg))/ r;
     *eth= *eth* exa;
@@ -7014,7 +6663,7 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
 /* ffld calculates the far zone radiated electric fields, */
 /* the factor exp(j*k*r)/(r/lamda) not included */
 void nec_context::ffld(nec_float thet, nec_float phi,
-    nec_complex *eth, nec_complex *eph, nec_float _wavelength )
+    nec_complex *eth, nec_complex *eph, nec_float in_wavelength )
 {
   static nec_complex CONST3(0.0, -em::impedance() / four_pi()); // -29.97922085;
 
@@ -7025,7 +6674,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
   nec_float too, boo, b, c, d, rr, ri, arg, dr;
   nec_complex cix, ciy, ciz, exa, ccx, ccy, ccz, cdp;
   nec_complex zrsin, rrv, rrh, rrv1, rrh1, rrv2, rrh2;
-  nec_complex tix, tiy, tiz, zscrn, ex, ey, ez;
+  nec_complex tix, tiy, tiz, ex, ey, ez;
   
   phx=- sin( phi);
   phy= cos( phi);
@@ -7061,12 +6710,12 @@ void nec_context::ffld(nec_float thet, nec_float phi,
         tthet= tan( thet);
       
         if ( ifar != 4)  {
-          nec_complex zrati2 = ground.get_zrati2(_wavelength);
+          nec_complex zrati2 = ground.get_zrati2(in_wavelength);
           
           zrsin = sqrt(1.-  zrati2 *  zrati2 * thz* thz);
           rrv2 =-( roz-  zrati2* zrsin)/( roz+  zrati2* zrsin);
           rrh2 =(  zrati2* roz- zrsin)/(  zrati2* roz+ zrsin);
-          darg = -two_pi() * 2.0 * ground.get_ch(_wavelength) * roz;
+          darg = -two_pi() * 2.0 * ground.get_ch(in_wavelength) * roz;
         }
       } /* if ( ifar > 1) */
     
@@ -7126,7 +6775,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
     
       d= dr* phy+ m_geometry->x[i];
       if ( ifar == 2)  {
-        if (( ground.get_cl(_wavelength) - d) > 0.0) {
+        if (( ground.get_cl(in_wavelength) - d) > 0.0) {
           rrv= rrv1;
           rrh= rrh1;
         } else {
@@ -7137,7 +6786,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
       } else { /* if ( ifar == 2) */
         d= sqrt( d*d + (m_geometry->y[i]-dr*phx)*(m_geometry->y[i]-dr*phx) );
         if ( ifar == 3)  {
-          if (( ground.get_cl(_wavelength) - d) > 0.0)  {
+          if (( ground.get_cl(in_wavelength) - d) > 0.0)  {
             rrv= rrv1;
             rrh= rrh1;
           } else {
@@ -7146,10 +6795,10 @@ void nec_context::ffld(nec_float thet, nec_float phi,
             arg= arg+ darg;
           }
         } else { /* if ( ifar == 3) */
-          if (( ground.scrwl- d) >= 0.0)  {
+          if (( ground.get_radial_wire_length_wavelengths() - d) >= 0.0)  {
             /* radial wire ground screen reflection coefficient */
             d += ground.t2;
-            zscrn= ground.m_t1 * d* log( d/ ground.t2);
+            nec_complex zscrn= ground.m_t1 * d* log( d/ ground.t2);
             zscrn=( zscrn* ground.zrati)/( em::impedance() * ground.zrati+ zscrn);
             zrsin= sqrt(1.- zscrn* zscrn* thz* thz);
             rrv=( roz+ zscrn* zrsin)/(- roz+ zscrn* zrsin);
@@ -7162,7 +6811,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
               if ( ifar == 5)
                 d= dr* phy+ m_geometry->x[i];
           
-              if (( ground.get_cl(_wavelength) - d) > 0.)  {
+              if (( ground.get_cl(in_wavelength) - d) > 0.)  {
                 rrv= rrv1;
                 rrh= rrh1;
               } else {
