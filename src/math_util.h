@@ -32,11 +32,10 @@
 
 #if USING_EIGEN_ARRAY
   #include <Eigen/Dense>
-  using namespace Eigen;
 
-  typedef Matrix<int32_t, Eigen::Dynamic, 1>  int_array;
-  typedef Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
-  typedef Matrix<nec_complex, Eigen::Dynamic, 1>  complex_array;
+  typedef Eigen::Matrix<int32_t, Eigen::Dynamic, 1>  int_array;
+  typedef Eigen::Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
+  typedef Eigen::Matrix<nec_complex, Eigen::Dynamic, 1>  complex_array;
 #else
   // Use our own types rather than Eigen
   #include "safe_array.h"
@@ -186,10 +185,9 @@ inline nec_float normL1(const nec_float x, const nec_float y, const nec_float z)
 
 #if USING_EIGEN_3VECT
   #include <Eigen/Dense>
-  using namespace Eigen;
 
-  typedef Matrix<nec_float,3,1> nec_3vector;
-  typedef Matrix<nec_complex,3,1> nec_c3vector;
+  typedef Eigen::Matrix<nec_float,3,1> nec_3vector;
+  typedef Eigen::Matrix<nec_complex,3,1> nec_c3vector;
 #else
 
 /** \brief A Class for handling 3 dimensional vectors */
