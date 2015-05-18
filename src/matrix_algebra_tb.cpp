@@ -154,6 +154,7 @@ TEST_CASE( "LU Decomposition EIGEN", "[lu_decompose]") {
   A(3,3) =4.0;
 
   cout << "Here is the matrix A:" << endl << A << endl;
+  
   Eigen::FullPivLU<MatrixXcd> lu(A);
   cout << "Here is, up to permutations, its LU decomposition matrix:"
   << endl << lu.matrixLU() << endl;
@@ -166,6 +167,12 @@ TEST_CASE( "LU Decomposition EIGEN", "[lu_decompose]") {
   cout << u << endl;
   cout << "Let us now reconstruct the original matrix m:" << endl;
   cout << lu.permutationP().inverse() * l * u * lu.permutationQ().inverse() << endl;
+  MatrixXcd B = lu.permutationP().inverse() * l * u * lu.permutationQ().inverse();
+  for (int i=0;i<4;i++) {
+    for (int j=0; j<4; j++) {
+      REQUIRE_APPROX_EQUAL(B(i,j), A(i,j));
+    }
+  }
 }
 
 #endif /* #if USING_EIGEN_3VECT */
