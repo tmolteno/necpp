@@ -547,6 +547,80 @@ cout << u << endl;
 cout << "Let us now reconstruct the original matrix m:" << endl;
 cout << lu.permutationP().inverse() * l * u * lu.permutationQ().inverse() << endl;
 
+void lu_decompose_eigen(nec_output_file& s_output,  int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
+{
+  UNUSED(s_output);
+  DEBUG_TRACE("lu_decompose_eigen(" << n << "," << ndim << ")");
+  ASSERT(n <= ndim);
+
+#ifdef NEC_MATRIX_CHECK
+  cout << "eigen_a = ";
+  to_octave(a_in,n,ndim);
+#endif
+
+  /* Un-transpose the matrix for Gauss elimination */
+  for (int i = 1; i < n; i++ )  {
+    int i_offset = i * ndim;
+    int j_offset = 0;
+    for (int j = 0; j < i; j++ )  {
+      nec_complex aij = a_in[i+j_offset];
+      a_in[i+j_offset] = a_in[j+i_offset];
+      a_in[j+i_offset] = aij;
+      
+      j_offset += ndim;
+    }
+  }
+
+  Eigen::FullPivLU<Matrix5x3> lu(m);
+
+
+         
+  int info = clapack_zgetrf (CblasColMajor, n, n, 
+          (void*) a_in.data(), ndim, ip.data());
+  
+  if (0 != info) {
+    /*
+      The factorization has been completed, but the factor U is exactly singular,
+      and division by zero will occur if it is used to solve a system of equations. 
+    */
+    throw new nec_exception("nec++:  LU Decomposition Failed: ",info);
+  }
+  
+  
+#ifdef NEC_MATRIX_CHECK
+  cout << "atlas_solved = ";
+  to_octave(a_in,n,ndim);
+
+  cout << "atlas_ip = ";
+  to_octave(ip,n);
+#endif
+}
+
+
+
+/*! \brief Solve system of linear equations
+  Subroutine to solve the matrix equation lu*x=b where l is a unit
+  lower triangular matrix and u is an upper triangular matrix both
+  of which are stored in a.  the rhs vector b is input and the
+  solution is returned through vector b.   (matrix transposed)
+*/
+void solve_eigen( int n, complex_array& a, int_array& ip,
+    complex_array& b, int64_t ndim )
+{
+  DEBUG_TRACE("solve_eigen(" << n << "," << ndim << ")");
+
+  int info = clapack_zgetrs (CblasColMajor, CblasNoTrans, 
+    n, 1, (void*) a.data(), ndim, ip.data(), b.data(), n);
+  
+  if (0 != info) {
+    /*
+      The factorization has been completed, but the factor U is exactly singular,
+      and division by zero will occur if it is used to solve a system of equations. 
+    */
+    throw new nec_exception("nec++: Solving Failed: ",info);
+  }
+}
+
 #endif /* EIGEN_LU */
 
 void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
