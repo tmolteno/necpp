@@ -34,7 +34,7 @@ nec2___LDFLAGS = -all-static
 noinst_PROGRAMS = test_manager
 
 test_manager_SOURCES  = $(libnecpp_la_SOURCES) safe_array_tb.cpp matrix_algebra_tb.cpp c_geometry_tb.cpp c_evlcom_tb.cpp
-test_manager_CXXFLAGS = -O0 -g3 -Wall -Wextra -Werror -DNEC_ERROR_CHECK=1
+test_manager_CXXFLAGS = -std=c++11 -O0 -g3 -Wall -Wextra -Werror -DNEC_ERROR_CHECK=1
 test_manager_LDADD    = $(libnecpp_la_LIBADD) 
 test_manager_LDFLAGS    = $(libnecpp_la_LDFLAGS) 
 
