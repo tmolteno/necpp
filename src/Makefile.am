@@ -13,7 +13,7 @@ noinst_HEADERS = nec_debug.h nec_exception.h nec_wire.h
 AM_CPPFLAGS = $(all_includes)
 
 # the library search path.
-nec2___LDADD = $(top_builddir)/src/libnecpp.la
+nec2___LDADD = libnecpp.la
 
 lib_LTLIBRARIES = libnecpp.la
 
