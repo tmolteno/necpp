@@ -5,16 +5,17 @@
 
 %{
 #include "Python.h"
-#include "numarray/libnumarray.h"
-#include "math_util.h"
-#include "nec_context.h"
-#include "c_geometry.h"
-#include "nec_radiation_pattern.h"
-#include "nec_structure_currents.h"
-#include "nec_results.h"
-#include "nec_ground.h"
-#include "safe_array.h"
-#include "nec_exception.h"
+#include "numpy/arrayobject.h"
+#include "src/math_util.h"
+#include "src/matrix_algebra.h"
+#include "src/nec_context.h"
+#include "src/c_geometry.h"
+#include "src/nec_radiation_pattern.h"
+#include "src/nec_structure_currents.h"
+#include "src/nec_results.h"
+#include "src/nec_ground.h"
+#include "src/safe_array.h"
+#include "src/nec_exception.h"
 #include <complex>
 %}
 
@@ -23,60 +24,60 @@
 %include exception.i       
 %exception
 {
-	try {
-		$action
-   	}
-	catch (nec_exception* nex)
-	{
-		SWIG_exception(SWIG_RuntimeError,nex->get_message().c_str());
-	}
-   	catch (const char* message){
-		SWIG_exception(SWIG_RuntimeError,message);
-	}
-	catch (...){
-		SWIG_exception(SWIG_RuntimeError,"Unknown exception");
-    	}	
+        try {
+                $action
+        }
+        catch (nec_exception* nex)
+        {
+                SWIG_exception(SWIG_RuntimeError,nex->get_message().c_str());
+        }
+        catch (const char* message){
+                SWIG_exception(SWIG_RuntimeError,message);
+        }
+        catch (...){
+                SWIG_exception(SWIG_RuntimeError,"Unknown exception");
+        }       
 }
 
-/*! The following typemaps allow the automatic conversion of vectors and safe_arrays into numarrays */
+/*! The following typemaps allow the automatic conversion of vectors and safe_arrays into numpy arrays */
 
 %typemap (python, out) real_array {
-	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tFloat64, nd, size));
+        int nd = 1;
+        npy_intp size = $1.size();
+        $result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_FLOAT64, (void *)($1.data()) ));
 }
 
 %typemap (python, out) int_array {
-	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tLong, nd, size));
+        int nd = 1;
+        npy_intp size = $1.size();
+        $result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_INT32, (void *)($1.data()) ));
 }
 
 %typemap (python, out) complex_array {
-	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)($1.get_ptr()), tComplex64, nd, size));
+        int nd = 1;
+        npy_intp size = $1.size();
+        $result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_COMPLEX64, (void *)($1.data()) ));
 }
 
 %typemap (python, out) vector<nec_float> {
-	vector<double>::pointer ptr = &($1[0]);
-	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)ptr, tFloat64, nd, size));
+        vector<double>::pointer ptr = &($1[0]);
+        int nd = 1;
+        npy_intp size = $1.size();
+        $result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_FLOAT64, (void *)($1.data()) ));
 }
 
 %typemap (python, out) vector<int> {
-	vector<int>::pointer ptr = &($1[0]);
-	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)ptr, tInt32, nd, size));
+        vector<int>::pointer ptr = &($1[0]);
+        int nd = 1;
+        npy_intp size = $1.size();
+        $result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_INT32, (void *)($1.data()) ));
 }
 
 %typemap (python, out) vector<nec_complex> {
-	vector<nec_complex>::pointer ptr = &($1[0]);
-	int nd = 1;
-	int size = $1.size();
-	$result =(PyObject *)(NA_NewArray((void *)ptr, tComplex64, nd, size));
+        vector<nec_complex>::pointer ptr = &($1[0]);
+        int nd = 1;
+        npy_intp size = $1.size();
+        $result =(PyObject *)(PyArray_SimpleNewFromData(nd, &size, NPY_COMPLEX64, (void *)($1.data()) ));
 }
 
 /*! The two following interface files have only been created to avoid errors during the wrapping process. */
@@ -86,7 +87,7 @@
 
 
 /*! For each of the following interface files a corresponding python file has been created. The python genrated file has been used as a starting point, then it has been improved to
-	provide a more user-friendly module.
+        provide a more user-friendly module.
 */
 %include "nec_context.i"
 %include "c_geometry.i"
@@ -101,6 +102,6 @@
 /*The function below is added to the init function of the wrapped module.
 It's mandatory to do so before to use the numarray API*/
 %init %{
-import_libnumarray();
+import_array();
 %} 
 

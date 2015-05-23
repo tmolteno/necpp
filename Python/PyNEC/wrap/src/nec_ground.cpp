@@ -54,6 +54,7 @@
 #include "nec_ground.h"
 #include "nec_output.h"
 #include "misc.h" // for stop() function
+#include "electromag.h"
 
 /*
 	Parse a GN card. The input parameters here are the fields of the
@@ -77,38 +78,44 @@ void nec_ground::parse_gn(int itmp1, int itmp2,
 	nec_float tmp5, nec_float tmp6
 	)
 {
-	// iperf = -1 - nullifies ground parameters previously used and sets free- space condition.
-	// The remainder of the card is left blank in this case. 
-	
-	if ( itmp1 == -1 ) // nullify previous ground conditions.
-	{
-		ksymp=1;
-		radial_wire_count=0;
-		iperf=0;
-		return;
-	}
+  // iperf = -1 - nullifies ground parameters previously used and sets free- space condition.
+  // The remainder of the card is left blank in this case. 
+  
+  if ( itmp1 == -1 ) { // nullify previous ground conditions.
+    ksymp=1;
+    radial_wire_count=0;
+    iperf=0;
+    return;
+  }
 
-	iperf = itmp1;
-	ASSERT(iperf >= 0);
-	
-	radial_wire_count = itmp2;
-	ksymp = 2;
-	epsr = tmp1;
-	sig = tmp2;
+  iperf = itmp1;
+  ASSERT(iperf >= 0);
+  
+  radial_wire_count = itmp2;
+  ksymp = 2;
+  epsr = tmp1;
+  sig = tmp2;
 
-	if (radial_wire_count != 0)
-	{
-		if ( iperf == 2)
-		{
-			throw new nec_exception("RADIAL WIRE G.S. APPROXIMATION MAY NOT BE USED WITH SOMMERFELD GROUND OPTION");
-		}
-	
-		radial_wire_length= tmp3;
-		radial_wire_radius= tmp4;
-		return;
-	}
+  if (radial_wire_count != 0) {
+    if ( iperf == 2) {
+      throw new nec_exception("RADIAL WIRE G.S. APPROXIMATION MAY NOT BE USED WITH SOMMERFELD GROUND OPTION");
+    }
 
-	setup_cliff(tmp3,tmp4,tmp5,tmp6);
+    radial_wire_length= tmp3;
+    radial_wire_radius= tmp4;
+    return;
+  }
+
+  if (0 == iperf) {
+    if (epsr == 0.0) {
+      throw new nec_exception("GROUND DIELECTRIC CONSTANT IS ZERO");
+    }
+    if (sig == 0.0) {
+      throw new nec_exception("GROUND CONDUCTIVITY IS ZERO");
+    }
+  }
+  
+  setup_cliff(tmp3,tmp4,tmp5,tmp6);
 }
 
 /*
@@ -126,9 +133,11 @@ void nec_ground::setup_cliff(nec_float in_eprs2,
 
 using namespace std;
 
+#include "electromag.h"
+
 nec_complex nec_ground::get_zrati2(nec_float wavelength)
 {
-	return sqrt(1.0 / nec_complex(epsr2,-sig2 * wavelength * 59.96));
+	return sqrt(1.0 / nec_complex(epsr2,-sig2 * wavelength * em::impedance_over_2pi()));
 }
 
 

@@ -1,4 +1,20 @@
-## Version 1.6a
+## Version 1.7.0
+* Added new functions for nec_get_gain() to get the radiation pattern elements.
+* added nec_medium_parameters to the C-style API. The user can now alter the permittivity and permeability of the environment via the API.
+* Added accessor methods to the radiation pattern to get all the theta and phi angles
+* Added 2D matrix for radiation pattern gain_. Much easier to plot radiation patterns.
+* nec_geometry_complete() now takes only one parameter. The second parameter was unused.
+* New c_geometry->reflect and c_geometry->generate_cylindrical_structure(int itx, int nop) helper functions to generate symmetric structures.
+* New c_ground methods for finding out the ground parameters
+* Split the ground enviroment computation from the output code. 
+
+
+## Version 1.6.2 [April 2015]
+* Added new functions for nec_excitation_voltage, nec_excitation_current and nec_excitation_planewave to simplfy C-style API calls
+* More documentation
+* Published python-necpp as a separate project.
+
+## Version 1.6.1 [March 29 2015]
 * Added python library for the c-stye API.
 * Fixed bug.  "SP" with multiple "SC" doesn't work #10.
 * Yoshi Takeyasu. Change instances of int to int64_t, to allow simulations up to 140 GB.
@@ -6,13 +22,22 @@
 * C-style library now supports error messages. This changes the public API.
 * Added missing library function nec_kh_card(). 
 * Cleaned up bitrot in example code.
-        
+* Added C-style support for patch command. nec_patch.
+* Added C-style support for GM card (move command). nec_gm_card.
+* Added python based testharness
+* Start to use matrix operations for multi-dimensional arrays. safe_matrix class.
+* Errors are thrown if zeros are specified for ground conductivity and dielectric constant.
+* Added Reflection nec_gx_card to C-style interface.
+* Added Reflection gx_card to c_geometry class.
+* Catch out of memory errors and create nice error messages
+* Fix memory allocation errors in patch simulations.
+
 ## Version 1.5.4 [December 2014]
 * Changed default compiler options to remove debugging symbols
 * Fixed bug printing maximum gain on the command line.
 * Remove vector test code from main loop 
 * Renamed the c_geometry->n to n_segments
-        
+
 ## Version 1.5.3 [October 2014]
 * Compatability with gcc4.9
 * Compatability with gcc4.9

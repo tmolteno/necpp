@@ -2,22 +2,22 @@
 #define __nec_context__
 
 /*
-	Copyright (C) 2004-2005  Timothy C.A. Molteno
-	tim@molteno.net 
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004-2008,2015  Timothy C.A. Molteno
+  tim@molteno.net 
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "common.h"
@@ -36,34 +36,27 @@ class c_geometry;
 
 enum excitation_return
 {
-	FREQ_PRINT_NORMALIZATION = 0,
-	FREQ_LOOP_CONTINUE = 1,
-	FREQ_LOOP_CARD_CONTINUE = 2
+    FREQ_PRINT_NORMALIZATION = 0,
+    FREQ_LOOP_CONTINUE = 1,
+    FREQ_LOOP_CARD_CONTINUE = 2
 };
 
-/**
-	0=E VOLTAGE (A),
-	1=LINEAR WAVE (B),
-	2= R CIRC WAVE (B)
-	3=L CIRC WAVE (B),
-	4= CURRENT (C),
-	5= VOLTAGE DISC.
-*/
-enum excitation_type
-{
-	EXCITATION_VOLTAGE = 0,
-	EXCITATION_LINEAR = 1,
-	EXCITATION_CIRC_RIGHT = 2,
-	EXCITATION_CIRC_LEFT = 3,
-	EXCITATION_CURRENT = 4,
-	EXCITATION_VOLTAGE_DISC = 5
-};
-
-/*!
-	A nec_context object is the container for an nec2++ simulation. A c_geometry object
-	is associated with the nec_context, and then after the simulation is done, the results
-	can be requested from this object.
+/*! \brief Using nec_context
+ * \file nec_context.h
+ * 
+ * The following code shows an example of how the nec_context class is used.
+ * 
+ * \example test_cpp.cpp
  */
+
+
+/*! \brief Container for an nec2++ simulation
+ * 
+ * An nec_context object is the container for an nec2++ simulation. A c_geometry object
+ * is associated with the nec_context, and then after the simulation is done, the results
+ * can be requested from this object.
+ * */
+
 class nec_context
 {
 public:
@@ -83,18 +76,113 @@ public:
 	
 	/*! \brief Get the maximum gain in dB.
 	
-	This function requires a previous rp_card() method to have been called.
+	This function requires a previous rp_card() method to have been called (with gain normalization requested)
 	
 	\return The maximum gain in dB or -999.0 if no radiation pattern had been previously requested.
-	This only works for a SINGLE FRQUENCY rp_card request.
 	*/
-	double get_maximum_gain(int index = 0)
+	double get_gain_max(int freq_index = 0)
 	{
-		nec_radiation_pattern* rp = get_radiation_pattern(index);
-		if (NULL == rp)
-			return -999.0;
-			
-		return rp->get_maximum_gain_db();
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_max();
+	}
+
+	double get_gain_min(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_min();
+	}
+
+	double get_gain_mean(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_mean();
+	}
+	
+	double get_gain_sd(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_sd();
+	}
+	
+	/********************** RHCP ********************************/
+	double get_gain_rhcp_max(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_rhcp_max();
+	}
+
+	double get_gain_rhcp_min(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_rhcp_min();
+	}
+
+	double get_gain_rhcp_mean(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_rhcp_mean();
+	}
+	
+	double get_gain_rhcp_sd(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_rhcp_sd();
+	}
+	
+	/********************** LHCP ********************************/
+	double get_gain_lhcp_max(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_lhcp_max();
+	}
+
+	double get_gain_lhcp_min(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_lhcp_min();
+	}
+
+	double get_gain_lhcp_mean(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_lhcp_mean();
+	}
+	
+	double get_gain_lhcp_sd(int freq_index = 0)
+	{
+		nec_radiation_pattern* rp = get_radiation_pattern(freq_index);
+		if (NULL == rp)	return -999.0;	
+		return rp->get_gain_lhcp_sd();
+	}
+	
+	/****************** IMPEDANCE CHARACTERISTICS *********************/
+	
+	/*! \brief Impedance: Real Part */
+	double get_impedance_real(int freq_index = 0)
+	{
+		nec_antenna_input* ipt = get_input_parameters(freq_index);
+		if (NULL == ipt) return -999.0;
+		vector<nec_complex>& imp(ipt->get_impedance());
+		return imp.back().real();
+	}
+	/*! \brief Impedance: Imaginary Part */
+	double get_impedance_imag(int freq_index = 0)
+	{
+		nec_antenna_input* ipt = get_input_parameters(freq_index);
+		if (NULL == ipt) return -999.0;	
+		vector<nec_complex>& imp(ipt->get_impedance());
+		return imp.back().imag();
 	}
 		
 	/*! \brief Get Antenna Input Parameter Results
@@ -189,11 +277,6 @@ public:
 		m_output_fp = m_output.get_fp();
 	}
 	
-	inline void set_results_stdout(bool flag)
-	{
-		m_results.set_stdout(flag);
-	}
-	
 	inline void set_results_format(enum RESULT_FORMAT result_format)
 	{
 		m_results.m_result_format = result_format;
@@ -215,28 +298,53 @@ public:
 	void geometry_complete(int card_int_1, int card_int_2);
 
 	
+	/*! Set the prameters of the medium (permittivity and permeability)
 	
-	
-	/*! Add a wire to the geometry,
-	
-	All co-ordinates are in meters.
-	
-		\param tag_id The tag ID.
-		\param segment_count The number of segments.
-		\param xw1 The x coordinate of the wire starting point.
-		\param yw1 The y coordinate of the wire starting point.
-		\param zw1 The z coordinate of the wire starting point.
-		\param xw2 The x coordinate of the wire ending point.
-		\param yw2 The y coordinate of the wire ending point.
-		\param zw2 The z coordinate of the wire ending point.
-		\param rad The wire radius (meters)
-		\param rdel For tapered wires, the. Otherwise set to 1.0
-		\param rrad For tapered wires, the. Otherwise set to 1.0
+		\param permittivity The electric permittivity of the medium (in farads per meter)
+		\param permeability The magnetic permeability of the medium (in henries per meter)
+
+		From these parameters a speed of light is chosen.
 	*/
-	void wire(int tag_id, int segment_count,
-		nec_float xw1, nec_float yw1, nec_float zw1,
-		nec_float xw2, nec_float yw2, nec_float zw2,
-		nec_float rad, nec_float rdel, nec_float rrad);
+	void medium_parameters(nec_float permittivity, nec_float permeability)
+	{
+		em::constants::permittivity = permittivity;
+		em::constants::permeability = permeability;
+	}
+	
+	
+  /*! Add a wire to the geometry,
+
+  All co-ordinates are in meters.
+
+  \param tag_id The tag ID.
+  \param segment_count The number of segments.
+  \param xw1 The x coordinate of the wire starting point.
+  \param yw1 The y coordinate of the wire starting point.
+  \param zw1 The z coordinate of the wire starting point.
+  \param xw2 The x coordinate of the wire ending point.
+  \param yw2 The y coordinate of the wire ending point.
+  \param zw2 The z coordinate of the wire ending point.
+  \param rad The wire radius (meters)
+  \param rdel For tapered wires, the. Otherwise set to 1.0
+  \param rrad For tapered wires, the. Otherwise set to 1.0
+  */
+  void wire(int tag_id, int segment_count,
+  nec_float xw1, nec_float yw1, nec_float zw1,
+  nec_float xw2, nec_float yw2, nec_float zw2,
+  nec_float rad, nec_float rdel, nec_float rrad);
+
+  void sp_card(int ns,
+      nec_float x1, nec_float y1, nec_float z1,
+      nec_float x2, nec_float y2, nec_float z2);
+
+  void sc_card( int i2,
+      nec_float x3, nec_float y3, nec_float z3,
+      nec_float x4, nec_float y4, nec_float z4);
+
+  void gx_card(int i1, int i2);
+
+  void move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
+                        nec_float ys, nec_float zs, int its, int nrpt, int itgi );
 
 	/*! Add an arc to the geometry,
 	
@@ -332,8 +440,7 @@ public:
 	/*! "ex" card, excitation parameters
 	\verbatim
 			EX	EXCITE STRUCTURE, LAST ENCOUNTERED=USED
-				I1- 0=E VOLTAGE (A), 1=LINEAR WAVE (B), 2= R CIRC WAVE (B)
-				3=L CIRC WAVE (B), 4= CURRENT (C), 5= VOLTAGE DISC. (A)
+				I1- 0=E VOLTAGE (A), 1=LINEAR WAVE (B), 2= R CIRC WAVE (B) 3=L CIRC WAVE (B), 4= CURRENT (C), 5= VOLTAGE DISC. (A)
 				I2- (A) SOURCE TAG#, (B) # TH ANGLS, (C) BLANK
 				I3- (A) SOURCE SEG#, (B) # PH ANGLS, (C) BLANK
 				I4- (A) XX= ADMIT.,IMPED. PRINT, X=0 NO/1 DO, (BC), 1= ADM. PRINT
@@ -525,10 +632,13 @@ public:
 	/*!****************************************************
 	*** normal exit of nec2++ when all jobs complete ok ***
 	******************************************************/
-	inline void all_jobs_completed()
+	void all_jobs_completed()
 	{
-		// put in here for the moment...
-		m_results.write_nec_file();
+	}
+	
+	void write_results(ostream& os)
+	{
+		m_results.write(os);
 	}
 	
 	
@@ -575,7 +685,7 @@ public:
 	real_array zlr, zli, zlc;
 	
 	// normalized receiving pattern
-	real_array fnorm;
+	real_matrix fnorm;
 	
 	int nthi, nphi;
 	nec_float thetis, phiss;
@@ -597,7 +707,7 @@ public:
 	
 	/* common  /matpar/ */
 	int icase, npblk, nlast;
-	int imat, nbbx, npbx, nlbx, nbbl, npbl, nlbl;
+	int nbbx, npbx, nlbx, nbbl, npbl, nlbl;
 	
 	/* common  /save/ */
 	int_array ip;
@@ -703,19 +813,16 @@ private:
 	*/
 	void	calculate_network_data(void);
 	void	print_network_data(void);
-	void	print_norm_rx_pattern(int iptflg, int nthi, int nphi, nec_float thetis, nec_float phiss);
-	void	print_input_impedance(int iped, int ifrq, int nfrq, nec_float delfrq);
+	void	print_norm_rx_pattern();
+	void	print_input_impedance();
 	void	print_power_budget(void);
 	void	structure_segment_loading();
 		
 	
 	enum excitation_return
-		excitation_loop(int in_freq_loop_state, int mhz, 
-			int iptflg, int iptflq, int iptag, int iptagf, int iptagt, 
-			int iptaq, int iptaqf, int iptaqt, nec_float thetis, 
-			int nfrq, int iflow, int nthi, int nphi, int iped);
+		excitation_loop(int in_freq_loop_state, int mhz);
 			
-	void	setup_excitation(int iptflg);
+	void	setup_excitation();
 	
 	/* pointers to output files */
 	FILE *m_output_fp;
@@ -732,15 +839,16 @@ private:
 	
 	void load();
 
-	void cmset(int nrow, complex_array& in_cm, nec_float rkhx);
+	void cmset(int64_t nrow, complex_array& in_cm, nec_float rkhx);
 	void compute_matrix_ss(int j1, int j2, int im1, int im2,
-			complex_array& in_cm, int nrow, int itrp);
+			complex_array& in_cm, int64_t nrow, int itrp);
 	void cmsw(int j1, int j2, int i1, int i2, complex_array& in_cm,
-			complex_array& cw, int ncw, int nrow, int itrp);
-	void cmws(int j, int i1, int i2, complex_array& in_cm, int nr,
-			complex_array& cw, int itrp);
-	void cmww(int j, int i1, int i2, complex_array& in_cm, int nr,
-			complex_array& cw, int nw, int itrp);
+			complex_array& cw, int64_t ncw, int64_t nrow, int itrp);
+	void cmws( int j, int i1, int i2, complex_array& in_cm,
+                        int64_t nr, complex_array& cw, int64_t nw, int itrp );
+        
+	void cmww(int j, int i1, int i2, complex_array& in_cm, int64_t nr,
+			complex_array& cw, int64_t nw, int itrp);
 	void couple(complex_array& cur, nec_float wlam);
 
 	void efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, bool on_source_segment);
@@ -782,12 +890,12 @@ private:
 	void pcint(nec_float xi, nec_float yi, nec_float zi, nec_float cabi,
 			nec_float sabi, nec_float salpi, complex_array& e);
 	void impedance_print(int in1, int in2, int in3, nec_float fl1, nec_float fl2,
-			nec_float fl3, nec_float fl4, nec_float fl5, nec_float fl6, char *ia);
+			nec_float fl3, nec_float fl4, nec_float fl5, nec_float fl6, const char *ia);
 	void qdsrc(int is, nec_complex v, complex_array& e);
 
 	
 	void rom2(nec_float a, nec_float b, complex_array& sum, nec_float dmin);
-	void sflds(nec_float t, complex_array& e);
+	void sflds(const nec_float t, complex_array& e);
 	void solgf(nec_complex *a, nec_complex *b, nec_complex *c,
 			nec_complex *d, nec_complex *xy, int *ip, int np, int n1,
 			int n, int mp, int m1, int m, int n1c, int n2c, int n2cz);

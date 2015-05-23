@@ -20,7 +20,7 @@ You should install SWIG (on Debian 'aptitude install swig ruby-dev'), and then
 issue the following commands
 
     cd ext/necpp
-    swig -v -c++ -ruby necpp.i
+    swig -v -I../../../src -c++ -ruby necpp.i
     ruby extconf.rb
     make
     sudo make install
@@ -32,7 +32,7 @@ Alternatively use the build.sh script.
       
 Then test with 
 
-    ruby test.rb
+    ruby ../example/test.rb
 
 ## Genetic Optimization of Antennas
 

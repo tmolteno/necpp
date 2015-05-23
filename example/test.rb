@@ -5,8 +5,8 @@ require 'necpp'
 require 'complex'
 
 =begin
-	Collect some statistics about an antenna. If a frequency scan is done, then each individual
-	result can be accessed using the index parameter. Here these are all zero.
+  Collect some statistics about an antenna. If a frequency scan is done, then each individual
+  result can be accessed using the index parameter. Here these are all zero.
 =end
 def antenna_stats(nec)
   result_index = 0

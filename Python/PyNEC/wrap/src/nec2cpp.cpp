@@ -51,6 +51,7 @@
 #include "nec2cpp.h"
 #include "nec_exception.h"
 #include <signal.h>
+#include <cstdlib>
 #include <vector>
 #include <string>
 
@@ -73,34 +74,14 @@ int nec_main( int argc, char **argv, nec_output_file& s_output );
 	This places an exception handler around the old main loop to 
 	allow errors to be nicely caught!
 */
+
 int main( int argc, char **argv )
 {
 	nec_output_file s_output;
 	
 	
 	try
-	{
-		// This is an nec_3vector testharness
-		{
-			nec_3vector x(1,2,3);
-			nec_3vector y(3,5,1);
-			
-			nec_3vector a = x + y;
-			ASSERT(a == nec_3vector(4,7,4));
-		
-			a = x * y;
-			ASSERT(a == nec_3vector(-13,8,-1));
-			a = y * x;
-			ASSERT(a == nec_3vector(13,-8,1));
-			
-			a = x + 3.0;
-			ASSERT(a == nec_3vector(4,5,6));
-			
-			nec_float ip = x.dot(y);
-			
-			ASSERT(ip == 16);
-		}
-	
+	{	
 		nec_main(argc, argv, s_output);
 	}
 	catch (const char* message)
@@ -117,6 +98,13 @@ int main( int argc, char **argv )
 		s_output.line(nex->get_message().c_str());
 		exit(1);
 	}
+	catch(...)
+	{
+		nec_error_mode nem(s_output);
+		s_output.line("NEC++ Runtime Error: ");
+ 		s_output.line(" Unknown exception");
+		exit(1);
+	}
 }
 
 #include "c_geometry.h"
@@ -124,11 +112,25 @@ void benchmark();
 
 void benchmark()
 {
-	cout << "The nec2++ benchmark." << endl;
-	cout << "nec2++ version " nec_version << endl << endl;
+	try {
+		cout << "The nec2++ benchmark." << endl;
+		cout << "nec2++ version " nec_version << endl << endl;
 	
-	nec_float bench = nec_context::benchmark();
-	cout << "Your computer's score is: " << bench << " NEC's" << endl;
+		nec_float bench = nec_context::benchmark();
+		cout << "Your computer's score is: " << bench << " NEC's" << endl;
+	}
+	catch (const char* message)
+	{
+		cout << "NEC++ Runtime Error: " << endl;
+		cout << message << endl;
+		exit(1);
+	}
+	catch (nec_exception* nex)
+	{
+		cout << "NEC++ Runtime Error: " << endl;
+		cout << nex->get_message().c_str() << endl;
+		exit(1);
+	}
 }
 
 int readmn(FILE* input_fp, FILE* output_fp, char *gm, int *i1, int *i2, int *i3, int *i4, nec_float *f1,
@@ -149,13 +151,13 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	
 	/* input card mnemonic list */
 	/* "XT" stands for "exit", added for testing */
-	#define CMD_NUM  20
-	char *atst[CMD_NUM] =
+	#define CMD_NUM  21
+	const char *atst[CMD_NUM] =
 	{
 		"FR", "LD", "GN", "EX", "NT", "TL", \
 		"XQ", "GD", "RP", "NX", "PT", "KH", \
 		"NE", "NH", "PQ", "EK", "CP", "PL", \
-		"EN", "WG"
+		"EN", "WG", "MP"
 	};
 	
 	int itmp3, itmp2, itmp4;
@@ -196,10 +198,11 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	}
 	
 	bool results_to_stdout = false;
-	bool results_in_csv_format = false;
+	// allocate a new nec_context;
+	nec_context s_context;
 	
 	/* process command line options */
-	while( (option = XGetopt(argc, argv, "i:o:hvscgb") ) != -1 )
+	while( (option = XGetopt(argc, argv, "i:o:hvscxgb") ) != -1 )
 	{
 		switch( option )
 		{
@@ -219,8 +222,12 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 			results_to_stdout = true;
 			break;
 
-		case 'c': /* use CVS result data */
-			results_in_csv_format = true;
+		case 'c': /* use CSV result data */
+			s_context.set_results_format(RESULT_FORMAT_CSV);
+			break;
+	
+		case 'x': /* use XML result data */
+			s_context.set_results_format(RESULT_FORMAT_XML);
 			break;
 	
 		case 'h' : /* print usage and exit */
@@ -273,17 +280,12 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	}
 	
 	s_output.set_file(output_fp);
-    
+
 	secnds( &ex_timer );
 
-	// allocate a new nec_context;
-	nec_context s_context;
 	s_context.set_output(s_output, s_output_flags);
-	s_context.set_results_stdout(results_to_stdout);
-	if (results_in_csv_format)
-		s_context.set_results_format(RESULT_FORMAT_CSV);
 	s_context.initialize();
-    
+
   /* main execution loop, exits at various points */
   /* depending on error conditions or end of jobs */
 	while( true )
@@ -294,7 +296,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 		s_output.line(" __________________________________________");
 		s_output.line("|                                          |");
 		s_output.line("| NUMERICAL ELECTROMAGNETICS CODE (nec2++) |");
-		s_output.line("| Translated to 'C++' in Double Precision  |");
+		s_output.line("| Implemented in 'C++' in Double Precision |");
 		s_output.line("|        Version " nec_version "        |");
 		s_output.line("|__________________________________________|");
 	
@@ -508,6 +510,10 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 			case 19: /* "wg" card, not supported */
 				throw new nec_exception("\"WG\" card, not supported.");
 		
+			case 20: /* "MP" card. Material Parameters */
+				s_context.medium_parameters(tmp1, tmp2);
+				continue;
+		
 			default:
 				if ( ain_num != 18 ) // EN card
 				{
@@ -518,6 +524,9 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 				*** normal exit of nec2++ when all jobs complete ok ***
 				******************************************************/
 				s_context.all_jobs_completed();
+				// put in here for the moment...
+ 				if (results_to_stdout)
+					s_context.write_results(cout);
 				
 				/* time the process */
 				secnds( &tmp1 );
@@ -564,7 +573,7 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	int line_idx;
 	int n_integer_params = 4, n_float_params = 6;
 	int integer_array[4] = { 0, 0, 0, 0 };
-	nec_float real_array[6] = { 0., 0., 0., 0., 0., 0. };
+	nec_float r_array[6] = { 0., 0., 0., 0., 0., 0. };
 	
 	/* read a line from input file */
 	int eof = load_line( line_buf, input_fp );
@@ -621,18 +630,18 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			(line_buf[  line_idx] >  '9')) &&
 			(line_buf[  line_idx] != '+')  &&
 			(line_buf[  line_idx] != '-') )
-		if ( (line_buf[line_idx] == '\0') )
+		if ( line_buf[line_idx] == '\0' )
 		{
 			*i1= integer_array[0];
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}
 		
@@ -667,12 +676,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}		
 	} /* for( i = 0; i < n_integer_params; i++ ) */
@@ -686,23 +695,23 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			(line_buf[  line_idx] != '+')  &&
 			(line_buf[  line_idx] != '-')  &&
 			(line_buf[  line_idx] != '.') )
-		if ( (line_buf[line_idx] == '\0') )
+		if ( line_buf[line_idx] == '\0' )
 		{
 			*i1= integer_array[0];
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}
 		
 		/* read a nec_float from line */
-		real_array[i] = atof( &line_buf[line_idx] );
+		r_array[i] = atof( &line_buf[line_idx] );
 		parameter_count++;
 		
 		/* traverse numerical field to next ' ' or ',' */
@@ -735,12 +744,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 			*i2= integer_array[1];
 			*i3= integer_array[2];
 			*i4= integer_array[3];
-			*f1= real_array[0];
-			*f2= real_array[1];
-			*f3= real_array[2];
-			*f4= real_array[3];
-			*f5= real_array[4];
-			*f6= real_array[5];
+			*f1= r_array[0];
+			*f2= r_array[1];
+			*f3= r_array[2];
+			*f4= r_array[3];
+			*f5= r_array[4];
+			*f6= r_array[5];
 			return parameter_count;
 		}		
 	} /* for( i = 0; i < n_float_params; i++ ) */
@@ -749,12 +758,12 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	*i2= integer_array[1];
 	*i3= integer_array[2];
 	*i4= integer_array[3];
-	*f1= real_array[0];
-	*f2= real_array[1];
-	*f3= real_array[2];
-	*f4= real_array[3];
-	*f5= real_array[4];
-	*f6= real_array[5];
+	*f1= r_array[0];
+	*f2= r_array[1];
+	*f3= r_array[2];
+	*f4= r_array[3];
+	*f5= r_array[4];
+	*f6= r_array[5];
 	
 	return parameter_count;
 }

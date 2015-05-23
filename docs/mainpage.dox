@@ -1,0 +1,72 @@
+/*! \mainpage NEC2++ Electromagnetic Simulation Software
+
+ NEC2++ is a free (GPL v2) electromagnetic simulation software compatable with NEC-2. It has been rewritten from the ground up.
+
+ Nec2++ consists of a library that can be called from C++, C, python and Ruby, and so it can incorporated into other projects like GUI tools and automatic antenna optimization systems. There is also an executable necpp that can read antenna description files (like the original). 
+
+ Nec2++ is developed on Debian linux, but will work on a variety of other operating systems.
+
+\section sec_features Features
+
+- NEC-2 syntax compatable.
+- C, C++, Python and Ruby libraries included. Ideal for antenna optimization.
+- Large designs can be simulated with tens of thousands of elements (to the limit of 64-bit address space)
+- Geometry error detection. Throws exceptions if wires intersect or lie too close to one another.
+- Simulate in different media (for example antennas in seawater) by modifying the dielectric properties.
+- Uses fast numerical routines (BLAS and LAPACK). Can use the Intel MKL or OpenBLAS.
+
+\subsection sec_citing Citing NEC2++
+
+If you use nec2++, please cite it as follows:
+
+\verbatim
+Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics Code'', 
+Electronics Technical Reports No. 2014-3, ISSN 1172-496X, October 2014.
+\endverbatim
+
+
+\section sec_using Using NEC2++
+
+NEC2++ can be used in several ways. Either standalone from the command line, or by using C, C++, Ruby or Python libriaries that
+are included.
+
+\subsection sec_cmd Command Line Use
+
+Command line usage:
+\verbatim
+usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]
+       -g: print maximum gain to stdout.
+       -b: Perform NEC++ Benchmark.
+       -s: print results to standard output.
+       -c: print results in comma-separated-value (CSV) format,
+           this options is used in conjunction with (-s) above.
+       -h: print this usage information and exit.
+       -v: print nec2++ version number and exit.
+\endverbatim
+
+\subsection intro_sec C API
+
+The NEC2++ library provides an API for modeling structures.
+This interface is described in the \ref libnecpp.h header file.
+ 
+\subsection intro_cpp C++ API
+
+The C++ API for using NEC2++ is described in \ref nec_context.h
+ 
+\subsection intro_py Python Module
+
+An example using the python module is \ref test.py
+
+\subsection intro_rb Ruby Module
+
+The code for the Ruby module for using nec2++ is contained in the 
+directory Ruby.
+
+An example using the python module is \ref test.rb. The Python API
+is the same as the C-style API, that is described in \ref libnecpp.h
+
+\example test.rb
+\example test.py
+
+**/
+

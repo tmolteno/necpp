@@ -7,17 +7,17 @@ print('Installation start')
 platform = sys.platform
 
 #==================================================================================================================================================================================
-#checks the Numarray installation
+#checks the Numpy installation
 
-print('\nNumarray installation check...')
+print('\nNumpy installation check...')
 try:
-	from numpy import numarray
+	import numpy
 except:
-	print('FAILURE - PyNEC requires Numarray to be installed. Please install Numarrray first.')
+	print('FAILURE - PyNEC requires numpy to be installed. Please install numpy first.')
 	print('Installation aborted')
 	sys.exit(-1)
 
-print('SUCCESS - Numarray seems to be installed.')
+print('SUCCESS - Numpy seems to be installed.')
 
 #==================================================================================================================================================================================
 #Detects the Python version number
@@ -25,11 +25,6 @@ print('SUCCESS - Numarray seems to be installed.')
 print('\nDetecting Python version number...')
 print(sys.version)
 python_version = sys.version[:3]
-if python_version != '2.3' and python_version != '2.4' :
-	print('WARNING - This python version has not yet been tested. Try and move to Python version 2.3 or 2.4 if you encounter problems')
-api_version = sys.api_version
-if api_version != 1012 :
-	print('WARNING - This api version has not yet been tested. Try and move to API version 1012 if you encounter problems')
 
 #==================================================================================================================================================================================
 #Looks for the python "include path"
@@ -74,25 +69,25 @@ python_include_path = search_include_path(False)
 print('SUCCESS - Python include path found')
 
 #==================================================================================================================================================================================
-#Looks for the Numarray "API path"
+#Looks for the Numpy "API path"
 
-print('\nLooking for the Numarray API path...')
+print('\nLooking for the Numpy API path...')
 
 def test_api_path(str):
-	open(os.path.join(str, 'libnumarray.h'), 'rb')
+	open(os.path.join(str, 'arrayobject.h'), 'rb')
 	return 0
 
 def search_api_path(flag):
 	try:
 		if platform == 'win32' :
-			api_path = os.path.join(sys.prefix, 'include','numarray')
+			api_path = os.path.join(sys.prefix, 'include','numpy')
 		else :
-			api_path = os.path.join(sys.prefix, 'include', 'python'+python_version, 'numarray')
+			api_path = os.path.join(sys.prefix, 'include', 'python'+python_version, 'numpy')
 		test_api_path(api_path)
 		return api_path
 	except:
 		if flag == False :
-			print("PROBLEM - Can not find the Numarray API path.\nPlease enter the actual Numarray API path ( example : " + api_path + ") :")
+			print("PROBLEM - Can not find the Numarray API path.\nPlease enter the actual Numpy API path ( example : " + api_path + ") :")
 		else :
 			print('Try again :')
 
@@ -111,7 +106,7 @@ def search_api_path(flag):
 			print('The API path provided seems to be correct')
 
 
-numarray_api_path = search_api_path(False)
+numpy_api_path = search_api_path(False)
 print('SUCCESS - Numarray API path found')
 
 #==================================================================================================================================================================================
@@ -207,11 +202,11 @@ if platform == 'linux2' or platform == 'win32' :
 			
 			f.write("\nLDFLAGS=-shared -lstdc++\n") 
 
-			f.write("\nCXXFLAGS=-Wall\n")
+			f.write("\nCXXFLAGS=-Wall -fPIC\n")
 			
-			swigcxxflags = "\nSWIGCXXFLAGS=-c"
+			swigcxxflags = "\nSWIGCXXFLAGS=-c -fPIC"
 			swigcxxflags += " -I"+python_include_path
-			swigcxxflags += " -I"+numarray_api_path
+			swigcxxflags += " -I"+numpy_api_path
 			swigcxxflags += " -I"+python_lib_path
 			swigcxxflags += " -DHAVE_CONFIG_H"
 			f.write(swigcxxflags+"\n")
@@ -246,7 +241,7 @@ if platform == 'linux2' or platform == 'win32' :
 			
 			install = "\ninstall:\n"
 			install += "	@rm -fr " + python_lib_path + "/site-packages/PyNEC\n"
-			install += "	@mkdir " + python_lib_path + "/site-packages/PyNEC\n"
+			install += "	@mkdir -p " + python_lib_path + "/site-packages/PyNEC\n"
 			install += "	cp python_module/*.* " + python_lib_path + "/site-packages/PyNEC/\n"
 			f.write(install)
 			

@@ -22,10 +22,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
  
-#include <complex>
-#include <stdint.h>
-
-
 #include "common.h"
 
 
@@ -36,21 +32,24 @@
 
 #if USING_EIGEN_ARRAY
   #include <Eigen/Dense>
-  using namespace Eigen;
 
-  typedef Matrix<int, Eigen::Dynamic, 1>  int_array;
-  typedef Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
-  typedef Matrix<nec_complex, Eigen::Dynamic, 1>  complex_array;
+  typedef Eigen::Matrix<int32_t, Eigen::Dynamic, 1>  int_array;
+  typedef Eigen::Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
+  typedef Eigen::Matrix<nec_complex, Eigen::Dynamic, 1>  complex_array;
 #else
   // Use our own types rather than Eigen
   #include "safe_array.h"
-  typedef safe_array<int>  int_array;
+  typedef safe_array<int32_t>  int_array;
   typedef safe_array<nec_float>  real_array;
   typedef safe_array<nec_complex>  complex_array;
+
+  typedef safe_matrix<int32_t>  int_matrix;
+  typedef safe_matrix<nec_float>  real_matrix;
+  typedef safe_matrix<nec_complex>  complex_matrix;
 #endif
 
 
-inline void vector_fill(complex_array& x, long start, long N, const nec_complex& y) {
+inline void vector_fill(complex_array& x, int32_t start, int32_t N, const nec_complex& y) {
   x.fill(start, N, y);
 }
 
@@ -186,10 +185,9 @@ inline nec_float normL1(const nec_float x, const nec_float y, const nec_float z)
 
 #if USING_EIGEN_3VECT
   #include <Eigen/Dense>
-  using namespace Eigen;
 
-  typedef Matrix<nec_float,3,1> nec_3vector;
-  typedef Matrix<nec_complex,3,1> nec_c3vector;
+  typedef Eigen::Matrix<nec_float,3,1> nec_3vector;
+  typedef Eigen::Matrix<nec_complex,3,1> nec_c3vector;
 #else
 
 /** \brief A Class for handling 3 dimensional vectors */

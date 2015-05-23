@@ -1,19 +1,19 @@
 /*
-	Copyright (C) 2004  Timothy C.A. Molteno
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004,2015  Timothy C.A. Molteno
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "c_evlcom.h"
 
@@ -640,107 +640,97 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 /* and its derivative for complex argument z. */
 void bessel( nec_complex z, nec_complex *j0, nec_complex *j0p )
 {
-	static int m[101];
-	static nec_float a1[25], a2[25];
-	static nec_complex cplx_01(0.0,1.0);
-	static nec_complex cplx_10(1.0,0.0);
-	
-	/* initialization of constants */
-	static bool bessel_init = false;
-	
-	if ( false == bessel_init )
-	{
-		for (int k = 1; k <= 25; k++ )
-		{
-			int index = k-1;
-			a1[index] = -0.25/(k*k);
-			a2[index] = 1.0/(k+1.0);
-		}
-		
-		for (int i = 1; i <= 101; i++ )
-		{
-			nec_float tst=1.0;
-			int init;
-			for (int k = 0; k < 24; k++ )
-			{
-				init = k;
-				tst *= -i*a1[k];
-				if ( tst < 1.0e-6 )
-					break;
-			}
-			
-			m[i-1] = init+1;
-		} /* for (int i = 1; i<= 101; i++ ) */
-		
-		bessel_init = true;
-	} /* if (false == bessel_init) */
-	
-	nec_float zms = norm(z);
-	
-	if (zms <= 1.e-12)
-	{
-		*j0=cplx_10;
-		*j0p=-0.5*z;
-		return;
-	}
-	
-	nec_complex j0x, j0px;
-	int ib=0;
-	if (zms <= 37.21)
-	{
-		if (zms > 36.0)
-			ib=1;
-		
-		/* series expansion */
-		#pragma message("Some strange code below. Why use the norm of a vector as an index?")
-		int iz = int(zms); 	// TCAM : conversion of nec_float to int here! 
-				// Using int() I think that this is the same as the fortran implicit coercion
-				// but perhaps we should be doing an explicit rounding operation?
-	
-		int miz=m[iz];
-		*j0 = cplx_10;
-		*j0p = cplx_10;
-		nec_complex zk = cplx_10;
-		nec_complex zi = z*z;
-		
-		for (int k = 0; k < miz; k++ )
-		{
-			zk *= a1[k]*zi;
-			*j0 += zk;
-			*j0p += a2[k]*zk;
-		}
-		*j0p *= -0.5*z;
-		
-		if (ib == 0)
-			return;
-		
-		j0x=*j0;
-		j0px=*j0p;
-	}
-	
-	/* asymptotic expansion */
-	nec_complex zi = 1.0/z;
-	nec_complex zi2 = zi*zi;
-	nec_complex p0z = 1.0 + (P20*zi2-P10)*zi2;
-	nec_complex p1z = 1.0 +(P11-P21*zi2)*zi2;
-	nec_complex q0z = (Q20*zi2-Q10)*zi;
-	nec_complex q1z = (Q11-Q21*zi2)*zi;
-	nec_complex zk = exp(cplx_01 * (z-POF));
-	
-	zi2 = 1.0/zk;
-	nec_complex cz = 0.5*(zk+zi2);
-	nec_complex sz = cplx_01 * 0.5 * (zi2-zk);
-	zk = C3*sqrt(zi);
-	*j0 = zk*(p0z*cz-q0z*sz);
-	*j0p = -zk*(p1z*sz+q1z*cz);
-	
-	if (ib == 0)
-		return;
-	
-	nec_float pi_10 = pi() * 10.0;
-	zms = cos((sqrt(zms)-6.0)*pi_10);
-	*j0 = 0.5*(j0x*(1.0+zms)+ *j0*(1.0-zms));
-	*j0p = 0.5*(j0px*(1.0+zms)+ *j0p*(1.0-zms));
+  static int m[101];
+  static nec_float a1[25], a2[25];
+  static nec_complex cplx_01(0.0,1.0);
+  static nec_complex cplx_10(1.0,0.0);
+  
+  /* initialization of constants */
+  static bool bessel_init = false;
+  
+  if ( false == bessel_init ) {
+    for (int k = 1; k <= 25; k++ ) {
+      int index = k-1;
+      a1[index] = -0.25/(k*k);
+      a2[index] = 1.0/(k+1.0);
+    }
+    
+    for (int i = 1; i <= 101; i++ ) {
+      nec_float tst=1.0;
+      int init;
+      for (int k = 0; k < 24; k++ ) {
+        init = k;
+        tst *= -i*a1[k];
+        if ( tst < 1.0e-6 )
+          break;
+      }
+      m[i-1] = init+1;
+    } /* for (int i = 1; i<= 101; i++ ) */
+    
+    bessel_init = true;
+  } /* if (false == bessel_init) */
+  
+  nec_float zms = norm(z);
+  
+  if (zms <= 1.e-12)
+  {
+    *j0=cplx_10;
+    *j0p=-0.5*z;
+    return;
+  }
+  
+  nec_complex j0x, j0px;
+  int ib=0;
+  if (zms <= 37.21) {
+    if (zms > 36.0)
+      ib=1;
+    
+    /* series expansion */
+    int iz = std::floor(zms);
+
+    int miz=m[iz];
+    *j0 = cplx_10;
+    *j0p = cplx_10;
+    nec_complex zk = cplx_10;
+    nec_complex zi = z*z;
+    
+    for (int k = 0; k < miz; k++ ) {
+      zk *= a1[k]*zi;
+      *j0 += zk;
+      *j0p += a2[k]*zk;
+    }
+    *j0p *= -0.5*z;
+    
+    if (ib == 0)
+      return;
+    
+    j0x=*j0;
+    j0px=*j0p;
+  }
+  
+  /* asymptotic expansion */
+  nec_complex zi = 1.0/z;
+  nec_complex zi2 = zi*zi;
+  nec_complex p0z = 1.0 + (P20*zi2-P10)*zi2;
+  nec_complex p1z = 1.0 +(P11-P21*zi2)*zi2;
+  nec_complex q0z = (Q20*zi2-Q10)*zi;
+  nec_complex q1z = (Q11-Q21*zi2)*zi;
+  nec_complex zk = exp(cplx_01 * (z-POF));
+  
+  zi2 = 1.0/zk;
+  nec_complex cz = 0.5*(zk+zi2);
+  nec_complex sz = cplx_01 * 0.5 * (zi2-zk);
+  zk = C3*sqrt(zi);
+  *j0 = zk*(p0z*cz-q0z*sz);
+  *j0p = -zk*(p1z*sz+q1z*cz);
+  
+  if (ib == 0)
+    return;
+  
+  nec_float pi_10 = pi() * 10.0;
+  zms = cos((sqrt(zms)-6.0)*pi_10);
+  *j0 = 0.5*(j0x*(1.0+zms)+ *j0*(1.0-zms));
+  *j0p = 0.5*(j0px*(1.0+zms)+ *j0p*(1.0-zms));
 }
 
 
@@ -779,7 +769,7 @@ void hankel( nec_complex z, nec_complex *h0, nec_complex *h0p )
 			{
 				init = k;
 				test *= -i*a1[k];
-				if (test*a3[k] < 1.e-6)
+				if ((test*a3[k]) < 1.e-6)
 					break;
 			}
 			m[i-1]=init+1;

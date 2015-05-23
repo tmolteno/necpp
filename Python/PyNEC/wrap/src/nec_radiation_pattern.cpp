@@ -1,20 +1,20 @@
 /*
-	Copyright (C) 2004-2005  Timothy C.A. Molteno
-	tim@molteno.net 
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004-2015  Timothy C.A. Molteno
+  tim@molteno.net 
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "nec_radiation_pattern.h"
 #include "nec_context.h"
@@ -67,10 +67,13 @@ nec_radiation_pattern::nec_radiation_pattern(int in_n_theta, int in_n_phi,
 	_power_gain_vert.resize(n_angles);
 	_power_gain_horiz.resize(n_angles);
 	_power_gain_tot.resize(n_angles);
+	_power_gain_rhcp.resize(n_angles);
+	_power_gain_lhcp.resize(n_angles);
 	_polarization_axial_ratio.resize(n_angles);
 	_polarization_tilt.resize(n_angles);
 	_polarization_sense_index.resize(n_angles);
-			
+	_averaging_scales.resize(n_angles);
+
 	_e_theta.resize(n_angles);
 	_e_phi.resize(n_angles);
 	_e_r.resize(n_angles);
@@ -92,9 +95,9 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 	if (false == m_analysis_done)
 		throw new nec_exception("Internal Error: Radiation Pattern Analysis not done");
 	
-	static char  *hpol[4] = { "LINEAR", "RIGHT ", "LEFT  ", " " };
-	static char  *gain_type[2] = { "----- POWER GAINS ----- ", "--- DIRECTIVE GAINS ---" };
-	static char  *igax[4] = { " MAJOR", " MINOR", " VERTC", " HORIZ" };
+	static const char  *hpol[4] = { "LINEAR", "RIGHT ", "LEFT  ", " " };
+	static const char  *gain_type[2] = { "----- POWER GAINS ----- ", "--- DIRECTIVE GAINS ---" };
+	static const char  *igax[4] = { " MAJOR", " MINOR", " VERTC", " HORIZ" };
 	
 	int i;
 	
@@ -102,8 +105,7 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 		
 	if ( _ifar >= 2) 
 	{
-		oh.section_start();
-		os << "                                 ------ FAR FIELD GROUND PARAMETERS ------" << endl << endl;
+		oh.section_start("FAR FIELD GROUND PARAMETERS");
 		
 		if ( _ifar > 3)
 		{
@@ -136,16 +138,14 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 
 	if ( _ifar == 1)
 	{
-		oh.section_start();
-		os << "                             ------- RADIATED FIELDS NEAR GROUND --------" << endl << endl;
+		oh.section_start("RADIATED FIELDS NEAR GROUND");
 		os << "    ------- LOCATION -------     --- E(THETA) ---     ---- E(PHI) ----    --- E(RADIAL) ---" << endl;
 		os << "      RHO    PHI        Z           MAG    PHASE         MAG    PHASE        MAG     PHASE" << endl;
 		os << "    METERS DEGREES    METERS      VOLTS/M DEGREES      VOLTS/M DEGREES     VOLTS/M  DEGREES" << endl;
 	}
 	else // _ifar != 1
 	{
-		oh.section_start();
-		os << "                             ---------- RADIATION PATTERNS -----------" << endl << endl;
+		oh.section_start("RADIATION PATTERNS");
 		
 		if ( m_range >= 1.0e-20)
 		{
@@ -206,7 +206,7 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 				nec_complex e_theta = _e_theta[i];
 				nec_complex e_phi = _e_phi[i];
 				
-				char* pol_sense = hpol[_polarization_sense_index[i]];
+				const char* pol_sense = hpol[_polarization_sense_index[i]];
 				
 				oh.start_record();
 				oh.padding(" ");
@@ -237,7 +237,7 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 
 	if ( m_rp_power_average != 0)
 	{		
-		oh.section_start();
+		oh.section_end();
 		os << "  AVERAGE POWER GAIN: "; oh.real_out(11,4,_average_power_gain); 
 		os << " - SOLID ANGLE USED IN AVERAGING: ("; oh.real_out(7,4,_average_power_solid_angle,false);
 		os << ")*PI STERADIANS" << endl;
@@ -252,8 +252,6 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 */
 void nec_radiation_pattern::analyze(nec_context* m_context)
 {
-	static nec_float s_impedance = 376.73; // impedance of free space
-	
 	if (m_analysis_done)
 		return;
 		
@@ -267,7 +265,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 	if ((m_context->m_excitation_type == EXCITATION_VOLTAGE) ||
 		(m_context->m_excitation_type == EXCITATION_VOLTAGE_DISC) )
 	{
-		gcop= _wavelength * _wavelength * 2.0 * pi()/(s_impedance * _pinr);
+		gcop= _wavelength * _wavelength * 2.0 * pi()/(em::impedance() * _pinr);
 		prad= _pinr- m_context->structure_power_loss- _pnlr;
 		gcon= gcop;
 		if ( m_context->ipd != 0)
@@ -277,7 +275,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 	if ( m_context->m_excitation_type == EXCITATION_CURRENT)
 	{
 		_pinr=394.51* m_context->xpr6* m_context->xpr6* _wavelength* _wavelength;
-		gcop= _wavelength* _wavelength*2.* pi()/(s_impedance * _pinr);
+		gcop= _wavelength* _wavelength*2.* pi()/(em::impedance() * _pinr);
 		prad= _pinr- m_context->structure_power_loss- _pnlr;
 		gcon= gcop;
 		if ( m_context->ipd != 0)
@@ -377,12 +375,12 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 					tilta= rad_to_degrees(tilta);
 					
 					if ( pol_axial_ratio <= 1.0e-5)
-						pol_sense_index = 0;
+						pol_sense_index = POL_LINEAR;
 					else
 					if ( dfaz <= 0.)
-						pol_sense_index = 1;
+						pol_sense_index = POL_RIGHT;
 					else
-						pol_sense_index = 2;
+						pol_sense_index = POL_LEFT;
 				
 				} /* if ( (ethm2 <= 1.0e-20) && (ephm2 <= 1.0e-20) ) */
 			
@@ -393,16 +391,19 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 				nec_float gnh = db10( gcon* ephm2);
 				nec_float gtot= db10( gcon*(ethm2+ ephm2) );
 			
-				if (m_rp_normalization > 0)
 				{
 					nec_float temp_gain;
 					
 					switch(m_rp_normalization )
 					{
-					case 1:
-						temp_gain = gnmj;
-						break;
-				
+          case 0:
+            temp_gain = gtot;
+            break;
+
+          case 1:
+            temp_gain = gnmj;
+            break;
+
 					case 2:
 						temp_gain = gnmn;
 						break;
@@ -474,9 +475,22 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 				_e_phi[result_counter] = deg_polar(ephm, epha);
 				
 				_power_gain_tot[result_counter] = gtot;
+				
+				{
+					nec_float a = pol_axial_ratio;
+					if (pol_sense_index == POL_RIGHT)
+						a = -a;
+					nec_float gain = from_db10(gtot);
+					nec_float lhcp_f =(1+2*a+a*a)/(2*(1+a*a));
+					nec_float rhcp_f =(1-2*a+a*a)/(2*(1+a*a));
+					_power_gain_rhcp[result_counter] = db10(gain * rhcp_f);
+					_power_gain_lhcp[result_counter] = db10(gain * lhcp_f);
+				}
+				
 				_polarization_axial_ratio[result_counter] = pol_axial_ratio;
 				_polarization_tilt[result_counter] = tilta;
 				_polarization_sense_index[result_counter] = pol_sense_index;
+				_averaging_scales[result_counter] = (sin(tha) * (n_theta - 1) / n_theta) + 1.0/n_theta;
 				
 			} /* if ( _ifar == 1) */
 			result_counter++;
@@ -505,7 +519,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 		_average_power_solid_angle = solid_angle / pi(); // We display it as a multiple of pi()
 	}
 
-	_maximum_gain = _gain.max();
+  _maximum_gain = _gain.maxCoeff();
 	m_analysis_done = true;
 }
 
@@ -531,25 +545,26 @@ void nec_radiation_pattern::write_normalized_gain(ostream& os)
 	switch (m_rp_normalization)
 	{
 		case 1:
-			norm_type = "  MAJOR AXIS"; break;
+			norm_type = "MAJOR AXIS"; break;
 		case 2:
-			norm_type = "  MINOR AXIS"; break;
+			norm_type = "MINOR AXIS"; break;
 		case 3:
-			norm_type = "    VERTICAL"; break;
+			norm_type = "VERTICAL"; break;
 		case 4:
-			norm_type = "  HORIZONTAL"; break;
+			norm_type = "HORIZONTAL"; break;
 		case 5:
-			norm_type = "      TOTAL "; break;
+			norm_type = "TOTAL "; break;
 		
 		default: throw new nec_exception("Unknown Gain Normalization Encountered.");
 	}
 	
 	output_helper oh(os,_result_format);
 	
-	oh.section_start();
-	os << "                              ---------- NORMALIZED GAIN ----------" << endl;
-	os << "                                      " << norm_type << " GAIN" << endl;
-	os << "                                   NORMALIZATION FACTOR: "; oh.real_out(7,2,normalization_factor,false); os << " db" << endl << endl;
+	oh.section_start("NORMALIZED GAIN");
+	{ stringstream mess;	mess << norm_type << " GAIN";	oh.center_text(mess.str(), ""); }
+	{ stringstream mess;	mess << "NORMALIZATION FACTOR: " << normalization_factor << " dB"; oh.center_text(mess.str(), ""); }
+/*	os << "                                      " << norm_type << " GAIN" << endl;
+	os << "                                   NORMALIZATION FACTOR: "; oh.real_out(7,2,normalization_factor,false); os << " db" << endl << endl; */
 	os << "    ---- ANGLES ----                ---- ANGLES ----                ---- ANGLES ----" << endl;
 	os << "    THETA      PHI        GAIN      THETA      PHI        GAIN      THETA      PHI       GAIN" << endl;
 	os << "   DEGREES   DEGREES        DB     DEGREES   DEGREES        DB     DEGREES   DEGREES       DB" << endl;

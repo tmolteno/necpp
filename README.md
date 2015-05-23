@@ -8,6 +8,15 @@ into other projects like GUI tools and automatic antenna optimization systems.
 There is also an executable necpp that can read antenna description files (like the original). 
 Nec2++ is developed on Debian linux, but will work on a variety of other operating systems.
 
+## Features
+
+* NEC-2 syntax compatable.
+* C, C++, Python and Ruby libraries included. Ideal for antenna optimization.
+* Large designs can be simulated with tens of thousands of elements (to the limit of 64-bit address space)
+* Geometry error detection. Throws exceptions if wires intersect or lie too close to one another.
+* Simulate in different media (for example antennas in seawater) by modifying the dielectric properties.
+* Uses fast numerical routines (BLAS and LAPACK). Can use the Intel MKL or OpenBLAS.
+
 ## Citing NEC2++
 
 If you use nec2++, please cite it as follows:
@@ -15,6 +24,9 @@ If you use nec2++, please cite it as follows:
 Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics Code'', Electronics Technical Reports No. 2014-3, ISSN 1172-496X, October
 2014.
 
+## Documentation
+
+Online documentation built form the source code is available at http://tmolteno.github.io/necpp/
 
 ## Instructions for Linux
 
@@ -24,7 +36,6 @@ nec2++ is available precompiled as part of most modern linux distributions, incl
 
 ## Compiling on Linux
 
-!NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 See the INSTALL file. But here is the short version
 
@@ -37,6 +48,8 @@ See the INSTALL file. But here is the short version
 To build a debugging version use
 
     ./configure --with-bounds
+
+!NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
 
 ## Instructions for Compiling on Windows
 

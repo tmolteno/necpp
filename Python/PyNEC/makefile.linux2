@@ -16,9 +16,9 @@ CXX=g++
 
 LDFLAGS=-shared -lstdc++
 
-CXXFLAGS=-Wall
+CXXFLAGS=-Wall -fPIC
 
-SWIGCXXFLAGS=-c -I/home/pi/Projects/math/venv/include/python2.7 -I/home/pi/Projects/math/venv/include/python2.7/numpy -I/home/pi/Projects/math/venv/lib/python2.7 -DHAVE_CONFIG_H
+SWIGCXXFLAGS=-c -fPIC -I/usr/include/python2.7 -I/usr/include/python2.7/numpy -I/usr/lib/python2.7 -DHAVE_CONFIG_H
 
 SWIGFLAGS=-python -c++
 
@@ -44,9 +44,9 @@ wrap/PyNEC_wrap.cxx: wrap/PyNEC.i
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 install:
-	@rm -fr /home/pi/Projects/math/venv/lib/python2.7/site-packages/PyNEC
-	@mkdir /home/pi/Projects/math/venv/lib/python2.7/site-packages/PyNEC
-	cp python_module/*.* /home/pi/Projects/math/venv/lib/python2.7/site-packages/PyNEC/
+	@rm -fr /usr/lib/python2.7/site-packages/PyNEC
+	@mkdir -p /usr/lib/python2.7/site-packages/PyNEC
+	cp python_module/*.* /usr/lib/python2.7/site-packages/PyNEC/
 
 clean:
 	rm -rf wrap/src/*.o wrap/PyNEC_wrap.cxx wrap/PyNEC_wrap.o python_module/*.pyc python_module/_PyNEC.so

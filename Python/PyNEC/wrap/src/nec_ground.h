@@ -18,6 +18,7 @@
 #ifndef __nec_ground__
 #define __nec_ground__
 
+#include "common.h"
 #include "math_util.h"
 #include "nec_debug.h"
 

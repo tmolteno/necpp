@@ -8,9 +8,10 @@
 *.o
 *.lo
 *.la
+*.trs
 src/nec2++
 src/nec2diff
-src/testbench
+src/test_manager
 
 # Packages #
 ############
@@ -59,6 +60,7 @@ missing
 src/.deps/
 src/.libs/
 stamp-h1
+necpp.pc
 
 html/*
 xml/*

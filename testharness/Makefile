@@ -51,8 +51,8 @@ NEC_TESTS := $(shell find data/ -name "example*.nec")
 SOM_TESTS := $(shell find data/ -name "sommer*.nec")
 ALL_TESTS := $(shell find data/ -name "*.nec")
 
-#DO_TESTS = ${NEC_TESTS} ${SOM_TESTS}
-DO_TESTS = ${ALL_TESTS}
+DO_TESTS = ${NEC_TESTS} ${SOM_TESTS}
+#DO_TESTS = ${ALL_TESTS}
 
 ############################################################################
 #	

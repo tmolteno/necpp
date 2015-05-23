@@ -3,6 +3,10 @@
 This module was contributed by Remi Sassolas. It wraps the C++ interface to nec2++. There is a more recent python module
 that wraps the C-style interface. It is in the directory ../python.
 
+## Prerequisites
+
+    sudo aptitude install python-dev python-numpy swig
+
 ## How one can build it ?
 
 To build it one must have Swig ver 1.3.25 installed
@@ -42,8 +46,8 @@ module from a python interpreter :
 
 from PyNEC import * 
 
-Warning : to use PyNEC one must have the numarray module installed
-(http://www.stsci.edu/resources/software_hardware/numarray). The version used
+Warning : to use PyNEC one must have the numpy module installed
+(http://www.stsci.edu/resources/software_hardware/numpy). The version used
 for the tests is ver 1.3.3.
 
 Then you can start using the module.

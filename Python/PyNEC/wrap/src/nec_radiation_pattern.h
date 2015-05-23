@@ -1,20 +1,20 @@
 /*
-	Copyright (C) 2004-2005  Timothy C.A. Molteno
-	tim@molteno.net
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004-2015  Timothy C.A. Molteno
+  tim@molteno.net
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #ifndef __nec_radiation_pattern__
 #define __nec_radiation_pattern__
@@ -25,16 +25,25 @@
 #include "c_plot_card.h"
 
 
+
 /** \brief The types of polarization that gain normalization should be done with
 */
-enum polarization_norm
-{	POL_MAJOR_AXIZ=1,
-	POL_MINOR_AXIS=2,
-	POL_VERTICAL=3,
-	POL_HORIZONTAL=4,
-	POL_TOTAL=5
+enum polarization_norm  {
+  POL_MAJOR_AXIZ=1,
+  POL_MINOR_AXIS=2,
+  POL_VERTICAL=3,
+  POL_HORIZONTAL=4,
+  POL_TOTAL=5
 };
-		
+
+/** \brief The types of polarization sense
+*/
+enum polarization_sense {
+  POL_LINEAR=0,
+  POL_RIGHT=1,
+  POL_LEFT=2
+};
+
 class nec_context;
 
 class nec_radiation_pattern : public nec_base_result
@@ -101,6 +110,13 @@ public:
 		return _polarization_axial_ratio;
 	}
 	
+	/*! \brief Get the polarization axial ratio
+	*/
+	nec_float get_pol_axial_ratio(int theta_index, int phi_index) const
+	{
+		return _polarization_axial_ratio[get_index(theta_index, phi_index)];
+	}
+	
 	real_array get_pol_tilt()
 	{
 		return _polarization_tilt;
@@ -111,11 +127,49 @@ public:
 		return _polarization_sense_index;
 	}
 	
+	/*! \brief Get the polarization sense
+	\return enum polarization_sense POL_LINEAR, POL_RIGHT, POL_LEFT
+	*/
+	int get_pol_sense(int theta_index, int phi_index) const
+	{
+		return _polarization_sense_index[get_index(theta_index, phi_index)];
+	}
+	
+	/*! \brief Get the magnitude of E(THETA)
+	*/
+	nec_float get_etheta_magnitude(int theta_index, int phi_index)
+	{
+		return abs(_e_theta[get_index(theta_index, phi_index)]);
+	}
+	/*! \brief Get the phase (in degrees) of E(THETA)
+	*/
+	nec_float get_etheta_phase(int theta_index, int phi_index)
+	{
+		return arg_degrees(_e_theta[get_index(theta_index, phi_index)]);
+	}
+	
+	/*! \brief Return a complex array for the electric field E(THETA)
+	*/
 	complex_array get_e_theta()
 	{
 		return _e_theta;
 	}
 	
+	/*! \brief Get the magnitude of E(PHI)
+	*/
+	nec_float get_ephi_magnitude(int theta_index, int phi_index)
+	{
+		return abs(_e_phi[get_index(theta_index, phi_index)]);
+	}
+	/*! \brief Get the phase (in degrees) of E(PHI)
+	*/
+	nec_float get_ephi_phase(int theta_index, int phi_index)
+	{
+		return arg_degrees(_e_phi[get_index(theta_index, phi_index)]);
+	}
+	
+	/*! \brief Return a complex array for the electric field E(PHI)
+	*/
 	complex_array get_e_phi()
 	{
 		return _e_phi;
@@ -209,6 +263,108 @@ public:
 		return get_gain_normalization_factor(0);
 	}
 	
+	/****************** STATISTICS ********************/
+
+
+private:
+	nec_float mean(real_array& pattern) const
+	{
+		nec_float sum = 0.0;
+		long len = pattern.size();
+		for (long i=0;i<len;i++)
+		{
+			sum += pattern[i] * _averaging_scales[i];
+		}
+		return sum/(len*2.0 / pi());
+	}
+
+	nec_float sd(real_array& pattern, nec_float _mean) const
+	{
+		nec_float sum = 0.0;
+		long len = pattern.size();
+		for (long i=0;i<len;i++)
+		{
+			nec_float diff = pattern[i] - _mean;
+			sum += diff*diff * _averaging_scales[i];
+		}
+		return std::sqrt(sum/(len*2.0 / pi()));
+	}
+
+
+public:
+	nec_float get_gain_max()
+	{
+		return _power_gain_tot.maxCoeff();
+	}
+
+	nec_float get_gain_min()
+	{
+		return _power_gain_tot.minCoeff();
+	}
+
+	nec_float get_gain_mean()
+	{
+		return mean(_power_gain_tot);
+	}
+	
+	nec_float get_gain_sd()
+	{
+		nec_float _mean = get_gain_mean();
+		return sd(_power_gain_tot, _mean);
+	}
+	
+	/********************** RHCP ********************************/
+	nec_float get_gain_rhcp_max()
+	{
+		return _power_gain_rhcp.maxCoeff();
+	}
+
+	nec_float get_gain_rhcp_min()
+	{
+		return _power_gain_rhcp.minCoeff();
+	}
+
+	nec_float get_gain_rhcp_mean()
+	{
+		return mean(_power_gain_rhcp);
+	}
+	
+	nec_float get_gain_rhcp_sd()
+	{
+		nec_float _mean = get_gain_rhcp_mean();
+		return sd(_power_gain_rhcp, _mean);
+	}
+	
+	/********************** LHCP ********************************/
+	nec_float get_gain_lhcp_max()
+	{
+		return _power_gain_lhcp.maxCoeff();
+	}
+
+	nec_float get_gain_lhcp_min()
+	{
+		return _power_gain_lhcp.minCoeff();
+	}
+
+	nec_float get_gain_lhcp_mean()
+	{
+		return mean(_power_gain_lhcp);
+	}
+	
+	nec_float get_gain_lhcp_sd()
+	{
+		nec_float _mean = get_gain_lhcp_mean();
+		return sd(_power_gain_lhcp, _mean);
+	}
+
+
+	/* End of Statistics functions for the C interface */
+
+
+
+
+
+
 	/*! \brief Get the theta angle corresponding to the theta_index
 	*/
 	nec_float get_theta(int theta_index) const
@@ -258,6 +414,39 @@ public:
 		return _power_gain_horiz[get_index(theta_index, phi_index)];
 	}
 
+	/*! \brief Get  a power gain (total dBi) from the radiation pattern
+	*/
+	nec_float get_power_gain_tot(int theta_index, int phi_index) const
+	{
+		return _power_gain_tot[get_index(theta_index, phi_index)];
+	}
+
+	/*! \brief Get the power gain if the antenna were receiving RHCP signals
+	*/
+	nec_float get_power_gain_rhcp(int theta_index, int phi_index) const
+	{
+		nec_float a = get_pol_axial_ratio(theta_index, phi_index);
+		nec_float dbi = get_power_gain_tot(theta_index, phi_index);
+		if (get_pol_sense(theta_index, phi_index) == POL_RIGHT)
+			a = -a;
+
+		nec_float f = (1-2*a+a*a)/(2*(1+a*a));
+		return dbi + 10*log10(f);
+	}
+
+	/*! \brief Get the power gain if the antenna were receiving LHCP signals
+	*/
+	nec_float get_power_gain_lhcp(int theta_index, int phi_index) const
+	{
+		nec_float a = get_pol_axial_ratio(theta_index, phi_index);
+		nec_float dbi = get_power_gain_tot(theta_index, phi_index);
+		if (get_pol_sense(theta_index, phi_index) == POL_RIGHT)
+			a = -a;
+
+		nec_float f = (1+2*a+a*a)/(2*(1+a*a));
+		return dbi + 10*log10(f);
+	}
+
 private:
 
 	int get_index(int theta_index, int phi_index) const;
@@ -289,11 +478,14 @@ private:
 	nec_float m_rp_gnor;
 	
 	real_array	_gain;
+	real_array	_power_gain_lhcp;
+	real_array	_power_gain_rhcp;
 	real_array	_power_gain_vert;
 	real_array	_power_gain_horiz;
 	real_array	_power_gain_tot;
 	real_array	_polarization_axial_ratio;
 	real_array	_polarization_tilt;
+	real_array	_averaging_scales;
 	int_array	_polarization_sense_index;
 				
 	complex_array	_e_theta;

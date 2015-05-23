@@ -1,51 +1,48 @@
 /*
-	Copyright (C) 2004-2005  Timothy C.A. Molteno
-	tim@molteno.net
-	
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  Copyright (C) 2004-2015  Timothy C.A. Molteno
+  tim@molteno.net
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-
 #include "nec_context.h"
 #include "c_geometry.h"
 #include "nec_exception.h"
-	
-static char* hpol[3] = { "LINEAR", "RIGHT", "LEFT" };
 
-nec_context::nec_context()
-{
-	m_output_fp=NULL;
-	m_results.set_stdout(false);
-	m_geometry = new c_geometry();
-	inc=0;
-	isave=0;
-	nthic=0;
-	nphic=0;
-	
-	impedance_norm_factor = 0.0; // was zpnorm
-	xpr1=0.0;
-	xpr2=0.0;
-	xpr3=0.0;
-	xpr4=0.0;
-	xpr5=0.0;
-	xpr7=0.0;
-	
-	/*structure_currents is a pointer to the "nec_base_result" which takes care of storing and printing of the currents*/
-	structure_currents = NULL;
-		
-	// allocate the ground grid
-	ggrid.initialize();
+#include <cstdlib>
+
+nec_context::nec_context() : fnorm(0,0), current_vector(0) {
+  m_output_fp=NULL;
+  m_geometry = new c_geometry();
+  inc=0;
+  isave=0;
+  nthic=0;
+  nphic=0;
+  
+  impedance_norm_factor = 0.0; // was zpnorm
+  xpr1=0.0;
+  xpr2=0.0;
+  xpr3=0.0;
+  xpr4=0.0;
+  xpr5=0.0;
+  xpr7=0.0;
+  
+  /*structure_currents is a pointer to the "nec_base_result" which takes care of storing and printing of the currents*/
+  structure_currents = NULL;
+          
+  // allocate the ground grid
+  ggrid.initialize();
 }
 
 nec_context::~nec_context()
@@ -76,8 +73,6 @@ void nec_context::initialize()
 	
 	init_voltage_sources();
 	m_geometry->set_context(this);
-
-	imat=0; // this should go away! It appears to be related to some very old code for handling out-of-core situations */
 }
 
 /*! \brief Private method to initialize the voltage source buffers
@@ -104,7 +99,7 @@ void nec_context::calc_prepare()
 	DEBUG_TRACE("calc_prepare()");
 	iflow=1;		
 	
-	int n_plus_m = m_geometry->n_plus_m;
+	int n_plus_m = m_geometry->n_plus_m();
 	/* Allocate some buffers */
 	air.resize(n_plus_m);
 	aii.resize(n_plus_m);
@@ -113,15 +108,14 @@ void nec_context::calc_prepare()
 	cir.resize(n_plus_m);
 	cii.resize(n_plus_m);
 	
-	ip.resize(m_geometry->n_plus_2m);		
-	current_vector.resize(m_geometry->n_plus_3m);
+	ip.resize(m_geometry->n_plus_2m);
+        ASSERT((m_geometry->n_segments + m_geometry->m*3 == m_geometry->n_plus_3m));
+        // TODO FIX HERE... THIS SIZE AINT RIGHT
+	current_vector.resize(m_geometry->n_segments + m_geometry->m*4);
 	
 	/* Matrix parameters */
-	if ( imat == 0)
-	{
-		neq= m_geometry->n_plus_2m;
-		neq2=0;
-	}
+	neq= m_geometry->n_plus_2m;
+	neq2=0;
 
 	/* default values for input parameters and flags */
 	npeq = m_geometry->np + 2*m_geometry->mp;
@@ -135,7 +129,7 @@ void nec_context::calc_prepare()
 	ifar=-1;
 	ncoup=0;
 	icoup=0;
-	freq_mhz= CVEL;
+	freq_mhz= em::speed_of_light() / 1.0e6;
 	ground.default_values();
 	nfrq=1;
 	iptflg=-2;
@@ -144,13 +138,13 @@ void nec_context::calc_prepare()
 }
 
 
-/*!\brief Benchmark the libnecpp engine. A score of 100 is roughly an Athlon XP 1800. */
+/*!\brief Benchmark the libnecpp engine. A score of 1.0 is roughly an Athlon XP 1800. */
 nec_float nec_context::benchmark()
 {
 	nec_float start_timer, stop_timer;
 	
 	secnds( &start_timer );
-	for (int i=0; i<2; i++)
+	for (int i=0; i<20; i++)
 	{
 		{
 			/*
@@ -172,7 +166,6 @@ nec_float nec_context::benchmark()
 			*/
 
 			nec_context nec;
-			nec.set_results_stdout(false);
 			nec.set_gain_only(true);
 			nec.initialize();
 			
@@ -227,21 +220,20 @@ nec_float nec_context::benchmark()
 			
 			*/
 			nec_context nec;
-			nec.set_results_stdout(false);
 			nec.set_gain_only(false);
 			nec.initialize();
 			
 			c_geometry* geo = nec.get_geometry();
 			geo->wire(0, 36, 0, 0, 0, -0.042, 0.008, 0.017, 0.001, 1.0, 1.0);
-			geo->wire(0, 21, -0.042, 0.008, 0.017, -0.048, 0.021, -0.005, 0.001, 1.0, 1.0);
-			geo->wire(0, 70, -0.048, 0.021, -0.005, 0.039, 0.032, -0.017, 0.001, 1.0, 1.0);
-			geo->wire(0, 70, -0.048, 0.021, -0.005, 0.035, 0.043, 0.014, 0.001, 1.0, 1.0);
-			geo->wire(0, 50, -0.042, 0.008, 0.017, 0.017, -0.015, 0.014, 0.001, 1.0, 1.0);
+			geo->wire(0, 21, 0.042, 0.002, 0.017, -0.028, 0.011, 0.005, 0.001, 1.0, 1.0);
+			geo->wire(0, 70, -0.058, 0.021, 0.005, 0.039, 0.062, 0.017, 0.001, 1.0, 1.0);
+			geo->wire(0, 70, 0.048, 0.021, -0.005, 0.035, 0.043, 0.014, 0.001, 1.0, 1.0);
+			geo->wire(0, 50, 0.042, 0.018, 0.017, 0.017, 0.015, 0.024, 0.001, 1.0, 1.0);
 			geo->wire(0, 66, 0.017, -0.015, 0.014, -0.027, 0.04, -0.031, 0.001, 1.0, 1.0);
-			geo->wire(0, 85, -0.027, 0.04, -0.031, 0.046, -0.01, 0.028, 0.001, 1.0, 1.0);
+			geo->wire(0, 85, 0.027, 0.04, 0.031, -0.046, -.01, 0.028, 0.001, 1.0, 1.0);
 			geo->wire(0, 47, 0.046, -0.01, 0.028, -0.013, -0.005, 0.031, 0.001, 1.0, 1.0);
-			geo->wire(0, 70, 0.017, -0.015, 0.014, -0.048, -0.038, -0.04, 0.001, 1.0, 1.0);
-			geo->wire(0, 77, -0.048, -0.038, -0.04, 0.049, -0.045, -0.04, 0.001, 1.0, 1.0);
+			geo->wire(0, 70, 0.027, 0.015, 0.014, -0.078, 0.038, -0.04, 0.001, 1.0, 1.0);
+			geo->wire(0, 77, 0.078, -0.038, 0.04, 0.049, 0.065, 0.04, 0.001, 1.0, 1.0);
 			nec.geometry_complete(0,0);
 			
 			nec.gn_card(-1,0,0.0, 0.0, 0.0,0.0, 0.0, 0.0);
@@ -250,8 +242,7 @@ nec_float nec_context::benchmark()
 			nec.ex_card(EXCITATION_LINEAR, 1, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 			nec.fr_card(0, 2, 2400.0, 100.0);
 			nec.rp_card(0, 1, 1, 0,5,0,0, 90.0, 90.0, 0.0, 0.0, 0.0, 0.0);
-			double g = 0;
-			g = nec.get_maximum_gain();
+			nec.get_gain_max();
 		}
 	}
 	/* time the process */
@@ -260,7 +251,7 @@ nec_float nec_context::benchmark()
 	cout << endl << endl;
 	nec_float sec = stop_timer / 1000.0;
 	
-	nec_float bench = 7.0 / sec;
+	nec_float bench = 70.0 / sec;
 	
 	return bench;
 }
@@ -301,6 +292,35 @@ void nec_context::wire(int tag_id, int segment_count,
 	m_geometry->wire(tag_id, segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, rdel, rrad);
 }
 
+
+void nec_context::sp_card(int ns,
+    nec_float x1, nec_float y1, nec_float z1,
+    nec_float x2, nec_float y2, nec_float z2)
+{
+  m_geometry->sp_card(ns, x1, y1, z1, x2, y2, z2);
+}
+
+
+
+void nec_context::sc_card(int i2,
+    nec_float x3, nec_float y3, nec_float z3,
+    nec_float x4, nec_float y4, nec_float z4)
+{
+  m_geometry->sc_card(i2, x3, y3, z3, x4, y4, z4);
+}
+
+void nec_context::gx_card(int i1, int i2) {
+  m_geometry->gx_card(i1, i2);
+}
+
+void nec_context::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
+    nec_float ys, nec_float zs, int its, int nrpt, int itgi )
+{
+  DEBUG_TRACE("nec_context::move nrpt=" << nrpt);
+  m_geometry->move(rox, roy, roz, xs, ys, zs, its, nrpt, itgi);
+}
+
+
 /*! Add an arc to the geometry,
 
 All co-ordinates are in meters.
@@ -313,9 +333,8 @@ All co-ordinates are in meters.
 	\param rad The wire radius.
 */
 void nec_context::arc( int tag_id, int segment_count, nec_float rada,
-		nec_float ang1, nec_float ang2, nec_float rad )
-{
-	m_geometry->arc(tag_id, segment_count, rada, ang1, ang2, rad);
+        nec_float ang1, nec_float ang2, nec_float rad ) {
+    m_geometry->arc(tag_id, segment_count, rada, ang1, ang2, rad);
 }
 		
 
@@ -336,9 +355,8 @@ All co-ordinates are in meters.
 	\param rad The wire radius.
 */
 void nec_context::helix(int tag_id, int segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1,
-		nec_float a2, nec_float b2, nec_float rad)
-{
-	m_geometry->helix(s, hl, a1, b1, a2, b2, rad, segment_count, tag_id);
+		nec_float a2, nec_float b2, nec_float rad) {
+  m_geometry->helix(s, hl, a1, b1, a2, b2, rad, segment_count, tag_id);
 }
 
 /* "fr" card, frequency parameters
@@ -351,21 +369,20 @@ I4- BLANK -- not used in this function
 F1- FREQUENCY OR START FREQUENCY
 F2- FREQ INCREMENT, ADD OR MULTIPLY
 */
-void nec_context::fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq)
-{
-	DEBUG_TRACE("fr_card()");
-	ifrq = in_ifrq;
-	nfrq = in_nfrq;
-	if ( nfrq == 0)
-		nfrq=1;
-		
-	freq_mhz = in_freq_mhz;
-	delfrq = in_del_freq;
-	if ( iped == 1)
-		impedance_norm_factor = 0.0;
-		
-	processing_state = 1;
-	iflow = 1;
+void nec_context::fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_float in_del_freq) {
+  DEBUG_TRACE("fr_card()");
+  ifrq = in_ifrq;
+  nfrq = in_nfrq;
+  if ( nfrq == 0)
+          nfrq=1;
+          
+  freq_mhz = in_freq_mhz;
+  delfrq = in_del_freq;
+  if ( iped == 1)
+          impedance_norm_factor = 0.0;
+          
+  processing_state = 1;
+  iflow = 1;
 }
 
 
@@ -439,13 +456,13 @@ GN		NEAR GROUND, GROUND SCREEN, ADDED GROUND
 */
 void nec_context::gn_card(int ground_type, int rad_wire_count, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
-	DEBUG_TRACE("gn_card(" << ground_type << ")");
-	ground.parse_gn(ground_type, rad_wire_count, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-	
-	iflow=4;
+  DEBUG_TRACE("gn_card(" << ground_type << ")");
+  ground.parse_gn(ground_type, rad_wire_count, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
+  
+  iflow=4;
 
-	if ( processing_state > 2)
-		processing_state=2;
+  if ( processing_state > 2)
+    processing_state=2;
 }
 
 
@@ -847,34 +864,33 @@ void nec_context::pt_card(int itmp1, int itmp2, int itmp3, int itmp4)
 
 
 	/* "pq" card, print control for charge */
-void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4)
-{
-	iptflq= itmp1;
-	iptaq= itmp2;
-	iptaqf= itmp3;
-	iptaqt= itmp4;
+void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4) {
+  iptflq= itmp1;
+  iptaq= itmp2;
+  iptaqf= itmp3;
+  iptaqt= itmp4;
 
-	if ( (itmp3 == 0) && (iptflq != -1) )
-		iptflq=-2;
-	if ( itmp4 == 0)
-		iptaqt= iptaqf;
+  if ( (itmp3 == 0) && (iptflq != -1) )
+    iptflq=-2;
+  if ( itmp4 == 0)
+    iptaqt= iptaqf;
 }
 
 
 
 /* "kh" card, matrix integration limit */
-void nec_context::kh_card(nec_float tmp1)
-{
-	rkh = tmp1;
-	if ( processing_state > 2)
-		processing_state=2;
-	iflow=1;
+void nec_context::kh_card(nec_float tmp1) {
+  rkh = tmp1;
+  if ( processing_state > 2)
+    processing_state=2;
+  iflow=1;
 }
 
 void nec_context::ne_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
 	ne_nh_card(0, itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
 }
+
 void nec_context::nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
 	ne_nh_card(1, itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
@@ -884,117 +900,105 @@ void nec_context::nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float 
 */
 void nec_context::ne_nh_card(int in_nfeh, int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
-	nfeh = in_nfeh;
+  nfeh = in_nfeh;
 
-	if ( (iflow == 8) && (nfrq != 1) )
-	{
-		m_output.endl(2);
-		m_output.line("WHEN MULTIPLE FREQUENCIES ARE REQUESTED, "
-			"ONLY ONE NEAR FIELD CARD CAN BE USED -");
-		m_output.line("  LAST CARD READ WILL BE USED" );
-	}
+  if ( (iflow == 8) && (nfrq != 1) ) {
+    m_output.endl(2);
+    m_output.line("WHEN MULTIPLE FREQUENCIES ARE REQUESTED, "
+            "ONLY ONE NEAR FIELD CARD CAN BE USED -");
+    m_output.line("  LAST CARD READ WILL BE USED" );
+  }
 
-	m_near= itmp1;
-	nrx= itmp2;
-	nry= itmp3;
-	nrz= itmp4;
-	xnr= tmp1;
-	ynr= tmp2;
-	znr= tmp3;
-	dxnr= tmp4;
-	dynr= tmp5;
-	dznr= tmp6;
-	iflow=8;
+  m_near= itmp1;
+  nrx= itmp2;
+  nry= itmp3;
+  nrz= itmp4;
+  xnr= tmp1;
+  ynr= tmp2;
+  znr= tmp3;
+  dxnr= tmp4;
+  dynr= tmp5;
+  dznr= tmp6;
+  iflow=8;
 
-	if ( nfrq == 1)
-		simulate();
+  if ( nfrq == 1)
+    simulate();
 }
 
 
 /* "ek" card,  extended thin wire kernel option */
-void nec_context::set_extended_thin_wire_kernel(bool ek_flag)
-{
-	m_use_exk = ek_flag;
-	
-	if ( processing_state > 2)
-		processing_state=2;
-	iflow=1;	
+void nec_context::set_extended_thin_wire_kernel(bool ek_flag) {
+  m_use_exk = ek_flag;
+  
+  if ( processing_state > 2)
+    processing_state=2;
+  iflow=1;	
 }
 
 
 /* "cp" card, maximum coupling between antennas */
-void nec_context::cp_card(int itmp1, int itmp2, int itmp3, int itmp4)
-{
-	if ( iflow != 2)
-	{
-		ncoup=0;
-		nctag.resize(0);
-		ncseg.resize(0);
-		y11a.resize(0);
-		y12a.resize(0);
-	}
+void nec_context::cp_card(int itmp1, int itmp2, int itmp3, int itmp4) {
+  if ( iflow != 2) {
+    ncoup=0;
+    nctag.resize(0);
+    ncseg.resize(0);
+    y11a.resize(0);
+    y12a.resize(0);
+  }
 
-	icoup=0;
-	iflow=2;
+  icoup=0;
+  iflow=2;
 
-	if ( itmp2 == 0)
-		return; /* continue card input loop */
+  if ( itmp2 == 0)
+    return; /* continue card input loop */
 
-	ncoup++;
-	nctag.resize(ncoup);
-	ncseg.resize(ncoup);
-	nctag[ncoup-1]= itmp1;
-	ncseg[ncoup-1]= itmp2;
+  ncoup++;
+  nctag.resize(ncoup);
+  ncseg.resize(ncoup);
+  nctag[ncoup-1]= itmp1;
+  ncseg[ncoup-1]= itmp2;
 
-	if ( itmp4 == 0)
-		return; /* continue card input loop */
+  if ( itmp4 == 0)
+    return; /* continue card input loop */
 
-	ncoup++;
-	nctag.resize(ncoup);
-	ncseg.resize(ncoup);
-	nctag[ncoup-1]= itmp3;
-	ncseg[ncoup-1]= itmp4;
+  ncoup++;
+  nctag.resize(ncoup);
+  ncseg.resize(ncoup);
+  nctag[ncoup-1]= itmp3;
+  ncseg[ncoup-1]= itmp4;
 }
 
 
 /* "pl" card, plot flags 
 	throws int on error.
 */
-void nec_context::pl_card(const char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4)
-{
-	std::string fname(ploutput_filename);
-	plot_card = c_plot_card(itmp1,itmp2,itmp3,itmp4, fname);
+void nec_context::pl_card(const char* ploutput_filename, int itmp1, int itmp2, int itmp3, int itmp4) {
+  std::string fname(ploutput_filename);
+  plot_card = c_plot_card(itmp1,itmp2,itmp3,itmp4, fname);
 }
 
 
 
-/*!	\brief Start a simulation
+/*! \brief Start a simulation
 
-	This function will trigger a calculation. In the traditional NEC
-	world, This signals the end of the main input section and the
-	beginning of the frequency do loop.
-	
-	\param far_field_flag is true if last card was XQ or RP
-	\warning far_field_flag is should never be specified as true
-	because both the xq_card() and rp_card() functions will call
-	this function automatically.
+    This function will trigger a calculation. In the traditional NEC
+    world, This signals the end of the main input section and the
+    beginning of the frequency do loop.
+    
+    \param far_field_flag is true if last card was XQ or RP
+    \warning far_field_flag is should never be specified as true
+    because both the xq_card() and rp_card() functions will call
+    this function automatically.
 */
-void nec_context::simulate(bool far_field_flag)
-{
-	DEBUG_TRACE("simulate(" << far_field_flag << ")");
-	/* Allocate the normalization buffer */
-	{
-		int mreq1 = 0;
-		int mreq2 = 0;
-	
-		if ( iped )
-			mreq1 = 4*nfrq;
-		if ( iptflg >= 2 )
-			mreq2 = nthi*nphi;
-	
-		int newsize = std::max(mreq1,mreq2);
-		fnorm.resize(newsize);
-	}
+void nec_context::simulate(bool far_field_flag) {
+  DEBUG_TRACE("simulate(" << far_field_flag << ")");
+  
+  /* Allocate the normalization buffer */
+  if ( iped )
+    fnorm.resize(nfrq,4);
+  if ( iptflg >= 2 )
+    fnorm.resize(nthi, nphi);
+
 
 	/* igox is a state variable that is used to change from
 		one processing mode to another. The processing to be 
@@ -1019,7 +1023,7 @@ void nec_context::simulate(bool far_field_flag)
 	
 	try
 	{
-	int iresrv = 0;
+	int64_t iresrv = 0;
 	bool in_freq_loop = false;
 	
 	do
@@ -1030,7 +1034,8 @@ void nec_context::simulate(bool far_field_flag)
 
 			if (false == in_freq_loop)
 			{
-				iresrv = m_geometry->n_plus_2m * (m_geometry->np+2*m_geometry->mp);
+				// TODO fix up the following (changed 2* to 3*)
+                                iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
 				cm.resize(iresrv);
 			
 				/* Memory allocation for symmetry array */
@@ -1038,9 +1043,7 @@ void nec_context::simulate(bool far_field_flag)
 				symmetry_array.resize(nop*nop);	
 				mhz = 1;
 				
-				/* irngf is not used (NGF function not implemented) */
-				if ( imat == 0)
-					fblock( npeq, neq, iresrv, m_geometry->m_ipsym);
+				fblock( npeq, neq, iresrv, m_geometry->m_ipsym);
 				
 				in_freq_loop = true;
 			}
@@ -1053,7 +1056,7 @@ void nec_context::simulate(bool far_field_flag)
 					freq_mhz += delfrq;
 			}
 
-			wavelength = CVEL / freq_mhz;
+			wavelength = em::speed_of_light() / (1.0e6 * freq_mhz);
 
 			print_freq_int_krnl(freq_mhz, wavelength, rkh, m_use_exk);
 				
@@ -1073,12 +1076,7 @@ void nec_context::simulate(bool far_field_flag)
 			nprint=0;
 
 		default:
-			enum excitation_return ret = excitation_loop(igox, mhz, 
-				iptflg, iptflq, 
-				iptag, iptagf, iptagt, 
-				iptaq, iptaqf, iptaqt, 
-				thetis, nfrq, iflow, 
-				nthi, nphi, iped);
+			enum excitation_return ret = excitation_loop(igox, mhz);
 		
 			if (FREQ_LOOP_CONTINUE == ret)
 			{
@@ -1092,7 +1090,7 @@ void nec_context::simulate(bool far_field_flag)
 			nphic = 1;
 	
 			/* normalized receiving pattern printed */
-			print_norm_rx_pattern(iptflg, nthi, nphi, thetis, phiss);
+			print_norm_rx_pattern();
 			
 			xpr2  = phiss;
 	
@@ -1105,7 +1103,7 @@ void nec_context::simulate(bool far_field_flag)
 				throw 1; // Continue card input
 			}
 		
-			print_input_impedance(iped, ifrq, nfrq, delfrq);
+			print_input_impedance();
 		
 			nfrq=1;
 			mhz=1;    
@@ -1165,9 +1163,9 @@ void nec_context::antenna_env(void)
 	if (false == ground.type_perfect()) // if ( ground.iperf != 1)
 	{
 		if ( ground.sig < 0.)
-			ground.sig=- ground.sig/(59.96*wavelength);
+			ground.sig=- ground.sig/(em::impedance_over_2pi()*wavelength);
 
-		nec_complex epsc = nec_complex( ground.epsr, -ground.sig*wavelength*59.96);
+		nec_complex epsc = nec_complex( ground.epsr, -ground.sig*wavelength*em::impedance_over_2pi());
 		ground.zrati = 1.0/ sqrt( epsc);
 		
 		ground_wave.set_u(ground.zrati);
@@ -1230,6 +1228,7 @@ void nec_context::antenna_env(void)
 	}
 }
 
+#if 0
 /*No more used...*/
 void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq,
 	 int iptag, int iptagf, int iptagt, int iptaq, int iptaqf, int iptaqt)
@@ -1242,7 +1241,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 	nec_float etha, ethm, ephm, epha;
 	nec_complex eth, eph, ex, ey, ez;
 
-	if ( m_geometry->n != 0)
+	if ( m_geometry->n_segments != 0)
 	{
 		if ( iptflg != -1)
 		{
@@ -1273,7 +1272,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 		int itmp1=0;
 		jump= iptflg+1;
 
-		for (int i = 0; i < m_geometry->n; i++ )
+		for (int i = 0; i < m_geometry->n_segments; i++ )
 		{
 			curi= current_vector[i]* wavelength;
 			cmag= abs( curi);
@@ -1368,7 +1367,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 			itmp1 = 0;
 			fr = 1.e-6/freq_mhz;
 
-			for(int i = 0; i < m_geometry->n; i++ )
+			for(int i = 0; i < m_geometry->n_segments; i++ )
 			{
 				if ( iptflq != -2 )
 				{
@@ -1419,7 +1418,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 		    "PHASE     MAG.       PHASE    REAL   IMAGINARY    REAL  "
 		    " IMAGINARY    REAL   IMAGINARY" );
 
-		int j = m_geometry->n-3;
+		int j = m_geometry->n_segments-3;
 		int itmp1 = -1;
 
 		for(int i = 0; i < m_geometry->m; i++ )
@@ -1451,7 +1450,7 @@ void nec_context::print_structure_currents(char *pattype, int iptflg, int iptflq
 		} /* for( i=0; i<m; i++ ) */
 	} /* if ( m != 0) */
 } /* print_structure_currents */
-
+#endif
 
 
 /*!\brief Calculate network data such as the lengths of transmission lines.
@@ -1515,7 +1514,7 @@ void nec_context::print_network_data(void)
 {
 //	int i, j;
 	int itmp1, itmp2, itmp3, itmp4, itmp5;
-	char *pnet[3] = { "        ", "STRAIGHT", " CROSSED" };
+	const char *pnet[3] = { "        ", "STRAIGHT", " CROSSED" };
 	
 	if ( (network_count != 0) && (inc <= 1) )
 	{
@@ -1612,8 +1611,7 @@ void nec_context::print_network_data(void)
 	} /* if ( (network_count != 0) && (inc <= 1) ) */
 } /* print_network_data */
 
-void nec_context::print_norm_rx_pattern(int iptflg, int nthi, int nphi,
-	nec_float thetis, nec_float phiss)
+void nec_context::print_norm_rx_pattern()
 {
 	if ((iptflg != 2)&&(iptflg != 3))
 		return; // do not print
@@ -1626,7 +1624,7 @@ void nec_context::print_norm_rx_pattern(int iptflg, int nthi, int nphi,
 		nec_float phi_step = xpr5;
 		nec_float eta = xpr3;
 		nec_float axial_ratio = xpr6;
-		string pol_type( hpol[m_excitation_type-1]);
+		string pol_type(nec_structure_currents::hpol(m_excitation_type));
 		int segment_number = isave;
 		
 		nec_norm_rx_pattern* rx_pattern = new nec_norm_rx_pattern(nthi, nphi,
@@ -1728,64 +1726,58 @@ void nec_context::print_power_budget(void)
 	} /* if ( (m_excitation_type == EXCITATION_VOLTAGE) || (m_excitation_type == EXCITATION_VOLTAGE_DISC) ) */
 }
 
-void nec_context::print_input_impedance(int iped, int ifrq, int nfrq, nec_float delfrq)
-{
-	nec_float tmp1, tmp2, tmp3, tmp4, tmp5;
-	int i, itmp1, itmp2;
+void nec_context::print_input_impedance() {
+  nec_float tmp1, tmp2, tmp3, tmp4, tmp5;
 
-	if ( iped != 0)
-	{
-		int iss;
+  if ( iped != 0) {
+    int iss;
 
-		if ( nvqd > 0)
-			iss = ivqd[nvqd-1];
-		else
-			iss = source_segment_array[voltage_source_count-1];
+    if ( nvqd > 0)
+      iss = ivqd[nvqd-1];
+    else
+      iss = source_segment_array[voltage_source_count-1];
 
-		m_output.endl(3);
-		m_output.nec_printf(
-		    "                            "
-		    " -------- INPUT IMPEDANCE DATA --------\n"
-		    "                                     "
-		    " SOURCE SEGMENT No: %d\n"
-		    "                                  "
-		    " NORMALIZATION FACTOR:%12.5E\n\n"
-		    "              ----------- UNNORMALIZED IMPEDANCE ----------  "
-		    "  ------------ NORMALIZED IMPEDANCE -----------\n"
-		    "      FREQ    RESISTANCE    REACTANCE    MAGNITUDE    PHASE  "
-		    "  RESISTANCE    REACTANCE    MAGNITUDE    PHASE\n"
-		    "       MHz       OHMS         OHMS         OHMS     DEGREES  "
-		    "     OHMS         OHMS         OHMS     DEGREES",
-		    iss, impedance_norm_factor );
+    m_output.endl(3);
+    m_output.nec_printf(
+        "                            "
+        " -------- INPUT IMPEDANCE DATA --------\n"
+        "                                     "
+        " SOURCE SEGMENT No: %d\n"
+        "                                  "
+        " NORMALIZATION FACTOR:%12.5E\n\n"
+        "              ----------- UNNORMALIZED IMPEDANCE ----------  "
+        "  ------------ NORMALIZED IMPEDANCE -----------\n"
+        "      FREQ    RESISTANCE    REACTANCE    MAGNITUDE    PHASE  "
+        "  RESISTANCE    REACTANCE    MAGNITUDE    PHASE\n"
+        "       MHz       OHMS         OHMS         OHMS     DEGREES  "
+        "     OHMS         OHMS         OHMS     DEGREES",
+        iss, impedance_norm_factor );
 
-		itmp1= nfrq;
-		if ( 0 == ifrq )
-			tmp1= freq_mhz-( nfrq-1)* delfrq;
-		else
-			tmp1= freq_mhz/( pow(delfrq, (nfrq-1)) );
+    if ( 0 == ifrq )
+      tmp1= freq_mhz-( nfrq-1)* delfrq;
+    else
+      tmp1= freq_mhz/( pow(delfrq, (nfrq-1)) );
 
-		for( i = 0; i < itmp1; i++ )
-		{
-			itmp2= 4*i;
-			tmp2= fnorm[itmp2  ]/ impedance_norm_factor;
-			tmp3= fnorm[itmp2+1]/ impedance_norm_factor;
-			tmp4= fnorm[itmp2+2]/ impedance_norm_factor;
-			tmp5= fnorm[itmp2+3];
+    for(int i = 0; i < nfrq; i++ ) {
+      tmp2= fnorm(i,0)/ impedance_norm_factor;
+      tmp3= fnorm(i,1)/ impedance_norm_factor;
+      tmp4= fnorm(i,2)/ impedance_norm_factor;
+      tmp5= fnorm(i,3);
 
-			m_output.endl();
-			m_output.nec_printf(
-			    " %9.3f   %11.4E  %11.4E  %11.4E  %7.2f  "
-			    " %11.4E  %11.4E  %11.4E  %7.2f",
-			    tmp1, fnorm[itmp2], fnorm[itmp2+1], fnorm[itmp2+2],
-			    fnorm[itmp2+3], tmp2, tmp3, tmp4, tmp5 );
+      m_output.endl();
+      m_output.nec_printf(
+          " %9.3f   %11.4E  %11.4E  %11.4E  %7.2f  "
+          " %11.4E  %11.4E  %11.4E  %7.2f",
+          tmp1, fnorm(i,0), fnorm(i,1), fnorm(i,2),
+          fnorm(i,3), tmp2, tmp3, tmp4, tmp5 );
 
-			if ( ifrq == 0)
-				tmp1 += delfrq;
-			else
-				tmp1 *= delfrq;
-		} /* for( i = 0; i < itmp1; i++ ) */
-		m_output.end_section();
-	} /* if ( iped != 0) */
+      if ( ifrq == 0)
+        tmp1 += delfrq;
+      else
+        tmp1 *= delfrq;
+    } /* for( i = 0; i < itmp1; i++ ) */
+    m_output.end_section();
+  } /* if ( iped != 0) */
 }
 
 
@@ -1823,7 +1815,7 @@ void nec_context::structure_segment_loading()
 }
 
 
-void nec_context::setup_excitation(int iptflg)
+void nec_context::setup_excitation()
 {
 	nec_float tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
 
@@ -1867,7 +1859,7 @@ void nec_context::setup_excitation(int iptflg)
 				m_output.nec_printf(
 					"PLANE WAVE - THETA: %7.2f deg, PHI: %7.2f deg,"
 					" ETA=%7.2f DEG, TYPE - %s  AXIAL RATIO: %6.3f",
-					xpr1, xpr2, xpr3, hpol[m_excitation_type-1], xpr6 );
+					xpr1, xpr2, xpr3, nec_structure_currents::hpol(m_excitation_type).c_str(), xpr6 );
 			}
 		} /* if ( m_excitation_type == 4) */
 	}
@@ -1881,11 +1873,7 @@ void nec_context::setup_excitation(int iptflg)
 	etmns( tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, incident_amplitude, m_excitation_type, current_vector);
 }
 
-enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int mhz, 
-	int iptflg, int iptflq, int iptag, int iptagf, int iptagt,
-	int iptaq, int iptaqf, int iptaqt, 
-	nec_float thetis, 
-	int nfrq, int iflow, int nthi, int nphi, int iped)
+enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int mhz)
 {
 	int itmp1;
 	
@@ -1893,7 +1881,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 	{
 		if (in_freq_loop_state < 4)
 		{
-			setup_excitation(iptflg);
+			setup_excitation();
 
 			/* matrix solving  (netwk calls solves) */
 			calculate_network_data();
@@ -1908,17 +1896,17 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 
 			if ( iped != 0)
 			{
-				itmp1= 4*( mhz-1);
+				itmp1= ( mhz-1);
 
-				fnorm[itmp1  ] = real( zped);
-				fnorm[itmp1+1] = imag( zped);
-				fnorm[itmp1+2] = abs( zped);
-				fnorm[itmp1+3] = arg_degrees( zped);
+				fnorm(itmp1,0) = real( zped);
+				fnorm(itmp1,1) = imag( zped);
+				fnorm(itmp1,2) = abs( zped);
+				fnorm(itmp1,3) = arg_degrees( zped);
 
 				if ( iped != 2 )
 				{
-			 		 if ( fnorm[itmp1+2] > impedance_norm_factor)
-			 			impedance_norm_factor = fnorm[itmp1+2];
+			 		 if ( fnorm(itmp1,2) > impedance_norm_factor)
+			 			impedance_norm_factor = fnorm(itmp1,2);
 				}
 			} /* if ( iped != 0) */
 
@@ -1929,13 +1917,13 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 			/* Check that the flag for currents and charge densities don't have unexpected values */ 
 			if((iptflg <-2)||(iptflg > 3))
 			{
-				printf("%s", "Warning : The print control flag for currents was uncorrect ; it has been set to -1 (no printing for currents).\n");
+				m_output.line("Warning : The print control flag for currents was uncorrect ; it has been set to -1 (no printing for currents).");
 				iptflg = -1;
 			}
 			
 			if((iptflq <-2)||(iptflq > 0))
 			{
-				printf("%s", "Warning : The print control flag for charge densities was uncorrect ; it has been set to -1 (no printing for charge densities).\n");
+				m_output.line("Warning : The print control flag for charge densities was uncorrect ; it has been set to -1 (no printing for charge densities).");
 				iptflq = -1;
 			}
 			
@@ -1944,7 +1932,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 			{
 				if (iptflg == 2 || iptflg == 3)
 				{
-					printf("%s", "Warning : The output format chosen for currents was incompatible with the excitation type. No currents has been printed.\n");
+					m_output.line("Warning : The output format chosen for currents was incompatible with the excitation type. No currents has been printed.");
 					iptflg = -1;
 				}
 			}
@@ -1954,10 +1942,10 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 			{
 				if((iptflg < 1 || iptflg == 3 || ((iptflg == 1 || iptflg == 2) && inc <= 1)) || (iptflg == -1 && iptflq != -1))
 				{
-					structure_currents = new nec_structure_currents(this, hpol[m_excitation_type-1],
+					structure_currents = new nec_structure_currents(this, m_excitation_type,
 					nload, xpr3, xpr6);
 				
-					if(iptflg != 3)		
+					if(iptflg != 3)
 					{
 						structure_currents->set_frequency(freq_mhz/(1.e-6));
 						m_results.add(structure_currents);
@@ -1974,13 +1962,12 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
 			
 			} /* if (iptflg != -1 || iptflq != -1) */
 								
-			/*print_structure_currents(...) is no more used*/
 			
 			/*print_structure_currents(hpol[m_excitation_type-1], iptflg, iptflq,
 				iptag, iptagf, iptagt, iptaq, iptaqf, iptaqt);*/
 						
 			print_power_budget();
-				     
+
 			processing_state = 4;
 
 			if ( ncoup > 0)
@@ -2123,7 +2110,7 @@ void nec_context::load()
 	bool iwarn = false;
 	nec_complex zt, tpcj;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	int np = m_geometry->np;
 	
 	tpcj = nec_complex(0.0,1.883698955e+9);
@@ -2134,7 +2121,7 @@ void nec_context::load()
 	/* Initialize impedance array, used for temporary */
 	/* storage of loading information. */
 	zarray.resize(n);
-	zarray.fill(cplx_00());
+	zarray.setConstant(cplx_00());
 	
 	istep = 0;
 	
@@ -2243,6 +2230,8 @@ void nec_context::load()
 			else
 				ichk=1;
 		
+			nec_float seg_length = m_geometry->segment_length[i];
+
 			ASSERT(0.0 != m_geometry->segment_length[i]);
 			ASSERT(0.0 != m_geometry->segment_radius[i]);
 			
@@ -2251,28 +2240,28 @@ void nec_context::load()
 			switch( jump )
 			{
 				case 1:
-					zt= zlr[istepx]/ m_geometry->segment_length[i]+ tpcj* zli[istepx]/( m_geometry->segment_length[i]*wavelength);
+					zt= zlr[istepx]/ seg_length+ tpcj* zli[istepx]/( seg_length*wavelength);
 					if ( fabs( zlc[istepx]) > 1.0e-20)
-						zt += wavelength/( tpcj* m_geometry->segment_length[i]* zlc[istepx]);
+						zt += wavelength/( tpcj* seg_length* zlc[istepx]);
 					break;
 			
 				case 2:
-					zt= tpcj* m_geometry->segment_length[i]* zlc[istepx]/ wavelength;
+					zt= tpcj* seg_length* zlc[istepx]/ wavelength;
 					if ( fabs( zli[istepx]) > 1.0e-20)
-						zt += m_geometry->segment_length[i]* wavelength/( tpcj* zli[istepx]);
+						zt += seg_length* wavelength/( tpcj* zli[istepx]);
 					if ( fabs( zlr[istepx]) > 1.0e-20)
-						zt += m_geometry->segment_length[i]/ zlr[istepx];
+						zt += seg_length/ zlr[istepx];
 					zt=1./ zt;
 					break;
 			
 				case 3:
 					zt= zlr[istepx]* wavelength+ tpcj* zli[istepx];
 					if ( fabs( zlc[istepx]) > 1.0e-20)
-						zt += 1./( tpcj* m_geometry->segment_length[i]* m_geometry->segment_length[i]* zlc[istepx]);
+						zt += 1./( tpcj* seg_length* seg_length* zlc[istepx]);
 					break;
 			
 				case 4:
-					zt= tpcj* m_geometry->segment_length[i]* m_geometry->segment_length[i]* zlc[istepx];
+					zt= tpcj* seg_length* seg_length* zlc[istepx];
 					if ( fabs( zli[istepx]) > 1.0e-20)
 						zt += 1./( tpcj* zli[istepx]);
 					if ( fabs( zlr[istepx]) > 1.0e-20)
@@ -2281,7 +2270,7 @@ void nec_context::load()
 					break;
 			
 				case 5:
-					zt= nec_complex( zlr[istepx], zli[istepx])/ m_geometry->segment_length[i];
+					zt= nec_complex( zlr[istepx], zli[istepx])/ seg_length;
 					break;
 			
 				case 6:
@@ -2341,154 +2330,144 @@ void nec_context::load()
 }
 
 /* cmset sets up the complex structure matrix in the array in_cm */
-void nec_context::cmset( int nrow, complex_array& in_cm, nec_float rkhx)
-{
-	int mp2, iout, it, j, i1, i2, in2;
-	int im1, im2, ist, ij, jss, jm1, jm2, jst, k, kk;
-	complex_array scm;
-	
-	int np = m_geometry->np;
-	int mp = m_geometry->mp;
-	
-	mp2 = 2 * mp;
+void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
+  int mp2, it, i1, i2, in2;
+  int im1, im2, ist, ij, jss, jm1, jm2, jst;
+  complex_array scm;
+  
+  int np = m_geometry->np;
+  int mp = m_geometry->mp;
+  
+  mp2 = 2 * mp;
 //	 = np + mp2;
 //	neq= m_geometry->n_plus_2m; // n + 2* m;
-	
-	rkh= rkhx;
-	iout=2* npblk* nrow;
-	it= nlast;
-			
-	in_cm.fill(0,it*nrow,cplx_00());
-	
-	i1= 1;
-	i2= it;
-	in2= i2;
-	
-	if ( in2 > np)
-		in2= np;
-	
-	im1= i1- np;
-	im2= i2- np;
-	
-	if ( im1 < 1)
-		im1=1;
-	
-	ist=1;
-	if ( i1 <= np)
-		ist= np- i1+2;
-	
-	/* wire source loop */
-	int n = m_geometry->n;
-		
-	for( j = 1; j <= n; j++ )
-	{
-		m_geometry->trio(j);
-		
-		for (int i = 0; i < m_geometry->jsno; i++ )
-		{
-			ij = m_geometry->jco[i];
-			m_geometry->jco[i] = ((ij-1)/ np)* mp2+ij;
-		}
-	
-		if ( i1 <= in2)
-			cmww( j, i1, in2, in_cm, nrow, in_cm, nrow,1);
-	
-		if ( im1 <= im2)
-		{
-			complex_array temp = in_cm.sub_array((ist-1)*nrow);
-			cmws( j, im1, im2, temp, nrow, in_cm, 1);
-		}
-		/* matrix elements modified by loading */
-		if ( nload == 0)
-			continue;
-	
-		if ( j > np)
-			continue;
-	
-		int ipr = j;
-		if ( (ipr < 1) || (ipr > it) )
-			continue;
-	
-		nec_complex zaj= zarray[j-1];
-	
-		for (int i = 0; i < m_geometry->jsno; i++ )
-		{
-			jss = m_geometry->jco[i];
-			in_cm[(jss-1)+(ipr-1)*nrow] -= ( m_geometry->ax[i]+ m_geometry->cx[i])* zaj;
-		}
-	} /* for( j = 1; j <= n; j++ ) */
-	
-	int m = m_geometry->m;
-	if ( m != 0)
-	{
-		/* matrix elements for patch current sources */
-		jm1=1- mp;
-		jm2=0;
-		jst=1- mp2;
-	
-		for (int i = 0; i < nop; i++ )
-		{
-			jm1 += mp;
-			jm2 += mp;
-			jst += npeq;
-		
-			if ( i1 <= in2)
-			{
-				complex_array temp = in_cm.sub_array((jst-1));
-				cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
-			}
-		
-			if ( im1 <= im2)
-			{
-				complex_array temp = in_cm.sub_array((jst-1)+(ist-1)*nrow);
-				compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
-			}
-		}
-	
-	} /* if ( m != 0) */
-	
-	if ( icase == 1)
-		return;
-	
-	/* Allocate to scratch memory */
-	scm.resize(m_geometry->n_plus_2m);
-	
-	/* combine elements for symmetry modes */
-	for (int i = 0; i < it; i++ )
-	{
-		int row_offset = i*nrow;
-		
-		for( j = 0; j < npeq; j++ )
-		{
-			for( k = 0; k < nop; k++ )
-			{
-				int ka = j+ k*npeq;
-				scm[k] = in_cm[row_offset + ka];
-			}
-		
-			in_cm[row_offset + j] = scm.sum(0,nop);
-			
-			for( k = 1; k < nop; k++ )
-			{
-				int ka = j+ k*npeq;
-				nec_complex deter = scm[0];
-			
-				for( kk = 1; kk < nop; kk++ )
-				{
-					deter += scm[kk] * symmetry_array[k+kk*nop];
-				}
-				in_cm[row_offset + ka] = deter;
-			}
-		}
-	}
-	
-	scm.resize(0);
+  
+  rkh= rkhx;
+  //iout=2* npblk* nrow;
+  it= nlast;
+                  
+  vector_fill(in_cm,0,it*nrow,cplx_00());
+  
+  i1= 1;
+  i2= it;
+  
+  in2= i2; 
+  if ( in2 > np)
+    in2= np;
+  
+  
+  im1= i1- np;
+  im2= i2- np;
+  
+  if ( im1 < 1)
+    im1=1;
+  
+  ist=1;
+  if ( i1 <= np)
+    ist= np- i1+2;
+
+  ASSERT(in2 == std::min(nlast, np));
+  
+  /* wire source loop */
+  for( int j = 1; j <= m_geometry->n_segments; j++ ) {
+    m_geometry->trio(j);
+    
+    for (int i = 0; i < m_geometry->jsno; i++ ) {
+      ij = m_geometry->jco[i];
+      m_geometry->jco[i] = ((ij-1)/ np)* mp2+ij;
+    }
+
+    if ( i1 <= in2)
+      cmww( j, i1, in2, in_cm, nrow, in_cm, nrow,1);
+
+    if ( im1 <= im2) {
+      complex_array temp = in_cm.segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
+      cmws( j, im1, im2, temp, nrow, in_cm, nrow, 1);
+      /* CMWS (J,IM1,IM2,CM(1,IST),NROW,CM,NROW,1) */
+    }
+    /* matrix elements modified by loading */
+    if ( nload == 0)
+      continue;
+
+    if ( j > np)
+      continue;
+
+    int ipr = j;
+    if ( (ipr < 1) || (ipr > it) )
+      continue;
+
+    nec_complex zaj= zarray[j-1];
+
+    for (int i = 0; i < m_geometry->jsno; i++ ) {
+      jss = m_geometry->jco[i];
+      in_cm[(jss-1)+(ipr-1)*nrow] -= ( m_geometry->ax[i]+ m_geometry->cx[i])* zaj;
+    }
+  } /* for( j = 1; j <= n; j++ ) */
+  
+  int m = m_geometry->m;
+  if ( m != 0)  {
+    /* matrix elements for patch current sources */
+    jm1=1- mp;
+    jm2=0;
+    jst=1- mp2;
+
+    for (int i = 0; i < nop; i++ ) {
+      jm1 += mp;
+      jm2 += mp;
+      jst += npeq;
+
+      if ( i1 <= in2) {
+        int tmp_n = (jst-1);
+        complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
+        cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
+      }
+
+      if ( im1 <= im2) {
+        int tmp_n = (jst-1)+(ist-1)*nrow;
+        complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
+        compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
+      }
+    }
+
+  } /* if ( m != 0) */
+  
+  if ( icase == 1)
+    return;
+  
+  /* Allocate to scratch memory */
+  scm.resize(m_geometry->n_plus_2m);
+  
+  /* combine elements for symmetry modes */
+  for (int i = 0; i < it; i++ ) {
+    int row_offset = i*nrow;
+    
+    for( int j = 0; j < npeq; j++ ) {
+      for( int k = 0; k < nop; k++ ) {
+        int ka = j+ k*npeq;
+        scm[k] = in_cm[row_offset + ka];
+      }
+
+      in_cm[row_offset + j] = scm.segment(0,nop).sum(); //scm.sum(0,nop);
+      
+      for( int k = 1; k < nop; k++ ) {
+        int ka = j+ k*npeq;
+        nec_complex deter = scm[0];
+
+        for( int kk = 1; kk < nop; kk++ ) {
+          deter += scm[kk] * symmetry_array[k+kk*nop];
+        }
+        in_cm[row_offset + ka] = deter;
+      }
+    }
+  }
+  
+  scm.resize(0);
 }
 
 /* compute_matrix_ss computes matrix elements for surface-surface interactions. */
 
 void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
-    complex_array& in_cm, int nrow, int itrp )
+    complex_array& in_cm, int64_t nrow, int itrp )
 {
 	int i1, i2, icomp, ii1, i, il, ii2, jj1, jl, jj2;
 	nec_float t1xi, t1yi, t1zi, t2xi, t2yi, t2zi, xi, yi, zi;
@@ -2591,445 +2570,348 @@ void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
 
 /* computes matrix elements for e along wires due to patch current */
 void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
-    complex_array& cw, int ncw, int nrow, int itrp )
+    complex_array& cw, int64_t ncw, int64_t nrow, int itrp )
 {
-  int neqs, k, icgo, i, ipch, jl, j, js, il;
-  int jsnox; /* -1 offset to "m_geometry->jsno" for array indexing */
-  nec_float xi, yi, zi, cabi, sabi, salpi, fsign=1., pyl, pxl;
-  complex_array emel;
+  nec_float fsign=1.0;
+  complex_array emel(9);
   
-  emel.resize(9);
+  /*! -1 offset to "m_geometry->jsno" for array indexing */
+  int jsnox = m_geometry->jsno-1;
+  
+  if (itrp < 0)
+    return;
 
-  neqs= m_geometry->n_plus_2m;
-  jsnox = m_geometry->jsno-1;
+  int k=-1;
+  int icgo=0;
+  
+  /* observation loop */
+  for (int i = i1-1; i < i2; i++ ) {
+    k++;
+    nec_float xi = m_geometry->x[i];
+    nec_float yi= m_geometry->y[i];
+    nec_float zi= m_geometry->z[i];
+    nec_float cabi= m_geometry->cab[i];
+    nec_float sabi= m_geometry->sab[i];
+    nec_float salpi= m_geometry->salp[i];
+    
+    int ipch=0;
+    
+    if ( m_geometry->icon1[i] >= PCHCON) {
+      ipch= m_geometry->icon1[i]-PCHCON;
+      fsign=-1.;
+    }
+    
+    if ( m_geometry->icon2[i] >= PCHCON) {
+      ipch= m_geometry->icon2[i]-PCHCON;
+      fsign=1.;
+    }
+    
+    /* source loop */
+    int jl = -1;
+    for (int j = j1; j <= j2; j++ ) {
+      jl += 2;
+      int js = j-1;
+      t1xj= m_geometry->t1x[js];
+      t1yj= m_geometry->t1y[js];
+      t1zj= m_geometry->t1z[js];
+      t2xj= m_geometry->t2x[js];
+      t2yj= m_geometry->t2y[js];
+      t2zj= m_geometry->t2z[js];
+      xj= m_geometry->px[js];
+      yj= m_geometry->py[js];
+      zj= m_geometry->pz[js];
+      m_s = m_geometry->pbi[js];
+    
+      /* ground loop */
+     // TODO weird problem to test here. replaced loop variable called ip
+      for (int ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) {	
+        if ( ((ipch == j) || (icgo != 0)) && (ipgnd != 2) ) {
+          if ( icgo <= 0 ) {
+            ASSERT(ipgnd != 2);
+            pcint( xi, yi, zi, cabi, sabi, salpi, emel);
+          
+            nec_float angle = pi()* m_geometry->segment_length[i]* fsign;
+            nec_float pxl = sin(angle);
+            nec_float pyl = cos(angle);
 
-  if ( itrp >= 0)
-  {
-    k=-1;
-    icgo=0;
-
-    /* observation loop */
-    for( i = i1-1; i < i2; i++ )
-    {
-      k++;
-      xi= m_geometry->x[i];
-      yi= m_geometry->y[i];
-      zi= m_geometry->z[i];
-      cabi= m_geometry->cab[i];
-      sabi= m_geometry->sab[i];
-      salpi= m_geometry->salp[i];
-      ipch=0;
-
-      if ( m_geometry->icon1[i] >= PCHCON)
-      {
-	ipch= m_geometry->icon1[i]-PCHCON;
-	fsign=-1.;
-      }
-
-      if ( m_geometry->icon2[i] >= PCHCON)
-      {
-	ipch= m_geometry->icon2[i]-PCHCON;
-	fsign=1.;
-      }
-
-      /* source loop */
-      jl = -1;
-      for( j = j1; j <= j2; j++ )
-      {
-	jl += 2;
-	js = j-1;
-	t1xj= m_geometry->t1x[js];
-	t1yj= m_geometry->t1y[js];
-	t1zj= m_geometry->t1z[js];
-	t2xj= m_geometry->t2x[js];
-	t2yj= m_geometry->t2y[js];
-	t2zj= m_geometry->t2z[js];
-	xj= m_geometry->px[js];
-	yj= m_geometry->py[js];
-	zj= m_geometry->pz[js];
-	m_s = m_geometry->pbi[js];
-
-	/* ground loop */
-	#warning weird problem to test here. replaced loop variable called ip
-	for (int ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ )
-	{
-
-	  if ( ((ipch == j) || (icgo != 0)) && (ipgnd != 2) )
-	  {
-	    if ( icgo <= 0 )
-	    {
-	      ASSERT(ipgnd != 2);
-		  pcint( xi, yi, zi, cabi, sabi, salpi, emel);
-
-	      pyl= pi()* m_geometry->segment_length[i]* fsign;
-	      pxl= sin( pyl);
-	      pyl= cos( pyl);
-	      exc= emel[8]* fsign;
-
-	      m_geometry->trio(i+1);
-
-	      il= i-ncw;
-	      if ( i < m_geometry->np)
-		il += (il/m_geometry->np)*2*m_geometry->mp;
-
-	      if ( itrp == 0 )
-		cw[k+il*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
-	      else
-		cw[il+k*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
-
-	    } /* if ( icgo <= 0 ) */
-
-	    if ( itrp == 0)
-	    {
-	      in_cm[k+(jl-1)*nrow]= emel[icgo];
-	      in_cm[k+jl*nrow]    = emel[icgo+4];
-	    }
-	    else
-	    {
-	      in_cm[(jl-1)+k*nrow]= emel[icgo];
-	      in_cm[jl+k*nrow]    = emel[icgo+4];
-	    }
-
-	    icgo++;
-	    if ( icgo == 4)
-	      icgo=0;
-
-	    continue;
-
-	  } /* if ( ((ipch == (j+1)) || (icgo != 0)) && (ipgnd != 2) ) */
-
-	  unere( xi, yi, zi, ipgnd == 2);
-
-	  /* normal fill */
-	  if ( itrp == 0)
-	  {
-	    in_cm[k+(jl-1)*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
-	    in_cm[k+jl*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
-	    continue;
-	  }
-
-	  /* transposed fill */
-	  in_cm[(jl-1)+k*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
-	  in_cm[jl+k*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
-
-	} /* for( ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) */
-
-      } /* for( j = j1; j <= j2; j++ ) */
-
-    } /* for( i = i1-1; i < i2; i++ ) */
-
-  } /* if ( itrp >= 0) */
+            exc= emel[8]* fsign;
+          
+            m_geometry->trio(i+1);
+          
+            int il= i-ncw;
+            if ( i < m_geometry->np)
+              il += (il/m_geometry->np)*2*m_geometry->mp;
+          
+            if ( itrp == 0 )
+              cw[k+il*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
+            else
+              cw[il+k*nrow] += exc*( m_geometry->ax[jsnox]+ m_geometry->bx[jsnox]* pxl+ m_geometry->cx[jsnox]* pyl);
+          } /* if ( icgo <= 0 ) */
+        
+          if ( itrp == 0) {
+            in_cm[k+(jl-1)*nrow]= emel[icgo];
+            in_cm[k+jl*nrow]    = emel[icgo+4];
+          } else {
+            in_cm[(jl-1)+k*nrow]= emel[icgo];
+            in_cm[jl+k*nrow]    = emel[icgo+4];
+          }
+        
+          icgo++;
+          if ( icgo == 4)
+            icgo=0;
+        
+          continue;
+        } /* if ( ((ipch == (j+1)) || (icgo != 0)) && (ipgnd != 2) ) */
+      
+        unere( xi, yi, zi, ipgnd == 2);
+      
+        /* normal fill */
+        if ( itrp == 0) {
+          in_cm[k+(jl-1)*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
+          in_cm[k+jl*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
+        } else {
+          /* transposed fill */
+          in_cm[(jl-1)+k*nrow] += exk* cabi+ eyk* sabi+ ezk* salpi;
+          in_cm[jl+k*nrow]     += exs* cabi+ eys* sabi+ ezs* salpi;
+        }
+      } /* for( ipgnd = 1; ipgnd <= ground.ksymp; ipgnd++ ) */
+    } /* for( j = j1; j <= j2; j++ ) */
+  } /* for( i = i1-1; i < i2; i++ ) */
 }
 
 /*-----------------------------------------------------------------------*/
 
 /* cmws computes matrix elements for wire-surface interactions */
 void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
-    int nr, complex_array& cw, int itrp )
+    int64_t nr, complex_array& cw, int64_t nw, int itrp )
 {
-	int ipr, ipatch, ik, js=0, jx;
-	nec_float xi, yi, zi, tx, ty, tz;
-	nec_complex etk, ets, etc;
-	
-	j--;
-	m_s= m_geometry->segment_length[j];
-	m_b= m_geometry->segment_radius[j];
-	xj= m_geometry->x[j];
-	yj= m_geometry->y[j];
-	zj= m_geometry->z[j];
-	cabj= m_geometry->cab[j];
-	sabj= m_geometry->sab[j];
-	salpj= m_geometry->salp[j];
-	
-	/* observation loop */
-	ipr= -1;
-	for(int i = i1; i <= i2; i++ )
-	{
-		ipr++;
-		ipatch=(i+1)/2;
-		ik= i-( i/2)*2;
-	
-		if ( (ik != 0) || (ipr == 0) )
-		{
-			js= ipatch-1;
-			xi= m_geometry->px[js];
-			yi= m_geometry->py[js];
-			zi= m_geometry->pz[js];
-			hsfld( xi, yi, zi,0.);
-		
-			if ( ik != 0 )
-			{
-				tx= m_geometry->t2x[js];
-				ty= m_geometry->t2y[js];
-				tz= m_geometry->t2z[js];
-			}
-			else
-			{
-				tx= m_geometry->t1x[js];
-				ty= m_geometry->t1y[js];
-				tz= m_geometry->t1z[js];
-			}
-		} /* if ( (ik != 0) || (ipr == 0) ) */
-		else
-		{
-			tx= m_geometry->t1x[js];
-			ty= m_geometry->t1y[js];
-			tz= m_geometry->t1z[js];
-		} /* if ( (ik != 0) || (ipr == 0) ) */
-	
-		etk=-( exk* tx+ eyk* ty+ ezk* tz)* m_geometry->psalp[js];
-		ets=-( exs* tx+ eys* ty+ ezs* tz)* m_geometry->psalp[js];
-		etc=-( exc* tx+ eyc* ty+ ezc* tz)* m_geometry->psalp[js];
-	
-		/* fill matrix elements.  element locations */
-		/* determined by connection data. */
-	
-		/* normal fill */
-		if ( itrp == 0)
-		{
-			for(int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				jx= m_geometry->jco[ij]-1;
-				in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		
-			continue;
-		} /* if ( itrp == 0) */
-	
-		/* transposed fill */
-		if ( itrp != 2)
-		{
-			for(int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				jx= m_geometry->jco[ij]-1;
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		
-			continue;
-		} /* if ( itrp != 2) */
-	
-		/* transposed fill - c(ws) and d(ws)prime (=cw) */
-		for (int ij = 0; ij < m_geometry->jsno; ij++ )
-		{
-			jx= m_geometry->jco[ij]-1;
-			if ( jx < nr)
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			else
-			{
-				jx -= nr;
-				cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		} /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
-	
-	} /* for( i = i1; i <= i2; i++ ) */
+  UNUSED(nw);
+  int ipr, js=0;
+  nec_float xi, yi, zi, tx, ty, tz;
+  nec_complex etk, ets, etc;
+  
+  j--;
+  m_s= m_geometry->segment_length[j];
+  m_b= m_geometry->segment_radius[j];
+  xj= m_geometry->x[j];
+  yj= m_geometry->y[j];
+  zj= m_geometry->z[j];
+  cabj= m_geometry->cab[j];
+  sabj= m_geometry->sab[j];
+  salpj= m_geometry->salp[j];
+  
+  /* observation loop */
+  ipr= -1;
+  for(int i = i1; i <= i2; i++ ) {
+    ipr++;
+    int ipatch=(i+1)/2;
+    int ik= i-( i/2)*2;
+
+    if ( (ik != 0) || (ipr == 0) ) {
+      js= ipatch-1;
+      xi= m_geometry->px[js];
+      yi= m_geometry->py[js];
+      zi= m_geometry->pz[js];
+      hsfld( xi, yi, zi,0.);
+
+      if ( ik != 0 ) {
+        tx= m_geometry->t2x[js];
+        ty= m_geometry->t2y[js];
+        tz= m_geometry->t2z[js];
+      } else {
+        tx= m_geometry->t1x[js];
+        ty= m_geometry->t1y[js];
+        tz= m_geometry->t1z[js];
+      }
+    } /* if ( (ik != 0) || (ipr == 0) ) */
+    else {
+      tx= m_geometry->t1x[js];
+      ty= m_geometry->t1y[js];
+      tz= m_geometry->t1z[js];
+    } /* if ( (ik != 0) || (ipr == 0) ) */
+
+    etk=-( exk* tx+ eyk* ty+ ezk* tz)* m_geometry->psalp[js];
+    ets=-( exs* tx+ eys* ty+ ezs* tz)* m_geometry->psalp[js];
+    etc=-( exc* tx+ eyc* ty+ ezc* tz)* m_geometry->psalp[js];
+
+    /* fill matrix elements.  element locations */
+    /* determined by connection data. */
+    
+    switch (itrp) {
+      case 0:   /* normal fill */
+        for(int ij = 0; ij < m_geometry->jsno; ij++ ) {
+          int jx= m_geometry->jco[ij]-1;
+          in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          /* CM(IPR,JX)=CM(IPR,JX)+ETK*AX(IJ)+ETS*BX(IJ)+ETC*CX(IJ) */
+        }
+        break;
+      
+      case 2:  /* transposed fill - c(ws) and d(ws)prime (=cw) */
+        for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+          int jx= m_geometry->jco[ij]-1;
+          if ( jx < nr) {
+            in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          } else {
+            jx -= nr;
+            cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          }
+        }
+        break;
+        
+      default:  /* transposed fill */
+        for(int ij = 0; ij < m_geometry->jsno; ij++ ) {
+          int jx= m_geometry->jco[ij]-1;
+          in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+          /* CM(JX,IPR)=CM(JX,IPR)+ETK*AX(IJ)+ETS*BX(IJ)+ETC*CX(IJ) */
+        }
+        break;
+    }
+  } /* for( i = i1; i <= i2; i++ ) */
 }
 
 /*-----------------------------------------------------------------------*/
 
 /* cmww computes matrix elements for wire-wire interactions */
 void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
-    int nr, complex_array& cw, int nw, int itrp)
+    int64_t nr, complex_array& cw, int64_t nw, int itrp) 
 {
-	int ipr, iprx, i, jx;
-	nec_float xi, yi, zi, ai, cabi, sabi, salpi;
-	nec_complex etk, ets, etc;
-	
-	/* set source segment parameters */
-	jx = j;
-	j--;
-	m_s= m_geometry->segment_length[j];
-	m_b= m_geometry->segment_radius[j];
-	xj= m_geometry->x[j];
-	yj= m_geometry->y[j];
-	zj= m_geometry->z[j];
-	cabj= m_geometry->cab[j];
-	sabj= m_geometry->sab[j];
-	salpj= m_geometry->salp[j];
-	
-	/* Decide whether ext. t.w. approx. can be used */
-	if ( m_use_exk == true)
-	{
-		ipr = m_geometry->icon1[j];
-		if ( ipr < 0 )
-		{
-			ipr= -ipr;
-			iprx= ipr-1;
-		
-			if ( -m_geometry->icon1[iprx] != jx )
-				ind1=2;
-			else
-			{
-				ind1 = m_geometry->test_ek_approximation(j,iprx);
-#ifdef NEC_ERROR_CHECK
-				int ind_test;
-				xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.0) > 1.e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
+  UNUSED(nw);
+  int i, jx;
+  nec_float xi, yi, zi, ai, cabi, sabi, salpi;
+  nec_complex etk, ets, etc;
+  
+  /* set source segment parameters */
+  jx = j;
+  j--;
+  m_s= m_geometry->segment_length[j];
+  m_b= m_geometry->segment_radius[j];
+  xj= m_geometry->x[j];
+  yj= m_geometry->y[j];
+  zj= m_geometry->z[j];
+  cabj= m_geometry->cab[j];
+  sabj= m_geometry->sab[j];
+  salpj= m_geometry->salp[j];
+  
+  /* Decide whether ext. t.w. approx. can be used */
+  if ( m_use_exk == true) {
+    int ipr = m_geometry->icon1[j];
+#if 0
+    if (ipr > PCHCON) ind1 = 0; // trap bug also in original fortran
+    else if (ipr == 0) ind1 = 1;
+    else if ((ipr == jx) && ( cabj*cabj + sabj*sabj > 1.e-8))
+            ind1=2;
+    else if (ipr < 0) {
+      ind1 = 2;
+      int iprx= -ipr - 1;
+      if ( m_geometry->icon1[iprx] == -jx )
+        ind1 = m_geometry->test_ek_approximation(j,iprx);
+    } else {  /* if ( ipr > 0 ) */
+      if ( ipr != jx ) {
+        ind1=2;
+        int iprx = ipr-1;
+        if ( m_geometry->icon2[iprx] == jx )
+          ind1 = m_geometry->test_ek_approximation(j,iprx);
+      }
+      else if ( (cabj* cabj+ sabj* sabj) > 1.e-8)
+        ind1=2;
+      else
+        ind1=0;
+    } /* if ( ipr < 0 ) */
 #endif
-			} /* if ( -m_geometry->icon1[iprx] != jx ) */
-		
-		} /* if ( ipr < 0 ) */
-		else
-		{
-			iprx = ipr-1;
-			if ( ipr == 0 )
-				ind1=1;
-			else
-			{
-				if ( ipr != jx )
-				{
-					if ( m_geometry->icon2[iprx] != jx )
-						ind1=2;
-					else
-					{
-						ind1 = m_geometry->test_ek_approximation(j,iprx);
-						
-#ifdef NEC_ERROR_CHECK
-						int ind_test;
-						xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-						if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.0) > 1.e-6) )
-							ind_test=2;
-						else
-							ind_test=0;
-							
-						ASSERT(ind_test == ind1);
-#endif
-					} /* if ( m_geometry->icon2[iprx] != jx ) */
-				
-				} /* if ( ipr != jx ) */
-				else
-				if ( cabj* cabj+ sabj* sabj > 1.e-8)
-					ind1=2;
-				else
-					ind1=0;
-			
-			} /* if ( ipr == 0 ) */
-		
-		} /* if ( ipr < 0 ) */
-	
-		ipr = m_geometry->icon2[j];
-		if ( ipr < 0 )
-		{
-			ipr= -ipr;
-			iprx = ipr-1;
-			if ( -m_geometry->icon2[iprx] != jx )
-				ind2=2;
-			else
-			{
-				ind2 = m_geometry->test_ek_approximation(j,iprx);
-#ifdef NEC_ERROR_CHECK
-				int ind_test;
-				xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.0) > 1.e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind2);
-#endif
-			} /* if ( -m_geometry->icon1[iprx] != jx ) */
-		
-		} /* if ( ipr < 0 ) */
-		else
-		{
-			iprx = ipr-1;
-			if ( ipr == 0 )
-				ind2=1;
-			else
-			{
-				if ( ipr != jx )
-				{
-					if ( m_geometry->icon1[iprx] != jx )
-						ind2=2;
-					else
-					{
-						ind2 = m_geometry->test_ek_approximation(j,iprx);
-#ifdef NEC_ERROR_CHECK	
-						int ind_test;
-						xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-						if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.0) > 1.e-6) )
-							ind_test=2;
-						else
-							ind_test=0;
-							
-						ASSERT(ind_test == ind2);
-#endif
-					} /* if ( m_geometry->icon2[iprx] != jx ) */
-				
-				} /* if ( ipr != jx ) */
-				else
-				if ( cabj* cabj+ sabj* sabj > 1.e-8)
-					ind2=2;
-				else
-					ind2=0;
-			
-			} /* if ( ipr == 0 ) */
-		
-		} /* if ( ipr < 0 ) */
-	
-	} /* if ( m_use_exk == true) */
-	
-	/* observation loop */
-	ipr=-1;
-	for( i = i1-1; i < i2; i++ )
-	{
-		ipr++;
-		xi= m_geometry->x[i];
-		yi= m_geometry->y[i];
-		zi= m_geometry->z[i];
-		ai= m_geometry->segment_radius[i];
-		cabi= m_geometry->cab[i];
-		sabi= m_geometry->sab[i];
-		salpi= m_geometry->salp[i];
-	
-		efld( xi, yi, zi, ai, i != j);
-	
-		etk= exk* cabi+ eyk* sabi+ ezk* salpi;
-		ets= exs* cabi+ eys* sabi+ ezs* salpi;
-		etc= exc* cabi+ eyc* sabi+ ezc* salpi;
-	
-		/* fill matrix elements. element locations */
-		/* determined by connection data. */
-	
-		/* normal fill */
-		if ( itrp == 0)
-		{
-			for (int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				jx = m_geometry->jco[ij]-1;
-				in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-			continue;
-		}
-	
-		/* transposed fill */
-		if ( itrp != 2)
-		{
-			for (int ij = 0; ij < m_geometry->jsno; ij++ )
-			{
-				jx= m_geometry->jco[ij]-1;
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-			continue;
-		}
-	
-		/* trans. fill for c(ww) - test for elements for d(ww)prime.  (=cw) */
-		for (int ij = 0; ij < m_geometry->jsno; ij++ )
-		{
-			jx= m_geometry->jco[ij]-1;
-			if ( jx < nr)
-				in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			else
-			{
-				jx -= nr;
-				cw[jx*ipr*nw] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
-			}
-		
-		} /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
-	
-	} /* for( i = i1-1; i < i2; i++ ) */
+    {
+      int iprx = std::abs(ipr) - 1;
+      ind1 = 2;
+      if (ipr > PCHCON)
+        ind1 = 0;
+      else if (ipr == 0)
+        ind1 = 1;
+      else if ((ipr == jx) && (cabj*cabj + sabj*sabj <= 1.e-8))
+        ind1 = 0;
+      else if ((ipr > 0) && (m_geometry->icon2[iprx] == jx))
+        ind1 = m_geometry->test_ek_approximation(j, ipr - 1);
+      else if ((ipr < 0) && (m_geometry->icon1[iprx] == -jx))
+        ind1 = m_geometry->test_ek_approximation(j, -ipr - 1);
+    }
+
+    ipr = m_geometry->icon2[j];
+
+    if (ipr > PCHCON) ind2 = 2; // trap bug also in original fortran
+    else if (ipr == 0) ind2 = 1;
+    else if (ipr < 0) {
+      int iprx = -ipr - 1;
+      if ( -m_geometry->icon2[iprx] != jx ) {
+        ind2=2;
+      } else {
+        ind2 = m_geometry->test_ek_approximation(j,iprx);
+      }
+    } else { /* if ( ipr>= 0 ) */
+      if ( ipr != jx ) {
+        int iprx = ipr-1;
+        if ( m_geometry->icon1[iprx] != jx ) {
+          ind2=2;
+        } else {
+          ind2 = m_geometry->test_ek_approximation(j,iprx);
+        }
+      }
+      else if ( (cabj* cabj+ sabj* sabj) > 1.e-8) {
+        ind2=2;
+      } else {
+        ind2=0;
+      }
+    } /* if ( ipr < 0 ) */
+  } /* if ( m_use_exk == true) */
+  
+  /* observation loop */
+  int ipr=-1;
+  for( i = i1-1; i < i2; i++ ) {
+    ipr++;
+    xi= m_geometry->x[i];
+    yi= m_geometry->y[i];
+    zi= m_geometry->z[i];
+    ai= m_geometry->segment_radius[i];
+    cabi= m_geometry->cab[i];
+    sabi= m_geometry->sab[i];
+    salpi= m_geometry->salp[i];
+
+    efld( xi, yi, zi, ai, i != j);
+
+    etk= exk* cabi+ eyk* sabi+ ezk* salpi;
+    ets= exs* cabi+ eys* sabi+ ezs* salpi;
+    etc= exc* cabi+ eyc* sabi+ ezc* salpi;
+
+    /* fill matrix elements. element locations */
+    /* determined by connection data. */
+
+    /* normal fill */
+    if ( itrp == 0) {
+      for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+        jx = m_geometry->jco[ij]-1;
+        in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      }
+      continue;
+    }
+
+    /* transposed fill */
+    if ( itrp != 2) {
+      for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+        jx= m_geometry->jco[ij]-1;
+        in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      }
+      continue;
+    }
+
+    /* trans. fill for c(ww) - test for elements for d(ww)prime.  (=cw) */
+    for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
+      jx= m_geometry->jco[ij]-1;
+      if ( jx < nr) {
+        in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      } else {
+        jx -= nr;
+        cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      }
+    } /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
+
+  } /* for( i = i1-1; i < i2; i++ ) */
 }
 
 
@@ -3201,8 +3083,8 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
 			px = rh/ r;
 			txk = nec_complex( cos( rmag),- sin( rmag));
 			py= two_pi() * r* r;
-			tyk= ETA* cth* txk* nec_complex(1.0,-1.0/ rmag)/ py;
-			tzk= ETA* px* txk* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
+			tyk= em::impedance() * cth* txk* nec_complex(1.0,-1.0/ rmag)/ py;
+			tzk= em::impedance() * px* txk* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
 			tezk= tyk* cth- tzk* px;
 			terk= tyk* px+ tzk* cth;
 			rmag= sin( pi()* m_s)/ pi();
@@ -3281,8 +3163,8 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
 			px = rh/ r;
 			txk = nec_complex( cos( rmag),- sin( rmag));
 			py= two_pi() * r* r;
-			tyk= ETA* cth* txk* nec_complex(1.0,-1.0/ rmag)/ py;
-			tzk= ETA* px* txk* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
+			tyk= em::impedance() * cth* txk* nec_complex(1.0,-1.0/ rmag)/ py;
+			tzk= em::impedance() * px* txk* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
 			tezk= tyk* cth- tzk* px;
 			terk= tyk* px+ tzk* cth;
 			rmag= sin( pi()* m_s)/ pi();
@@ -3333,7 +3215,7 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
 				if ( rhospc <= ground.scrwl)
 				{
 					zscrn= ground.m_t1* rhospc* log( rhospc/ ground.t2);
-					zratx=( zscrn* ground.zrati)/( ETA* ground.zrati+ zscrn);
+					zratx=( zscrn* ground.zrati)/( em::impedance() * ground.zrati+ zscrn);
 				}
 			} /* if (  ground.radial_wire_count != 0) */
 		
@@ -3631,7 +3513,7 @@ void nec_context::ekscx( nec_float bx, nec_float s, nec_float z,
 
 /*-----------------------------------------------------------------------*/
 
-/*!\brief Fills the array e with the negative of the electric field incident on the structure. 
+/*!\brief Fills the array e with the negative of the electric field tangent to the segments and the tangential magnetic field on the surfaces
 
 \param e is the right hand side of the matrix equation.
 */
@@ -3642,7 +3524,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 	nec_float wy, wz, qx, qy, qz, ds, dsh, rs, r;
 	nec_complex er, et, ezh, erh, rrv, rrh, tt1, tt2;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	int m = m_geometry->m;
 	
 //	int neq= n+2*m;
@@ -3655,7 +3537,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 	/* applied field of voltage sources for transmitting case */
 	if ( (excite_type == EXCITATION_VOLTAGE) || (excite_type == EXCITATION_VOLTAGE_DISC) )
 	{
-		e.fill(0,neq,cplx_00());
+		vector_fill(e,0,neq,cplx_00());
 	
 		for (int i = 0; i < voltage_source_count; i++ )
 		{
@@ -3754,7 +3636,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 					nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
 					ASSERT( arg == (- two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]+ wz* m_geometry->pz[i])));
 					
-					nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * RETA;
+					nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
 					e[i2]=( qx* m_geometry->t1x[i]+ qy* m_geometry->t1y[i]+ qz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
 					e[i1]=( qx* m_geometry->t2x[i]+ qy* m_geometry->t2y[i]+ qz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
 				}
@@ -3777,7 +3659,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 					nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
 					ASSERT((-two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]- wz* m_geometry->pz[i])) == arg);
 					
-					nec_complex e_amplitude = cplx_exp(arg) * m_geometry->psalp[i] * RETA;
+					nec_complex e_amplitude = cplx_exp(arg) * m_geometry->psalp[i] * em::inverse_impedance();
 					
 					e[i2]= e[i2]+( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
 					e[i1]= e[i1]+( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
@@ -3840,7 +3722,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 				nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
 				ASSERT(arg == -two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]+ wz* m_geometry->pz[i]));
 
-				nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * RETA;
+				nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
 				
 				e[i2]=( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
 				e[i1]=( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
@@ -3864,7 +3746,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 				nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
 				ASSERT(arg == -two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]- wz* m_geometry->pz[i]));
 				
-				nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * RETA;
+				nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
 				
 				e[i2] += ( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
 				e[i1] += ( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
@@ -3883,13 +3765,13 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 	wx = cosp4 * cos(p5);
 	wy = cosp4 * sin(p5);
 	wz = sin(p4);
-	ds = p6*59.958;
+	ds = p6*em::impedance_over_2pi();
 	dsh= p6/(2.0 * two_pi());
 		
 	// TODO: Split the following loop up into two loops i=1:n and i=1:m
 	// to loop over the patches and the segments seperately
 	
-	for (int i = 0; i < m_geometry->n_plus_m; i++ )
+	for (int i = 0; i < m_geometry->n_plus_m(); i++ )
 	{
 		if ( i < n )
 		{
@@ -3965,7 +3847,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
 			e[i2] = cx*m_geometry->t1x[patch_index] + cy*m_geometry->t1y[patch_index] + cz*m_geometry->t1z[patch_index];
 			e[i1] = cx*m_geometry->t2x[patch_index] + cy*m_geometry->t2y[patch_index] + cz*m_geometry->t2z[patch_index];
 		} /* if ( i < n) */
-	} /* for( i = 0; i < m_geometry->n_plus_m; i++ ) */
+	} /* for( i = 0; i < m_geometry->n_plus_m(); i++ ) */
 }
 
 
@@ -4276,7 +4158,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
 		rk= two_pi() * r;
 		cr= cos( rk);
 		sr= sin( rk);
-		gam=-( nec_complex(cr,-sr)+rk*nec_complex(sr,cr) )/( FPI*rsq*r )* m_s;
+		gam=-( nec_complex(cr,-sr)+rk*nec_complex(sr,cr) )/( four_pi()*rsq*r )* m_s;
 		exc= gam* rx;
 		eyc= gam* ry;
 		ezc= gam* rz;
@@ -4410,7 +4292,7 @@ void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai 
 					if ( rhospc <= ground.scrwl)
 					{
 						rrv = ground.m_t1 * rhospc* log(rhospc/ ground.t2);
-						zratx = ( rrv* ground.zrati)/( ETA* ground.zrati + rrv);
+						zratx = ( rrv* ground.zrati)/( em::impedance() * ground.zrati + rrv);
 					}
 				}
 			
@@ -4728,7 +4610,7 @@ void nec_context::intx( nec_float el1, nec_float el2, nec_float b, int ij, nec_f
 void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
     nec_complex *ex, nec_complex *ey, nec_complex *ez )
 {
-	int i, ix, ipr, iprx, jc;
+	int i, ix, ipr, jc;
 	nec_float zp, ax;
 	nec_complex acx, bcx, ccx;
 	
@@ -4737,7 +4619,7 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 	*ez=cplx_00();
 	ax=0.0;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	for( i = 0; i < n; i++ )
 	{
 		xj= xob- m_geometry->x[i];
@@ -4774,33 +4656,24 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 		{
 		ipr= m_geometry->icon1[i];
 	
-		if ( ipr < 0 )
+		if (ipr > PCHCON) ind1 = 2;
+		else if ( ipr < 0 )
 		{
 			ipr = -ipr;
-			iprx = ipr-1;
+			int iprx = ipr-1;
 		
 			if ( -m_geometry->icon1[iprx] != ix )
 				ind1=2;
 			else
 			{
 				ind1 = m_geometry->test_ek_approximation(i,iprx);
-#ifdef NEC_ERROR_CHECK
-				int ind_test;
-				nec_float xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.) > 1.0e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
-#endif
 			}
 		} /* if ( ipr < 0 ) */
-		else
-		if ( ipr == 0 )
+		else if ( ipr == 0 )
 			ind1=1;
 		else
 		{
-			iprx = ipr-1;
+			int iprx = ipr-1;
 	
 			if ( ipr != ix )
 			{
@@ -4809,20 +4682,11 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 				else
 				{
 					ind1 = m_geometry->test_ek_approximation(i,iprx);
-#ifdef NEC_ERROR_CHECK
-					int ind_test;
-					nec_float xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-					if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.) > 1.0e-6) )
-						ind_test=2;
-					else
-						ind_test=0;
-					ASSERT(ind_test == ind1);
-#endif
 				}
 			} /* if ( ipr != ix ) */
 			else
 			{
-				if ( cabj* cabj+ sabj* sabj > 1.0e-8)
+				if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
 					ind1=2;
 				else
 					ind1=0;
@@ -4831,33 +4695,24 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 	
 		ipr= m_geometry->icon2[i];
 	
-		if ( ipr < 0 )
+		if (ipr > PCHCON) ind2 = 2;
+		else if ( ipr < 0 )
 		{
 			ipr = -ipr;
-			iprx = ipr-1;
+			int iprx = ipr-1;
 		
 			if ( -m_geometry->icon2[iprx] != ix )
 				ind1=2;
 			else
 			{
 				ind1 = m_geometry->test_ek_approximation(i,iprx);
-#ifdef NEC_ERROR_CHECK
-				int ind_test;
-				nec_float xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.) > 1.0e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
-#endif
 			}
 		} /* if ( ipr < 0 ) */
-		else
-		if ( ipr == 0 )
+		else if ( ipr == 0 )
 			ind2=1;
 		else
 		{
-			iprx = ipr-1;
+			int iprx = ipr-1;
 	
 			if ( ipr != ix )
 			{
@@ -4866,20 +4721,11 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 				else
 				{
 					ind2 = m_geometry->test_ek_approximation(i,iprx);
-#ifdef NEC_ERROR_CHECK
-					int ind_test;
-					nec_float xi= fabs( cabj* m_geometry->cab[iprx]+ sabj* m_geometry->sab[iprx]+ salpj* m_geometry->salp[iprx]);
-					if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[iprx]/m_b-1.) > 1.0e-6) )
-						ind_test=2;
-					else
-						ind_test=0;
-					ASSERT(ind_test == ind2);
-#endif
 				}
 			} /* if ( ipr != (i+1) ) */
 			else
 			{
-				if ( cabj* cabj+ sabj* sabj > 1.0e-8)
+				if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
 					ind1=2;
 				else
 					ind1=0;
@@ -5057,10 +4903,10 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 					isc1 = ipnt[i]-1;
 					asmx= m_geometry->segment_length[isc1];
 				
-					rhs.fill(0,neqt,cplx_00());
+					vector_fill(rhs,0,neqt,cplx_00());
 				
 					rhs[isc1] = cplx_10();
-					solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+					solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 					m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 				
 					for (int j = 0; j < irow1; j++ )
@@ -5103,8 +4949,8 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 		if ( network_count != 0)
 		{
 			// zero the cmn array, and the rhnx array
-			cmn.fill(cplx_00());
-			rhnx.fill(cplx_00());
+			cmn.setConstant(cplx_00());
+			rhnx.setConstant(cplx_00());
 			
 			nteq=0;
 			ntsc=0;
@@ -5284,11 +5130,11 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 				elements to network equation matrix */
 			for( i = 0; i < nteq; i++ )
 			{
-				rhs.fill(0,neqt,cplx_00());
+				vector_fill(rhs, 0, neqt, cplx_00());
 				
 				irow1= nteqa[i]-1;
 				rhs[irow1]=cplx_10();
-				solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+				solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 				m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 				
 				for (int j = 0; j < nteq; j++ )
@@ -5307,7 +5153,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 	if (0 == network_count)
 	{
 		/* solve for currents when no networks are present */
-		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 		m_geometry->get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 		ntsc=0;
 	}
@@ -5320,7 +5166,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 		for (i = 0; i < neqt; i++)
 			rhs[i]= einc[i];
 	
-		solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+		solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 		m_geometry->get_current_coefficients(wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 	
 		for( i = 0; i < nteq; i++ )
@@ -5342,7 +5188,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 			einc[irow1] -= rhnt[i];
 		}
 	
-		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+		solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
 		m_geometry->get_current_coefficients(wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 
 
@@ -5448,7 +5294,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 	nec_antenna_input* antenna_input = new nec_antenna_input();
 	antenna_input->set_frequency(freq_mhz/(1.e-6));
 	m_results.add(antenna_input);
-	
+	DEBUG_TRACE("Creating new antenna input")
 /*	m_output.end_section();
 	m_output.nec_printf( 
 		"                        "
@@ -5756,7 +5602,7 @@ void nec_context::nhfld( nec_float xob, nec_float yob, nec_float zob,
 	*hz=cplx_00();
 	nec_float ax = 0.0;
 	
-	int n = m_geometry->n;
+	int n = m_geometry->n_segments;
 	for (int i = 0; i < n; i++ )
 	{
 		xj= xob- m_geometry->x[i];
@@ -5919,7 +5765,7 @@ void nec_context::pcint( nec_float xi, nec_float yi, nec_float zi, nec_float cab
 
 /* impedance_print sets up the print formats for impedance loading */
 void nec_context::impedance_print( int in1, int in2, int in3, nec_float fl1, nec_float fl2,
-    nec_float fl3, nec_float fl4, nec_float fl5, nec_float fl6, char *ia)
+    nec_float fl3, nec_float fl4, nec_float fl5, nec_float fl6, const char *ia)
 {
 	/* record to be output and buffer used to make it */
 	std::string record;
@@ -5980,198 +5826,418 @@ void nec_context::impedance_print( int in1, int in2, int in3, nec_float fl1, nec
 /* fill incident field array for charge discontinuity voltage source */
 void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
 {
-	static nec_complex s_CCJ(0.0,-0.01666666667);
-	
-	int i, jx, j, jp1, ipr, i1;
-	nec_float xi, yi, zi, ai, cabi, sabi, salpi, tx, ty, tz;
-	nec_complex curd, etk, ets, etc;
-	
-	is--;
-	i= m_geometry->icon1[is];
-	m_geometry->icon1[is]=0;
-	m_geometry->tbf( is+1,0);
-	m_geometry->icon1[is]= i;
-	m_s = m_geometry->segment_length[is]*.5;
-	curd= s_CCJ * v/(( log(2.* m_s/ m_geometry->segment_radius[is])-1.)*( m_geometry->bx[m_geometry->jsno-1]*
-		cos( two_pi() * m_s)+ m_geometry->cx[m_geometry->jsno-1]* sin( two_pi() * m_s))* wavelength);
-	vqds[nqds]= v;
-	iqds[nqds]= is+1;
-	nqds++;
-	
-	for( jx = 0; jx < m_geometry->jsno; jx++ )
-	{
-		j= m_geometry->jco[jx]-1;
-		jp1 = j+1;
-		m_s= m_geometry->segment_length[j];
-		m_b= m_geometry->segment_radius[j];
-		xj= m_geometry->x[j];
-		yj= m_geometry->y[j];
-		zj= m_geometry->z[j];
-		cabj= m_geometry->cab[j];
-		sabj= m_geometry->sab[j];
-		salpj= m_geometry->salp[j];
-	
-		if ( m_use_exk == true)
-		{
-		ipr= m_geometry->icon1[j];
-	
-		if ( ipr < 0 )
-		{
-			ipr=- ipr;
-			ipr--;
-			if ( -m_geometry->icon1[ipr-1] != jp1 )
-				ind1=2;
-			else
-			{
-				ind1 = m_geometry->test_ek_approximation(j,ipr);
-				
-				int ind_test;
-				xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
-			}
-		}  /* if ( ipr < 0 ) */
-		else if ( ipr == 0 )
-			ind1=1;
-		else /* ipr > 0 */
-		{
-			ipr--;
-			if ( ipr != j )
-			{
-				if ( m_geometry->icon2[ipr] != jp1)
-					ind1=2;
-				else
-				{
-					ind1 = m_geometry->test_ek_approximation(j,ipr);
-					
-					int ind_test;
-					xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-					if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-						ind_test=2;
-					else
-						ind_test=0;
-					ASSERT(ind_test == ind1);
-				}
-			} /* if ( ipr != j ) */
-			else
-			{
-				if ( cabj* cabj+ sabj* sabj > 1.0e-8)
-					ind1=2;
-				else
-					ind1=0;
-			}
-		} /* else */
-	
-		ipr= m_geometry->icon2[j];
-		if ( ipr < 0 )
-		{
-			ipr = -ipr;
-			ipr--;
-			if ( -m_geometry->icon2[ipr] != jp1 )
-				ind1=2;
-			else
-			{
-				ind1 = m_geometry->test_ek_approximation(j,ipr);
-				
-				int ind_test;
-				xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-				if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-					ind_test=2;
-				else
-					ind_test=0;
-				ASSERT(ind_test == ind1);
-			}
-		} /* if ( ipr < 0 ) */
-		else if ( ipr == 0 )
-			ind2=1;
-		else /* ipr > 0 */
-		{
-			ipr--;
-			if ( ipr != j )
-			{
-				if ( m_geometry->icon1[ipr] != jp1)
-					ind2=2;
-				else
-				{
-					ind2 = m_geometry->test_ek_approximation(j,ipr);
-					
-					int ind_test;
-					xi= fabs( cabj* m_geometry->cab[ipr]+ sabj* m_geometry->sab[ipr]+ salpj* m_geometry->salp[ipr]);
-					if ( (xi < 0.999999) || (fabs(m_geometry->segment_radius[ipr]/m_b-1.) > 1.0e-6) )
-						ind_test=2;
-					else
-						ind_test=0;
-					ASSERT(ind_test == ind2);
-				}
-			} /* if ( ipr != j )*/
-			else
-			{
-				if ( cabj* cabj+ sabj* sabj > 1.0e-8)
-					ind1=2;
-				else
-					ind1=0;
-			}
-		} /* else */
-	
-		} /* if ( m_use_exk == true) */
-	
-		int n = m_geometry->n;
-		for( i = 0; i < n; i++ )
-		{
-			xi= m_geometry->x[i];
-			yi= m_geometry->y[i];
-			zi= m_geometry->z[i];
-			ai= m_geometry->segment_radius[i];
-			efld( xi, yi, zi, ai, (i != j));
-			cabi= m_geometry->cab[i];
-			sabi= m_geometry->sab[i];
-			salpi= m_geometry->salp[i];
-			etk= exk* cabi+ eyk* sabi+ ezk* salpi;
-			ets= exs* cabi+ eys* sabi+ ezs* salpi;
-			etc= exc* cabi+ eyc* sabi+ ezc* salpi;
-			e[i]= e[i]-( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd;
-		}
-	
-		int m = m_geometry->m;
-		if ( m != 0)
-		{
-			i1= n-1;
-			for( i = 0; i < m; i++ )
-			{
-				xi= m_geometry->px[i];
-				yi= m_geometry->py[i];
-				zi= m_geometry->pz[i];
-				hsfld( xi, yi, zi,0.);
-				i1++;
-				tx= m_geometry->t2x[i];
-				ty= m_geometry->t2y[i];
-				tz= m_geometry->t2z[i];
-				etk= exk* tx+ eyk* ty+ ezk* tz;
-				ets= exs* tx+ eys* ty+ ezs* tz;
-				etc= exc* tx+ eyc* ty+ ezc* tz;
-				e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx] )* curd* m_geometry->psalp[i];
-				i1++;
-				tx= m_geometry->t1x[i];
-				ty= m_geometry->t1y[i];
-				tz= m_geometry->t1z[i];
-				etk= exk* tx+ eyk* ty+ ezk* tz;
-				ets= exs* tx+ eys* ty+ ezs* tz;
-				etc= exc* tx+ eyc* ty+ ezc* tz;
-				e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd* m_geometry->psalp[i];
-			}	
-		} /* if ( m != 0) */
-	
-		if ( nload > 0 )
-			e[j] += zarray[j]* curd*(m_geometry->ax[jx]+ m_geometry->cx[jx]);
-	
-	} /* for( jx = 0; jx < m_geometry->jsno; jx++ ) */
+  static nec_complex s_CCJ(0.0,-0.01666666667);
+  
+  int i, jx, j, jp1, ipr, i1;
+  nec_float xi, yi, zi, ai, cabi, sabi, salpi, tx, ty, tz;
+  nec_complex curd, etk, ets, etc;
+  
+  is--;
+  i= m_geometry->icon1[is];
+  m_geometry->icon1[is]=0;
+  m_geometry->tbf( is+1,0);
+  m_geometry->icon1[is]= i;
+  m_s = m_geometry->segment_length[is]*.5;
+  curd= s_CCJ * v/(( log(2.* m_s/ m_geometry->segment_radius[is])-1.)*( m_geometry->bx[m_geometry->jsno-1]*
+    cos( two_pi() * m_s)+ m_geometry->cx[m_geometry->jsno-1]* sin( two_pi() * m_s))* wavelength);
+  vqds[nqds]= v;
+  iqds[nqds]= is+1;
+  nqds++;
+  
+  for( jx = 0; jx < m_geometry->jsno; jx++ ) {
+    j= m_geometry->jco[jx]-1;
+    jp1 = j+1;
+    m_s= m_geometry->segment_length[j];
+    m_b= m_geometry->segment_radius[j];
+    xj= m_geometry->x[j];
+    yj= m_geometry->y[j];
+    zj= m_geometry->z[j];
+    cabj= m_geometry->cab[j];
+    sabj= m_geometry->sab[j];
+    salpj= m_geometry->salp[j];
+  
+    if ( m_use_exk == true) {
+    ipr= m_geometry->icon1[j];
+  
+    if (ipr > PCHCON)
+      ind1=2;
+    else if ( ipr < 0 ) {
+      ipr=- ipr;
+      ipr--;
+      if ( -m_geometry->icon1[ipr-1] != jp1 ) {
+        ind1=2;
+      } else {
+        ind1 = m_geometry->test_ek_approximation(j,ipr);
+      }
+    }  /* if ( ipr < 0 ) */
+    else if ( ipr == 0 )
+      ind1=1;
+    else /* ipr > 0 */
+    {
+      ipr--;
+      if ( ipr != j ) {
+        if ( m_geometry->icon2[ipr] != jp1) {
+          ind1=2;
+        } else {
+          ind1 = m_geometry->test_ek_approximation(j,ipr);
+        }
+      } /* if ( ipr != j ) */
+      else {
+        if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
+          ind1=2;
+        else
+          ind1=0;
+      }
+    } /* else */
+  
+    ipr= m_geometry->icon2[j];
+    if (ipr > PCHCON) ind2=2;
+    else if ( ipr < 0 ) {
+      ipr = -ipr;
+      ipr--;
+      if ( -m_geometry->icon2[ipr] != jp1 ) {
+        ind1=2;
+      } else {
+        ind1 = m_geometry->test_ek_approximation(j,ipr);
+      }
+    } /* if ( ipr < 0 ) */
+    else if ( ipr == 0 )
+      ind2=1;
+    else /* ipr > 0 */
+    {
+      ipr--;
+      if ( ipr != j ) {
+        if ( m_geometry->icon1[ipr] != jp1) {
+          ind2=2;
+        } else {
+          ind2 = m_geometry->test_ek_approximation(j,ipr);
+        }
+      } /* if ( ipr != j )*/
+      else {
+        if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
+          ind1=2;
+        else
+          ind1=0;
+      }
+    } /* else */
+  
+    } /* if ( m_use_exk == true) */
+  
+    int n = m_geometry->n_segments;
+    for( i = 0; i < n; i++ ) {
+      xi= m_geometry->x[i];
+      yi= m_geometry->y[i];
+      zi= m_geometry->z[i];
+      ai= m_geometry->segment_radius[i];
+      efld( xi, yi, zi, ai, (i != j));
+      cabi= m_geometry->cab[i];
+      sabi= m_geometry->sab[i];
+      salpi= m_geometry->salp[i];
+      etk= exk* cabi+ eyk* sabi+ ezk* salpi;
+      ets= exs* cabi+ eys* sabi+ ezs* salpi;
+      etc= exc* cabi+ eyc* sabi+ ezc* salpi;
+      e[i]= e[i]-( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd;
+    }
+  
+    int m = m_geometry->m;
+    if ( m != 0) {
+      i1= n-1;
+      for( i = 0; i < m; i++ ) {
+        xi= m_geometry->px[i];
+        yi= m_geometry->py[i];
+        zi= m_geometry->pz[i];
+        hsfld( xi, yi, zi,0.);
+        i1++;
+        tx= m_geometry->t2x[i];
+        ty= m_geometry->t2y[i];
+        tz= m_geometry->t2z[i];
+        etk= exk* tx+ eyk* ty+ ezk* tz;
+        ets= exs* tx+ eys* ty+ ezs* tz;
+        etc= exc* tx+ eyc* ty+ ezc* tz;
+        e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx] )* curd* m_geometry->psalp[i];
+        i1++;
+        tx= m_geometry->t1x[i];
+        ty= m_geometry->t1y[i];
+        tz= m_geometry->t1z[i];
+        etk= exk* tx+ eyk* ty+ ezk* tz;
+        ets= exs* tx+ eys* ty+ ezs* tz;
+        etc= exc* tx+ eyc* ty+ ezc* tz;
+        e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx])* curd* m_geometry->psalp[i];
+      }	
+    } /* if ( m != 0) */
+  
+    if ( nload > 0 )
+      e[j] += zarray[j]* curd*(m_geometry->ax[jx]+ m_geometry->cx[jx]);
+  
+  } /* for( jx = 0; jx < m_geometry->jsno; jx++ ) */
 }
 	
 /*-----------------------------------------------------------------------*/
 
+#if 1
+
+/*
+Results: (epsilon = 81)
+cond	--------- NEC-4D ------------- ------------- NEC-2D -----------
+S/m	Rin 		Xin		Avg. Gain	Rin 		Xin 		Avg. Gain
+
+0.001	7.69123E+01	1.26695E+02	0.160		7.90906E+01	1.29476E+02	0.155
+0.003	7.21069E+01	1.25749E+02	0.167		7.38409E+01 	1.28334E+02 	0.162
+0.01	6.06862E+01	1.19449E+02	0.218		6.02083E+01 	1.22146E+02	0.202
+0.03	4.92272E+01	1.02255E+02	0.289		4.36457E+01	1.07793E+02 	0.323
+0.1	4.10716E+01	7.86277E+01	0.409		2.84842E+01 	9.36058E+01 	0.583
+0.3	2.78348E+01	6.67538E+01	0.664		1.96676E+01 	8.87374E+01 	0.929
+1.0	-4.87995E+00	1.01535E+02	-4.060		1.59479E+01 	8.70547E+01 	1.218
+5.0	-4.21415E+01	3.45929E+02	-0.492		.42931E+01 	8.59620E+01 	1.472
+*/
+void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float dmin )
+{
+/*
+      Z=A
+      ZE=B
+      S=B-A
+      IF (S.GE.0.) GO TO 1
+      WRITE(3,18)
+      STOP
+*/
+	int nts = 4, nx = 1;
+	const int n = 9;
+	nec_float rx = 1e-4;
+	nec_float dz = 0.0;
+	nec_float dzot= dz*.5;
+
+	nec_float _z = a;
+	nec_float ze = b;
+	nec_float _s = b - a;
+	if ( _s < 0.0)
+	{
+		throw new nec_exception("ERROR - B LESS THAN A IN ROM2");
+	}
+
+
+/*
+1     EP=S/(1.E4*NM)
+      ZEND=ZE-EP
+      DO 2 I=1,N
+2     SUM(I)=(0.,0.)
+      NS=NX
+      NT=0
+      CALL SFLDS (Z,G1)
+*/
+	complex_array g1(9), g2(9), g3(9), g4(9), g5(9);
+	complex_array t01(9), t10(9), t20(9), t11(9);
+
+	/*! tolerance for hitting upper limit */
+	const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m());
+
+	/*! upper limit */
+	const nec_float zend = ze - ep;
+	
+	vector_fill(sum,0,n,cplx_00());
+	
+	int ns = nx;
+	/*! counter to control increasing subinterval size */
+	int nt = 0;
+	sflds( _z, g1);
+
+/*
+3     DZ=S/NS
+      IF (Z+DZ.LE.ZE) GO TO 4
+      DZ=ZE-Z
+      IF (DZ.LE.EP) GO TO 17
+4     DZOT=DZ*.5
+      CALL SFLDS (Z+DZOT,G3)
+      CALL SFLDS (Z+DZ,G5)
+*/
+loop3:	
+	
+	dz = _s / ns;
+	if ( _z + dz >= ze)
+	{
+		dz = ze - _z;
+		if ( dz <= ep)
+			return;
+	}
+
+	dzot= dz*.5;
+	sflds( _z + dzot, g3);
+	sflds( _z + dz, g5);
+	
+	
+/*
+5     TMAG1=0.
+      TMAG2=0.
+C
+C     EVALUATE 3 POINT ROMBERG RESULT AND TEST CONVERGENCE.
+C
+      DO 6 I=1,N
+      T00=(G1(I)+G5(I))*DZOT
+      T01(I)=(T00+DZ*G3(I))*.5
+      T10(I)=(4.*T01(I)-T00)/3.
+      IF (I.GT.3) GO TO 6
+      TR=DREAL(T01(I))
+      TI=DIMAG(T01(I))
+      TMAG1=TMAG1+TR*TR+TI*TI
+      TR=DREAL(T10(I))
+      TI=DIMAG(T10(I))
+      TMAG2=TMAG2+TR*TR+TI*TI
+6     CONTINUE
+*/
+loop5:
+	for (int i=0;i<n;i++)
+	{
+		nec_complex t00 = (g1[i]+ g5[i]) * dzot;
+		t01[i] = (t00 + dz * g3[i]) * 0.5;
+		t10[i] = (4.0 * t01[i] - t00)/3.;
+	}
+
+/*
+      TMAG1=SQRT(TMAG1)
+      TMAG2=SQRT(TMAG2)
+      CALL TEST(TMAG1,TMAG2,TR,0.D0,0.D0,TI,DMIN)
+*/
+	nec_float tmag1 = sqrt( norm(t01[0]) + norm(t01[1]) + norm(t01[2]) );
+	nec_float tmag2 = sqrt( norm(t10[0]) + norm(t10[1]) + norm(t10[2]) );
+
+	nec_float tr = test_simple( tmag1, tmag2, dmin);
+
+/*
+      IF(TR.GT.RX)GO TO 8
+      DO 7 I=1,N
+7     SUM(I)=SUM(I)+T10(I)
+      NT=NT+2
+      GO TO 12
+*/
+	if (tr <= rx)
+	{
+		for (int i = 0; i < n; i++ )
+			sum[i] += t10[i];
+		nt += 2;
+		goto loop12;
+	}
+
+/*
+8     CALL SFLDS (Z+DZ*.25,G2)
+      CALL SFLDS (Z+DZ*.75,G4)
+      TMAG1=0.
+      TMAG2=0.
+C
+C     EVALUATE 5 POINT ROMBERG RESULT AND TEST CONVERGENCE.
+C
+      DO 9 I=1,N
+      T02=(T01(I)+DZOT*(G2(I)+G4(I)))*.5
+      T11=(4.*T02-T01(I))/3.
+      T20(I)=(16.*T11-T10(I))/15.
+      IF (I.GT.3) GO TO 9
+      TR=DREAL(T11)
+      TI=DIMAG(T11)
+      TMAG1=TMAG1+TR*TR+TI*TI
+      TR=DREAL(T20(I))
+      TI=DIMAG(T20(I))
+      TMAG2=TMAG2+TR*TR+TI*TI
+9     CONTINUE
+      TMAG1=SQRT(TMAG1)
+      TMAG2=SQRT(TMAG2)
+      CALL TEST(TMAG1,TMAG2,TR,0.D0,0.D0,TI,DMIN)
+*/
+	sflds( _z+ dz*.25, g2);
+	sflds( _z+ dz*.75, g4);
+	
+	/* Evaluate 5 point Romberg result and test convergence. */
+	for (int i = 0; i < n; i++ )
+	{
+		nec_complex t02 = (t01[i]+ dzot*( g2[i]+ g4[i]))*0.5;
+		t11[i] = (4.0 * t02- t01[i] )/3.0;
+		t20[i] = (16.* t11[i] - t10[i])/15.0;
+	}
+
+	tmag1 = sqrt( norm(t11[0]) + norm(t11[1]) + norm(t11[2]) );
+	tmag2 = sqrt( norm(t20[0]) + norm(t20[1]) + norm(t20[2]) );
+
+	tr = test_simple( tmag1, tmag2, dmin);
+/*
+      IF(TR.GT.RX)GO TO 14
+10    DO 11 I=1,N
+11    SUM(I)=SUM(I)+T20(I)
+      NT=NT+1
+12    Z=Z+DZ
+      IF (Z.GT.ZEND) GO TO 17
+      DO 13 I=1,N
+13    G1(I)=G5(I)
+      IF (NT.LT.NTS.OR.NS.LE.NX) GO TO 3
+      NS=NS/2
+      NT=1
+      GO TO 3
+*/
+	if (tr <= rx)
+	{
+loop10:
+		for (int i = 0; i < n; i++ )
+			sum[i] += t20[i];
+
+		nt = nt+1;
+	
+loop12:
+		_z = _z + dz;
+		if ( _z > zend)
+			return;
+	
+		for (int i = 0; i < n; i++ )
+			g1[i] = g5[i];
+
+		if ( (nt >= nts) && (ns > nx) )
+		{
+			/* Double step size */
+			ns = ns/2;
+			nt = 1;
+		}
+		goto loop3;
+	}
+
+/*
+14    NT=0
+      IF (NS.LT.NM) GO TO 15
+      WRITE(3,19)  Z
+      GO TO 10
+15    NS=NS*2
+      DZ=S/NS
+      DZOT=DZ*.5
+      DO 16 I=1,N
+      G5(I)=G3(I)
+16    G3(I)=G2(I)
+      GO TO 5
+*/
+	nt=0;
+	if ( ns >= m_geometry->n_plus_m() )
+	{
+		nec_error_mode em(m_output);
+		m_output.string("ROM2 -- STEP SIZE LIMITED AT Z = ");
+		m_output.real_out(12,5,_z);
+		m_output.endl();
+		goto loop10;
+	}
+
+	ns = ns*2;
+	dz = _s/ ns;
+	dzot = dz*.5;
+	
+	for (int i = 0; i < n; i++ )
+	{
+		g5[i] = g3[i];
+		g3[i] = g2[i];
+	}
+	goto loop5;
+}
+/*
+17    CONTINUE
+      RETURN
+C
+18    FORMAT (30H ERROR - B LESS THAN A IN ROM2)
+19    FORMAT (33H ROM2 -- STEP SIZE LIMITED AT Z =,1P,E12.5)
+      END
+*/
+
+#else
 
 /*!
 	For the Sommerfeld ground option, rom2 integrates over the source 
@@ -6188,42 +6254,69 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 {
 	ASSERT(sum.size() == 9);
 	
-	bool flag = true;
+	bool recalculate_fields = true;
 	static bool step_warning_issued = false;
 	
 	int nts = 4, nx = 1, n = 9;
-	nec_float dz=0., dzot=0.0;
-	nec_float rx = 1.0e-4;
+
+	/*! subinterval size */
+	nec_float dz=0.0;
+
+	/*! dz divided by 2.0 */
+	nec_float dzot=0.0;
+
+	/*! relative error limit */
+	nec_float rx = 1.0e-8;
 	
 	complex_array g1(9), g2(9), g3(9), g4(9), g5(9);
 	complex_array t01(9), t10(9), t20(9);
 	
 	nec_float _z = a;
-	nec_float ze = b;
-	nec_float _s = b - a;
+	const nec_float ze = b;
+	const nec_float _s = b - a;
 	
 	if ( _s < 0.0)
 	{
 		throw new nec_exception("ERROR - B LESS THAN A IN ROM2");
 	}
 	
-	nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m);
-	nec_float zend = ze - ep;
+	/*! tolerance for hitting upper limit */
+	const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m());
+
+	/*! upper limit */
+	const nec_float zend = ze - ep;
 	
-	sum.fill(0,n,cplx_00());
+	vector_fill(sum,0,n,cplx_00());
 	
 	int ns = nx;
+
+	/*! counter to control increasing subinterval size */
 	int nt = 0;
 	sflds( _z, g1);
 
 	while ( true )
 	{
-		if ( flag )
+		if ( recalculate_fields )
 		{
+			// Now we do the same housekeeping before looping back
+			_z = _z + dz;
+			if ( _z > zend)
+				return;
+		
+			for (int i = 0; i < n; i++ )
+				g1[i] = g5[i];
+	
+			if ( (nt >= nts) && (ns > nx) )
+			{
+				/* Double step size */
+				ns = ns/2;
+				nt = 1;
+			}
+
 			dz = _s / ns;
 			if ( _z + dz >= ze)
 			{
-				dz = ze- _z;
+				dz = ze - _z;
 				if ( dz <= ep)
 					return;
 			}
@@ -6248,25 +6341,12 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 		
 		if ( tr <= rx)
 		{
+			nt += 2;
+
 			for (int i = 0; i < n; i++ )
 				sum[i] += t10[i];
-			nt += 2;
 		
-			// Now we do some housekeeping before looping back
-			_z += dz;
-			if ( _z > zend)
-				return;
-		
-			for (int i = 0; i < n; i++ )
-				g1[i] = g5[i];
-		
-			if ( (nt >= nts) && (ns > nx) )
-			{
-				ns= ns/2;
-				nt=1;
-			}
-			
-			flag = true;
+			recalculate_fields = true;
 			continue;
 		
 		} /* if ( tr <= rx) */
@@ -6295,14 +6375,12 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 		tmag2 = sqrt(tmag2);
 		tr = test_simple( tmag1, tmag2, dmin);
 
-		// check this with the FORTRAN flow, Neoklis (probably correctly) feels that it
-		// should be if (tr > rx)
-		// TODO test this code here on Sommerfeld Norton Conditions
 		if ( tr > rx)
 		{
 			nt=0;
-			if ( ns < m_geometry->n_plus_m )
+			if ( ns <= m_geometry->n_plus_m() )
 			{
+				// halve step size
 				ns = ns*2;
 				dz = _s/ ns;
 				dzot = dz*.5;
@@ -6313,7 +6391,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 					g3[i] = g2[i];
 				}
 			
-				flag=false;
+				recalculate_fields=false;
 				continue;
 			}
 		
@@ -6331,28 +6409,16 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 			}
 		} /* if ( tr <= rx) */
 	
+		nt = nt+1;
+
 		for (int i = 0; i < n; i++ )
 			sum[i] += t20[i];
-		nt = nt+1;
 	
-		// Now we do the same housekeeping before looping back
-		_z = _z + dz;
-		if ( _z > zend)
-			return;
-	
-		for (int i = 0; i < n; i++ )
-			g1[i] = g5[i];
-	
-		flag = true;
+		recalculate_fields = true;
 		
-		if ( (nt >= nts) && (ns > nx) )
-		{
-			/* Double step size */
-			ns = ns/2;
-			nt = 1;
-		}
 	} /* while( true ) */
 }
+#endif
 
 /*-----------------------------------------------------------------------*/
 
@@ -6360,7 +6426,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
 	sflds returns the field due to ground for a current element on
 	the source segment at t relative to the segment center.
 */
-void nec_context::sflds( nec_float t, complex_array& e )
+void nec_context::sflds(const nec_float t, complex_array& e )
 
 {
 	static nec_complex __const1(0.0,4.771341189);
@@ -6415,7 +6481,7 @@ void nec_context::sflds( nec_float t, complex_array& e )
 		ground_wave.zmh=1.0;
 		ground_wave.r1=1.;
 		ground_wave.xx1=0.;
-		gwave( &erv, &ezv, &erh, &ezh, &eph, ground_wave);
+		gwave(erv, ezv, erh, ezh, eph, ground_wave);
 
 		nec_complex et = -__const1 * ground.frati* ground_wave.xx2/( r2s* ground_wave.r2);
 		nec_complex er = 2.* et* nec_complex(1.0, rk);
@@ -6755,11 +6821,10 @@ void nec_context::fblock( int nrow, int ncol, int imax, int ipsym )
 {
 	int ka, kk;
 	
-	if ( nrow*ncol <= imax)
+	if ( (nrow*ncol) <= imax)
 	{
 		npblk= nrow;
 		nlast= nrow;
-		imat= nrow* ncol;
 		
 		if ( nrow == ncol)
 		{
@@ -6770,7 +6835,7 @@ void nec_context::fblock( int nrow, int ncol, int imax, int ipsym )
 			icase=2;
 	} /* if ( nrow*ncol <= imax) */
 	
-	if ( nop*nrow != ncol)
+	if ( (nop*nrow) != ncol)
 	{
 		nec_stop("SYMMETRY ERROR - NROW: %d NCOL: %d", nrow, ncol );
 	}
@@ -6862,7 +6927,7 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
 	ciz=cplx_00();
 	
 	/* summation of field from individual segments */
-	for( i = 0; i < m_geometry->n; i++ )
+	for( i = 0; i < m_geometry->n_segments; i++ )
 	{
 		dx= m_geometry->cab[i];
 		dy= m_geometry->sab[i];
@@ -6954,7 +7019,7 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
 	
 		/* call subroutine to compute the field */
 		/* of segment including ground wave. */
-		gwave( &erv, &ezv, &erh, &ezh, &eph, ground_wave);
+		gwave(erv, ezv, erh, ezh, eph, ground_wave);
 		erh= erh* cph* calp+ erv* dz;
 		eph= eph* sph* calp;
 		ezh= ezh* cph* calp+ ezv* dz;
@@ -6987,7 +7052,7 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
 void nec_context::ffld(nec_float thet, nec_float phi,
 		nec_complex *eth, nec_complex *eph, nec_float _wavelength )
 {
-	static nec_complex CONST3(0.0,-29.97922085);
+	static nec_complex CONST3(0.0, -em::impedance() / four_pi()); // -29.97922085;
 
 	int k, i;
 	bool jump;
@@ -7009,7 +7074,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 	roy= thz* phx;
 	
 	jump = false;
-	if ( m_geometry->n != 0)
+	if ( m_geometry->n_segments != 0)
 	{
 		/* loop for structure image if any */
 		/* calculation of reflection coeffecients */
@@ -7061,7 +7126,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 		ciz=cplx_00();
 	
 		/* loop over structure segments */
-		for( i = 0; i < m_geometry->n; i++ )
+		for( i = 0; i < m_geometry->n_segments; i++ )
 		{
 		omega=-( rox* m_geometry->cab[i]+ roy* m_geometry->sab[i]+ roz* m_geometry->salp[i]);
 		el= pi()* m_geometry->segment_length[i];
@@ -7145,7 +7210,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 					/* radial wire ground screen reflection coefficient */
 					d += ground.t2;
 					zscrn= ground.m_t1 * d* log( d/ ground.t2);
-					zscrn=( zscrn* ground.zrati)/( ETA* ground.zrati+ zscrn);
+					zscrn=( zscrn* ground.zrati)/( em::impedance() * ground.zrati+ zscrn);
 					zrsin= sqrt(1.- zscrn* zscrn* thz* thz);
 					rrv=( roz+ zscrn* zrsin)/(- roz+ zscrn* zrsin);
 					rrh=( zscrn* roz+ zrsin)/( zscrn* roz- zrsin);
@@ -7237,7 +7302,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 	roz= rozs;
 	{
 		// without ground 
-		complex_array temp = current_vector.sub_array(m_geometry->n);
+		complex_array temp = current_vector.segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
 		m_geometry->fflds(rox, roy, roz, temp, &ex, &ey, &ez);
 	}
 	if (ground.present())
@@ -7245,7 +7310,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 		// with ground
 		nec_complex tempx, tempy, tempz;
 		
-		complex_array temp = current_vector.sub_array(m_geometry->n);
+		complex_array temp = current_vector.segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
 		m_geometry->fflds(rox, roy, -roz, temp, &tempx, &tempy, &tempz);
 	
 		if (ground.type_perfect())
@@ -7278,7 +7343,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
 	ex += cix* CONST3;
 	ey += ciy* CONST3;
 	ez += ciz* CONST3;
-	*eth= ex* thx+ ey* thy+ ez* thz;
-	*eph= ex* phx+ ey* phy;
+	*eth= ex*thx + ey*thy + ez*thz;
+	*eph= ex*phx + ey*phy;
 }
-	
+

@@ -1,11 +1,11 @@
-AC_INIT([necpp], [1.6.0])
+AC_INIT([necpp], [1.7.0])
 AC_CONFIG_MACRO_DIR([m4])
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 
 LT_INIT
 
-CXXFLAGS="-O2 -Wall -Wextra"
+dnl CXXFLAGS="-O2 -Wall -Wextra -Wshadow -Werror"
 
 dnl ************************************************
 dnl *** Check for Array Bounds
@@ -13,15 +13,32 @@ dnl ************************************************
 
 
 AC_ARG_WITH([bounds],
-	[AS_HELP_STRING([--with-bounds],
-	[Enable support for bounds-checking])],
-	[],
-	[with_bounds=no])
+  [AS_HELP_STRING([--with-bounds],
+  [Enable support for bounds-checking])],
+  [],
+  [with_bounds=no])
 
 AS_IF([test "x$with_bounds" = xyes],
 [
-		AC_SUBST([AM_CPPFLAGS], ["-DNEC_ERROR_CHECK=1"])
-		AC_SUBST([CXXFLAGS], ["-g3 -O0 -DNEC_ERROR_CHECK=1"])
+  AC_SUBST([AM_CPPFLAGS], ["-DNEC_ERROR_CHECK=1"])
+  AC_SUBST([CXXFLAGS], ["-g3 -O0 -DNEC_ERROR_CHECK=1"])
+])
+
+dnl ************************************************
+dnl *** Trigger typesafe integer checking
+dnl ************************************************
+
+
+AC_ARG_WITH([typecheck],
+  [AS_HELP_STRING([--with-typecheck],
+  [Enable support for typesafe integer checking])],
+  [],
+  [with_typecheck=no])
+
+AS_IF([test "x$with_typecheck" = xyes],
+[
+  AC_SUBST([AM_CPPFLAGS], ["-DTYPESAFE_PEDANTIC=1"])
+  AC_SUBST([CXXFLAGS], ["-g3 -O0 -DTYPESAFE_PEDANTIC=1"])
 ])
 
 
@@ -45,21 +62,21 @@ dnl ************************************************
 
 
 AC_ARG_WITH([lapack],
-	[AS_HELP_STRING([--without-lapack],
-	[disable support for lapack])],
-	[],
-	[with_lapack=yes])
+  [AS_HELP_STRING([--without-lapack],
+  [disable support for lapack])],
+  [],
+  [with_lapack=yes])
 
 LIBLAPACK=
-	AS_IF([test "x$with_lapack" != xno],
-	[
-		LDFLAGS="$LDFLAGS -L/usr/lib/atlas-base/atlas"
-		AC_CHECK_LIB(
-		[lapack], [clapack_zgetrf], 
-		[AC_SUBST([LIBLAPACK], ["-L/usr/lib/atlas-base/atlas -llapack -lblas -lpthread"]) AC_DEFINE([LAPACK], [1], [Define if you have liblapack])],
-		[AC_MSG_FAILURE([lapack library test failed (--without-lapack to disable)])],
-		[])
-	])
+  AS_IF([test "x$with_lapack" != xno],
+  [
+    LDFLAGS="$LDFLAGS -L/usr/lib/atlas-base/atlas"
+    AC_CHECK_LIB(
+    [lapack], [clapack_zgetrf], 
+    [AC_SUBST([LIBLAPACK], ["-L/usr/lib/atlas-base/atlas -llapack -lblas -lpthread"]) AC_DEFINE([LAPACK], [1], [Define if you have liblapack])],
+    [AC_MSG_FAILURE([lapack library test failed (--without-lapack to disable)])],
+    [])
+  ])
 
 dnl ************************************************
 dnl *** Check for Eigen library
@@ -71,38 +88,38 @@ AM_PROG_LIBTOOL
 
 
 AC_ARG_WITH([eigen],
-        [AS_HELP_STRING([--without-eigen],
-        [disable support for eigen])],
-        [],
-        [with_eigen=no])
+  [AS_HELP_STRING([--without-eigen],
+  [disable support for eigen])],
+  [],
+  [with_eigen=no])
 
 AC_ARG_WITH([eigenv],
-        [AS_HELP_STRING([--without-eigenv],
-        [disable support for eigen])],
-        [],
-        [with_eigenv=no])
+  [AS_HELP_STRING([--without-eigenv],
+  [disable support for eigen])],
+  [],
+  [with_eigenv=no])
 
 LIBEIGEN=
-        AS_IF([test "x$with_eigen" != xno],
-        [
-                CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-                AC_CHECK_HEADER(
-                [Eigen/Core],
-                [AC_DEFINE([USING_EIGEN_ARRAY], [1], [Define if you have eigen])],
-                [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
-                [])
-        ])
+  AS_IF([test "x$with_eigen" != xno],
+  [
+    CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+    AC_CHECK_HEADER(
+    [Eigen/Core],
+    [AC_DEFINE([USING_EIGEN_ARRAY], [1], [Define if you have eigen])],
+    [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
+    [])
+  ])
 
 LIBEIGENV=
-        AS_IF([test "x$with_eigenv" != xno],
-        [
-                CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-                AC_CHECK_HEADER(
-                [Eigen/Core],
-                [AC_DEFINE([USING_EIGEN_3VECT], [1], [Define if you have eigen])],
-                [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
-                [])
-        ])
+  AS_IF([test "x$with_eigenv" != xno],
+  [
+    CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+    AC_CHECK_HEADER(
+    [Eigen/Core],
+    [AC_DEFINE([USING_EIGEN_3VECT], [1], [Define if you have eigen])],
+    [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
+    [])
+  ])
 
 
 AC_CHECK_LIB([m],[pow])

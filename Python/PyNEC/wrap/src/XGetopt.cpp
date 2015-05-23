@@ -130,10 +130,10 @@
 char	*optarg;		// global argument pointer
 int		optind = 0; 	// global argv index
 
-int XGetopt(int argc, char *argv[], char *optstring)
+int XGetopt(int argc, char *argv[], const char *optstring)
 {
 	char c;
-	char *cp;
+	const char *cp;
 	static char *next = NULL;
 	if (optind == 0)
 		next = NULL;

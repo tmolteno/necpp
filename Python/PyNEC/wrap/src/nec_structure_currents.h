@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004-2005  Timothy C.A. Molteno
+	Copyright (C) 2004-2008  Timothy C.A. Molteno
 	tim@molteno.net
 	
 	This program is free software; you can redistribute it and/or modify
@@ -22,18 +22,21 @@
 #include "nec_results.h"
 #include "math_util.h"
 #include "nec_context.h"
-#include "c_geometry.h"
+
 
 class nec_context;
+class c_geometry;
 
 class nec_structure_currents : public nec_base_result
 {
 public:
 	/*Structure currents*/
-	nec_structure_currents(nec_context * in_context, char * in_pattype,
+	nec_structure_currents(nec_context * in_context, enum excitation_type in_pattype,
 			int in_nload,
 			nec_float in_xpr3, nec_float in_xpr6);
 	
+	static std::string hpol(enum excitation_type e);
+
 	void analyze();
 	
 	virtual ~nec_structure_currents()
@@ -60,15 +63,9 @@ public:
 		return iptflq;
 	}
 	
-	int get_n()
-	{
-		return m_geometry->n;
-	}
+	int get_n();
 	
-	int get_m()
-	{
-		return m_geometry->m;
-	}
+	int get_m();
 			
 	vector<int> get_current_segment_number()
 	{
@@ -199,7 +196,7 @@ private:
 	
 	nec_context *m_context;
 	c_geometry * m_geometry;
-	char * pattype;
+	enum excitation_type pattype;
 	
 	int iptflg;
 	int iptag, iptagf, iptagt;
@@ -216,6 +213,7 @@ private:
 		
 	int current_nb_elements;
 	int q_density_nb_elements;
+	int q_density_last_printed;
 	int patch_nb_elements;
 	
 	complex_array zarray;

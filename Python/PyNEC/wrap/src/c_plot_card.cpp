@@ -92,7 +92,7 @@ void c_plot_card::plot_endl() const
 	fprintf( plot_fp, "\n");
 }
 
-void c_plot_card::plot_double(double x) const
+void c_plot_card::plot_double(nec_float x) const
 {
 	if (NULL == plot_fp)
 		throw 100;
@@ -149,7 +149,7 @@ void c_plot_card::plot_currents(nec_complex ex, nec_complex ey, nec_complex ez) 
 
 void c_plot_card::plot_segments(int i,
 	real_array& x, real_array& y, real_array& z, real_array& si,
-	double xw2, double yw2,
+	nec_float xw2, nec_float yw2,
 	real_array& bi, int_array& icon1, int_array& icon2) const
 {
 	if (false == near_field())
@@ -163,12 +163,12 @@ void c_plot_card::plot_segments(int i,
 	
 void c_plot_card::plot_fields(
 	nec_complex ex, nec_complex ey, nec_complex ez, 
-	double xob, double yob, double zob)
+	nec_float xob, nec_float yob, nec_float zob)
 {
 	if ( p1 != 2)
 		return;
 
-	double xxx;
+	nec_float xxx;
 	
 	if ( p4 < 0 )
 		xxx = xob;
@@ -182,9 +182,9 @@ void c_plot_card::plot_fields(
 	plot_endl();		
 }
 
-void c_plot_card::plot_patterns(double theta, double phi,
+void c_plot_card::plot_patterns(nec_float theta, nec_float phi,
 	nec_complex e_theta, nec_complex e_phi,
-	double g_vert, double g_horiz, double g_tot)
+	nec_float g_vert, nec_float g_horiz, nec_float g_tot)
 {
 	if ( false == patterns())
 		return;

@@ -1,5 +1,5 @@
 /*
-	Copyright (C) 2004  Timothy C.A. Molteno
+	Copyright (C) 2004-2006  Timothy C.A. Molteno
 	
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -72,10 +72,9 @@ public:
 	}
 };
 
-void gwave( nec_complex *erv, nec_complex *ezv,
-    nec_complex *erh, nec_complex *ezh, nec_complex *eph, c_ground_wave& ground_wave);
-
-#define	CONST4	nec_complex(0.0,+188.365)
+void gwave( nec_complex& erv, nec_complex& ezv,
+	nec_complex& erh, nec_complex& ezh, nec_complex& eph,
+	c_ground_wave& ground_wave);
 
 
 #endif

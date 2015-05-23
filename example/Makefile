@@ -22,15 +22,20 @@
 #
 
 LD_LIBRARY_PATH=/usr/lib/atlas-base/atlas solve
+# TEST_LIBRARY_PATH=../lib
+# ./configure  --prefix=`pwd` --with-bounds
 
 all: test_cpp
 
 test_static: test_nec.c
 	gcc --static -o test_static test_nec.c -lnecpp -lstdc++ -lm -llapack  -lblas
 
-test_c: test_nec.c
-	gcc -o test_nec test_nec.c -lnecpp
-	./test_nec
+test_c: test_nec.o
+	gcc -o test_c -Wl,-rpath -Wl,$(TEST_LIBRARY_PATH) test_nec.o -lnecpp
+
+test: test_c
+	./test_c
+	ldd test_c
 
 
 #####################################################################################
@@ -43,14 +48,14 @@ NECPP_SRC  = ../src/c_ggrid.cpp ../src/matrix_algebra.cpp ../src/nec_ground.cpp 
              ../src/c_evlcom.cpp ../src/c_plot_card.cpp ../src/misc.cpp \
              ../src/nec_context.cpp ../src/nec_output.cpp ../src/c_geometry.cpp \
              ../src/nec_exception.cpp ../src/nec_radiation_pattern.cpp \
-	     ../src/nec_structure_currents.cpp ../src/electromag.cpp
+	     ../src/nec_structure_currents.cpp ../src/electromag.cpp ../src/nec_results.cpp
 NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 
 
 CPP_SRC  = test_cpp.cpp
 CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
-CXXFLAGS=-I ../src/ -I .. -O3 -Wall
+CXXFLAGS=-I ../src/ -I .. -O2 -Wall
 
 
 test_cpp: ${CPP_OBJS} ${NECPP_OBJS}
@@ -61,4 +66,4 @@ cpp_clean:
 	rm -f ${CPP_OBJS} ${NECPP_OBJS} 
 
 clean: cpp_clean
-	rm -f test_cpp test_static test_nec
+	rm -f test_cpp test_static test_c

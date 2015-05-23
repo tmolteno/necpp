@@ -90,7 +90,6 @@ private:
 	int m_indent;
 	
 	bool m_error_mode;
-	FILE* m_error_fp;
 };
 
 
