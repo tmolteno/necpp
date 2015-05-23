@@ -1,3 +1,3 @@
 The C++ port started and completed by Tim Molteno <tim@physics.otago.ac.nz>
-The Python work is done by Remi Sassolas<uptheiron@wanadoo.fr>
+The Python 2.4 port was initially by Remi Sassolas<uptheiron@wanadoo.fr>. This is now maintained by Tim Molteno.
 This work could not have been done without the tremendous effort put into the C port by Neoklis Kyriazis.

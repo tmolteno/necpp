@@ -6,7 +6,8 @@
 
 * Work on Doxygen Source Documentation
 * Get rid of libnec's dependance on the C++ standard library. See Below.
-* Export only the C API functions from libnec. This requires some extra know-how that I don't have right now -- probably an exports file. When done, this will mean that libnec can be linked to without additional libc++ linking.
+* Export only the C API functions from libnec. This requires some extra know-how that I don't have right now -- probably an exports file. 
+  When done, this will mean that libnec can be linked to without additional libc++ linking.
 
 ## NEC Syntax Improvements
 
@@ -21,7 +22,7 @@
 * Add Monte Carlo simulations that measure the sensitivity of a design to random fluctuations in the geometry. Suggestion from Mike Pot.
 * Add output option for the impedance (admittance) matrix to go to the output file.
 
-Using Eigen
+## Using Eigen
 
-Nec2++ requires Eigen. svn co svn://anonsvn.kde.org/home/kde/trunk/kdesupport/eigen2
+* To avoid dependency on Lapack, we are going to shift the LU decomposition to using the Eigen library.
 
