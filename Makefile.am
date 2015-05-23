@@ -8,9 +8,7 @@ SUBDIRS = src
 EXTRA_DIST = \
 	example \
 	html \
-	test_data \
-	win32 \
-	Makefile.test
+	win32
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = necpp.pc
