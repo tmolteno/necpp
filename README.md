@@ -26,7 +26,8 @@ Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics C
 
 ## Documentation
 
-Online documentation built form the source code is available at http://tmolteno.github.io/necpp/
+Online documentation built form the source code is available at http://tmolteno.github.io/necpp/. 
+A guide to [using nec2++ from python](http://astroelec.blogspot.co.nz/2015/05/modeling-antennas-in-python-with-nec2.html).
 
 ## Instructions for Linux
 
