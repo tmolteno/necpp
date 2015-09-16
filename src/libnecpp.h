@@ -295,6 +295,9 @@ long nec_ek_card(nec_context* in_context, int itmp1);
   * The loading specified is applied to each of the mth through nth segments of the set of segments having tags 
   * equal to LDTAG. Again if LDTAG is zero, these parameters refer to absolute segment numbers. 
   * If LDTAGT is left blank, it is set equal to the previous parameter (LDTAGF).
+  * \param tmp1 Resistance in Ohms, OR (A) Ohms per meter, OR (B) Resistance. OR (C) Conductivity (ldtyp=5)
+  * \param tmp2 IND., HENRY, OR (A) HY/LENGTH OR (B) REACT. OR (C) Set to 0.0
+  * \param tmp3 CAP,. FARAD, OR (A,B) BLANK (set to 0.0)
   * \copydoc error_return
   * \remark Floating Point Input for the Various Load Types:
   */

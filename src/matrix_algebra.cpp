@@ -530,22 +530,6 @@ void solve_lapack( int n, complex_array& a, int_array& ip,
 #include <Eigen/Dense>
 using namespace Eigen;
 
-typedef Matrix<double, 5, 3> Matrix5x3;
-typedef Matrix<double, 5, 5> Matrix5x5;
-Matrix5x3 m = Matrix5x3::Random();
-cout << "Here is the matrix m:" << endl << m << endl;
-Eigen::FullPivLU<Matrix5x3> lu(m);
-cout << "Here is, up to permutations, its LU decomposition matrix:"
-<< endl << lu.matrixLU() << endl;
-cout << "Here is the L part:" << endl;
-Matrix5x5 l = Matrix5x5::Identity();
-l.block<5,3>(0,0).triangularView<StrictlyLower>() = lu.matrixLU();
-cout << l << endl;
-cout << "Here is the U part:" << endl;
-Matrix5x3 u = lu.matrixLU().triangularView<Upper>();
-cout << u << endl;
-cout << "Let us now reconstruct the original matrix m:" << endl;
-cout << lu.permutationP().inverse() * l * u * lu.permutationQ().inverse() << endl;
 
 void lu_decompose_eigen(nec_output_file& s_output,  int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
 {
@@ -571,9 +555,11 @@ void lu_decompose_eigen(nec_output_file& s_output,  int64_t n, complex_array& a_
     }
   }
 
-  Eigen::FullPivLU<Matrix5x3> lu(m);
+  
+  Eigen::PartialPivLU<MatrixXc> lu = A.partialPivLu();
 
-
+  Eigen::MatrixXc X = lu.matrixLU();
+  ipiv = lu.permutationP();
          
   int info = clapack_zgetrf (CblasColMajor, n, n, 
           (void*) a_in.data(), ndim, ip.data());
@@ -609,16 +595,10 @@ void solve_eigen( int n, complex_array& a, int_array& ip,
 {
   DEBUG_TRACE("solve_eigen(" << n << "," << ndim << ")");
 
-  int info = clapack_zgetrs (CblasColMajor, CblasNoTrans, 
-    n, 1, (void*) a.data(), ndim, ip.data(), b.data(), n);
-  
-  if (0 != info) {
-    /*
-      The factorization has been completed, but the factor U is exactly singular,
-      and division by zero will occur if it is used to solve a system of equations. 
-    */
-    throw new nec_exception("nec++: Solving Failed: ",info);
-  }
+  Eigen::MatrixXc soln = a.solve( b );
+
+  for (int64_t i=0;i<ndim;i++)
+    b[i] = soln[i];
 }
 
 #endif /* EIGEN_LU */

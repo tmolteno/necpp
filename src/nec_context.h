@@ -395,10 +395,13 @@ public:
   
   /*! \brief Ground parameters under the antenna
   
-  \remark Specifies the relative dielectric constant and conductivity of ground in the vicinity of the antenna. In addition, a second set of ground parameters for a second medium can be specified, or a radial wire ground screen can be modeled using a reflection coefficient approximation.
+  \remark Specifies the relative dielectric constant and conductivity of ground in the vicinity of the antenna. 
+  In addition, a second set of ground parameters for a second medium can be specified, or a radial wire 
+  ground screen can be modeled using a reflection coefficient approximation.
   
   \param ground_type (was IPERF) Ground-type flag. The options are:
-    \arg \c -1 - Nullifies ground parameters previously used and sets free-space condition. The remainder of the parameters should be zero in this case. 
+    \arg \c -1 - Nullifies ground parameters previously used and sets free-space condition. The remainder of the \
+    parameters should be zero in this case. 
     \arg \c O - Finite ground, reflection-coefficient approximation.
     \arg \c 1 - Perfectly conducting ground.
     \arg \c 2 - Finite ground, Sommerfeld/Norton method. 
