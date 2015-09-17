@@ -784,8 +784,8 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
            B2  (F6) - Radius in y at z = HL.
            RAD (F7) - Radius of wire.
 */
-void c_geometry::helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
-    nec_float a2, nec_float b2, nec_float rad, int segment_count, int tag_id )
+void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1,
+    nec_float a2, nec_float b2, nec_float rad)
 {
   int ist;
   nec_float zinc, sangle, hdia, turn, pitch, hmaj, hmin;

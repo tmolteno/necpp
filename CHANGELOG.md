@@ -1,3 +1,6 @@
+## Version 1.7.1
+* Changed API of c_geometry::helix() to put the tag id and segment count at the start.
+
 ## Version 1.7.0
 * Added new functions for nec_get_gain() to get the radiation pattern elements.
 * added nec_medium_parameters to the C-style API. The user can now alter the permittivity and permeability of the environment via the API.

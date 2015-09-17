@@ -72,8 +72,9 @@ public:
   void arc( int tag_id, int segment_count, nec_float rada,
                   nec_float ang1, nec_float ang2, nec_float rad );
                   
-  void helix( nec_float s, nec_float hl, nec_float a1, nec_float b1,
-                  nec_float a2, nec_float b2, nec_float rad, int segment_count, int tag_id );
+  void helix(int tag_id, int segment_count, 
+             nec_float s, nec_float hl, nec_float a1, nec_float b1,
+             nec_float a2, nec_float b2, nec_float rad);
   
   void move( nec_float rox, nec_float roy, nec_float roz, nec_float xs,
                   nec_float ys, nec_float zs, int its, int nrpt, int itgi );
