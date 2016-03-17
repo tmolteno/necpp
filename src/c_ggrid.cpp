@@ -38,7 +38,7 @@ nec_float c_ggrid::m_ysa[3] = {0.,0.,.3490658504};
 void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
     nec_complex *f2, nec_complex *f3, nec_complex *f4 )
 {
-  static int ix, iy, ixs=-10, iys=-10, igrs=-10, ixeg=0, iyeg=0;
+  static int ix, iy, ixs = -10, iys = -10, igrs = -10, ixeg=0, iyeg=0;
   static int nxm2, nym2, nxms, nyms, nd, ndp;
   static nec_float dx = 1., dy = 1., xs = 0., ys = 0., xz, yz;
   static nec_complex a[4][4], b[4][4], c[4][4], d[4][4];
@@ -95,7 +95,7 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
     ixs=(( ix-1)/3)*3+2;
     if( ixs < 2)
       ixs=2;
-    ixeg=-10000;
+    ixeg = -10000;
   
     if( ixs > nxm2) {
       ixs= nxm2;
@@ -105,7 +105,7 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
     iys=(( iy-1)/3)*3+2;
     if( iys < 2)
       iys=2;
-    iyeg=-10000;
+    iyeg = -10000;
   
     if( iys > nym2) {
       iys= nym2;
@@ -298,7 +298,7 @@ void c_ggrid::sommerfeld( nec_float epr, nec_float sig, nec_float wavelength )
   cl2 = -CONST4*(m_epscf-1.)/(m_epscf+1.);
   cl1 = cl2/(m_epscf+1.);
   ezv = m_epscf*cl1;
-  thet=-dth;
+  thet = -dth;
   int nth = m_nya[0];
   
   for (int ith = 0; ith < nth; ith++ ) {
@@ -313,7 +313,7 @@ void c_ggrid::sommerfeld( nec_float epr, nec_float sig, nec_float wavelength )
     } else {
       erv=0.;
       erh=cl2-.5*cl1;
-      eph=-erh;
+      eph = -erh;
     }
   
     m_ar1[0+ith*11+  0]=erv;
@@ -342,7 +342,7 @@ nec_complex  fbar(const nec_complex& p )  {
     pow= z;
   
     for (int i = 1; i <= 100; i++ ) {
-      pow=- pow* zs/ (nec_float)i;
+      pow = - pow* zs/ (nec_float)i;
       term= pow/(2.* i+1.);
       sum = sum + term;
       tms = norm(term);
@@ -360,7 +360,7 @@ nec_complex  fbar(const nec_complex& p )  {
   /* asymptotic expansion */
   if ( real( z) < 0.) {
     minus=1;
-    z=- z;
+    z = - z;
   }
   else
     minus=0;
@@ -370,13 +370,13 @@ nec_complex  fbar(const nec_complex& p )  {
   term=cplx_10();
   
   for (int i = 1; i <= 6; i++ ) {
-    term =- term*(2.*i -1.)* zs;
+    term = - term*(2.*i -1.)* zs;
     sum += term;
   }
   
   if ( minus == 1)
     sum -= 2.0 * sqrt_pi() * z* exp( z* z);
-  fbar=- sum;
+  fbar = - sum;
   
   return( fbar );
 }
@@ -414,8 +414,8 @@ void gwave(nec_complex& erv, nec_complex& ezv,
     cpp2=1.0e-20;
   
   cpp= sqrt( cpp2);
-  rk1=- two_pi_j()* ground_wave.r1;
-  rk2=- two_pi_j()* ground_wave.r2;
+  rk1 = - two_pi_j()* ground_wave.r1;
+  rk2 = - two_pi_j()* ground_wave.r2;
   t1=1. -ground_wave.u2* cpp2;
   t2= sqrt( t1);
   t3=(1. -1./ rk1)/ rk1;
@@ -448,9 +448,9 @@ void gwave(nec_complex& erv, nec_complex& ezv,
   x5=3.* sppp* cppp* t3* xr1;
   x6= cpp* ground_wave.u* t2* omr* xr2/ rk2*.5;
   x7=3.* spp* cpp* t4* xr2;
-  erv=-( x1+ x2- x3+ x4- x5+ x6- x7)* (-CONST4);
+  erv = -( x1+ x2- x3+ x4- x5+ x6- x7)* (-CONST4);
 
-  ezh=-( x1- x2+ x3- x4- x5- x6+ x7)* (-CONST4);
+  ezh = -( x1- x2+ x3- x4- x5- x6+ x7)* (-CONST4);
 
   x1= sppp2* xr1;
   x2= rv* spp2* xr2;
@@ -466,6 +466,6 @@ void gwave(nec_complex& erv, nec_complex& ezv,
   x4= t3* xr1;
   x5= t4*(1.- ground_wave.u2*(1.+ rv)- ground_wave.u2* omr* f)* xr2;
   x6=.5* ground_wave.u2* omr*( f*( ground_wave.u2* t1- spp2-1./ rk2)+1./ rk2)* xr2/ rk2;
-  eph=-( x1- x2+ x3- x4+ x5+ x6)* (-CONST4);
+  eph = -( x1- x2+ x3- x4+ x5+ x6)* (-CONST4);
 }
 

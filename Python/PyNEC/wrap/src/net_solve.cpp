@@ -267,15 +267,15 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 					y12r=0.;
 					y12i=1./( x11r[j]* sin( y22r));
 					y11r= x12r[j];
-					y11i=- y12i* cos( y22r);
+					y11i = - y12i* cos( y22r);
 					y22r= x22r[j];
 					y22i= y11i+ x22i[j];
 					y11i= y11i+ x12i[j];
 				
 					if ( ntyp[j] != 2)
 					{
-						y12r=- y12r;
-						y12i=- y12i;
+						y12r = - y12r;
+						y12i = - y12i;
 					}
 				} /* if ( ntyp[j] <= 1) */
 		
@@ -293,7 +293,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 				jump2 = false;
 				if ( ! jump1 )
 				{
-					isc1=-1;
+					isc1 = -1;
 			
 					for( i = 0; i < nteq; i++ )
 					{
@@ -348,7 +348,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 				jump2 = false;
 				if ( ! jump1 )
 				{
-					isc2=-1;
+					isc2 = -1;
 			
 					for( i = 0; i < nteq; i++ )
 					{

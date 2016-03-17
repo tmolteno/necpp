@@ -404,11 +404,11 @@ void c_evlcom::saoa( nec_float t, complex_array& ans)
 		com=xl-m_ck1;
 		cgam1=sqrt(xl+m_ck1)*sqrt(com);
 		if (real(com) < 0. && imag(com) >= 0.)
-			cgam1=-cgam1;
+			cgam1 = -cgam1;
 		com=xl-m_ck2;
 		cgam2=sqrt(xl+m_ck2)*sqrt(com);
 		if (real(com) < 0. && imag(com) >= 0.)
-			cgam2=-cgam2;
+			cgam2 = -cgam2;
 	}
 	
 	if (norm(xl) >= m_tsmag)
@@ -429,7 +429,7 @@ void c_evlcom::saoa( nec_float t, complex_array& ans)
 			}
 			else
 			{
-				nec_float sign=-1.0;
+				nec_float sign = -1.0;
 				dgam=1.0/(xl*xl);
 				dgam=sign*((m_ct3*dgam+m_ct2)*dgam+m_ct1)/xl;
 			} /* if (xlr >= m_ck2) */
@@ -472,17 +472,17 @@ void c_evlcom::saoa( nec_float t, complex_array& ans)
 	if (m_rho != 0.)
 	{
 		b0p=b0p/m_rho;
-		ans[0]=-com*xl*(b0p+b0*xl);
+		ans[0] = -com*xl*(b0p+b0*xl);
 		ans[3]=com*xl*b0p;
 	}
 	else
 	{
-		ans[0]=-com*xl*xl*.5;
+		ans[0] = -com*xl*xl*.5;
 		ans[3]=ans[0];
 	}
 	
 	ans[1]=com*cgam2*cgam2*b0;
-	ans[2]=-ans[3]*cgam2*m_rho;
+	ans[2] = -ans[3]*cgam2*m_rho;
 	ans[4]=com*b0;
 }
 
@@ -531,7 +531,7 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 		*erv=conj(m_ck1sq*ans[2]);
 		*ezv=conj(m_ck1sq*(ans[1]+m_ck2sq*ans[4]));
 		*erh=conj(m_ck2sq*(ans[0]+ans[5]));
-		*eph=-conj(m_ck2sq*(ans[3]+ans[5]));
+		*eph = -conj(m_ck2sq*(ans[3]+ans[5]));
 		
 		return;	
 	} /* if (m_zph >= 2.*m_rho) */
@@ -549,7 +549,7 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 	rom1(6,ans,2);
 	
 	for (int i = 0; i < 6; i++ )
-		sum[i]=-(sum[i]+ans[i]);
+		sum[i] = -(sum[i]+ans[i]);
 	
 	/* path from imaginary axis to -infinity */
 	if (m_zph > .001*m_rho)
@@ -559,7 +559,7 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 	
 	del=PTP/del;
 	delta=nec_complex(-1.0,slope)*del/sqrt(1.+slope*slope);
-	delta2=-conj(delta);
+	delta2 = -conj(delta);
 	gshank(cp1,delta,ans,6,sum,0,bk,bk);
 	rmis=m_rho*(real(m_ck1)-m_ck2);
 	
@@ -569,7 +569,7 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 		if (m_zph >= 1.e-10)
 		{
 			bk=nec_complex(-m_zph,m_rho)*(m_ck1-cp3);
-			rmis=-real(bk)/fabs(imag(bk));
+			rmis = -real(bk)/fabs(imag(bk));
 			if (rmis > 4.*m_rho/m_zph)
 				jump = true;
 		}
@@ -600,7 +600,7 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 	{
 		/* integrate below branch points, then to + infinity */
 		for (int i = 0; i < 6; i++ )
-			sum[i]=-ans[i];
+			sum[i] = -ans[i];
 		
 		rmis=real(m_ck1)*1.01;
 		if ( (m_ck2+1.) > rmis )
@@ -618,7 +618,7 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 	*erv=conj(m_ck1sq*ans[2]);
 	*ezv=conj(m_ck1sq*(ans[1]+m_ck2sq*ans[4]));
 	*erh=conj(m_ck2sq*(ans[0]+ans[5]));
-	*eph=-conj(m_ck2sq*(ans[3]+ans[5]));
+	*eph = -conj(m_ck2sq*(ans[3]+ans[5]));
 }
 
 /*-----------------------------------------------------------------------*/
@@ -675,7 +675,7 @@ void bessel( nec_complex z, nec_complex *j0, nec_complex *j0p )
   if (zms <= 1.e-12)
   {
     *j0=cplx_10;
-    *j0p=-0.5*z;
+    *j0p = -0.5*z;
     return;
   }
   
@@ -750,11 +750,11 @@ void hankel( nec_complex z, nec_complex *h0, nec_complex *h0p )
 	/* initialization of constants */
 	if ( ! hankel_init )
 	{
-		nec_float psi=-GAMMA;
+		nec_float psi = -GAMMA;
 		for (int k = 1; k <= 25; k++ )
 		{
 			int i = k-1;
-			a1[i]=-.25/(k*k);
+			a1[i] = -.25/(k*k);
 			a2[i]=1.0/(k+1.0);
 			psi += 1.0/k;
 			a3[i]=psi+psi;

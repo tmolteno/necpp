@@ -240,7 +240,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 				"\n  STRUCTURE ROTATED ABOUT Z-AXIS %d TIMES"
 				" - LABELS INCREMENTED BY %d\n", card_int_2, card_int_1 );
 		
-			int ix=-1;
+			int ix = -1;
 			int iy = 0;
 			int iz = 0;
 			reflect( ix, iy, iz, card_int_1, card_int_2);
@@ -574,7 +574,7 @@ void c_geometry::geometry_complete(nec_context* in_context, int card_int_1, int 
 			if ( xw2 > 1.)
 				xw2=1.;
 			if ( xw2 < -1.)
-				xw2=-1.;
+				xw2 = -1.;
 	
 			salp[i]= xw2;
 			xw2= rad_to_degrees(asin( xw2));
@@ -920,7 +920,7 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
   yx= sph* cth;
   yy= sph* sth* sps+ cph* cps;
   yz= sph* sth* cps- cph* sps;
-  zx=- sth;
+  zx = - sth;
   zy= cth* sps;
   zz= cth* cps;
 
@@ -1106,10 +1106,10 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 	
 		x[nx]= x[i];
 		y[nx]= y[i];
-		z[nx]=- e1;
+		z[nx] = - e1;
 		x2[nx]= x2[i];
 		y2[nx]= y2[i];
-		z2[nx]=- e2;
+		z2[nx] = - e2;
 		itagi= segment_tags[i];
 	
 		if ( itagi == 0)
@@ -1155,14 +1155,14 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 	
 			px[nx]= px[i];
 			py[nx]= py[i];
-			pz[nx]=- pz[i];
+			pz[nx] = - pz[i];
 			t1x[nx]= t1x[i];
 			t1y[nx]= t1y[i];
-			t1z[nx]=- t1z[i];
+			t1z[nx] = - t1z[i];
 			t2x[nx]= t2x[i];
 			t2y[nx]= t2y[i];
-			t2z[nx]=- t2z[i];
-			psalp[nx]=- psalp[i];
+			t2z[nx] = - t2z[i];
+			psalp[nx] = - psalp[i];
 			pbi[nx]= pbi[i];
 		}
 	
@@ -1206,10 +1206,10 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 			}
 		
 			x[nx]= x[i];
-			y[nx]=- e1;
+			y[nx] = - e1;
 			z[nx]= z[i];
 			x2[nx]= x2[i];
-			y2[nx]=- e2;
+			y2[nx] = - e2;
 			z2[nx]= z2[i];
 			itagi= segment_tags[i];
 		
@@ -1255,15 +1255,15 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 				}
 			
 				px[nx]= px[i];
-				py[nx]=- py[i];
+				py[nx] = - py[i];
 				pz[nx]= pz[i];
 				t1x[nx]= t1x[i];
-				t1y[nx]=- t1y[i];
+				t1y[nx] = - t1y[i];
 				t1z[nx]= t1z[i];
 				t2x[nx]= t2x[i];
-				t2y[nx]=- t2y[i];
+				t2y[nx] = - t2y[i];
 				t2z[nx]= t2z[i];
-				psalp[nx]=- psalp[i];
+				psalp[nx] = - psalp[i];
 				pbi[nx]= pbi[i];
 			
 			} /* for( i = m2; i <= m; i++ ) */
@@ -1307,10 +1307,10 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 				throw nex;
 			}
 		
-			x[nx]=- e1;
+			x[nx] = - e1;
 			y[nx]= y[i];
 			z[nx]= z[i];
-			x2[nx]=- e2;
+			x2[nx] = - e2;
 			y2[nx]= y2[i];
 			z2[nx]= z2[i];
 			itagi= segment_tags[i];
@@ -1355,16 +1355,16 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 				throw nex;
 			}
 		
-			px[nx]=- px[i];
+			px[nx] = - px[i];
 			py[nx]= py[i];
 			pz[nx]= pz[i];
-			t1x[nx]=- t1x[i];
+			t1x[nx] = - t1x[i];
 			t1y[nx]= t1y[i];
 			t1z[nx]= t1z[i];
-			t2x[nx]=- t2x[i];
+			t2x[nx] = - t2x[i];
 			t2y[nx]= t2y[i];
 			t2z[nx]= t2z[i];
-			psalp[nx]=- psalp[i];
+			psalp[nx] = - psalp[i];
 			pbi[nx]= pbi[i];
 		}
 	
@@ -1375,7 +1375,7 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop )
 	
 	/* reproduce structure with rotation to form cylindrical structure */
 	fnop= (nec_float)nop;
-	m_ipsym=-1;
+	m_ipsym = -1;
 	sam=two_pi() / fnop;
 	cs= cos( sam);
 	ss= sin( sam);
@@ -1814,7 +1814,7 @@ void c_geometry::connect_segments( int ignd )
         for (int i = 0; i < ic; i++ ) {
           ix= jco[i];
           if ( ix <= 0) {
-            ix=- ix;
+            ix = - ix;
             int ixx = ix-1; // TODO if ix == 0 we have a problem
             x[ixx]= xa;
             y[ixx]= ya;
@@ -2148,7 +2148,7 @@ void c_geometry::patch( int nx, int ny,
 	
 		if ( xa >= 1.0e-6)
 		{
-			t1x[mi]=- ynv/ xa;
+			t1x[mi] = - ynv/ xa;
 			t1y[mi]= xnv/ xa;
 			t1z[mi]=0.;
 		}
@@ -2603,11 +2603,11 @@ void c_geometry::tbf( int i, int icap )
 		if ( jcox != 0 )
 		{
 			if ( jcox < 0 )
-				jcox=- jcox;
+				jcox = - jcox;
 			else
 			{
 				_sig = -_sig;
-				jend=- jend;
+				jend = - jend;
 			}
 		
 			jcoxx = jcox-1;
@@ -2631,7 +2631,7 @@ void c_geometry::tbf( int i, int icap )
 			pp= pp- omc/ sd* aj;
 			ax[jsnox]= aj/ sd* _sig;
 			bx[jsnox]= aj/(2.* cdh);
-			cx[jsnox]=- aj/(2.* sdh)* _sig;
+			cx[jsnox] = - aj/(2.* sdh)* _sig;
 		
 			if ( jcox != i)
 			{
@@ -2653,13 +2653,13 @@ void c_geometry::tbf( int i, int icap )
 				}
 			} /* if ( jcox != i) */
 			else
-			bx[jsnox] =- bx[jsnox];
+			bx[jsnox] = - bx[jsnox];
 		
 			if ( iend == 1)
 				break;
 		} /* if ( jcox != 0 ) */
 	
-		pm=- pp;
+		pm = - pp;
 		pp=0.;
 		njun1= jsno;
 	
@@ -2669,7 +2669,7 @@ void c_geometry::tbf( int i, int icap )
 	
 		jend=1;
 		iend=1;
-		_sig=-1.;
+		_sig = -1.;
 	
 	} /* do */
 	while( jcox != 0 );
@@ -2712,7 +2712,7 @@ void c_geometry::tbf( int i, int icap )
 		
 			cx[jsnop]=1./( cdh- xxi* sdh);
 			jsno= jsnop+1;
-			ax[jsnop]=-1.;
+			ax[jsnop] = -1.;
 			return;
 		} /* if ( njun2 == 0) */
 	
@@ -2725,20 +2725,20 @@ void c_geometry::tbf( int i, int icap )
 			xxi= qp*(1.-.5* xxi)/(1.- xxi);
 		}
 	
-		qp=-( omc+ xxi* sd)/( sd*( ap+ xxi* pp)+ cd*( xxi* ap- pp));
+		qp = -( omc+ xxi* sd)/( sd*( ap+ xxi* pp)+ cd*( xxi* ap- pp));
 		d= cd- xxi* sd;
 		bx[jsnop]=( sdh+ ap* qp*( cdh- xxi* sdh))/ d;
 		cx[jsnop]=( cdh+ ap* qp*( sdh+ xxi* cdh))/ d;
 	
 		for( iend = 0; iend < njun2; iend++ )
 		{
-			ax[iend]=-ax[iend]* qp;
+			ax[iend] = -ax[iend]* qp;
 			bx[iend]= bx[iend]* qp;
-			cx[iend]=- cx[iend]* qp;
+			cx[iend] = - cx[iend]* qp;
 		}
 	
 		jsno= jsnop+1;
-		ax[jsnop]=-1.;
+		ax[jsnop] = -1.;
 		return;
 	} /* if ( njun1 == 0) */
 	
@@ -2766,14 +2766,14 @@ void c_geometry::tbf( int i, int icap )
 		}
 	
 		jsno= jsnop+1;
-		ax[jsnop]=-1.;
+		ax[jsnop] = -1.;
 		return;
 	
 	} /* if ( njun2 == 0) */
 	
 	qp= sd*( pm* pp+ aj* ap)+ cd*( pm* ap- pp* aj);
 	qm=( ap* omc- pp* sd)/ qp;
-	qp=-( aj* omc+ pm* sd)/ qp;
+	qp = -( aj* omc+ pm* sd)/ qp;
 	bx[jsnop]=( aj* qm+ ap* qp)* sdh/ sd;
 	cx[jsnop]=( aj* qm- ap* qp)* cdh/ sd;
 	
@@ -2787,13 +2787,13 @@ void c_geometry::tbf( int i, int icap )
 	jend= njun1;
 	for( iend = jend; iend < jsno; iend++ )
 	{
-		ax[iend]=- ax[iend]* qp;
+		ax[iend] = - ax[iend]* qp;
 		bx[iend]= bx[iend]* qp;
-		cx[iend]=- cx[iend]* qp;
+		cx[iend] = - cx[iend]* qp;
 	}
 	
 	jsno= jsnop+1;
-	ax[jsnop]=-1.;
+	ax[jsnop] = -1.;
 }
 
 
@@ -2810,8 +2810,8 @@ void c_geometry::trio( int j )
 	
 	if ( jcox <= PCHCON)
 	{
-		jend=-1;
-		iend=-1;
+		jend = -1;
+		iend = -1;
 	}
 	
 	if ( (jcox == 0) || (jcox > PCHCON) )
@@ -2849,9 +2849,9 @@ void c_geometry::trio( int j )
 	do
 	{
 		if ( jcox < 0 )
-			jcox=- jcox;
+			jcox = - jcox;
 		else
-			jend=- jend;
+			jend = - jend;
 		jcoxx = jcox-1;
 	
 		if ( jcox != j)
@@ -2949,9 +2949,9 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 		jcox= i;
 	jcoxx = jcox-1;
 	
-	jend=-1;
-	iend=-1;
-	sig=-1.;
+	jend = -1;
+	iend = -1;
+	sig = -1.;
 	
 	do
 	{
@@ -2959,11 +2959,11 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 		if ( jcox != 0 )
 		{
 			if ( jcox < 0 )
-				jcox=- jcox;
+				jcox = - jcox;
 			else
 			{
-				sig=- sig;
-				jend=- jend;
+				sig = - sig;
+				jend = - jend;
 			}
 		
 			jcoxx = jcox-1;
@@ -2988,7 +2988,7 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 			{
 				*aa= aj/ sd* sig;
 				*bb= aj/(2.* cdh);
-				*cc=- aj/(2.* sdh)* sig;
+				*cc = - aj/(2.* sdh)* sig;
 				june= iend;
 			}
 		
@@ -3013,13 +3013,13 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 			} /* if ( jcox != i ) */
 			else
 			if ( jcox == is)
-				*bb=- *bb;
+				*bb = - *bb;
 		
 			if ( iend == 1)
 				break;
 		} /* if ( jcox != 0 ) */
 	
-		pm=- pp;
+		pm = - pp;
 		pp=0.;
 		njun1= local_jsno;
 	
@@ -3029,7 +3029,7 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 	
 		jend=1;
 		iend=1;
-		sig=-1.;
+		sig = -1.;
 	
 	} /* do */
 	while( jcox != 0 );
@@ -3056,7 +3056,7 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 	{
 		if ( njun2 == 0)
 		{
-			*aa =-1.;
+			*aa = -1.;
 			qp= pi()* segment_radius[ix];
 			xxi= qp* qp;
 			xxi= qp*(1.-.5* xxi)/(1.- xxi);
@@ -3067,13 +3067,13 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 		qp= pi()* segment_radius[ix];
 		xxi= qp* qp;
 		xxi= qp*(1.-.5* xxi)/(1.- xxi);
-		qp=-( omc+ xxi* sd)/( sd*( ap+ xxi* pp)+ cd*( xxi* ap- pp));
+		qp = -( omc+ xxi* sd)/( sd*( ap+ xxi* pp)+ cd*( xxi* ap- pp));
 	
 		if ( june == 1)
 		{
-			*aa=- *aa* qp;
+			*aa = - *aa* qp;
 			*bb=  *bb* qp;
-			*cc=- *cc* qp;
+			*cc = - *cc* qp;
 			if ( i != is)
 				return;
 		}
@@ -3111,7 +3111,7 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 	
 	qp= sd*( pm* pp+ aj* ap)+ cd*( pm* ap- pp* aj);
 	qm=( ap* omc- pp* sd)/ qp;
-	qp=-( aj* omc+ pm* sd)/ qp;
+	qp = -( aj* omc+ pm* sd)/ qp;
 	
 	if ( june != 0 )
 	{
@@ -3123,9 +3123,9 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
 		}
 		else
 		{
-			*aa=- *aa* qp;
+			*aa = - *aa* qp;
 			*bb= *bb* qp;
-			*cc=- *cc* qp;
+			*cc = - *cc* qp;
 		}
 	
 		if ( i != is)

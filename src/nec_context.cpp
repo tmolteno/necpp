@@ -122,15 +122,15 @@ void nec_context::calc_prepare()
   m_excitation_type = EXCITATION_VOLTAGE;
   nload=0;
   network_count=0;
-  m_near=-1;
-  ifar=-1;
+  m_near = -1;
+  ifar = -1;
   ncoup=0;
   icoup=0;
   freq_mhz= em::speed_of_light() / 1.0e6;
   ground.default_values();
   nfrq=1;
-  iptflg=-2;
-  iptflq=-1;
+  iptflg = -2;
+  iptflq = -1;
   iped=0;
 }
 
@@ -842,7 +842,7 @@ void nec_context::pt_card(int itmp1, int itmp2, int itmp3, int itmp4) {
   iptagt= itmp4;
 
   if ( (itmp3 == 0) && (iptflg != -1) )
-    iptflg=-2;
+    iptflg = -2;
   if ( itmp4 == 0)
     iptagt= iptagf;
     
@@ -857,7 +857,7 @@ void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4) {
   iptaqt= itmp4;
 
   if ( (itmp3 == 0) && (iptflq != -1) )
-    iptflq=-2;
+    iptflq = -2;
   if ( itmp4 == 0)
     iptaqt= iptaqf;
 }
@@ -1077,7 +1077,7 @@ void nec_context::simulate(bool far_field_flag) {
       xpr2  = phiss;
   
       if ( mhz == nfrq)
-        ifar=-1;
+        ifar = -1;
   
       if ( nfrq == 1)
       {
@@ -1674,7 +1674,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
           nfpat();
 
         if ( mhz == nfrq)
-          m_near=-1;
+          m_near = -1;
 
         if ( nfrq == 1)
         {
@@ -1724,7 +1724,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
     if ( (m_excitation_type == 0) || (m_excitation_type >= 4) )
     {
       if ( mhz == nfrq )
-        ifar=-1;
+        ifar = -1;
 
       if ( nfrq != 1)
       {
@@ -2130,9 +2130,9 @@ void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
   i1=( im1+1)/2;
   i2=( im2+1)/2;
   icomp= i1*2-3;
-  ii1=-2;
+  ii1 = -2;
   if ( icomp+2 < im1)
-    ii1=-3;
+    ii1 = -3;
   
   /* loop over observation patches */
   il = -1;
@@ -2154,7 +2154,7 @@ void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
     zi= m_geometry->pz[il];
   
     /* loop over source patches */
-    jj1=-2;
+    jj1 = -2;
     for(int j = j1; j <= j2; j++ )
     {
       jl=j-1;
@@ -2174,10 +2174,10 @@ void nec_context::compute_matrix_ss( int j1, int j2, int im1, int im2,
     
       hintg( xi, yi, zi);
     
-      g11=-( t2xi* exk+ t2yi* eyk+ t2zi* ezk);
-      g12=-( t2xi* exs+ t2yi* eys+ t2zi* ezs);
-      g21=-( t1xi* exk+ t1yi* eyk+ t1zi* ezk);
-      g22=-( t1xi* exs+ t1yi* eys+ t1zi* ezs);
+      g11 = -( t2xi* exk+ t2yi* eyk+ t2zi* ezk);
+      g12 = -( t2xi* exs+ t2yi* eys+ t2zi* ezs);
+      g21 = -( t1xi* exk+ t1yi* eyk+ t1zi* ezk);
+      g22 = -( t1xi* exs+ t1yi* eys+ t1zi* ezs);
     
       if ( i == j )
       {
@@ -2235,7 +2235,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
   if (itrp < 0)
     return;
 
-  int k=-1;
+  int k = -1;
   int icgo=0;
   
   /* observation loop */
@@ -2252,7 +2252,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
     
     if ( m_geometry->icon1[i] >= PCHCON) {
       ipch= m_geometry->icon1[i]-PCHCON;
-      fsign=-1.;
+      fsign = -1.;
     }
     
     if ( m_geometry->icon2[i] >= PCHCON) {
@@ -2384,9 +2384,9 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
       tz= m_geometry->t1z[js];
     } /* if ( (ik != 0) || (ipr == 0) ) */
 
-    etk=-( exk* tx+ eyk* ty+ ezk* tz)* m_geometry->psalp[js];
-    ets=-( exs* tx+ eys* ty+ ezs* tz)* m_geometry->psalp[js];
-    etc=-( exc* tx+ eyc* ty+ ezc* tz)* m_geometry->psalp[js];
+    etk = -( exk* tx+ eyk* ty+ ezk* tz)* m_geometry->psalp[js];
+    ets = -( exs* tx+ eys* ty+ ezs* tz)* m_geometry->psalp[js];
+    etc = -( exc* tx+ eyc* ty+ ezc* tz)* m_geometry->psalp[js];
 
     /* fill matrix elements.  element locations */
     /* determined by connection data. */
@@ -2516,7 +2516,7 @@ void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
   } /* if ( m_use_exk == true) */
   
   /* observation loop */
-  int ipr=-1;
+  int ipr = -1;
   for( i = i1-1; i < i2; i++ ) {
     ipr++;
     xi= m_geometry->x[i];
@@ -2883,14 +2883,14 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
       }
       else
       {
-        px=- yij/ xymag;
+        px = - yij/ xymag;
         py= xij/ xymag;
         cth= zij/ rmag;
         zrsin= sqrt(1.0 - zratx*zratx*(1.0 - cth*cth) );
       } /* if ( xymag <= 1.0e-6) */
     
       refs=( cth- zratx* zrsin)/( cth+ zratx* zrsin);
-      refps=-( zratx* cth- zrsin)/( zratx* cth+ zrsin);
+      refps = -( zratx* cth- zrsin)/( zratx* cth+ zrsin);
       refps= refps- refs;
       epy= px* txk+ py* tyk;
       epx= px* epy;
@@ -2940,7 +2940,7 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
   
   /* displace observation point for thin wire approximation */
   zij= zi+ zj;
-  salpr=- salpj;
+  salpr = - salpj;
   rhox= sabj* zij- salpr* yij;
   rhoy= salpr* xij- cabj* zij;
   rhoz= cabj* yij- sabj* xij;
@@ -2953,7 +2953,7 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
   } else {
     rh= ai/ sqrt( rh);
     if ( rhoz < 0.0)
-      rh=- rh;
+      rh = - rh;
     xo= xi+ rh* rhox;
     yo= yi+ rh* rhoy;
     zo= zi+ rh* rhoz;
@@ -3036,7 +3036,7 @@ void nec_context::eksc( nec_float s, nec_float z, nec_float rh, nec_float xk, in
   nec_float ss = sin(shk);
   nec_float cs = cos(shk);
   nec_float z2a = sh - z;
-  nec_float z1a =-(sh + z);
+  nec_float z1a = -(sh + z);
   
   nec_complex gz1, gz2, gp1, gp2;
   gx( z1a, rh, xk, &gz1, &gp1);
@@ -3045,21 +3045,21 @@ void nec_context::eksc( nec_float s, nec_float z, nec_float rh, nec_float xk, in
   nec_complex gzp2 = gp2 * z2a;
   
   *in_ezs=  __const1*(( gz2- gz1)* cs* xk-( gzp2+ gzp1)* ss);
-  *in_ezc=- __const1*(( gz2+ gz1)* ss* xk+( gzp2- gzp1)* cs);
+  *in_ezc = - __const1*(( gz2+ gz1)* ss* xk+( gzp2- gzp1)* cs);
   *erk= __const1*( gp2- gp1)* rh;
   
   nec_float cint, sint;
   intx(-shk, shk, rhk, ij, &cint, &sint);
-  *in_ezk=- __const1*( gzp2- gzp1+ xk* xk* nec_complex( cint,- sint));
+  *in_ezk = - __const1*( gzp2- gzp1+ xk* xk* nec_complex( cint,- sint));
   
   if ( rh >= 1.0e-10)
   {
     gzp1 = gzp1 * z1a;
     gzp2 = gzp2 * z2a;
     
-    *ers =- __const1*(( gzp2+ gzp1+ gz2+ gz1)*
+    *ers = - __const1*(( gzp2+ gzp1+ gz2+ gz1)*
       ss-( z2a* gz2- z1a* gz1)* cs*xk)/ rh;
-    *erc =- __const1*(( gzp2- gzp1+ gz2- gz1)*
+    *erc = - __const1*(( gzp2- gzp1+ gz2- gz1)*
       cs+( z2a* gz2+ z1a* gz1)* ss*xk)/ rh;
     return;
   }
@@ -3111,7 +3111,7 @@ void nec_context::ekscx( nec_float bx, nec_float s, nec_float z,
   ss= sin( shk);
   cs= cos( shk);
   z2a= sh- z;
-  z1a=-( sh+ z);
+  z1a = -( sh+ z);
   a2= b* b;
   
   if ( inx1 != 2)
@@ -3139,16 +3139,16 @@ void nec_context::ekscx( nec_float bx, nec_float s, nec_float z,
   }
   
   *in_ezs= __const1*(( gz2- gz1)* cs* xk-( gzp2+ gzp1)* ss);
-  *in_ezc=- __const1*(( gz2+ gz1)* ss* xk+( gzp2- gzp1)* cs);
-  *ers=- __const1*(( z2a* grp2+ z1a* grp1+ gr2+ gr1)*ss
+  *in_ezc = - __const1*(( gz2+ gz1)* ss* xk+( gzp2- gzp1)* cs);
+  *ers = - __const1*(( z2a* grp2+ z1a* grp1+ gr2+ gr1)*ss
     -( z2a* gr2- z1a* gr1)* cs* xk);
-  *erc=- __const1*(( z2a* grp2- z1a* grp1+ gr2- gr1)*cs
+  *erc = - __const1*(( z2a* grp2- z1a* grp1+ gr2- gr1)*cs
     +( z2a* gr2+ z1a* gr1)* ss* xk);
   *erk= __const1*( grk2- grk1);
   intx(- shk, shk, rhk, ij, &cint, &sint);
   bk= b* xk;
   bk2= bk* bk*.25;
-  *in_ezk=- __const1*( gzp2- gzp1+ xk* xk*(1.- bk2)*
+  *in_ezk = - __const1*( gzp2- gzp1+ xk* xk*(1.- bk2)*
     nec_complex( cint,- sint)-bk2*( gzz2- gzz1));
 }
 
@@ -3209,10 +3209,10 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     set= sin( p3);
     pxl= cth* cph* cet- sph* set;
     pyl= cth* sph* cet+ cph* set;
-    pzl=- sth* cet;
-    wx=- sth* cph;
-    wy=- sth* sph;
-    wz=- cth;
+    pzl = - sth* cet;
+    wx = - sth* cph;
+    wy = - sth* sph;
+    wz = - cth;
     qx= wy* pzl- wz* pyl;
     qy= wz* pxl- wx* pzl;
     qz= wx* pyl- wy* pxl;
@@ -3221,8 +3221,8 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     {
       if (ground.type_perfect())
       {
-        rrv=-cplx_10();
-        rrh=-cplx_10();
+        rrv = -cplx_10();
+        rrh = -cplx_10();
       }
       else
       {
@@ -3230,7 +3230,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
         rrh= ground.zrati* cth;
         rrh=( rrh- rrv)/( rrh+ rrv);
         rrv= ground.zrati* rrv;
-        rrv=-( cth- rrv)/( cth+ rrv);
+        rrv = -( cth- rrv)/( cth+ rrv);
       }
     }
   
@@ -3240,7 +3240,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
       {
         for (int i = 0; i < n; i++ )
         {
-          nec_float arg=- two_pi() *( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
+          nec_float arg = - two_pi() *( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
           nec_complex e_amplitude(cos(arg), sin(arg));
           
           e[i] = -(pxl*m_geometry->cab[i]+ pyl*m_geometry->sab[i]+ pzl*m_geometry->salp[i]) * e_amplitude * incident_amplitude;
@@ -3251,11 +3251,11 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
           tt1=( pyl* cph- pxl* sph)*( rrh- rrv);
           nec_complex cx= rrv* pxl- tt1* sph;
           nec_complex cy= rrv* pyl+ tt1* cph;
-          nec_complex cz=- rrv* pzl;
+          nec_complex cz = - rrv* pzl;
         
           for (int i = 0; i < n; i++ )
           {
-            nec_float arg=- two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
+            nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
             nec_complex e_amplitude(cos(arg), sin(arg));
             e[i] -= ( cx* m_geometry->cab[i]+ cy* m_geometry->sab[i]+ cz* m_geometry->salp[i])* e_amplitude * incident_amplitude;
           }
@@ -3286,8 +3286,8 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
       if (ground.present())
       {
         tt1=( qy* cph- qx* sph)*( rrv- rrh);
-        nec_complex cx=-( rrh* qx- tt1* sph);
-        nec_complex cy=-( rrh* qy+ tt1* cph);
+        nec_complex cx = -( rrh* qx- tt1* sph);
+        nec_complex cy = -( rrh* qy+ tt1* cph);
         nec_complex cz= rrh* qz;
         
         int i= -1;
@@ -3310,9 +3310,9 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     } /* if ( excite_type == EXCITATION_LINEAR) */
 
     /* incident plane wave, elliptic polarization. */
-    tt1=-(cplx_01())* p6;
+    tt1 = -(cplx_01())* p6;
     if ( excite_type == EXCITATION_CIRC_LEFT)
-      tt1=- tt1;
+      tt1 = - tt1;
   
     if ( n != 0)
     {
@@ -3322,7 +3322,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     
       for (int i = 0; i < n; i++ )
       {
-        nec_float arg=- two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
+        nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
         nec_complex e_amplitude(cos(arg), sin(arg));
         e[i] = -(cx* m_geometry->cab[i] + cy* m_geometry->sab[i] + cz*m_geometry->salp[i])* e_amplitude * incident_amplitude;
       }
@@ -3333,11 +3333,11 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
         tt2=( cy* cph- cx* sph)*( rrh- rrv);
         nec_complex ccx= rrv* cx- tt2* sph;
         nec_complex ccy= rrv* cy+ tt2* cph;
-        nec_complex ccz=- rrv* cz;
+        nec_complex ccz = - rrv* cz;
       
         for (int i = 0; i < n; i++ )
         {
-          nec_float arg=- two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
+          nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
           nec_complex e_amplitude(cos(arg), sin(arg));
           e[i] -= (ccx* m_geometry->cab[i]+ ccy* m_geometry->sab[i]+ ccz* m_geometry->salp[i]) * e_amplitude * incident_amplitude;
         }
@@ -3373,8 +3373,8 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     if (ground.present())
     {
       tt1=( cy* cph- cx* sph)*( rrv- rrh);
-      cx=-( rrh* cx- tt1* sph);
-      cy=-( rrh* cy+ tt1* cph);
+      cx = -( rrh* cx- tt1* sph);
+      cy = -( rrh* cy+ tt1* cph);
       cz= rrh* cz;
 
       int i= -1;
@@ -3597,7 +3597,7 @@ void nec_context::gxx( nec_float zz, nec_float rh, nec_float a, nec_float a2, ne
   if ( ira != 1)
   {
     *g3=( *g3+ *gzp)* rh;
-    *gzp=- zz* c1* gz;
+    *gzp = - zz* c1* gz;
   
     if ( rh <= 1.0e-10)
     {
@@ -3612,11 +3612,11 @@ void nec_context::gxx( nec_float zz, nec_float rh, nec_float a, nec_float a2, ne
   } /* if ( ira != 1) */
   
   t2=.5* a;
-  *g2=- t2* c1* gz;
+  *g2 = - t2* c1* gz;
   *g2p= t2* gz* c2/ r2;
   *g3= rh2* *g2p- a* gz* c1;
   *g2p= *g2p* zz;
-  *gzp=- zz* c1* gz;
+  *gzp = - zz* c1* gz;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -3778,7 +3778,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
   
   rx= xi- xj;
   ry= yi- yj;
-  rfl=-1.;
+  rfl = -1.;
   exk=cplx_00();
   eyk=cplx_00();
   ezk=cplx_00();
@@ -3788,7 +3788,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
   
   for (int ground_loop = 1; ground_loop <= ground.ksymp; ground_loop++ )
   {
-    rfl=- rfl;
+    rfl = - rfl;
     rz = zi - zj*rfl;
     rsq = rx*rx + ry*ry + rz*rz;
   
@@ -3799,7 +3799,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
     rk= two_pi() * r;
     cr= cos( rk);
     sr= sin( rk);
-    gam=-( nec_complex(cr,-sr)+rk*nec_complex(sr,cr) )/( four_pi()*rsq*r )* m_s;
+    gam = -( nec_complex(cr,-sr)+rk*nec_complex(sr,cr) )/( four_pi()*rsq*r )* m_s;
     exc= gam* rx;
     eyc= gam* ry;
     ezc= gam* rz;
@@ -3816,12 +3816,12 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
     {
       if (  ground.type_perfect() ) //ground.iperf == 1)
       {
-        f1x=- f1x;
-        f1y=- f1y;
-        f1z=- f1z;
-        f2x=- f2x;
-        f2y=- f2y;
-        f2z=- f2z;
+        f1x = - f1x;
+        f1y = - f1y;
+        f1z = - f1z;
+        f2x = - f2x;
+        f2y = - f2y;
+        f2z = - f2z;
       }
       else
       {
@@ -3835,7 +3835,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
         }
         else
         {
-          pxx=- ry/ xymag;
+          pxx = - ry/ xymag;
           pyy= rx/ xymag;
           cth= rz/ r;
           rrv= sqrt(1.0 - ground.get_zrati_sqr() *(1.0 - cth* cth));
@@ -3844,7 +3844,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
         rrh= ground.zrati* cth;
         rrh=( rrh- rrv)/( rrh+ rrv);
         rrv= ground.zrati* rrv;
-        rrv=-( cth- rrv)/( cth+ rrv);
+        rrv = -( cth- rrv)/( cth+ rrv);
         
         gam=( f1x* pxx+ f1y* pyy)*( rrv- rrh);
         f1x= f1x* rrh+ gam* pxx;
@@ -3879,11 +3879,11 @@ void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai 
   
   xij= xi- xj;
   yij= yi- yj;
-  rfl=-1.;
+  rfl = -1.;
   
   for (int ground_loop = 0; ground_loop < ground.ksymp; ground_loop++ )
   {
-    rfl=- rfl;
+    rfl = - rfl;
     salpr= salpj* rfl;
     zij= zi- rfl* zj;
     zp= xij* cabj+ yij* sabj+ zij* salpr;
@@ -3947,14 +3947,14 @@ void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai 
         }
         else
         {
-          px=- yij/ xymag;
+          px = - yij/ xymag;
           py= xij/ xymag;
           cth= zij/ rmag;
           rrv= sqrt(1.- zratx* zratx*(1.- cth* cth));
         }
       
         rrh= zratx* cth;
-        rrh=-( rrh- rrv)/( rrh+ rrv);
+        rrh = -( rrh- rrv)/( rrh+ rrv);
         rrv= zratx* rrv;
         rrv=( cth- rrv)/( cth+ rrv);
         qy=( phx* px+ phy* py)*( rrv- rrh);
@@ -4021,8 +4021,8 @@ void nec_context::hsflx( nec_float s, nec_float rh, nec_float zpx,
     }
     else
     {
-      zp=- zpx;
-      hss=-1.;
+      zp = - zpx;
+      hss = -1.;
     }
   
     dh= 0.5* s;
@@ -4049,8 +4049,8 @@ void nec_context::hsflx( nec_float s, nec_float rh, nec_float zpx,
       t1= z1* ekr1/ r1;
       t2= z2a* ekr2/ r2;
       *hps=( cdk*( ekr2- ekr1)- cplx_01()* sdk*( t2+ t1))* hss;
-      *hpc=- sdk*( ekr2+ ekr1)- cplx_01()* cdk*( t2- t1);
-      cons=- cplx_01()/(2.0 * two_pi() * rh);
+      *hpc = - sdk*( ekr2+ ekr1)- cplx_01()* cdk*( t2- t1);
+      cons = - cplx_01()/(2.0 * two_pi() * rh);
       *hps= cons* *hps;
       *hpc= cons* *hpc;
       return;
@@ -4619,7 +4619,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
           y12r=0.;
           y12i=1./( x11r[j]* sin( y22r));
           y11r= x12r[j];
-          y11i=- y12i* cos( y22r);
+          y11i = - y12i* cos( y22r);
           y22r= x22r[j];
           y22i= y11i+ x22i[j];
           y11i= y11i+ x12i[j];
@@ -4645,7 +4645,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         jump2 = false;
         if ( ! jump1 )
         {
-          isc1=-1;
+          isc1 = -1;
       
           for( i = 0; i < nteq; i++ )
           {
@@ -4700,7 +4700,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
         jump2 = false;
         if ( ! jump1 )
         {
-          isc2=-1;
+          isc2 = -1;
       
           for( i = 0; i < nteq; i++ )
           {
@@ -5503,7 +5503,7 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
     if (ipr > PCHCON)
       ind1=2;
     else if ( ipr < 0 ) {
-      ipr=- ipr;
+      ipr = - ipr;
       ipr--;
       if ( -m_geometry->icon1[ipr-1] != jp1 ) {
         ind1=2;
@@ -6198,7 +6198,7 @@ void nec_context::unere( nec_float xob, nec_float yob, nec_float zob, bool groun
   
   if ( ground_reflection)
   {
-    zr =- zr;
+    zr = - zr;
     t1zr = -t1zr;
     t2zr = -t2zr;
   }
@@ -6241,13 +6241,13 @@ void nec_context::unere( nec_float xob, nec_float yob, nec_float zob, bool groun
   // handle the ground_reflection
   if (  ground.type_perfect() ) // (ground.iperf == 1)
   {
-    exk=- exk;
-    eyk=- eyk;  
+    exk = - exk;
+    eyk = - eyk;  
     
-    ezk=- ezk;
-    exs=- exs;
-    eys=- eys;
-    ezs=- ezs;
+    ezk = - ezk;
+    exs = - exs;
+    eys = - eys;
+    ezs = - ezs;
     return;
   }
   
@@ -6261,7 +6261,7 @@ void nec_context::unere( nec_float xob, nec_float yob, nec_float zob, bool groun
   }
   else
   {
-    px=- ry/ xymag;
+    px = - ry/ xymag;
     py= rx/ xymag;
     cth= rz/ sqrt( xymag* xymag+ rz* rz);
     rrv= sqrt(1.0- ground.get_zrati_sqr() * (1.0 - cth*cth));
@@ -6270,7 +6270,7 @@ void nec_context::unere( nec_float xob, nec_float yob, nec_float zob, bool groun
   rrh= ground.zrati* cth;
   rrh=( rrh- rrv)/( rrh+ rrv);
   rrv= ground.zrati* rrv;
-  rrv=-( cth- rrv)/( cth+ rrv);
+  rrv = -( cth- rrv)/( cth+ rrv);
   
   edp=( exk* px+ eyk* py)*( rrh- rrv);
   exk= exk* rrv+ edp* px;
@@ -6499,7 +6499,7 @@ void nec_context::fblock( int nrow, int ncol, int imax, int ipsym ) {
       for(int j = 0; j < kk; j++ )  {
         nec_complex deter = symmetry_array[i+j*nop];
         symmetry_array[i+(j+kk)*nop] = deter;
-        symmetry_array[i+kk+(j+kk)*nop] =- deter;
+        symmetry_array[i+kk+(j+kk)*nop] = - deter;
         symmetry_array[i+kk+j*nop] = deter;
       }
     }
@@ -6542,10 +6542,10 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
   
   /* computation of space and ground waves. */
   ground_wave.set_u(ground.zrati);
-  phx=- sin( phi);
+  phx = - sin( phi);
   phy= cos( phi);
   rx= rho* phy;
-  ry=- rho* phx;
+  ry = - rho* phx;
   cix=cplx_00();
   ciy=cplx_00();
   ciz=cplx_00();
@@ -6581,18 +6581,18 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
     }
   
     el= pi()* m_geometry->segment_length[i];
-    rfl=-1.;
+    rfl = -1.;
   
     /* Integration of (current)*(phase factor) over segment and image for 
        constant, sine, and cosine current distributions */
     for( k = 0; k < 2; k++ )  {
-      rfl=- rfl;
+      rfl = - rfl;
       riz= rz- m_geometry->z[i]* rfl;
       rxyz= sqrt( rix* rix+ riy* riy+ riz* riz);
       rnx= rix/ rxyz;
       rny= riy/ rxyz;
       rnz= riz/ rxyz;
-      omega=-( rnx* dx+ rny* dy+ rnz* dz* rfl);
+      omega = -( rnx* dx+ rny* dy+ rnz* dz* rfl);
       sill= omega* el;
       top= el+ sill;
       bot= el- sill;
@@ -6653,8 +6653,8 @@ void nec_context::gfld(nec_float rho, nec_float phi, nec_float rz,
   rny= ry/ r;
   rnz= rz/ r;
   thx= rnz* phy;
-  thy=- rnz* phx;
-  thz=- rho/ r;
+  thy = - rnz* phx;
+  thz = - rho/ r;
   *eth= cix* thx+ ciy* thy+ ciz* thz;
   *epi= cix* phx+ ciy* phy;
   *erd= cix* rnx+ ciy* rny+ ciz* rnz;
@@ -6676,14 +6676,14 @@ void nec_context::ffld(nec_float thet, nec_float phi,
   nec_complex zrsin, rrv, rrh, rrv1, rrh1, rrv2, rrh2;
   nec_complex tix, tiy, tiz, ex, ey, ez;
   
-  phx=- sin( phi);
+  phx = - sin( phi);
   phy= cos( phi);
   roz= cos( thet);
   rozs= roz;
   thx= roz* phy;
-  thy=- roz* phx;
-  thz=- sin( thet);
-  rox=- thz* phy;
+  thy = - roz* phx;
+  thz = - sin( thet);
+  rox = - thz* phy;
   roy= thz* phx;
   
   jump = false;
@@ -6694,12 +6694,12 @@ void nec_context::ffld(nec_float thet, nec_float phi,
     if ( k != 0 )  {
       /* for perfect ground */
       if (ground.type_perfect()) {
-        rrv=-cplx_10();
-        rrh=-cplx_10();
+        rrv = -cplx_10();
+        rrh = -cplx_10();
       } else {
         /* for infinite planar ground */
         zrsin= sqrt(1.- ground.get_zrati_sqr() * thz* thz);
-        rrv=-( roz- ground.zrati * zrsin)/( roz+ ground.zrati* zrsin);
+        rrv = -( roz- ground.zrati * zrsin)/( roz+ ground.zrati* zrsin);
         rrh=( ground.zrati* roz- zrsin)/( ground.zrati* roz+ zrsin);
       }
     
@@ -6713,13 +6713,13 @@ void nec_context::ffld(nec_float thet, nec_float phi,
           nec_complex zrati2 = ground.get_zrati2(in_wavelength);
           
           zrsin = sqrt(1.-  zrati2 *  zrati2 * thz* thz);
-          rrv2 =-( roz-  zrati2* zrsin)/( roz+  zrati2* zrsin);
+          rrv2 = -( roz-  zrati2* zrsin)/( roz+  zrati2* zrsin);
           rrh2 =(  zrati2* roz- zrsin)/(  zrati2* roz+ zrsin);
           darg = -two_pi() * 2.0 * ground.get_ch(in_wavelength) * roz;
         }
       } /* if ( ifar > 1) */
     
-      roz=- roz;
+      roz = - roz;
       ccx= cix;
       ccy= ciy;
       ccz= ciz;
@@ -6731,7 +6731,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
   
     /* loop over structure segments */
     for( i = 0; i < m_geometry->n_segments; i++ )  {
-      omega=-( rox* m_geometry->cab[i]+ roy* m_geometry->sab[i]+ roz* m_geometry->salp[i]);
+      omega = -( rox* m_geometry->cab[i]+ roy* m_geometry->sab[i]+ roz* m_geometry->salp[i]);
       el= pi()* m_geometry->segment_length[i];
       sill= omega* el;
       top= el+ sill;
@@ -6892,7 +6892,7 @@ void nec_context::ffld(nec_float thet, nec_float phi,
       rrh= ground.zrati * roz;
       rrh=( rrh- rrv)/( rrh+ rrv);
       rrv= ground.zrati * rrv;
-      rrv=-( roz- rrv)/( roz+ rrv);
+      rrv = -( roz- rrv)/( roz+ rrv);
       
       *eth=( tempx* phx+ tempy* phy)*( rrh- rrv);
       tempx= tempx* rrv+ *eth* phx;
