@@ -352,7 +352,12 @@ All co-ordinates are in meters.
 */
 void nec_context::helix(int tag_id, int segment_count, nec_float s, nec_float hl, nec_float a1, nec_float b1,
     nec_float a2, nec_float b2, nec_float rad) {
-  m_geometry->helix(s, hl, a1, b1, a2, b2, rad, segment_count, tag_id);
+    
+  /* int tag_id, int segment_count, 
+             nec_float s, nec_float hl, nec_float a1, nec_float b1,
+             nec_float a2, nec_float b2, nec_float rad
+  */
+  m_geometry->helix(tag_id, segment_count, s, hl, a1, b1, a2, b2, rad);
 }
 
 /* "fr" card, frequency parameters

@@ -446,8 +446,17 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
         " LENGTH: %8.3f  %8.3f %5d %5d %5d %4d\n      "
         " RADIUS X1:%8.3f Y1:%8.3f X2:%8.3f Y2:%8.3f ",
         nwire, xw1, yw1, rad, card_int_2, i1, i2, card_int_1, zw1, xw2, yw2, zw2 );
-    
-      helix( xw1, yw1, zw1, xw2, yw2, zw2, rad, card_int_2, card_int_1);
+      int tag_id(card_int_1);
+      int segment_count(card_int_2);
+      nec_float s(xw1);
+      nec_float hl(yw1);
+      nec_float a1(zw1);
+      nec_float b1(xw2);
+      nec_float a2(yw2);
+      nec_float b2(zw2);
+      
+      helix(tag_id, segment_count,
+            s, hl, a1, b1, a2, b2, rad);
     }
 
     /* "gf" card, not supported */

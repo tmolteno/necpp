@@ -1,3 +1,6 @@
+## Version 1.7.2
+* Fixed bug in helix introduced in 1.7.1 - had not updated all calls to the helix function (thanks to Yoshi Takeyasu for pointing this out)
+
 ## Version 1.7.1
 * Changed API of c_geometry::helix() to put the tag id and segment count at the start.
 
