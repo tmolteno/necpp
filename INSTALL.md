@@ -23,13 +23,13 @@ install these with the following command.
 
   3. Then do the usual thing 
        ./configure --without-lapack
-       make 
+       make -j 4
        sudo make install
 
   4. To use LAPACK, you should install the appropriate atlas system
      aptitude install libatlas-base-dev. And then to the usual thing, i.e.,
         ./configure 
-        make
+        make -j 4
         sudo make install
 
 ## Compiling for a specific architecture
