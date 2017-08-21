@@ -184,6 +184,7 @@
     <ClCompile Include="..\..\src\nec_ground.cpp" />
     <ClCompile Include="..\..\src\nec_output.cpp" />
     <ClCompile Include="..\..\src\nec_radiation_pattern.cpp" />
+    <ClCompile Include="..\..\src\nec_results.cpp" />
     <ClCompile Include="..\..\src\nec_structure_currents.cpp" />
     <ClCompile Include="..\..\src\XGetopt.cpp" />
   </ItemGroup>
