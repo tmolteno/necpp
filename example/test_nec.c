@@ -21,7 +21,7 @@ void seven_wire_antenna() {
 /*  NEC_ERROR_HANDLE(nec_wire(nec, 5, 7, -0.0318, 0.0439, 0.014, -0.0318, 0.0045, 0.0624, 0.001, 1.0, 1.0));*/
   NEC_ERROR_HANDLE(nec_wire(nec, 6, 5, -0.0318, 0.0045, 0.0624, -0.0106, 0.0378, 0.0866, 0.001, 1.0, 1.0));
   NEC_ERROR_HANDLE(nec_wire(nec, 7, 7, -0.0106, 0.0378, 0.0866, -0.0106, 0.0257, 0.023, 0.001, 1.0, 1.0));
-  NEC_ERROR_HANDLE(nec_geometry_complete(nec, 1));
+  NEC_ERROR_HANDLE(nec_geometry_complete(nec, 1, 0));
   NEC_ERROR_HANDLE(nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0));
   NEC_ERROR_HANDLE(nec_fr_card(nec, 0, 1, 1600.0, 0.0));
   NEC_ERROR_HANDLE(nec_ex_card(nec, 0, 1, 1,  0,  1.0,  0.0,  0.0,  0.0,  0.0,  0.0));
@@ -48,7 +48,7 @@ void simple_example() {
   nec = nec_create();
   
   nec_wire(nec, 0, 9, 0, 0, 2, 0, 0, 7, 0.1, 1, 1);
-  nec_geometry_complete(nec, 1);
+  nec_geometry_complete(nec, 1, 0);
   nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
   nec_fr_card(nec, 0, 1, 30, 0);
   nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0, 0, 0, 0, 0);
@@ -87,7 +87,7 @@ void example3() {
   nec = nec_create();
   
   nec_wire(nec, 0, 9, 0., 0.0, 2.0, 0.0, 0.0, 7.0, 0.03, 1.0, 1.0);
-  nec_geometry_complete(nec, 1);
+  nec_geometry_complete(nec, 1, 0);
   nec_ek_card(nec, 0);
   nec_fr_card(nec, 0, 1, 30., 0 );
   nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
