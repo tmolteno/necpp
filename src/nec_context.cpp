@@ -1049,18 +1049,21 @@ void nec_context::simulate(bool far_field_flag) {
         
       m_geometry->frequency_scale(freq_mhz);
       processing_state = 2;
+      /* Falls through. */
 
     case 2: /* structure segment loading */
       structure_segment_loading();
 
       processing_state=3;
       ntsol=0;
+      /* Falls through. */
     
     case 3: /* excitation set up (right hand side, -e inc.) */
       nthic=1;
       nphic=1;
       inc=1;
       nprint=0;
+      /* Falls through. */
 
     default:
       enum excitation_return ret = excitation_loop(igox, mhz);
