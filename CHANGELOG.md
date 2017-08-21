@@ -1,3 +1,8 @@
+## Version 1.7.3
+* Changes to allow compilation on CLANG. Change to use std::abs() and friends.
+* Minor bug fixes in example c code.
+* Minor bug in fallthrough on printing complex numbers.
+
 ## Version 1.7.2
 * Fixed bug in helix introduced in 1.7.1 - had not updated all calls to the helix function (thanks to Yoshi Takeyasu for pointing this out)
 
