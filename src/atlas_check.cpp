@@ -513,7 +513,7 @@ void matrix_setup(complex_array& A)
 {	int n = 4;
 	A.get(0,0) = 3.0;
 	A.get(0,1) =1.0;
-	A.get(0,2) =-4.0;
+	A.get(0,2) = -4.0;
 	A.get(0,3) =2.0;
 	A.get(1,0) =3.0;
 	A.get(1,1) =1.0;
@@ -521,11 +521,11 @@ void matrix_setup(complex_array& A)
 	A.get(1,3) =2.0;
 	A.get(2,0) =2.0;
 	A.get(2,1) =13.0;
-	A.get(2,2) =-1.0;
+	A.get(2,2) = -1.0;
 	A.get(2,3) =0.0;
-	A.get(3,0) =-2.0;
+	A.get(3,0) = -2.0;
 	A.get(3,1) =3.0;
-	A.get(3,2) =-1.0;
+	A.get(3,2) = -1.0;
 	A.get(3,3) =4.0;
 	for (int i = 1; i < n; i++ )
 	{

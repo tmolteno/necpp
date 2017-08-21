@@ -292,7 +292,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 	{
 		exrm=1./ m_range;
 		exra= m_range/ _wavelength;
-		exra=-360.*( exra- floor( exra));
+		exra = -360.*( exra- floor( exra));
 	}
 	
 	int result_counter=0;
@@ -366,7 +366,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
 					stilta= sin( tilta);
 					tstor1= tstor1* stilta* stilta;
 					tstor2= tstor2* stilta* cos( tilta);
-					emajr2=- tstor1+ tstor2+ ethm2;
+					emajr2 = - tstor1+ tstor2+ ethm2;
 					eminr2= tstor1- tstor2+ ephm2;
 					if ( eminr2 < 0.)
 						eminr2=0.;

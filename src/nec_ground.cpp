@@ -189,7 +189,7 @@ void nec_ground::calculate_antenna_environment(c_ground_wave& ground_wave, nec_f
   nec_float wavelength = em::get_wavelength(freq_mhz * 1.0e6);
   
   if ( sig < 0.)
-    sig=- sig/(em::impedance_over_2pi()*wavelength);
+    sig = - sig/(em::impedance_over_2pi()*wavelength);
 
   _epsc = nec_complex( epsr, -sig*wavelength*em::impedance_over_2pi());
   zrati = 1.0/ sqrt( _epsc);
