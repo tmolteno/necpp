@@ -252,29 +252,29 @@ public:
 private:
   nec_float mean(const real_matrix& pattern) const  {
     nec_float sum = 0.0;
-    long rows = pattern.rows();
-    long cols = pattern.cols();
-    for (long i=0;i<rows;i++) {
-      for (long j=0;j<cols;j++) {
+    int64_t rows = pattern.rows();
+    int64_t cols = pattern.cols();
+    for (int64_t i=0;i<rows;i++) {
+      for (int64_t j=0;j<cols;j++) {
         sum += pattern(i,j) * _averaging_scales(i,j);
       }
     }
-    long len = rows*cols;
+    int64_t len = rows*cols;
     return sum/(len*2.0 / pi());
   }
 
   nec_float sd(const real_matrix& pattern, nec_float _mean) const  {
     nec_float sum = 0.0;
-    long rows = pattern.rows();
-    long cols = pattern.cols();
+    int64_t rows = pattern.rows();
+    int64_t cols = pattern.cols();
     
-    for (long i=0;i<rows;i++) {
-      for (long j=0;j<cols;j++) {
+    for (int64_t i=0;i<rows;i++) {
+      for (int64_t j=0;j<cols;j++) {
         nec_float diff = pattern(i,j) - _mean;
         sum += diff*diff * _averaging_scales(i,j);
       }
     }
-    long len = rows*cols;
+    int64_t len = rows*cols;
     return std::sqrt(sum/(len*2.0 / pi()));
   }
 

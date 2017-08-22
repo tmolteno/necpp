@@ -11,8 +11,8 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
   
-  You should have received a copy of the GNU General Public License
-  aint32_t with this program; if not, write to the Free Software
+  You should have received a copy of the GNU General Public License with 
+  this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #ifndef __safe_array__
@@ -48,185 +48,185 @@ template<typename T>
 class safe_array {
 public:
   safe_array()
-    : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
+    : _len(0), _rows(0), _cols(0), _resize_chunk(2), _data(NULL), _data_size(0), _own_data(true)
   { }
 
   safe_array(int64_t in_size)
-    : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
+    : _len(0), _rows(0), _cols(0), _resize_chunk(2), _data(NULL), _data_size(0), _own_data(true)
   {
     resize(in_size);
   }
   
   safe_array(const safe_array<T>& in_array)
-    : len_(0), rows_(0), cols_(0), resize_chunk_(2), data_(NULL), data_size_(0), own_data_(true)
+    : _len(0), _rows(0), _cols(0), _resize_chunk(2), _data(NULL), _data_size(0), _own_data(true)
   {
     copy(in_array);
   }
   
   ~safe_array()  {
-    if (own_data_) {
-      delete[] data_;
-      data_ = NULL;
+    if (_own_data) {
+      delete[] _data;
+      _data = NULL;
     }
   }
   
   
   int64_t size() const {
-    return len_;
+    return _len;
   }
 
-  int32_t rows() const {
-    return rows_;
+  int64_t rows() const {
+    return _rows;
   }
 
-  int32_t cols() const {
-    return cols_;
+  int64_t cols() const {
+    return _cols;
   }
 
   int64_t capacity() const {
-    return data_size_;
+    return _data_size;
   }
 
-  void resize(int32_t n_rows, int32_t n_cols) {
-    rows_ = n_rows;
-    cols_ = n_cols;
+  void resize(int64_t n_rows, int64_t n_cols) {
+    _rows = n_rows;
+    _cols = n_cols;
     
-    resize(rows_ * cols_);
+    resize(_rows * _cols);
   }
 
   // Copy the contents of in_array to our array
   // resizing as appropriate.
   void copy(const safe_array<T>& in_array) {
-    if (in_array.rows_ == 0)
-      resize(in_array.len_);
+    if (in_array._rows == 0)
+      resize(in_array._len);
     else
-      resize(in_array.rows_,in_array.cols_);
+      resize(in_array._rows,in_array._cols);
       
-    for (int64_t i=0; i<len_; i++)
-      data_[i] = in_array[i];
+    for (int64_t i=0; i<_len; i++)
+      _data[i] = in_array[i];
   }
 
   
   void resize(int64_t new_length) {
 #ifdef NEC_ERROR_CHECK
-    if (! own_data_)
+    if (! _own_data)
       throw new nec_exception("attempt to resize data we do not own");
 #endif
-    if (new_length > data_size_) {
-      // We allocate resize_chunk_ more bytes than we need to avoid
+    if (new_length > _data_size) {
+      // We allocate _resize_chunk more bytes than we need to avoid
       // resizing too often. 
-      data_size_ = new_length + resize_chunk_;
+      _data_size = new_length + _resize_chunk;
       try {
-        T* new_data_ = new T[data_size_];
-        if (0 != len_)
-          std::memcpy(new_data_, data_, len_ * sizeof(T));
+        T* new_data_ = new T[_data_size];
+        if (0 != _len)
+          std::memcpy(new_data_, _data, _len * sizeof(T));
 
-        delete[] data_;
-        data_ = new_data_;
+        delete[] _data;
+        _data = new_data_;
       } catch (std::bad_alloc& ba) {
         throw new nec_exception("Error: Out of Memory ");
       }
     }
-    len_ = new_length;
+    _len = new_length;
   }
   
   /*!\brief return the largest element of the array */
   T maxCoeff() const {
-    if (0 == len_)
+    if (0 == _len)
       throw new nec_exception("No elements in maxCoeff");
 
-    T ret = data_[check(0)];
+    T ret = _data[check(0)];
     
-    for (int64_t i = 1; i < len_; i++ ) {
-      if ( data_[check(i)] > ret)
-        ret = data_[check(i)];
+    for (int64_t i = 1; i < _len; i++ ) {
+      if ( _data[check(i)] > ret)
+        ret = _data[check(i)];
     }
     return ret;
   }
 
   /*!\brief return the largest element of the array */
   T minCoeff() const {
-    if (int64_t(0) == len_)
+    if (int64_t(0) == _len)
       throw new nec_exception("No elements in minCoeff");
 
-    T ret = data_[check(0)];
+    T ret = _data[check(0)];
     
-    for (int64_t i = 1; i < len_; i++ ) {
-      if ( data_[check(i)] < ret)
-        ret = data_[check(i)];
+    for (int64_t i = 1; i < _len; i++ ) {
+      if ( _data[check(i)] < ret)
+        ret = _data[check(i)];
     }
     return ret;
   }
 
   /*!\brief return the sum of the specified elements in the array */
   T sum(int64_t start_index, int64_t stop_index)  {
-    T ret = data_[check(start_index)];
+    T ret = _data[check(start_index)];
     
     for (int64_t i = start_index+1; i < stop_index; i++ )  {
-      ret += data_[check(i)];
+      ret += _data[check(i)];
     }
     return ret;
   }
 
   /*!\brief return the sum of all elements in the array */
   T sum() {
-    return sum(0,len_);
+    return sum(0,_len);
   }
 
   // fill specified elements of the array with x
   void fill(int64_t start, int64_t N, const T& x) {
     int64_t stop = start + N;
     for (int64_t i = start; i < stop; i++ ) {
-      data_[check(i)] = x;
+      _data[check(i)] = x;
     }
   }
   
   // fill all elements of the array with x
   void setConstant(const T& x)  {
-    fill(0,len_,x);
+    fill(0,_len,x);
   }
 
   /*! \brief Set an element assuming that the data is stored in column major form.
   */
-  void set_col_major(int32_t col_dim, int32_t col, int32_t row, const T& val) {
-    data_[check(row*col_dim + col)] = val;
+  void set_col_major(int64_t col_dim, int64_t col, int64_t row, const T& val) {
+    _data[check(row*col_dim + col)] = val;
   }
 
   /*! \brief Get an element assuming that the data is stored in column major form.
   */
-  T& get_col_major(int32_t col_dim, int32_t col, int32_t row) {
-    return data_[check(row*col_dim + col)];
+  T& get_col_major(int64_t col_dim, int64_t col, int64_t row) {
+    return _data[check(row*col_dim + col)];
   }
   
   
   /**
    * \remark This is an accessor function that is useful for wrapping.
    * */
-  T& getItem(int32_t row, int32_t col) {
-    return data_[check(row,col)];
+  T& getItem(int64_t row, int64_t col) {
+    return _data[check(row,col)];
   }
 
   
   /**
    * \remark We use round brackets for indexing into 2D arrays.
    * */
-  T& operator()(int32_t row, int32_t col)  {
+  T& operator()(int64_t row, int64_t col)  {
     return getItem(row, col);
   }
   
-  const T& operator()(int32_t row, int32_t col) const  {
-    return data_[check(row,col)];
+  const T& operator()(int64_t row, int64_t col) const  {
+    return _data[check(row,col)];
   }
   
   /* \brief An accessor method to help with wrapping the C++ objects
   * into other languages (like python, ruby)
   */
   T& getItem(int64_t i) {
-    return data_[check(i)];
+    return _data[check(i)];
   }
   
   const T& operator[](int64_t i) const  {
-    return data_[check(i)];
+    return _data[check(i)];
   }
   
   T& operator[](int64_t i)  {
@@ -254,7 +254,7 @@ public:
   
   
   T* data() const  {
-    return data_;
+    return _data;
   }
                   
   safe_array<T>& operator=(const safe_array<T>& in_array)  {
@@ -264,15 +264,15 @@ public:
           
 
 protected:
-  int64_t len_;
-  int32_t rows_;
-  int32_t cols_;
-  int64_t resize_chunk_;
+  int64_t _len;
+  int64_t _rows;
+  int64_t _cols;
+  int64_t _resize_chunk;
   
-  T*  data_;
-  int64_t data_size_;
+  T*  _data;
+  int64_t _data_size;
   
-  bool own_data_;
+  bool _own_data;
   
   /*!\brief Constructor only used to construct segment
   \param start_index The first element of in_array to copy.
@@ -281,42 +281,42 @@ protected:
   */
   safe_array(const safe_array<T>& in_array, int64_t start_index, int64_t end_index, bool in_copy_data)
   {
-    resize_chunk_ = in_array.resize_chunk_;
-    len_ = (end_index - start_index)+1; // include the end_index element
-    rows_ = 0;
-    cols_ = 0;
+    _resize_chunk = in_array._resize_chunk;
+    _len = (end_index - start_index)+1; // include the end_index element
+    _rows = 0;
+    _cols = 0;
     
     if (in_copy_data)  {
-      data_ = new T[len_];
-      data_size_ = len_;
+      _data = new T[_len];
+      _data_size = _len;
       
-      for (int64_t i=0; i<len_; i++)
-        data_[check(i)] = in_array[start_index + i];
+      for (int64_t i=0; i<_len; i++)
+        _data[check(i)] = in_array[start_index + i];
 
-      own_data_ = true;
+      _own_data = true;
     } else {
-      data_ = in_array.data() + start_index;
-      data_size_ = 0;
-      own_data_ = false;
+      _data = in_array.data() + start_index;
+      _data_size = 0;
+      _own_data = false;
     }
   }
   
   inline int64_t check(int64_t i) const  {
 #ifdef NEC_ERROR_CHECK
-    if (i < 0 || i >= len_)
-      throw new BoundsViol("safe_array: ", i, len_);
+    if (i < 0 || i >= _len)
+      throw new BoundsViol("safe_array: ", i, _len);
 #endif
     return i;
   }
 
-  inline int64_t check(int32_t row, int32_t col) const  {
+  inline int64_t check(int64_t row, int64_t col) const  {
 #ifdef NEC_ERROR_CHECK
-    if (row < 0 || row >= rows_)
-      throw new BoundsViol("safe_array: ", row, rows_);
-    if (col < 0 || col >= cols_)
-      throw new BoundsViol("safe_array: ", col, cols_);
+    if (row < 0 || row >= _rows)
+      throw new BoundsViol("safe_array: ", row, _rows);
+    if (col < 0 || col >= _cols)
+      throw new BoundsViol("safe_array: ", col, _cols);
 #endif
-    return check(int64_t(col)*rows_ + row);
+    return check(int64_t(col)*_rows + row);
   }
 }; 
 
@@ -324,8 +324,8 @@ protected:
 template<typename T>
 class safe_matrix : public safe_array<T> {
 public:
-  safe_matrix(int32_t _rows, int32_t _cols) : safe_array<T>(_rows*_cols) {
-    this->resize(_rows, _cols);
+  safe_matrix(int64_t in_rows, int64_t in_cols) : safe_array<T>(in_rows*in_cols) {
+    this->resize(in_rows, in_cols);
   }
   safe_matrix() : safe_array<T>()
   { }
