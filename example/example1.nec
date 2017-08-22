@@ -1,0 +1,11 @@
+CM EXAMPLE 1. CENTER FED LINEAR ANTENNA
+CM nec2++ -i example1.nec -o example1.out
+CE
+GW 0 7 0. 0. -.25 0. 0. .25 .001
+GE
+EX 0 0 4 0 1.
+XQ
+LD 0 0 4 4 10. 3.000E-09 5.300E-11
+PQ
+NE 0 1 1 15 .001 0 0 0. 0. .01786
+EN
