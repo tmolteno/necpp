@@ -147,7 +147,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	
 	string input_filename, output_filename;
 	
-	char ain[3], line_buf[81];
+	char ain[3], line_buf[LINE_LEN+1];
 	
 	/* input card mnemonic list */
 	/* "XT" stands for "exit", added for testing */

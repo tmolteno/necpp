@@ -65,10 +65,9 @@ void secnds( nec_float *x)
 
 int load_line( char *buff, FILE *pfile )
 {
-	int
-		num_chr = 0, /* number of characters read, excluding lf/cr */
-		eof = 0, /* EOF flag */
-		chr;     /* character read by getc */
+	int num_chr = 0; /* number of characters read, excluding lf/cr */
+	int eof = 0; /* EOF flag */
+	int chr;     /* character read by getc */
 	
 	/* clear buffer at start */
 	buff[0] = '\0';
@@ -78,10 +77,9 @@ int load_line( char *buff, FILE *pfile )
 		return( EOF );
 	
 	while( (chr == '#') ||
-			(chr == ' ') ||
-			(chr == CR ) ||
-			(chr == LF ) )
-	{
+                (chr == ' ') ||
+                (chr == CR ) ||
+                (chr == LF ) ) {
 		/* go to the end of line (look for lf or cr) */
 		while( (chr != CR) && (chr != LF) )
 			if( (chr = fgetc(pfile)) == EOF )
@@ -91,11 +89,9 @@ int load_line( char *buff, FILE *pfile )
 		while( (chr == CR) || (chr == LF) )
 			if( (chr = fgetc(pfile)) == EOF )
 				return( EOF );
-	
 	} /* end of while( (chr == '#') || ... */
 	
-	while( num_chr < LINE_LEN )
-	{
+	while( num_chr < LINE_LEN ) {
 		/* if lf/cr reached before filling buffer, return */
 		if( (chr == CR) || (chr == LF) )
 			break;
@@ -104,8 +100,7 @@ int load_line( char *buff, FILE *pfile )
 		buff[num_chr++] = chr;
 	
 		/* terminate buffer as a string on EOF */
-		if( (chr = fgetc(pfile)) == EOF )
-		{
+		if( (chr = fgetc(pfile)) == EOF ) {
 			buff[num_chr] = '\0';
 			eof = EOF;
 		}

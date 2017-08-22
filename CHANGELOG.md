@@ -1,3 +1,6 @@
+## Vresion 1.7.4
+* Fix bug in reading comments longer than 80 characters (issue #47)
+
 ## Version 1.7.3
 * Changes to allow compilation on CLANG. Change to use std::abs() and friends.
 * Minor bug fixes in example c code.
