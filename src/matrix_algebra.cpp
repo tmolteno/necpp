@@ -373,31 +373,31 @@ void lu_decompose_ge(nec_output_file& s_output, int64_t n, complex_array& a, int
     of which are stored in a.  The RHS vector b is input and the
     solution is returned through vector b.   (matrix transposed)
 */
-void solve_ge( int n, complex_array& a, int_array& ip,
+void solve_ge( int64_t n, complex_array& a, int_array& ip,
     complex_array& b, int64_t ndim )
 {
   DEBUG_TRACE("solve(" << n << "," << ndim << ")");
   complex_array y(n);
   
   /* forward substitution */
-  for (int i = 0; i < n; i++ )  {
-    int pivot_index = ip[i]-1;
+  for (int64_t i = 0; i < n; i++ )  {
+    int64_t pivot_index = ip[i]-1;
     y[i]= b[pivot_index];
     b[pivot_index]= b[i];
-    int ip1= i+1;
+    int64_t ip1= i+1;
     
-    int i_offset = i*ndim;
-    for (int j = ip1; j < n; j++ )
+    int64_t i_offset = i*ndim;
+    for (int64_t j = ip1; j < n; j++ )
       b[j] -= a[j+i_offset] * y[i];
   }
   
   /* backward substitution */
-  for (int k = 0; k < n; k++ )  {
-    int i= n-k-1;
+  for (int64_t k = 0; k < n; k++ )  {
+    int64_t i= n-k-1;
     nec_complex sum(cplx_00());
-    int ip1= i+1;
+    int64_t ip1= i+1;
     
-    for (int j = ip1; j < n; j++ )
+    for (int64_t j = ip1; j < n; j++ )
       sum += a[i+j*ndim]* b[j];
     
     b[i] = (y[i]- sum) / a[i+i*ndim];
@@ -428,9 +428,9 @@ void lu_decompose_lapack(nec_output_file& s_output,  int64_t n, complex_array& a
 
   /* Un-transpose the matrix for Gauss elimination */
   for (int i = 1; i < n; i++ )  {
-    int i_offset = i * ndim;
-    int j_offset = 0;
-    for (int j = 0; j < i; j++ )  {
+    int64_t i_offset = i * ndim;
+    int64_t j_offset = 0;
+    for (int64_t j = 0; j < i; j++ )  {
       nec_complex aij = a_in[i+j_offset];
       a_in[i+j_offset] = a_in[j+i_offset];
       a_in[j+i_offset] = aij;
@@ -480,7 +480,7 @@ void lu_decompose_lapack(nec_output_file& s_output,  int64_t n, complex_array& a
   *                to solve a system of equations.
   */
   int info = clapack_zgetrf (CblasColMajor, n, n, 
-          (void*) a_in.data(), ndim, ip.data());
+          (void*) a_in.data(), static_cast<int>(ndim), ip.data());
   
   if (0 != info) {
     /*
@@ -506,13 +506,13 @@ void lu_decompose_lapack(nec_output_file& s_output,  int64_t n, complex_array& a
   of which are stored in a.  the rhs vector b is input and the
   solution is returned through vector b.   (matrix transposed)
 */
-void solve_lapack( int n, complex_array& a, int_array& ip,
+void solve_lapack( int64_t n, complex_array& a, int_array& ip,
     complex_array& b, int64_t ndim )
 {
   DEBUG_TRACE("solve_lapack(" << n << "," << ndim << ")");
 
   int info = clapack_zgetrs (CblasColMajor, CblasNoTrans, 
-    n, 1, (void*) a.data(), ndim, ip.data(), b.data(), n);
+    static_cast<int>(n), 1, (void*) a.data(), static_cast<int>(ndim), ip.data(), b.data(), static_cast<int>(n));
   
   if (0 != info) {
     /*
@@ -559,19 +559,7 @@ void lu_decompose_eigen(nec_output_file& s_output,  int64_t n, complex_array& a_
   Eigen::PartialPivLU<MatrixXc> lu = A.partialPivLu();
 
   Eigen::MatrixXc X = lu.matrixLU();
-  ipiv = lu.permutationP();
-         
-  int info = clapack_zgetrf (CblasColMajor, n, n, 
-          (void*) a_in.data(), ndim, ip.data());
-  
-  if (0 != info) {
-    /*
-      The factorization has been completed, but the factor U is exactly singular,
-      and division by zero will occur if it is used to solve a system of equations. 
-    */
-    throw new nec_exception("nec++:  LU Decomposition Failed: ",info);
-  }
-  
+  ipiv = lu.permutationP();  
   
 #ifdef NEC_MATRIX_CHECK
   cout << "atlas_solved = ";
@@ -590,7 +578,7 @@ void lu_decompose_eigen(nec_output_file& s_output,  int64_t n, complex_array& a_
   of which are stored in a.  the rhs vector b is input and the
   solution is returned through vector b.   (matrix transposed)
 */
-void solve_eigen( int n, complex_array& a, int_array& ip,
+void solve_eigen( int64_t n, complex_array& a, int_array& ip,
     complex_array& b, int64_t ndim )
 {
   DEBUG_TRACE("solve_eigen(" << n << "," << ndim << ")");
@@ -612,7 +600,7 @@ void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_ar
 #endif
 }
 
-void solve( int n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim )
+void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim )
 {
 #if LAPACK
   return solve_lapack(n, a, ip, b, ndim);
@@ -640,7 +628,7 @@ void factrs(nec_output_file& s_output,  int64_t np, int64_t nrow, complex_array&
     return;
   }
   
-  int num_symmetric_modes = nrow / np;
+  int num_symmetric_modes = static_cast<int>(nrow / np);
   DEBUG_TRACE("\tnum_symmetric_modes = " << num_symmetric_modes);
   
   for (int mode = 0; mode < num_symmetric_modes; mode++ ) {
@@ -675,24 +663,24 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
   complex_array scm;
   scm.resize(n + 2*m);
   
-  int npeq= np+ 2*mp;
-  nec_float fnop = nop;
+  int64_t npeq= np+ 2*mp;
+  nec_float fnop = nec_float(nop);
   nec_float fnorm = 1.0/ fnop;
-  int nrow= neq;
+  int64_t nrow= neq;
   
   if ( nop != 1) {
     for (int ic = 0; ic < nrh; ic++ ) {
       int64_t column_offset = ic*neq;
       if ( (n != 0) && (m != 0) ) {
-        for (int i = 0; i < neq; i++ )
+        for (int64_t i = 0; i < neq; i++ )
           scm[i]= b[i+column_offset];
 
-        int j= np-1;
+        int64_t j= np-1;
 
-        for (int k = 0; k < nop; k++ ) {
+        for (int64_t k = 0; k < nop; k++ ) {
           if ( k != 0 ) {
-            int ia= np-1;
-            for (int i = 0; i < np; i++ ) {
+            int64_t ia= np-1;
+            for (int64_t i = 0; i < np; i++ ) {
               ia++;
               j++;
               b[j+column_offset]= scm[ia];
@@ -702,9 +690,9 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
               continue;
           } /* if ( k != 0 ) */
   
-          int mp2 = 2*mp;
-          int ib= n-1;
-          for (int i = 0; i < mp2; i++ ) {
+          int64_t mp2 = 2*mp;
+          int64_t ib= n-1;
+          for (int64_t i = 0; i < mp2; i++ ) {
             ib++;
             j++;
             b[j+column_offset]= scm[ib];
@@ -713,23 +701,23 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
       } /* if ( (n != 0) && (m != 0) ) */
 
       /* transform matrix eq. rhs vector according to symmetry modes */
-      for (int i = 0; i < npeq; i++ ) {
-        for (int k = 0; k < nop; k++ ) {
+      for (int64_t i = 0; i < npeq; i++ ) {
+        for (int64_t k = 0; k < nop; k++ ) {
           int64_t ia= i+ k* npeq;
           scm[k]= b[ia+column_offset];
         }
 
         nec_complex sum_normal(scm[0]);
-        for (int k = 1; k < nop; k++ )
+        for (int64_t k = 1; k < nop; k++ )
           sum_normal += scm[k];
 
         b[i+column_offset]= sum_normal * fnorm;
 
-        for (int k = 1; k < nop; k++ ) {
-          int ia= i+ k* npeq;
+        for (int64_t k = 1; k < nop; k++ ) {
+          int64_t ia= i+ k* npeq;
           nec_complex sum(scm[0]);
   
-          for (int j = 1; j < nop; j++ )
+          for (int64_t j = 1; j < nop; j++ )
             sum += scm[j]* conj( symmetry_array[k+j*nop]);
   
           b[ia+column_offset]= sum* fnorm;
@@ -739,11 +727,11 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
   } /* if ( nop != 1) */
 
   /* solve each mode equation */
-  for (int kk = 0; kk < nop; kk++ ) {
-    int ia= kk* npeq;
+  for (int64_t kk = 0; kk < nop; kk++ ) {
+    int64_t ia= kk* npeq;
 
-    for (int ic = 0; ic < nrh; ic++ ) {
-      int column_offset = ic*neq;
+    for (int64_t ic = 0; ic < nrh; ic++ ) {
+      int64_t column_offset = ic*neq;
       complex_array a_sub = a.segment(ia, a.size()-ia);
       complex_array b_sub = b.segment(ia+column_offset, b.size() - (ia+column_offset) );
       int_array ip_sub = ip.segment(ia, ip.size()-ia);
@@ -756,26 +744,26 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
   }
   
   /* inverse transform the mode solutions */
-  for (int ic = 0; ic < nrh; ic++ ) {
-    int column_offset = ic*neq;
-    for (int i = 0; i < npeq; i++ ) {
-      for (int k = 0; k < nop; k++ ) {
-        int ia= i+ k* npeq;
+  for (int64_t ic = 0; ic < nrh; ic++ ) {
+    int64_t column_offset = ic*neq;
+    for (int64_t i = 0; i < npeq; i++ ) {
+      for (int64_t k = 0; k < nop; k++ ) {
+        int64_t ia= i+ k* npeq;
         scm[k]= b[ia+column_offset];
       }
 
       nec_complex sum_normal(scm[0]);
-      for (int k = 1; k < nop; k++ )
+      for (int64_t k = 1; k < nop; k++ )
         sum_normal += scm[k];
 
       b[i+column_offset]= sum_normal;
       
-      for (int k = 1; k < nop; k++ ) {
-        int ia= i+ k* npeq;
+      for (int64_t k = 1; k < nop; k++ ) {
+        int64_t ia= i+ k* npeq;
         
         nec_complex sum(scm[0]);
 
-        for (int j = 1; j < nop; j++ )
+        for (int64_t j = 1; j < nop; j++ )
           sum += scm[j]* symmetry_array[k+j*nop];
 
         b[ia+column_offset]= sum;
@@ -785,15 +773,15 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
     if ( (n == 0) || (m == 0) )
       continue;
 
-    for (int i = 0; i < neq; i++ )
+    for (int64_t i = 0; i < neq; i++ )
             scm[i]= b[i+column_offset];
 
-    int j = np-1;
+    int64_t j = np-1;
 
-    for (int32_t k = 0; k < nop; k++ ) {
+    for (int64_t k = 0; k < nop; k++ ) {
       if ( k != 0 )  {
-        int ia = np-1;
-        for (int32_t i = 0; i < np; i++ ) {
+        int64_t ia = np-1;
+        for (int64_t i = 0; i < np; i++ ) {
           ia++;
           j++;
           b[ia+column_offset]= scm[j];
@@ -803,9 +791,9 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
           continue;
       } /* if ( k != 0 ) */
 
-      int ib = n-1;
-      int mp2 = 2* mp;
-      for (int i = 0; i < mp2; i++ ) {
+      int64_t ib = n-1;
+      int64_t mp2 = 2* mp;
+      for (int64_t i = 0; i < mp2; i++ ) {
         ib++;
         j++;
         b[ib+column_offset]= scm[j];

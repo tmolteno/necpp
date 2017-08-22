@@ -41,7 +41,7 @@ libnecpp_la_SOURCES = c_evlcom.cpp c_geometry.cpp c_ggrid.cpp c_plot_card.cpp \
 	libnecpp.h nec_context.h nec_exception.h nec_ground.h nec_output.h \
 	nec_radiation_pattern.h nec_results.h safe_array.h nec_structure_currents.cpp \
 	nec_structure_currents.h electromag.cpp nec_results.cpp 
-libnecpp_la_CXXFLAGS = -O2 -g0 -Wall -Wextra -Wshadow
+libnecpp_la_CXXFLAGS = -O2 -g0 -Wall -Wextra -Wshadow -Wconversion
 
 
 libnecpp_la_LDFLAGS = @LIBLAPACK@ -lm -lstdc++

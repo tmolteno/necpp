@@ -25,19 +25,19 @@
 /** \brief LU that uses either lapack or built in
  * */
 void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
-void solve( int n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
+void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
 /** \brief LU that uses built in functions (no library dependency)
  * */
 void lu_decompose_ge(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
-void solve_ge( int n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
+void solve_ge( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
 #if LAPACK
 /** \brief LU that uses LAPACK. These are not built unless a LAPACK is chosen at
  * compile time.
  * */
 void lu_decompose_lapack(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
-void solve_lapack( int n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
+void solve_lapack( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 #endif
 
 
