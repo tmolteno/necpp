@@ -97,7 +97,7 @@ int load_line( char *buff, FILE *pfile )
 			break;
 	
 		/* enter new char to buffer */
-		buff[num_chr++] = chr;
+		buff[num_chr++] = static_cast<char>(chr);
 	
 		/* terminate buffer as a string on EOF */
 		if( (chr = fgetc(pfile)) == EOF ) {
@@ -107,10 +107,12 @@ int load_line( char *buff, FILE *pfile )
 	} /* end of while( num_chr < max_chr ) */
 	
 	/* Capitalize first two characters (mnemonics) */
-	if( (buff[0] > 0x60) && (buff[0] < 0x79) )
-		buff[0] -= 0x20;
-	if( (buff[1] > 0x60) && (buff[1] < 0x79) )
-		buff[1] -= 0x20;
+	buff[0] = static_cast<char>(std::toupper(buff[0]));
+	buff[1] = static_cast<char>(std::toupper(buff[1]));
+        //if( (buff[0] > 0x60) && (buff[0] < 0x79) )
+	//	buff[0] -= 0x20;
+	//if( (buff[1] > 0x60) && (buff[1] < 0x79) )
+	//	buff[1] -= 0x20;
 	
 	/* terminate buffer as a string */
 	buff[num_chr] = '\0';
