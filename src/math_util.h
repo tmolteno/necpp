@@ -49,7 +49,7 @@
 #endif
 
 
-inline void vector_fill(complex_array& x, int32_t start, int32_t N, const nec_complex& y) {
+inline void vector_fill(complex_array& x, int64_t start, int64_t N, const nec_complex& y) {
   x.fill(start, N, y);
 }
 

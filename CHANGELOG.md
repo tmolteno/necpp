@@ -1,5 +1,6 @@
 ## Vresion 1.7.4
 * Fix bug in reading comments longer than 80 characters (issue #47)
+* Fixed bug in nec_context::fblock when setting up symmetry_array matrix for plane symmetry.
 
 ## Version 1.7.3
 * Changes to allow compilation on CLANG. Change to use std::abs() and friends.

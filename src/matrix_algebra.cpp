@@ -479,8 +479,8 @@ void lu_decompose_lapack(nec_output_file& s_output,  int64_t n, complex_array& a
   *                singular, and division by zero will occur if it is used
   *                to solve a system of equations.
   */
-  int info = clapack_zgetrf (CblasColMajor, n, n, 
-          (void*) a_in.data(), static_cast<int>(ndim), ip.data());
+  int32_t info = clapack_zgetrf (CblasColMajor, int32_t(n), int32_t(n), 
+          (void*) a_in.data(), int32_t(ndim), ip.data());
   
   if (0 != info) {
     /*

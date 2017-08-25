@@ -903,7 +903,7 @@ private:
   void etmns(nec_float p1, nec_float p2, nec_float p3, nec_float p4, nec_float p5,
       nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e);
 
-  void fblock( int nrow, int ncol, int imax, int ipsym );
+  void fblock( int nrow, int ncol, int64_t imax, int ipsym );
 
   void gf(nec_float zk, nec_float *co, nec_float *si);
   void gh(nec_float zk, nec_float *hr, nec_float *hi);

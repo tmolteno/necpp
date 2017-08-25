@@ -1993,7 +1993,7 @@ void nec_context::load()
 
 /* cmset sets up the complex structure matrix in the array in_cm */
 void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
-  int mp2, it, i1, i2, in2;
+  int mp2, i1, i2, in2;
   int im1, im2, ist, ij, jss, jm1, jm2, jst;
   complex_array scm;
   
@@ -2006,7 +2006,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   
   rkh= rkhx;
   //iout=2* npblk* nrow;
-  it= nlast;
+  int64_t it = nlast;
                   
   vector_fill(in_cm,0,it*nrow,cplx_00());
   
@@ -2085,7 +2085,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
       }
 
       if ( im1 <= im2) {
-        int tmp_n = (jst-1)+(ist-1)*nrow;
+        int64_t tmp_n = (jst-1)+(ist-1)*nrow;
         complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
         compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
       }
@@ -2101,7 +2101,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   
   /* combine elements for symmetry modes */
   for (int i = 0; i < it; i++ ) {
-    int row_offset = i*nrow;
+    int64_t row_offset = i*nrow;
     
     for( int j = 0; j < npeq; j++ ) {
       for( int k = 0; k < nop; k++ ) {
@@ -2300,7 +2300,7 @@ void nec_context::cmsw( int j1, int j2, int i1, int i2, complex_array& in_cm,
           
             m_geometry->trio(i+1);
           
-            int il= i-ncw;
+            int64_t il= i-ncw;
             if ( i < m_geometry->np)
               il += (il/m_geometry->np)*2*m_geometry->mp;
           
@@ -2402,7 +2402,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
     switch (itrp) {
       case 0:   /* normal fill */
         for(int ij = 0; ij < m_geometry->jsno; ij++ ) {
-          int jx= m_geometry->jco[ij]-1;
+          int64_t jx = m_geometry->jco[ij]-1;
           in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
           /* CM(IPR,JX)=CM(IPR,JX)+ETK*AX(IJ)+ETS*BX(IJ)+ETC*CX(IJ) */
         }
@@ -2410,7 +2410,7 @@ void nec_context::cmws( int j, int i1, int i2, complex_array& in_cm,
       
       case 2:  /* transposed fill - c(ws) and d(ws)prime (=cw) */
         for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
-          int jx= m_geometry->jco[ij]-1;
+          int64_t jx = m_geometry->jco[ij]-1;
           if ( jx < nr) {
             in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
           } else {
@@ -3881,7 +3881,7 @@ void nec_context::hintg( nec_float xi, nec_float yi, nec_float zi )
 */
 void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai )
 {
-  nec_float xij, yij, rfl, salpr, zij, zp, rhox, rhoy, rhoz, rh, phx;
+  nec_float xij, yij, rfl, salpr, zij, zp, rhox, rhoy, rhoz, phx;
   nec_float phy, phz, rmag, xymag, xspec, yspec, rhospc, px, py, cth;
   nec_complex hpk, hps, hpc, qx, qy, qz, rrv, rrh, zratx;
   
@@ -3891,14 +3891,14 @@ void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai 
   
   for (int ground_loop = 0; ground_loop < ground.ksymp; ground_loop++ )
   {
-    rfl = - rfl;
-    salpr= salpj* rfl;
-    zij= zi- rfl* zj;
-    zp= xij* cabj+ yij* sabj+ zij* salpr;
-    rhox= xij- cabj* zp;
-    rhoy= yij- sabj* zp;
-    rhoz= zij- salpr* zp;
-    rh= sqrt( rhox* rhox+ rhoy* rhoy+ rhoz* rhoz+ ai* ai);
+    rfl = -rfl;
+    salpr = salpj*rfl;
+    zij= zi - rfl*zj;
+    zp = xij*cabj + yij*sabj+ zij*salpr;
+    rhox = xij - cabj*zp;
+    rhoy = yij - sabj*zp;
+    rhoz = zij - salpr*zp;
+    nec_float rh = sqrt(rhox*rhox + rhoy*rhoy + rhoz*rhoz + ai*ai);
   
     if ( rh <= 1.0e-10)
     {
@@ -3914,12 +3914,12 @@ void nec_context::hsfld( nec_float xi, nec_float yi, nec_float zi, nec_float ai 
       continue;
     }
   
-    rhox= rhox/ rh;
-    rhoy= rhoy/ rh;
-    rhoz= rhoz/ rh;
-    phx= sabj* rhoz- salpr* rhoy;
-    phy= salpr* rhox- cabj* rhoz;
-    phz= cabj* rhoy- sabj* rhox;
+    rhox = rhox/rh;
+    rhoy = rhoy/rh;
+    rhoz = rhoz/rh;
+    phx = sabj*rhoz - salpr*rhoy;
+    phy = salpr*rhox - cabj*rhoz;
+    phz = cabj*rhoy - sabj*rhox;
   
     hsflx( m_s, rh, zp, &hpk, &hps, &hpc);
   
@@ -6461,9 +6461,7 @@ nec_complex nec_context::zint( nec_float sigl, nec_float rolam )
 */
 /* fblock sets parameters for out-of-core */
 /* solution for the primary matrix (a) */
-void nec_context::fblock( int nrow, int ncol, int imax, int ipsym ) {
-  int ka, kk;
-  
+void nec_context::fblock( int nrow, int ncol, int64_t imax, int ipsym ) {
   if ( (nrow*ncol) <= imax)  {
     npblk= nrow;
     nlast= nrow;
@@ -6479,28 +6477,47 @@ void nec_context::fblock( int nrow, int ncol, int imax, int ipsym ) {
   if ( (nop*nrow) != ncol)  {
     nec_stop("SYMMETRY ERROR - NROW: %d NCOL: %d", nrow, ncol );
   }
-  
+
   /* set up symmetry_array matrix for rotational symmetry. */
   if ( ipsym <= 0)  {
     nec_float phaz = two_pi()/nop;
     
     for(int i = 1; i < nop; i++ )  {
       for(int j= i; j < nop; j++ )  {
-        nec_float arg = phaz * (nec_float)i * (nec_float)j;
-        symmetry_array[i+j*nop]= nec_complex( cos( arg), sin( arg));
+        nec_float arg = phaz * nec_float(i) * nec_float(j);
+        symmetry_array[i+j*nop]= nec_complex( cos(arg), sin(arg));
         symmetry_array[j+i*nop]= symmetry_array[i+j*nop];
       }
     }
     return;
   } /* if ( ipsym <= 0) */
   
-  /* set up symmetry_array matrix for plane symmetry */
-  kk=1;
+  /* set up symmetry_array matrix for plane symmetry
+    7     KK=1
+        SSX(1,1)=(1.,0.)
+        IF ((NOP.EQ.2).OR.(NOP.EQ.4).OR.(NOP.EQ.8)) GO TO 8
+        STOP
+    8     KA=NOP/2
+        IF (NOP.EQ.8) KA=3
+        DO 10 K=1,KA
+        DO 9 I=1,KK
+        DO 9 J=1,KK
+        DETER=SSX(I,J)
+        SSX(I,J+KK)=DETER
+        SSX(I+KK,J+KK)=-DETER
+    9     SSX(I+KK,J)=DETER
+    10    KK=KK*2
+   */
+  int kk=1;
   symmetry_array[0]=cplx_10();
   
-  int k_power = 2;
-  for( ka = 1; k_power != nop; ka++ )
-    k_power *= 2;
+  if ((2 == nop) || (4 == nop) || (8 == nop))
+      return;
+  int ka = nop / 2;
+  
+//   int k_power = 2;
+//   for( ka = 1; k_power != nop; ka++ )
+//     k_power *= 2;
   
   for(int k = 0; k < ka; k++ )  {
     for(int i = 0; i < kk; i++ )  {
