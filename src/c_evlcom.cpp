@@ -686,7 +686,7 @@ void bessel( nec_complex z, nec_complex *j0, nec_complex *j0p )
       ib=1;
     
     /* series expansion */
-    int iz = std::floor(zms);
+    int iz = static_cast<int>(std::floor(zms));
 
     int miz=m[iz];
     *j0 = cplx_10;

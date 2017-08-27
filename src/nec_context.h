@@ -747,7 +747,8 @@ public:
   complex_array cm;  // primary interaction matrix
   
   /* common  /matpar/ */
-  int icase, npblk, nlast;
+  int icase, npblk;
+  int64_t nlast;
   int nbbx, npbx, nlbx, nbbl, npbl, nlbl;
   
   /* common  /save/ */

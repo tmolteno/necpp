@@ -260,7 +260,7 @@ private:
       }
     }
     int64_t len = rows*cols;
-    return sum/(len*2.0 / pi());
+    return sum/(nec_float(len*2) / pi());
   }
 
   nec_float sd(const real_matrix& pattern, nec_float _mean) const  {
@@ -275,7 +275,7 @@ private:
       }
     }
     int64_t len = rows*cols;
-    return std::sqrt(sum/(len*2.0 / pi()));
+    return std::sqrt(sum/(nec_float(len*2) / pi()));
   }
 
 

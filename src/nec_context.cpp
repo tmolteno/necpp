@@ -1993,14 +1993,12 @@ void nec_context::load()
 
 /* cmset sets up the complex structure matrix in the array in_cm */
 void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
-  int mp2, i1, i2, in2;
-  int im1, im2, ist, ij, jss, jm1, jm2, jst;
   complex_array scm;
   
-  int np = m_geometry->np;
-  int mp = m_geometry->mp;
+  int64_t np = m_geometry->np;
+  int64_t mp = m_geometry->mp;
   
-  mp2 = 2 * mp;
+  int64_t mp2 = 2 * mp;
 //   = np + mp2;
 //  neq= m_geometry->n_plus_2m; // n + 2* m;
   
@@ -2010,21 +2008,17 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
                   
   vector_fill(in_cm,0,it*nrow,cplx_00());
   
-  i1= 1;
-  i2= it;
+  int64_t i1 = 1;
+  int64_t i2 = it;
   
-  in2= i2; 
-  if ( in2 > np)
-    in2= np;
+  int64_t in2 = std::min(i2, np);
   
+  int64_t im1 = i1 - np;
+  int64_t im2 = i2 - np;
   
-  im1= i1- np;
-  im2= i2- np;
+  im1 = std::max(im1, int64_t(1));
   
-  if ( im1 < 1)
-    im1=1;
-  
-  ist=1;
+  int64_t ist=1;
   if ( i1 <= np)
     ist= np- i1+2;
 
@@ -2035,7 +2029,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
     m_geometry->trio(j);
     
     for (int i = 0; i < m_geometry->jsno; i++ ) {
-      ij = m_geometry->jco[i];
+      int ij = m_geometry->jco[i];
       m_geometry->jco[i] = ((ij-1)/ np)* mp2+ij;
     }
 
@@ -2061,7 +2055,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
     nec_complex zaj= zarray[j-1];
 
     for (int i = 0; i < m_geometry->jsno; i++ ) {
-      jss = m_geometry->jco[i];
+      int64_t jss = m_geometry->jco[i];
       in_cm[(jss-1)+(ipr-1)*nrow] -= ( m_geometry->ax[i]+ m_geometry->cx[i])* zaj;
     }
   } /* for( j = 1; j <= n; j++ ) */
@@ -2069,9 +2063,9 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   int m = m_geometry->m;
   if ( m != 0)  {
     /* matrix elements for patch current sources */
-    jm1=1- mp;
-    jm2=0;
-    jst=1- mp2;
+    int64_t jm1 = 1 - mp;
+    int64_t jm2 = 0;
+    int64_t jst = 1 - mp2;
 
     for (int i = 0; i < nop; i++ ) {
       jm1 += mp;
@@ -2079,7 +2073,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
       jst += npeq;
 
       if ( i1 <= in2) {
-        int tmp_n = (jst-1);
+        int64_t tmp_n = (jst-1);
         complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
         cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
       }
@@ -2547,8 +2541,8 @@ void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
     /* normal fill */
     if ( itrp == 0) {
       for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
-        jx = m_geometry->jco[ij]-1;
-        in_cm[ipr+jx*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+        int _x = m_geometry->jco[ij]-1;
+        in_cm[ipr+_x*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
       }
       continue;
     }
@@ -2556,20 +2550,20 @@ void nec_context::cmww( int j, int i1, int i2, complex_array& in_cm,
     /* transposed fill */
     if ( itrp != 2) {
       for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
-        jx= m_geometry->jco[ij]-1;
-        in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+        int _x = m_geometry->jco[ij]-1;
+        in_cm[_x+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
       }
       continue;
     }
 
     /* trans. fill for c(ww) - test for elements for d(ww)prime.  (=cw) */
     for (int ij = 0; ij < m_geometry->jsno; ij++ ) {
-      jx= m_geometry->jco[ij]-1;
-      if ( jx < nr) {
-        in_cm[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+      int64_t _x = m_geometry->jco[ij]-1;
+      if ( _x < nr) {
+        in_cm[_x+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
       } else {
-        jx -= nr;
-        cw[jx+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
+        _x -= nr;
+        cw[_x+ipr*nr] += etk* m_geometry->ax[ij]+ ets* m_geometry->bx[ij]+ etc* m_geometry->cx[ij];
       }
     } /* for( ij = 0; ij < m_geometry->jsno; ij++ ) */
 

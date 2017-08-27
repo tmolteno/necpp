@@ -257,8 +257,8 @@ class nec_norm_rx_pattern : public nec_base_result
   int _segment_number;
   string _type;
   
-  long n_theta;
-  long n_phi;
+  int n_theta;
+  int n_phi;
   nec_float _theta0, _theta_step;
   nec_float _phi0, _phi_step;
   
@@ -453,7 +453,7 @@ private:
   vector<int> _tag, _segment;
   vector<nec_complex> _voltage, _current, _impedance, _admittance;
   vector<nec_float> _power;
-  long n_items;
+  int64_t n_items;
   nec_complex voli, curi;
   
 public:
