@@ -135,7 +135,7 @@ geometryEnd
 	:	GE (gpflag=intNum)? NEWLINE
 		{
 			c_geometry* geo = nec->get_geometry();
-			geo->geometry_complete(nec, gpflag, 0);
+			geo->geometry_complete(nec, gpflag);
 			nec->calc_prepare();
 			cout << "Geometry Complete" << endl;
 		}

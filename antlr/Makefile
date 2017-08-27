@@ -15,7 +15,7 @@ NECPP_SRC 	= ../src/c_evlcom.cpp ../src/c_geometry.cpp ../src/c_ggrid.cpp \
 	../src/c_plot_card.cpp ../src/matrix_algebra.cpp ../src/misc.cpp \
 	../src/nec_context.cpp ../src/nec_ground.cpp ../src/nec_output.cpp \
 	../src/nec_radiation_pattern.cpp ../src/nec_exception.cpp \
-	../src/electromag.cpp ../src/nec_structure_currents.cpp \
+	../src/electromag.cpp ../src/nec_structure_currents.cpp ../src/nec_results.cpp \
 	../src/XGetopt.cpp
 NECPP_OBJ 	= $(NECPP_SRC:.cpp=.o)
 
@@ -35,7 +35,7 @@ clean:
 	rm -f ${ANTLR_OBJ} ${NECPP_OBJ} NEC* antlr_test
 
 LDFLAGS = -lstdc++ -lantlr -lm -L /usr/lib/atlas -llapack
-CXXFLAGS = -I ../ -I ../src/ -g3 -O0
+CXXFLAGS = -I ../ -I ../src/ -g3 -O0 -fPIC
 
 test: ${ANTLR_OBJ} ${ANTLR_SRC} ${NECPP_OBJ} ${NECPP_SRC}
 	g++ -o antlr_test ${ANTLR_OBJ} ${NECPP_OBJ} ${LDFLAGS}
