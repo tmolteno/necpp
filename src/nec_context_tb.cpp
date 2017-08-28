@@ -40,6 +40,15 @@ TEST_CASE( "Example 1", "[example_1]") {
 */
         REQUIRE_APPROX_EQUAL(nec.get_impedance_real(0), 8.2698E+01 );
         REQUIRE_APPROX_EQUAL(nec.get_impedance_imag(0), 4.6306E+01 );
+        
+/*
+                      ----- ANTENNA INPUT PARAMETERS -----
+  TAG   SEG       VOLTAGE (VOLTS)         CURRENT (AMPS)         IMPEDANCE (OHMS)        ADMITTANCE (MHOS)     POWER
+  NO.   NO.     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY    REAL       IMAGINARY   (WATTS)
+   0     4  1.0000E+00  0.0000E+00  8.9547E-03 -4.0515E-03  9.2698E+01  4.1941E+01  8.9547E-03 -4.0515E-03  4.4773E-03
+*/
+        REQUIRE_APPROX_EQUAL(nec.get_impedance_real(1), 9.2698E+01 );
+        REQUIRE_APPROX_EQUAL(nec.get_impedance_imag(1), 4.1941E+01 );
     }
     catch (nec_exception* e) {
         cout << e->get_message() << endl;
