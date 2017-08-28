@@ -9,3 +9,9 @@ You may need to make distclean in the parent directory before this is done.
 Then
 
     make -f Makefile.test
+
+    ## Running a specific test
+
+To run a particular test file
+
+    make DO_TESTS=data/plane_wave_excitation.nec
