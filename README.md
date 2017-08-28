@@ -29,37 +29,12 @@ Timothy C.A. Molteno, ''NEC2++: An NEC-2 compatible Numerical Electromagnetics C
 Online documentation built form the source code is available at http://tmolteno.github.io/necpp/. 
 A guide to [using nec2++ from python](http://astroelec.blogspot.co.nz/2015/05/modeling-antennas-in-python-with-nec2.html).
 
-## Instructions for Linux
+## Installation
 
-nec2++ is available precompiled as part of most modern linux distributions, including Debian, Ubuntu and Fedora.
+Instructions are in the file INSTALL.md.
 
-    sudo aptitude install necpp
+## Links
 
-## Compiling on Linux
-
-
-See the INSTALL file. But here is the short version
-
-    sudo aptitude install libatlas-base-dev
-    make -f Makefile.git
-    ./configure
-    make
-    sudo make install
-
-To build a debugging version use
-
-    ./configure --with-bounds
-
-!NOTE! nec2++ now requires LAPACK (unless you use the  --without-lapack configure option)
-
-## Instructions for Compiling on Windows
-
-Versions of nec2++ since 1.2.3 now compile fine with the MinGW (http://www.mingw.org/) free compiler tools. 
-Just download the source distribution, and follow the unix installation guide (./configure and make).
-
-### Compiling with Visual Studio 2013
-
-NEC2++ has been tested with Microsoft Visual Studio 2013.
-Step-by-step instructions
-
-* Build the project inside the win32 subdirectory with Visual Studio 2103.
+* http://tmolteno.github.io/necpp/ Documentation
+* https://github.com/tmolteno/python-necpp/ Python packages
+* https://github.com/rcnlee/necpp.jl Julia wrapper for the python packages
