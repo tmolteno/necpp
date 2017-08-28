@@ -1987,6 +1987,9 @@ void nec_context::load()
   } /* while( true ) */
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+
 /* cmset sets up the complex structure matrix in the array in_cm */
 void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   complex_array scm;
@@ -2115,6 +2118,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
   
   scm.resize(0);
 }
+#pragma GCC diagnostic pop
 
 /* compute_matrix_ss computes matrix elements for surface-surface interactions. */
 

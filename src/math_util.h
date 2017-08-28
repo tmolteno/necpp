@@ -31,7 +31,11 @@
 //#define USING_EIGEN_3VECT 1
 
 #if USING_EIGEN_ARRAY
-  #include <Eigen/Dense>
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wshadow"
+    #pragma GCC diagnostic ignored "-Wconversion"
+    #include <Eigen/Dense>
+    #pragma GCC diagnostic pop
 
   typedef Eigen::Matrix<int32_t, Eigen::Dynamic, 1>  int_array;
   typedef Eigen::Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
@@ -186,7 +190,6 @@ inline nec_float normL1(const nec_float x, const nec_float y, const nec_float z)
 #if USING_EIGEN_3VECT
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wshadow"
-    #pragma GCC diagnostic ignored "-Wint-in-bool-context"
     #pragma GCC diagnostic ignored "-Wconversion"
     #include <Eigen/Dense>
     #pragma GCC diagnostic pop
