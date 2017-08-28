@@ -19,7 +19,6 @@
 #include "math_util.h"
 
 
-#include "math_util.h"
 #include <string>
 #include <stdio.h>
 

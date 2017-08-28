@@ -116,7 +116,7 @@ void nec_context::calc_prepare()
 
   /* default values for input parameters and flags */
   npeq = m_geometry->np + 2*m_geometry->mp;
-  processing_state=1;
+  processing_state = PROCESSING_MEMORY_ALLOC;
   rkh=1.;
   m_use_exk=false;
   m_excitation_type = EXCITATION_VOLTAGE;
@@ -382,7 +382,7 @@ void nec_context::fr_card(int in_ifrq, int in_nfrq, nec_float in_freq_mhz, nec_f
   if ( iped == 1)
           impedance_norm_factor = 0.0;
           
-  processing_state = 1;
+  processing_state = PROCESSING_MEMORY_ALLOC;
   iflow = 1;
 }
 
@@ -404,8 +404,8 @@ void nec_context::ld_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float 
     zli.resize(0);
     zlc.resize(0);
   
-    if ( processing_state > 2 )
-      processing_state=2;
+    reset_processing_to_structure_loading();
+    
     if ( itmp1 == -1 )
       return; // continue card input loop
   }
@@ -462,8 +462,7 @@ void nec_context::gn_card(int ground_type, int rad_wire_count, nec_float tmp1, n
   
   iflow=4;
 
-  if ( processing_state > 2)
-    processing_state=2;
+  reset_processing_to_structure_loading();
 }
 
 
@@ -503,8 +502,7 @@ void nec_context::ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int 
 
     iflow=5;
     
-    if ( processing_state > 3)
-      processing_state=3;
+    reset_processing_to_excitation_setup();
   }
 
   masym = itmp4/10;
@@ -605,9 +603,8 @@ void nec_context::tl_card(int itmp1, int itmp2, int itmp3, int itmp4,
     ntsol=0;
     iflow=6;
   
-    if ( processing_state > 3)
-      processing_state=3;
-  
+    reset_processing_to_excitation_setup();
+
     if ( itmp2 == -1 )
       return; /* continue card input loop */
   }
@@ -665,9 +662,8 @@ void nec_context::nt_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float 
     ntsol=0;
     iflow=6;
   
-    if ( processing_state > 3)
-      processing_state=3;
-  
+    reset_processing_to_excitation_setup();
+    
     if ( itmp2 == -1 )
       return; /* continue card input loop */
   }
@@ -872,8 +868,7 @@ void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4) {
 /* "kh" card, matrix integration limit */
 void nec_context::kh_card(nec_float tmp1) {
   rkh = tmp1;
-  if ( processing_state > 2)
-    processing_state=2;
+  reset_processing_to_structure_loading();
   iflow=1;
 }
 
@@ -921,8 +916,7 @@ void nec_context::ne_nh_card(int in_nfeh, int itmp1, int itmp2, int itmp3, int i
 void nec_context::set_extended_thin_wire_kernel(bool ek_flag) {
   m_use_exk = ek_flag;
   
-  if ( processing_state > 2)
-    processing_state=2;
+  reset_processing_to_structure_loading();
   iflow=1;  
 }
 
@@ -1002,28 +996,26 @@ void nec_context::simulate(bool far_field_flag) {
     5: Near field calculation
     6: standard far field calculation
   */
-  int igox;
+  enum processing_state igox;
   int mhz = 0;
   
-  if ( (far_field_flag == true)
-    && (processing_state == 5) )
-    igox = 6;
+  if ( (far_field_flag == true) && (processing_state == PROCESSING_NEAR_FIELD) )
+    igox = PROCESSING_FAR_FIELD;
   else
     igox = processing_state;
   
   
   try  {
-  int64_t iresrv = 0;
   bool in_freq_loop = false;
   
   do {  
     switch( igox )
     {
-    case 1: /* Memory allocation for primary interacton matrix. */
+    case PROCESSING_MEMORY_ALLOC: /* Memory allocation for primary interacton matrix. */
 
       if (false == in_freq_loop)  {
-        // TODO fix up the following (changed 2* to 3*)
-        iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
+        // TODO fix up the following (changed 2* to 3*) to avoid out-of-memory error
+        int64_t iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
         cm.resize(iresrv);
       
         /* Memory allocation for symmetry array */
@@ -1048,17 +1040,17 @@ void nec_context::simulate(bool far_field_flag) {
       print_freq_int_krnl(freq_mhz, _wavelength, rkh, m_use_exk);
         
       m_geometry->frequency_scale(freq_mhz);
-      processing_state = 2;
+      processing_state = PROCESSING_STRUCTURE_LOADING;
       /* Falls through. */
 
-    case 2: /* structure segment loading */
+    case PROCESSING_STRUCTURE_LOADING: /* structure segment loading */
       structure_segment_loading();
 
-      processing_state=3;
+      processing_state=PROCESSING_EXCITATION_SETUP;
       ntsol=0;
       /* Falls through. */
     
-    case 3: /* excitation set up (right hand side, -e inc.) */
+    case PROCESSING_EXCITATION_SETUP: /* excitation set up (right hand side, -e inc.) */
       nthic=1;
       nphic=1;
       inc=1;
@@ -1535,10 +1527,13 @@ void nec_context::setup_excitation()
   etmns( tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, incident_amplitude, m_excitation_type, current_vector);
 }
 
-enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int mhz)
+enum excitation_return nec_context::excitation_loop(enum processing_state in_freq_loop_state, int mhz)
 {
   int itmp1;
-  
+  /** TODO This is horrendous code. It needs a complete refactor and rewrite.
+   * 
+   * See Issue #43
+   **/
   do
   {
     if (in_freq_loop_state < 4)
@@ -1579,13 +1574,13 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
       /* Check that the flag for currents and charge densities don't have unexpected values */ 
       if((iptflg <-2)||(iptflg > 3))
       {
-        m_output.line("Warning : The print control flag for currents was uncorrect ; it has been set to -1 (no printing for currents).");
+        m_output.line("Warning : The print control flag for currents was incorrect ; it has been set to -1 (no printing for currents).");
         iptflg = -1;
       }
       
       if((iptflq <-2)||(iptflq > 0))
       {
-        m_output.line("Warning : The print control flag for charge densities was uncorrect ; it has been set to -1 (no printing for charge densities).");
+        m_output.line("Warning : The print control flag for charge densities was incorrect ; it has been set to -1 (no printing for charge densities).");
         iptflq = -1;
       }
       
@@ -1630,7 +1625,7 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
             
       print_power_budget();
 
-      processing_state = 4;
+      processing_state = PROCESSING_EXCITATION_LOOP; // 4
 
       if ( ncoup > 0)
         couple( current_vector, _wavelength );
@@ -1670,11 +1665,11 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
     }
     
     if (in_freq_loop_state < 5)
-      processing_state = 5;
+      processing_state = PROCESSING_NEAR_FIELD;
 
     
     /* near field calculation */
-    if (in_freq_loop_state < 6)
+    if (in_freq_loop_state != PROCESSING_FAR_FIELD) // 6
     {
       if ( m_near != -1)
       {
@@ -1725,11 +1720,12 @@ enum excitation_return nec_context::excitation_loop(int in_freq_loop_state, int 
         std::stringstream ss;
         rad_pat->write_to_file(ss);
         m_output.line(ss.str().c_str());
-        // print_radiation_pattern(input_power, network_power_loss);
       }
     }
 
-    if ( (m_excitation_type == 0) || (m_excitation_type >= 4) )
+    if ( (m_excitation_type == EXCITATION_VOLTAGE) 
+      || (m_excitation_type == EXCITATION_CURRENT)
+      || (m_excitation_type == EXCITATION_VOLTAGE_DISC) ) // >= 4
     {
       if ( mhz == nfrq )
         ifar = -1;

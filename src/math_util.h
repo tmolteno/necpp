@@ -184,10 +184,16 @@ inline nec_float normL1(const nec_float x, const nec_float y, const nec_float z)
 
 
 #if USING_EIGEN_3VECT
-  #include <Eigen/Dense>
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wshadow"
+    #pragma GCC diagnostic ignored "-Wint-in-bool-context"
+    #pragma GCC diagnostic ignored "-Wconversion"
+    #include <Eigen/Dense>
+    #pragma GCC diagnostic pop
 
-  typedef Eigen::Matrix<nec_float,3,1> nec_3vector;
-  typedef Eigen::Matrix<nec_complex,3,1> nec_c3vector;
+
+    typedef Eigen::Matrix<nec_float,3,1> nec_3vector;
+    typedef Eigen::Matrix<nec_complex,3,1> nec_c3vector;
 #else
 
 /** \brief A Class for handling 3 dimensional vectors */

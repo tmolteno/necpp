@@ -155,7 +155,7 @@ TEST_CASE( "LU Decomposition EIGEN", "[lu_decompose]") {
 
   cout << "Here is the matrix A:" << endl << A << endl;
   
-  Eigen::FullPivLU<MatrixXcd> lu(A);
+  Eigen::PartialPivLU<MatrixXcd> lu(A);
   cout << "Here is, up to permutations, its LU decomposition matrix:"
   << endl << lu.matrixLU() << endl;
   cout << "Here is the L part:" << endl;
@@ -166,8 +166,8 @@ TEST_CASE( "LU Decomposition EIGEN", "[lu_decompose]") {
   MatrixXcd u = lu.matrixLU().triangularView<Upper>();
   cout << u << endl;
   cout << "Let us now reconstruct the original matrix m:" << endl;
-  cout << lu.permutationP().inverse() * l * u * lu.permutationQ().inverse() << endl;
-  MatrixXcd B = lu.permutationP().inverse() * l * u * lu.permutationQ().inverse();
+  MatrixXcd B = lu.permutationP().inverse() * l * u;
+  cout << B << endl;
   for (int i=0;i<4;i++) {
     for (int j=0; j<4; j++) {
       REQUIRE_APPROX_EQUAL(B(i,j), A(i,j));
