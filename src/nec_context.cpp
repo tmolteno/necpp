@@ -1084,7 +1084,8 @@ void nec_context::simulate(bool far_field_flag) {
     default:
       DEBUG_TRACE("igox = " << igox << ", processing_state = " << processing_state);
       enum excitation_return ret = excitation_loop(igox, mhz);
-    
+      DEBUG_TRACE("excitation_return = " << ret << ", processing_state = " << processing_state);
+
       if (FREQ_LOOP_CONTINUE == ret)
       {
         continue; // Continue frequency loop
@@ -1560,8 +1561,8 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
    **/
   do
   {
-    DEBUG_TRACE("excitation_loop: state=" << in_freq_loop_state << " processing_state = " << processing_state << "mHz=" << mhz);
-    
+    DEBUG_TRACE("excitation_loop: state=" << in_freq_loop_state << " processing_state = " << processing_state << "mHz=" << mhz << " iflow=" << iflow);
+    DEBUG_TRACE("nthic = " << nthic << " nthi = " << nthi);
     if (in_freq_loop_state < 4)
     {
       setup_excitation();
@@ -1658,7 +1659,8 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
 
       if ( iflow == 7)
       {
-        if ( (m_excitation_type > 0) && (m_excitation_type < 4) )
+        DEBUG_TRACE("iflow == 7, nfrq =" << nfrq)
+        if ( (m_excitation_type >= 1) && (m_excitation_type <= 3) )
         {
           nthic++;
           inc++;
@@ -1764,7 +1766,7 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
       m_output.end_section();
       return FREQ_LOOP_CARD_CONTINUE;  /* continue card input loop */
     }
-
+    
     nthic++;
     inc++;
     xpr1 += xpr4;
@@ -4955,8 +4957,10 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 */
   } // if ( network_count != 0)
 
-  if ( (voltage_source_count+nvqd) == 0)
+  if ( (voltage_source_count+nvqd) == 0) {
+    DEBUG_TRACE("voltage_source_count+nvqd) == 0")
     return;
+  }
   
   
   // Create an antenna_input results object to hold the antenna input results.

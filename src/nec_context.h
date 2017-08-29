@@ -483,7 +483,9 @@ public:
         // NOT YET DONE... F7- (A) BLANK, (B) INCIDENT AMPLITUDE (Volts/m)
   \endverbatim
   */
-  void ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);
+  void ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3,         
+                    nec_float tmp4, nec_float tmp5, nec_float tmp6);
+  
 
 
   /*! \brief Specifies the excitation for the structure. The excitation can be voltage sources on the structure, an elementary current source,

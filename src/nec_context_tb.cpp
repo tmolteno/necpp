@@ -64,7 +64,7 @@ TEST_CASE( "Example 1", "[example_1]") {
 
 
 
-TEST_CASE( "Plane Wave Excitation", "[plane_wave]") {
+TEST_CASE( "Voltage Excitation", "[voltage_excitation]") {
 
     /**
         CM A simple structure excited by a plane wave, and at multiple frequencies.
@@ -93,11 +93,54 @@ TEST_CASE( "Plane Wave Excitation", "[plane_wave]") {
     nec.pt_card(-1, 0, 0, 0);
     nec.ex_card(EXCITATION_VOLTAGE, 0, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
     nec.rp_card(0, 10, 10, 0,5,0,0, 0.0, 0.0, 9.0, 9.0, 0.0, 0.0);
+    //nec.xq_card(0);
 
-    for (int i = 0; i < n_freq; i++) {
-        nec_antenna_input* ai = nec.get_input_parameters(i);
-        REQUIRE(ai->get_segment()[0] == 1 );
-        REQUIRE(ai->get_tag()[0] == 0 );
+    // Check that we get n_freq radiation patterns
+    for (int freq_index = 0; freq_index < n_freq; freq_index++) {
+        nec_radiation_pattern* rp = nec.get_radiation_pattern(freq_index);
+        REQUIRE(rp->get_theta_start() == 0.0 );
+//         REQUIRE_APPROX_EQUAL(rp->get_rp_power_average(), 12.0);
     }
 
 }
+
+
+TEST_CASE( "Plane Wave Excitation", "[plane_wave]") {
+
+    /**
+        CE A simple structure excited by a plane wave, and at multiple frequencies.
+        GW 0 36 0 0 0 -0.042 0.008 0.017 0.001
+        GE 0
+        GN -1
+        LD 5 0 0 0 3.720E+07 
+        FR 0 10 0 0 2400.0 10.0
+        PT -1
+        EX 1 0 1 0 0 0 0 0 0 0 0
+        RP 0 1 1 0500 90 90 0 0
+        EN
+    */
+    nec_context nec;
+    nec.initialize();
+
+    int n_freq = 10;
+    
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(0, 36, 0.0, 0.0, 0.0, -0.042, 0.008, 0.017, 0.001, 1.0, 1.0);
+    nec.geometry_complete(0);
+    nec.gn_card(-1, 0, 0, 0, 0, 0, 0, 0);
+    nec.ld_card(5, 0, 0, 0, 3.72e7, 0, 0);
+    nec.fr_card(0, n_freq, 2400.0, 10.0);
+    nec.pt_card(-1, 0, 0, 0);
+    nec.ex_card(EXCITATION_LINEAR, 0, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    nec.rp_card(0, 10, 10, 0,5,0,0, 0.0, 0.0, 9.0, 9.0, 0.0, 0.0);
+    //nec.xq_card(0);
+
+    // Check that we get n_freq radiation patterns
+    for (int freq_index = 0; freq_index < n_freq; freq_index++) {
+        nec_radiation_pattern* rp = nec.get_radiation_pattern(freq_index);
+        REQUIRE(rp->get_theta_start() == 0.0 );
+//         REQUIRE_APPROX_EQUAL(rp->get_rp_power_average(), 12.0);
+    }
+}
+
+
