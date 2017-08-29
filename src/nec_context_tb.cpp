@@ -61,3 +61,43 @@ TEST_CASE( "Example 1", "[example_1]") {
     REQUIRE(ai->get_segment()[0] == 4 );
     REQUIRE_APPROX_EQUAL(ai->get_current()[0], nec_complex(8.9547E-03, -4.0515E-03) );
 }
+
+
+
+TEST_CASE( "Plane Wave Excitation", "[plane_wave]") {
+
+    /**
+        CM A simple structure excited by a plane wave, and at multiple frequencies.
+        CE go blue ! 
+        GW 0 36 0 0 0 -0.042 0.008 0.017 0.001
+        GE 0
+        GN -1
+        LD 5 0 0 0 3.720E+07 
+        FR 0 1 0 0 2400
+        PT -1
+        EX 1 1 1 0 0 0 0 0 0 0 0
+        RP 0 1 1 0500 90 90 0 0
+        EN
+    */
+    nec_context nec;
+    nec.initialize();
+
+    int n_freq = 10;
+    
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(0, 36, 0.0, 0.0, 0.0, -0.042, 0.008, 0.017, 0.001, 1.0, 1.0);
+    nec.geometry_complete(0);
+    nec.gn_card(-1, 0, 0, 0, 0, 0, 0, 0);
+    nec.ld_card(5, 0, 0, 0, 3.72e7, 0, 0);
+    nec.fr_card(0, n_freq, 2400.0, 10.0);
+    nec.pt_card(-1, 0, 0, 0);
+    nec.ex_card(EXCITATION_VOLTAGE, 0, 1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    nec.rp_card(0, 10, 10, 0,5,0,0, 0.0, 0.0, 9.0, 9.0, 0.0, 0.0);
+
+    for (int i = 0; i < n_freq; i++) {
+        nec_antenna_input* ai = nec.get_input_parameters(i);
+        REQUIRE(ai->get_segment()[0] == 1 );
+        REQUIRE(ai->get_tag()[0] == 0 );
+    }
+
+}
