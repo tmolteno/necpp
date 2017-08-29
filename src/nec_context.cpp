@@ -874,11 +874,33 @@ void nec_context::kh_card(nec_float tmp1) {
 
 void nec_context::ne_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
+  DEBUG_TRACE("ne_card(" << itmp1
+    << "," << itmp2 
+    << "," << itmp3 
+    << "," << itmp4 
+    << "," << tmp1 
+    << "," << tmp2 
+    << "," << tmp3 
+    << "," << tmp4 
+    << "," << tmp5 
+    << "," << tmp6
+    << ")");
   ne_nh_card(0, itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
 }
 
 void nec_context::nh_card(int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6)
 {
+  DEBUG_TRACE("nh_card(" << itmp1
+    << "," << itmp2 
+    << "," << itmp3 
+    << "," << itmp4 
+    << "," << tmp1 
+    << "," << tmp2 
+    << "," << tmp3 
+    << "," << tmp4 
+    << "," << tmp5 
+    << "," << tmp6
+    << ")");
   ne_nh_card(1, itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
 }
 
@@ -977,7 +999,7 @@ void nec_context::pl_card(const char* ploutput_filename, int itmp1, int itmp2, i
 */
 void nec_context::simulate(bool far_field_flag) {
   DEBUG_TRACE("simulate(" << far_field_flag << ")");
-  
+
   /* Allocate the normalization buffer */
   if ( iped )
     fnorm.resize(nfrq,4);
@@ -997,7 +1019,7 @@ void nec_context::simulate(bool far_field_flag) {
     6: standard far field calculation
   */
   enum processing_state igox;
-  int mhz = 0;
+  int mhz = 1;
   
   if ( (far_field_flag == true) && (processing_state == PROCESSING_NEAR_FIELD) )
     igox = PROCESSING_FAR_FIELD;
@@ -1012,7 +1034,7 @@ void nec_context::simulate(bool far_field_flag) {
     switch( igox )
     {
     case PROCESSING_MEMORY_ALLOC: /* Memory allocation for primary interacton matrix. */
-
+      DEBUG_TRACE("igox = " << igox << ", processing_state = " << processing_state);
       if (false == in_freq_loop)  {
         // TODO fix up the following (changed 2* to 3*) to avoid out-of-memory error
         int64_t iresrv = (m_geometry->n_plus_2m) * (m_geometry->np+3*m_geometry->mp);
@@ -1044,6 +1066,7 @@ void nec_context::simulate(bool far_field_flag) {
       /* Falls through. */
 
     case PROCESSING_STRUCTURE_LOADING: /* structure segment loading */
+      DEBUG_TRACE("igox = " << igox << ", processing_state = " << processing_state);
       structure_segment_loading();
 
       processing_state=PROCESSING_EXCITATION_SETUP;
@@ -1051,6 +1074,7 @@ void nec_context::simulate(bool far_field_flag) {
       /* Falls through. */
     
     case PROCESSING_EXCITATION_SETUP: /* excitation set up (right hand side, -e inc.) */
+      DEBUG_TRACE("igox = " << igox << ", processing_state = " << processing_state);
       nthic=1;
       nphic=1;
       inc=1;
@@ -1058,6 +1082,7 @@ void nec_context::simulate(bool far_field_flag) {
       /* Falls through. */
 
     default:
+      DEBUG_TRACE("igox = " << igox << ", processing_state = " << processing_state);
       enum excitation_return ret = excitation_loop(igox, mhz);
     
       if (FREQ_LOOP_CONTINUE == ret)
@@ -1529,13 +1554,14 @@ void nec_context::setup_excitation()
 
 enum excitation_return nec_context::excitation_loop(enum processing_state in_freq_loop_state, int mhz)
 {
-  int itmp1;
   /** TODO This is horrendous code. It needs a complete refactor and rewrite.
    * 
    * See Issue #43
    **/
   do
   {
+    DEBUG_TRACE("excitation_loop: state=" << in_freq_loop_state << " processing_state = " << processing_state << "mHz=" << mhz);
+    
     if (in_freq_loop_state < 4)
     {
       setup_excitation();
@@ -1553,8 +1579,8 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
 
       if ( iped != 0)
       {
-        itmp1= ( mhz-1);
-
+        int itmp1= ( mhz-1);
+        DEBUG_TRACE("Index = " << itmp1);
         fnorm(itmp1,0) = real( zped);
         fnorm(itmp1,1) = imag( zped);
         fnorm(itmp1,2) = abs( zped);
@@ -4953,6 +4979,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
 */  
   for( i = 0; i < voltage_source_count; i++ )
   {
+    DEBUG_TRACE("Voltage Source " << i)
     int segment_index = source_segment_array[i]-1;
     nec_complex voltage = source_voltage_array[i];
     nec_complex current = einc[segment_index] * _wavelength;
@@ -5054,6 +5081,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
   
   for( i = 0; i < nvqd; i++ )
   {
+    DEBUG_TRACE("nvqd " << i)
 /*
     isc1= ivqd[i]-1;
     vlt= vqd[i];
@@ -5106,7 +5134,8 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
       real(impedance), imag(impedance), real(admittance), imag(admittance), power ); */
     
   } /* for( i = 0; i < nvqd; i++ ) */
-  
+  DEBUG_TRACE("netwk complete")
+
   std::stringstream ss;
   antenna_input->write_to_file(ss);
   m_output.line(ss.str().c_str());
