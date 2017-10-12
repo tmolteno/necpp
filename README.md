@@ -36,5 +36,6 @@ Instructions are in the file INSTALL.md.
 ## Links
 
 * http://tmolteno.github.io/necpp/ Documentation
+* https://github.com/lncgomz/UCNEC Java-Based GUI project
 * https://github.com/tmolteno/python-necpp/ Python packages
 * https://github.com/rcnlee/necpp.jl Julia wrapper for the python packages
