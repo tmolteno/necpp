@@ -409,8 +409,7 @@ void solve_ge( int64_t n, complex_array& a, int_array& ip,
 
 extern "C"
 {
-//#include <atlas/atlas_enum.h>
-#include <atlas/clapack.h>
+#include <clapack.h>
 }
 
 /*! \brief Use lapack to perform LU decomposition
