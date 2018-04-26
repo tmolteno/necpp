@@ -26,6 +26,7 @@ C***
       COMMON /GGRID/ AR1(11,10,4),AR2(17,5,4),AR3(9,8,4),EPSCF,DXA(3),DY
      1A(3),XSA(3),YSA(3),NXA(3),NYA(3)
       CHARACTER*3  LCOMP(4)
+      REAL TIM, TST
       DATA LCOMP/'ERV','EZV','ERH','EPH'/
       WRITE(*,*) 'SOMNEC2D,  Last changes: May 31 1995,  J. Bergervoet'
       WRITE(*,*)
@@ -764,7 +765,7 @@ C
       SUBROUTINE SECOND (CPUSECD)
 C     Purpose:
 C     SECOND returns cpu time in seconds.  Must be customized!!!
-      REAL*8 CPUSECD
+      REAL*4 CPUSECD
       integer Iticks
 
 C--   Not customized:
