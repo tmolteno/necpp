@@ -210,6 +210,8 @@ public:
     _v[2] = in_z;
   }
   
+  nec_3vector(const nec_3vector&) = default;
+  
   /**!\brief The Euclidian norm */
   inline nec_float norm() const {
     return ::norm(_v[0], _v[1], _v[2]);
