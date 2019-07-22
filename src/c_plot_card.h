@@ -50,6 +50,8 @@ public:
 	
 	virtual ~c_plot_card();
 	
+	c_plot_card& operator=(const c_plot_card&) = default;
+	
 	bool is_valid()	const;
 	
 	bool storing()	const;
