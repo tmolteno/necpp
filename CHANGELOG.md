@@ -1,3 +1,7 @@
+## Unreleased
+
+* Fix error in Sommerfeld ground interpolation thanks to Alexander Schewelew
+
 ## Vresion 1.7.4
 * Fix bug in reading comments longer than 80 characters (issue #47)
 * Fixed bug in nec_context::fblock when setting up symmetry_array matrix for plane symmetry.
