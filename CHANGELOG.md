@@ -1,6 +1,7 @@
 ## Unreleased
 
 * Fix error in Sommerfeld ground interpolation thanks to Alexander Schewelew
+* Update checking for blas, so that other blas can be used like openblas.
 
 ## Vresion 1.7.4
 * Fix bug in reading comments longer than 80 characters (issue #47)

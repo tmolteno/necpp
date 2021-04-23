@@ -1,11 +1,13 @@
 AC_INIT([necpp], [1.7.4])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([m4])
+AC_CONFIG_MACRO_DIR([config/m4])
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE
-
+AM_INIT_AUTOMAKE([foreign subdir-objects])
+AM_PROG_LIBTOOL
+AM_SILENT_RULES([yes])
 LT_INIT
 
-dnl CXXFLAGS="-O2 -Wall -Wextra -Wshadow -Werror"
+CXXFLAGS="-O2 -Wall -Wextra -Wshadow -Werror"
 
 dnl ************************************************
 dnl *** Check for Array Bounds
@@ -59,7 +61,7 @@ fi
 dnl ************************************************
 dnl *** Check for Lapack library
 dnl ************************************************
-
+AC_PROG_F77
 
 AC_ARG_WITH([lapack],
   [AS_HELP_STRING([--without-lapack],
@@ -70,10 +72,13 @@ AC_ARG_WITH([lapack],
 LIBLAPACK=
   AS_IF([test "x$with_lapack" != xno],
   [
-    LDFLAGS="$LDFLAGS -L/usr/lib/atlas-base/atlas"
+    AX_BLAS([], [AC_MSG_ERROR([BLAS library not found])])
+    AX_LAPACK([], [AC_MSG_ERROR([LAPACK library not found])])
+
+    LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
     AC_CHECK_LIB(
     [lapack], [clapack_zgetrf], 
-    [AC_SUBST([LIBLAPACK], ["-L/usr/lib/atlas-base/atlas -llapack -lblas -lpthread"]) AC_DEFINE([LAPACK], [1], [Define if you have liblapack])],
+    [AC_SUBST([LIBLAPACK], ["$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"]) AC_DEFINE([LAPACK], [1], [Define if you have liblapack])],
     [AC_MSG_FAILURE([lapack library test failed (--without-lapack to disable)])],
     [])
   ])

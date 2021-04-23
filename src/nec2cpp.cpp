@@ -587,8 +587,11 @@ int readmn(FILE* input_fp, FILE* output_fp,
 		if (EOF == eof)
 		{
 			// insert an EN card if we get to an end of file
-			strncpy( gm, "EN", 2 );
-			return 0;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+            strncpy( gm, "EN", 2 );
+#pragma GCC diagnostic pop
+            return 0;
 		}
 		else
 		{
