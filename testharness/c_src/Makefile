@@ -9,7 +9,7 @@ objects = calculations.o fields.o geometry.o ground.o input.o \
 	  main.o matrix.o misc.o network.o radiation.o somnec.o
 
 $(PROJECT) : $(objects)
-	    $(CC) -lm -o $(PROJECT) $(objects)
+	    $(CC) -o $(PROJECT) $(objects) -lm 
 
 $(objects) : nec2c.h
 
