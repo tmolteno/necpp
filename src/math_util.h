@@ -40,6 +40,12 @@
   typedef Eigen::Matrix<int32_t, Eigen::Dynamic, 1>  int_array;
   typedef Eigen::Matrix<nec_float, Eigen::Dynamic, 1>  real_array;
   typedef Eigen::Matrix<nec_complex, Eigen::Dynamic, 1>  complex_array;
+
+inline void vector_fill(complex_array& x, int64_t start, int64_t N, const nec_complex& y) {
+  for (int64_t i=start; i<start+N; i++)
+      x(i)=y;
+}
+
 #else
   // Use our own types rather than Eigen
   #include "safe_array.h"
@@ -50,12 +56,17 @@
   typedef safe_matrix<int32_t>  int_matrix;
   typedef safe_matrix<nec_float>  real_matrix;
   typedef safe_matrix<nec_complex>  complex_matrix;
-#endif
-
 
 inline void vector_fill(complex_array& x, int64_t start, int64_t N, const nec_complex& y) {
   x.fill(start, N, y);
 }
+
+#endif
+
+
+// inline void vector_fill(complex_array& x, int64_t start, int64_t N, const nec_complex& y) {
+//   x.fill(start, N, y);
+// }
 
 
 inline nec_complex cplx_00() {
