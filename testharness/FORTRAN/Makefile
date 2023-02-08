@@ -33,8 +33,8 @@ somnec:	somnec2d.f
 	${FORTRAN} -Wall -O1 -o somnec somnec2d.f
 
 clean:
-	rm nec2
-	rm somnec
+	rm -f nec2
+	rm -f somnec
 
 test:
 	./nec2 ../test_data/example2.nec ../test_data/example2.outf

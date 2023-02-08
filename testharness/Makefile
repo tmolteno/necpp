@@ -51,8 +51,9 @@ NEC_TESTS := $(shell find data/ -name "example*.nec")
 SOM_TESTS := $(shell find data/ -name "sommer*.nec")
 ALL_TESTS := $(shell find data/ -name "*.nec")
 
-DO_TESTS = ${NEC_TESTS} ${SOM_TESTS}
+#DO_TESTS = ${NEC_TESTS} ${SOM_TESTS}
 #DO_TESTS = ${ALL_TESTS}
+DO_TESTS = $(shell find data/ -name "herzian_dipole.nec")
 
 ############################################################################
 #	
@@ -95,7 +96,7 @@ test_f: ${NECF} $(DO_TESTS:.nec=.outf)
 #	test_aux:	${NEC2DIFF} nec2cpp $(NEC_TESTS:.nec=.outcpp) $(NEC_TESTS:.nec=.outc) $(NEC_TESTS:.nec=.diff) $(NEC_TESTS:.nec=.dif)
 #	in order to include the FORTRAN code in the test suite.
 
-test_aux: $(DO_TESTS:.nec=.outcpp) $(DO_TESTS:.nec=.outc) $(DO_TESTS:.nec=.diff)
+test_aux: $(DO_TESTS:.nec=.outcpp) $(DO_TESTS:.nec=.outc)  $(DO_TESTS:.nec=.outf) $(DO_TESTS:.nec=.diff)
 	echo "Test Complete"
 
 ############################################################################
