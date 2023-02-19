@@ -372,13 +372,14 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
           nec_float tmp3 = tha - tmp2;
           nec_float tmp4 = tha + tmp2;
         
-          if ( kth == 1)
+          /* kth runs from 0 to n_theta - 1 not from 1 as in nec2c */
+          if ( kth == 0)
             tmp3= tha;
-          else if ( kth == n_theta)
+          else if ( kth == n_theta - 1)
             tmp4= tha;
         
           nec_float da = fabs( delta_phi_rad*( cos(tmp3)- cos(tmp4)));
-          if ( (kph == 1) || (kph == n_phi) )
+          if ( (kph == 0) || (kph == n_phi - 1) )
             da *=.5;
           pint += tstor1 * da;
         
