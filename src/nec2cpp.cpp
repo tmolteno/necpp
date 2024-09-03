@@ -254,10 +254,19 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	}
 
 	/*** open input file ***/
-	if ( (input_fp = fopen(input_filename.c_str(), "r")) == NULL )
+	if ( input_filename == "" )
+	{
+		string mesg = "nec2++: -i input_filename is required. Use input_filename \"-\" for stdin.\n";
+		fprintf( stderr, mesg.c_str() );
+		exit(-1);
+	}
+	else if ( input_filename == "-" )
+	{
+		input_fp = stdin;
+	}
+	else if ( (input_fp = fopen(input_filename.c_str(), "r")) == NULL )
 	{
 		string mesg = "nec2++: "  + input_filename;
-		
 		perror( mesg.c_str() );
 		exit(-1);
 	}
