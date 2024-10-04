@@ -196,8 +196,8 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 		usage();
 		exit(-1);
 	}
-	
-	bool results_to_stdout = false;
+
+	bool summary_to_stdout = false;
 	// allocate a new nec_context;
 	nec_context s_context;
 	
@@ -219,7 +219,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 			break;
 
 		case 's': /* return output to stdout */
-			results_to_stdout = true;
+			summary_to_stdout = true;
 			break;
 
 		case 'c': /* use CSV result data */
@@ -280,7 +280,11 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	}
 	
 	/* open output file */
-	if ( (output_fp = fopen(output_filename.c_str(), "w")) == NULL )
+	if ( output_filename == "-" )
+	{
+		output_fp = stdout;
+	}
+	else if ( (output_fp = fopen(output_filename.c_str(), "w")) == NULL )
 	{
 		string mesg = "nec2++: "  + output_filename;
 		
@@ -534,7 +538,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 				******************************************************/
 				s_context.all_jobs_completed();
 				// put in here for the moment...
- 				if (results_to_stdout)
+				if (summary_to_stdout)
 					s_context.write_results(cout);
 				
 				/* time the process */

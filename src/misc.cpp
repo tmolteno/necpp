@@ -21,7 +21,7 @@ void usage(void)
       "usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]"
       "\n       -g: print maximum gain to stdout."
       "\n       -b: Perform NEC++ Benchmark."
-      "\n       -s: print results to standard output."
+      "\n       -s: print result summary to standard output."
       "\n       -c: print results in comma-separated-value (CSV) format,"
       "\n           this options is used in conjunction with (-s) above."
       "\n       -h: print this usage information and exit."
