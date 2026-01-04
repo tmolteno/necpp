@@ -36,7 +36,7 @@ typedef std::complex<nec_float> nec_complex;
   #define nec_build_date BUILD_DATE
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
 #include "../win32/nec2++/config.h"
 #else
 #include "config.h"
