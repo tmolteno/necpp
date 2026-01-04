@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++ make automake autoconf libtool gfortran
+    
+    - name: Generate configure script
+      run: make -f Makefile.git
+    
+    - name: Configure
+      run: ./configure --without-lapack
+    
+    - name: Build
+      run: make -j 4
