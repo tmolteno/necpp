@@ -257,7 +257,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	if ( input_filename == "" )
 	{
 		string mesg = "nec2++: -i input_filename is required. Use input_filename \"-\" for stdin.\n";
-		fprintf( stderr, mesg.c_str() );
+		fprintf( stderr, "%", mesg.c_str() );
 		exit(-1);
 	}
 	else if ( input_filename == "-" )
