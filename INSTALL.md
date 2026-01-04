@@ -9,13 +9,13 @@ Nec2++ requires a C++ compiler and uses the GNU autoconf packages for
 keeping track of dependencies. On Debian or a derivative, you can
 install these with the following command.
 
-    aptitude install g++ make automake autoconf libtool libatlas-base-dev
+    aptitude install g++ make automake autoconf libtool gfortran
 
 ## Installation Steps
 
   1. Install the autoconf and libtool packages.
      On Debian this is done with 
-       `aptitude install automake autoconf libtool'
+       `aptitude install automake autoconf libtool gfortran'
      on other systems you will have to find the appropriate way to do this.
 
   2. Cenerate the ./configure script. To do this, type
@@ -65,4 +65,3 @@ NEC2++ has been tested with Microsoft Visual Studio 2013.
 Step-by-step instructions
 
 * Build the project inside the win32 subdirectory with Visual Studio 2103.
-
