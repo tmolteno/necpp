@@ -9,28 +9,22 @@ Nec2++ requires a C++ compiler and uses the GNU autoconf packages for
 keeping track of dependencies. On Debian or a derivative, you can
 install these with the following command.
 
-    aptitude install g++ make automake autoconf libtool gfortran
+    aptitude install g++ make automake autoconf libtool
 
 ## Installation Steps
 
   1. Install the autoconf and libtool packages.
      On Debian this is done with 
-       `aptitude install automake autoconf libtool gfortran'
+       `aptitude install automake autoconf libtool'
      on other systems you will have to find the appropriate way to do this.
 
   2. Cenerate the ./configure script. To do this, type
        `make -f Makefile.git'
 
   3. Then do the usual thing 
-       ./configure --without-lapack
+       ./configure
        make -j 4
        sudo make install
-
-  4. To use LAPACK, you should install the appropriate atlas system
-     aptitude install libatlas-base-dev. And then to the usual thing, i.e.,
-        ./configure 
-        make -j 4
-        sudo make install
 
 ## Compiling for a specific architecture
 

@@ -1,4 +1,4 @@
-AC_INIT([necpp],[1.7.4])
+AC_INIT([necpp],[1.7.5])
 AC_CONFIG_AUX_DIR([m4])
 AC_CONFIG_MACRO_DIR([config/m4])
 AC_CONFIG_HEADERS(config.h)
@@ -59,31 +59,6 @@ else
 fi
 
 dnl ************************************************
-dnl *** Check for Lapack library
-dnl ************************************************
-AC_PROG_F77
-
-AC_ARG_WITH([lapack],
-  [AS_HELP_STRING([--without-lapack],
-  [disable support for lapack])],
-  [],
-  [with_lapack=yes])
-
-LIBLAPACK=
-  AS_IF([test "x$with_lapack" != xno],
-  [
-    AX_BLAS([], [AC_MSG_ERROR([BLAS library not found])])
-    AX_LAPACK([], [AC_MSG_ERROR([LAPACK library not found])])
-
-    LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
-    AC_CHECK_LIB(
-    [lapack], [clapack_zgetrf], 
-    [AC_SUBST([LIBLAPACK], ["$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"]) AC_DEFINE([LAPACK], [1], [Define if you have liblapack])],
-    [AC_MSG_FAILURE([lapack library test failed (--without-lapack to disable)])],
-    [])
-  ])
-
-dnl ************************************************
 dnl *** Check for Eigen library
 dnl ************************************************
 
@@ -137,4 +112,3 @@ AC_SUBST(PRIVATE_LIBS)
 
 AC_CONFIG_FILES([Makefile src/Makefile necpp.pc])
 AC_OUTPUT
-
