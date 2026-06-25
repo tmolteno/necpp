@@ -1,4 +1,4 @@
-## Unreleased
+## Version 1.7.6
 
 * Fix bug in nec_ground::get_radial_wire_length() which returned radial_wire_count instead
   of radial_wire_length.
