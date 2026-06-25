@@ -22,6 +22,7 @@
 #include "nec_exception.h"
 
 #include <cstring>
+#include <cctype>
 #include <stdint.h>
 
 c_geometry::c_geometry() 
