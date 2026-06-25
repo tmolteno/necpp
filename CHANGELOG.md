@@ -11,6 +11,9 @@
   is disabled (#76).
 * Fix typos in K5332187.nec test data: erroneous apostrophe before PL card and
   "Richtanzenne" → "Richtantenne" (#77).
+* Add comprehensive 12×12 complex matrix factor+ solve test (factrs/solves)
+  validating the full linear algebra pipeline: transpose handling, LU decomposition,
+  partial pivoting, and forward/back substitution with complex arithmetic.
 
 ## Version 1.7.6
 
