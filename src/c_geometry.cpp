@@ -835,7 +835,7 @@ void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl,
     if ( a2 == a1) {
       if ( b1 == 0.)
         b1= a1;
-    
+
       x[i]= a1* cos(2.* pi()* z[i]/ s);
       y[i]= b1* sin(2.* pi()* z[i]/ s);
       x2[i]= a1* cos(2.* pi()* z2[i]/ s);
@@ -843,27 +843,41 @@ void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl,
     } else {
       if ( b2 == 0.)
         b2= a2;
-    
-      x[i]=( a1+( a2- a1)* z[i]/ fabs( hl))* cos(2.* pi()* z[i]/ s);
-      y[i]=( b1+( b2- b1)* z[i]/ fabs( hl))* sin(2.* pi()* z[i]/ s);
-      x2[i]=( a1+( a2- a1)* z2[i]/ fabs( hl))* cos(2.* pi()* z2[i]/ s);
-      y2[i]=( b1+( b2- b1)* z2[i]/ fabs( hl))* sin(2.* pi()* z2[i]/ s);  
+
+      // Interpolate radius: use segment index when hl == 0,
+      // otherwise use z / fabs(hl) to avoid division by zero.
+      nec_float radius_frac;
+      if (hl == 0.)
+        radius_frac = nec_float(i - ist) / nec_float(segment_count - 1);
+      else
+        radius_frac = z[i] / fabs(hl);
+
+      x[i]=( a1+( a2- a1)* radius_frac)* cos(2.* pi()* z[i]/ s);
+      y[i]=( b1+( b2- b1)* radius_frac)* sin(2.* pi()* z[i]/ s);
+
+      if (hl == 0.)
+        radius_frac = nec_float(i - ist + 1) / nec_float(segment_count - 1);
+      else
+        radius_frac = z2[i] / fabs(hl);
+
+      x2[i]=( a1+( a2- a1)* radius_frac)* cos(2.* pi()* z2[i]/ s);
+      y2[i]=( b1+( b2- b1)* radius_frac)* sin(2.* pi()* z2[i]/ s);
     } /* if ( a2 == a1) */
-  
-    if ( hl <= 0.) {  
-      nec_float copy= x[i];
-      x[i]= y[i];
-      y[i]= copy;
-      copy= x2[i];
-      x2[i]= y2[i];
-      y2[i]= copy;
+
+    if ( hl < 0.) {
+      // Left-handed helix: negate rotation sense (preserves +x start
+      // and A1→x, B1→y axis mapping, per GH card specification).
+      y[i]  = -y[i];
+      y2[i] = -y2[i];
     }
   } /* for( i = ist; i < n_segments; i++ ) */
   
   if ( a2 != a1) {
-    sangle= atan( a2/( fabs( hl)+( fabs( hl)* a1)/( a2- a1)));
-    m_output->nec_printf(
-      "\n       THE CONE ANGLE OF THE SPIRAL IS %10.4f", sangle );
+    if (hl != 0.) {
+      sangle= atan( a2/( fabs( hl)+( fabs( hl)* a1)/( a2- a1)));
+      m_output->nec_printf(
+        "\n       THE CONE ANGLE OF THE SPIRAL IS %10.4f", sangle );
+    }
     return;
   }
   
