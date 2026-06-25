@@ -59,3 +59,13 @@ NEC2++ has been tested with Microsoft Visual Studio 2013.
 Step-by-step instructions
 
 * Build the project inside the win32 subdirectory with Visual Studio 2103.
+
+## Notes for embedding in other projects
+
+Some source files are header-only and have no corresponding `.cpp` file.
+If your build system expects a `.cpp` for every `.h`, the following files
+are intentionally header-only and should be included directly:
+
+* `math_util.h` — math constants and the `nec_3vector` class
+* `nec_wire.h` — wire intersection geometry
+* `safe_array.h` — bounds-checked array template
