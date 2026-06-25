@@ -126,10 +126,18 @@ public:
   
   void gx_card(int card_int_1, int card_int_2);
        
-  /*! \brief Geometry is complete
-   *  \exception nec_exception* If there is an error with the geometry.
-   */
-  void geometry_complete(nec_context* m_context, int gpflag);
+  	/*! \brief Enable or disable segment intersection checking.
+  	 *  Intersection checking is on by default. Disabling it can be useful
+  	 *  for geometries where closely-spaced parallel wires cause false
+  	 *  positive intersection errors (e.g., phasing stubs, boom models).
+  	 *  \param enable true to check (default), false to skip checks.
+  	 */
+  	void set_intersection_check(bool enable) { _check_intersections = enable; }
+
+  	/*! \brief Geometry is complete
+  	 *  \exception nec_exception* If there is an error with the geometry.
+  	 */
+  	void geometry_complete(nec_context* m_context, int gpflag);
   
   
   
@@ -207,10 +215,11 @@ private:
           nec_float *x2, nec_float *y2, nec_float *z2, 
           nec_float *rad );
 
-  nec_context* m_context;
-  nec_output_file* m_output;
+  	nec_context* m_context;
+  	nec_output_file* m_output;
+  	bool _check_intersections;
 
-  std::vector<nec_wire> m_wires;
+  	std::vector<nec_wire> m_wires;
   
   int patch_type;
   nec_3vector patch_x1, patch_x2, patch_x3, patch_x4;
