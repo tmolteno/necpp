@@ -144,3 +144,51 @@ TEST_CASE( "Plane Wave Excitation", "[plane_wave]") {
 }
 
 
+TEST_CASE( "Left-handed helix starts on +x axis", "[helix_handedness]") {
+    // Regression test for #91: LH helix must start at (A1, 0, 0)
+    // on the +x axis, not at (0, A1) on the +y axis.
+    // Check coordinates before geometry_complete (which rescales
+    // meters to wavelengths).
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    // Left-handed helix: HL < 0, tag=1, 10 segments, spacing=0.1,
+    // length=-0.3, a1=0.2, b1=0.1, a2=0.2, b2=0.1, radius=0.001
+    geo->helix(1, 10, 0.1, -0.3, 0.2, 0.1, 0.2, 0.1, 0.001);
+
+    // First segment should start on +x axis: x ≈ a1, y ≈ 0
+    REQUIRE(geo->x[0] == Approx(0.2).margin(1e-6));
+    REQUIRE(geo->y[0] == Approx(0.0).margin(1e-6));
+}
+
+TEST_CASE( "Flat spiral does not divide by zero", "[helix_flat_spiral]") {
+    // Regression test for #91: HL=0 with A2 != A1 used to
+    // divide by fabs(hl), causing a divide-by-zero.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    // Flat spiral: hl=0, a1=0.1, a2=0.2 (different radii)
+    geo->helix(1, 10, 0.1, 0.0, 0.1, 0.1, 0.2, 0.2, 0.001);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+
+    // Should have 10 segments
+    REQUIRE(geo->n_segments == 10);
+}
+
+TEST_CASE( "Connected wires do not trigger false intersection", "[false_intersection]") {
+    // Regression test for #87: two wires sharing an endpoint
+    // must not trigger a "SEGMENT MIDPOINT INTERSECTS" error.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    // Wire 1: from origin to (0, 0, 0.5)
+    geo->wire(1, 11, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.002, 1.0, 1.0);
+    // Wire 2: from (0, 0, 0.5) to (0.36, 0.36, 0.5)
+    // Shares endpoint with wire 1 — this used to cause a false
+    // positive intersection error.
+    geo->wire(2, 11, 0.0, 0.0, 0.5, 0.36, 0.36, 0.5, 0.002, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+}
