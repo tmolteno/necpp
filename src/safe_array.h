@@ -117,7 +117,7 @@ public:
       try {
         T* new_data_ = new T[_data_size];
         if (0 != _len)
-          std::memcpy(new_data_, _data, _len * sizeof(T));
+          std::memcpy(new_data_, _data, static_cast<size_t>(_len) * sizeof(T));
 
         delete[] _data;
         _data = new_data_;
