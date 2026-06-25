@@ -1779,8 +1779,11 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
     xpr2 += xpr5;
     nphic++;
 
-    if ( nphic > nphi )
-      return FREQ_PRINT_NORMALIZATION;
+	    if ( nphic > nphi ) {
+	      if ( nfrq != 1)
+	        return FREQ_LOOP_CONTINUE;
+	      return FREQ_PRINT_NORMALIZATION;
+	    }
 
   }
   while( true );

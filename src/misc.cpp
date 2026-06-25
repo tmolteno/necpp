@@ -5,6 +5,7 @@
 #include "misc.h"
 
 #include <stdio.h>
+#include <cctype>
 
 using namespace std;
 

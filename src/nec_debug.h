@@ -28,10 +28,9 @@
   #define DEBUG_TRACE(__x) {std::cout << __x << std::endl;}
   #define ASSERT(__x) \
     { if (false == (__x))\
-      {	std::stringstream __ss; \
+      {	std::ostringstream __ss; \
         __ss << "assert in file " << __FILE__ << " at line " << __LINE__;\
-        std::string __s = __ss.str(); \
-        throw __s.c_str(); \
+        throw __ss.str(); \
       } \
     }
   #define ASSERT_EQUAL(__x, __y) ASSERT(fabs((__x) - (__y)) < 1e-15)

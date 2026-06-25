@@ -38,31 +38,25 @@ nec_float c_ggrid::m_ysa[3] = {0.,0.,.3490658504};
 void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
         nec_complex *f2, nec_complex *f3, nec_complex *f4 )
 {
-    static int ix, iy, ixs = -10, iys = -10, igrs = -10, ixeg=0, iyeg=0;
-    static int nxm2, nym2, nxms, nyms, nd, ndp;
-    static nec_float dx = 1., dy = 1., xs = 0., ys = 0., xz, yz;
-    static nec_complex a[4][4], b[4][4], c[4][4], d[4][4];
-    static int nda[3] = {11,17,9}, ndpa[3] = {110, 85, 72};
-    
-    nec_complex p1, p2, p3, p4, fx1, fx2, fx3, fx4;
-    
+    static const int nda[3] = {11,17,9}, ndpa[3] = {110, 85, 72};
+
     bool recalculate = true;
-    
-    if( (x >= xs) && (y >= ys) ) {
-        ix = (int)((x-xs) / dx)+1;
-        iy = (int)((y-ys) / dy)+1;
+
+    if( (x >= m_ip_xs) && (y >= m_ip_ys) ) {
+        m_ip_ix = (int)((x - m_ip_xs) / m_ip_dx) + 1;
+        m_ip_iy = (int)((y - m_ip_ys) / m_ip_dy) + 1;
     } else {
         /* if point lies in same 4 by 4 point region */
         /* as previous point, old values are reused. */
-        if ( ((ix >= ixeg) && (iy >= iyeg)) &&
-             ((std::abs(ix - ixs) < 2) &&  (std::abs(iy - iys) < 2)) )
+        if ( ((m_ip_ix >= m_ip_ixeg) && (m_ip_iy >= m_ip_iyeg)) &&
+             ((std::abs(m_ip_ix - m_ip_ixs) < 2) &&  (std::abs(m_ip_iy - m_ip_iys) < 2)) )
             recalculate = false;
     }
-    
+
     if (true == recalculate) {
         /* determine correct grid and grid region */
         int igr;
-        
+
         if( x <= m_xsa[1])
             igr=0;
         else {
@@ -71,125 +65,96 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
             else
                 igr=1;
         }
-    
-        if( igr != igrs) {
-            igrs= igr;
-            dx= m_dxa[igrs];
-            dy= m_dya[igrs];
-            xs= m_xsa[igrs];
-            ys= m_ysa[igrs];
-            nxm2= m_nxa[igrs]-2;
-            nym2= m_nya[igrs]-2;
-            nxms=(( nxm2+1)/3)*3+1;
-            nyms=(( nym2+1)/3)*3+1;
-            nd= nda[igrs];
-            ndp= ndpa[igrs];
-            ix= (int)(( x- xs)/ dx)+1;
-            iy= (int)(( y- ys)/ dy)+1;
-        } /* if( igr != igrs) */
-    
-        ixs=(( ix-1)/3)*3+2;
-        if( ixs < 2)
-            ixs=2;
-        ixeg = -10000;
-    
-        if( ixs > nxm2) {
-            ixs= nxm2;
-            ixeg= nxms;
+
+        if( igr != m_ip_igrs) {
+            m_ip_igrs = igr;
+            m_ip_dx = m_dxa[m_ip_igrs];
+            m_ip_dy = m_dya[m_ip_igrs];
+            m_ip_xs = m_xsa[m_ip_igrs];
+            m_ip_ys = m_ysa[m_ip_igrs];
+            m_ip_nxm2 = m_nxa[m_ip_igrs] - 2;
+            m_ip_nym2 = m_nya[m_ip_igrs] - 2;
+            m_ip_nxms = (( m_ip_nxm2 + 1) / 3) * 3 + 1;
+            m_ip_nyms = (( m_ip_nym2 + 1) / 3) * 3 + 1;
+            m_ip_nd = nda[m_ip_igrs];
+            m_ip_ndp = ndpa[m_ip_igrs];
+            m_ip_ix = (int)(( x - m_ip_xs) / m_ip_dx) + 1;
+            m_ip_iy = (int)(( y - m_ip_ys) / m_ip_dy) + 1;
+        } /* if( igr != m_ip_igrs) */
+
+        m_ip_ixs = (( m_ip_ix - 1) / 3) * 3 + 2;
+        if( m_ip_ixs < 2)
+            m_ip_ixs = 2;
+        m_ip_ixeg = -10000;
+
+        if( m_ip_ixs > m_ip_nxm2) {
+            m_ip_ixs = m_ip_nxm2;
+            m_ip_ixeg = m_ip_nxms;
         }
-    
-        iys=(( iy-1)/3)*3+2;
-        if( iys < 2)
-            iys=2;
-        iyeg = -10000;
-    
-        if( iys > nym2) {
-            iys= nym2;
-            iyeg= nyms;
+
+        m_ip_iys = (( m_ip_iy - 1) / 3) * 3 + 2;
+        if( m_ip_iys < 2)
+            m_ip_iys = 2;
+        m_ip_iyeg = -10000;
+
+        if( m_ip_iys > m_ip_nym2) {
+            m_ip_iys = m_ip_nym2;
+            m_ip_iyeg = m_ip_nyms;
         }
-    
+
+        // Select the correct array once, outside the inner loop.
+        complex_array& ar = (m_ip_igrs == 0) ? m_ar1 : (m_ip_igrs == 1) ? m_ar2 : m_ar3;
+
         /* compute coefficients of 4 cubic polynomials in x for */
         /* the 4 grid values of y for each of the 4 functions */
-        int iadz= ixs+( iys-3)* nd- ndp;
+        int iadz = m_ip_ixs + (m_ip_iys - 3) * m_ip_nd - m_ip_ndp;
         for (int k = 0; k < 4; k++ ) {
-            iadz += ndp;
+            iadz += m_ip_ndp;
             int iadd = iadz;
-        
+
             for (int i = 0; i < 4; i++ ) {
-                iadd += nd;
-            
-                switch( igrs ) {
-                case 0:
-                    p1= m_ar1[iadd-2];
-                    p2= m_ar1[iadd-1];
-                    p3= m_ar1[iadd];
-                    p4= m_ar1[iadd+1];
-                    break;
-            
-                case 1:
-                    p1= m_ar2[iadd-2];
-                    p2= m_ar2[iadd-1];
-                    p3= m_ar2[iadd];
-                    p4= m_ar2[iadd+1];
-                    break;
-            
-                case 2:
-                    p1= m_ar3[iadd-2];
-                    p2= m_ar3[iadd-1];
-                    p3= m_ar3[iadd];
-                    p4= m_ar3[iadd+1];
-                } /* switch( igrs ) */
-            
-                a[i][k]=( p4- p1+3.*( p2- p3))*.1666666667;
-                b[i][k]=( p1-2.* p2+ p3)*.5;
-                c[i][k]= p3-(2.* p1+3.* p2+ p4)*.1666666667;
-                d[i][k]= p2;
-            
+                iadd += m_ip_nd;
+
+                nec_complex p1 = ar[iadd-2];
+                nec_complex p2 = ar[iadd-1];
+                nec_complex p3 = ar[iadd];
+                nec_complex p4 = ar[iadd+1];
+
+                m_ip_a[i][k] = ( p4 - p1 + 3.0 * ( p2 - p3)) * 0.1666666667;
+                m_ip_b[i][k] = ( p1 - 2.0 * p2 + p3) * 0.5;
+                m_ip_c[i][k] = p3 - (2.0 * p1 + 3.0 * p2 + p4) * 0.1666666667;
+                m_ip_d[i][k] = p2;
+
             } /* for ( i = 0; i < 4; i++ ) */
-        
+
         } /* for ( k = 0; k < 4; k++ ) */
-    
-        xz=( ixs-1)* dx+ xs;
-        yz=( iys-1)* dy+ ys;
-    
-    } /* if( (abs(ix- ixs) >= 2) || */
-    
-    /* evaluate polymomials in x and use cubic */
+
+        m_ip_xz = ( m_ip_ixs - 1) * m_ip_dx + m_ip_xs;
+        m_ip_yz = ( m_ip_iys - 1) * m_ip_dy + m_ip_ys;
+
+    } /* if (true == recalculate) */
+
+    /* evaluate polynomials in x and use cubic */
     /* interpolation in y for each of the 4 functions. */
-    nec_float xx=( x- xz)/ dx;
-    nec_float yy=( y- yz)/ dy;
-    fx1=(( a[0][0]* xx+ b[0][0])* xx+ c[0][0])* xx+ d[0][0];
-    fx2=(( a[1][0]* xx+ b[1][0])* xx+ c[1][0])* xx+ d[1][0];
-    fx3=(( a[2][0]* xx+ b[2][0])* xx+ c[2][0])* xx+ d[2][0];
-    fx4=(( a[3][0]* xx+ b[3][0])* xx+ c[3][0])* xx+ d[3][0];
-    p1= fx4- fx1+3.*( fx2- fx3);
-    p2=3.*( fx1-2.* fx2+ fx3);
-    p3=6.* fx3-2.* fx1-3.* fx2- fx4;
-    *f1=(( p1* yy+ p2)* yy+ p3)* yy*.1666666667+ fx2;
-    fx1=(( a[0][1]* xx+ b[0][1])* xx+ c[0][1])* xx+ d[0][1];
-    fx2=(( a[1][1]* xx+ b[1][1])* xx+ c[1][1])* xx+ d[1][1];
-    fx3=(( a[2][1]* xx+ b[2][1])* xx+ c[2][1])* xx+ d[2][1];
-    fx4=(( a[3][1]* xx+ b[3][1])* xx+ c[3][1])* xx+ d[3][1];
-    p1= fx4- fx1+3.*( fx2- fx3);
-    p2=3.*( fx1-2.* fx2+ fx3);
-    p3=6.* fx3-2.* fx1-3.* fx2- fx4;
-    *f2=(( p1* yy+ p2)* yy+ p3)* yy*.1666666667+ fx2;
-    fx1=(( a[0][2]* xx+ b[0][2])* xx+ c[0][2])* xx+ d[0][2];
-    fx2=(( a[1][2]* xx+ b[1][2])* xx+ c[1][2])* xx+ d[1][2];
-    fx3=(( a[2][2]* xx+ b[2][2])* xx+ c[2][2])* xx+ d[2][2];
-    fx4=(( a[3][2]* xx+ b[3][2])* xx+ c[3][2])* xx+ d[3][2];
-    p1= fx4- fx1+3.*( fx2- fx3);
-    p2=3.*( fx1-2.* fx2+ fx3);
-    p3=6.* fx3-2.* fx1-3.* fx2- fx4;
-    *f3=(( p1* yy+ p2)* yy+ p3)* yy*.1666666667+ fx2;
-    fx1=(( a[0][3]* xx+ b[0][3])* xx+ c[0][3])* xx+ d[0][3];
-    fx2=(( a[1][3]* xx+ b[1][3])* xx+ c[1][3])* xx+ d[1][3];
-    fx3=(( a[2][3]* xx+ b[2][3])* xx+ c[2][3])* xx+ d[2][3];
-    fx4=(( a[3][3]* xx+ b[3][3])* xx+ c[3][3])* xx+ d[3][3];
-    p1= fx4- fx1+3.*( fx2- fx3);
-    p2=3.*( fx1-2.* fx2+ fx3);
-    p3=6.* fx3-2.* fx1-3.* fx2- fx4;
-    *f4=(( p1* yy+ p2)* yy+ p3)* yy*.16666666670+ fx2;
+    nec_float xx = ( x - m_ip_xz) / m_ip_dx;
+    nec_float yy = ( y - m_ip_yz) / m_ip_dy;
+
+    // Helper lambda to evaluate cubic for one function index k
+    auto eval_func = [&](int k, nec_complex* fout) {
+        nec_complex l_fx1 = ((m_ip_a[0][k] * xx + m_ip_b[0][k]) * xx + m_ip_c[0][k]) * xx + m_ip_d[0][k];
+        nec_complex l_fx2 = ((m_ip_a[1][k] * xx + m_ip_b[1][k]) * xx + m_ip_c[1][k]) * xx + m_ip_d[1][k];
+        nec_complex l_fx3 = ((m_ip_a[2][k] * xx + m_ip_b[2][k]) * xx + m_ip_c[2][k]) * xx + m_ip_d[2][k];
+        nec_complex l_fx4 = ((m_ip_a[3][k] * xx + m_ip_b[3][k]) * xx + m_ip_c[3][k]) * xx + m_ip_d[3][k];
+        nec_complex l_p1 = l_fx4 - l_fx1 + 3.0 * (l_fx2 - l_fx3);
+        nec_complex l_p2 = 3.0 * (l_fx1 - 2.0 * l_fx2 + l_fx3);
+        nec_complex l_p3 = 6.0 * l_fx3 - 2.0 * l_fx1 - 3.0 * l_fx2 - l_fx4;
+        *fout = ((l_p1 * yy + l_p2) * yy + l_p3) * yy * 0.1666666667 + l_fx2;
+    };
+
+    eval_func(0, f1);
+    eval_func(1, f2);
+    eval_func(2, f3);
+    eval_func(3, f4);
 }
 
 #include "electromag.h"

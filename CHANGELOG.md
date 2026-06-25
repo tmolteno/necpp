@@ -1,7 +1,29 @@
 ## Unreleased
 
+* Fix bug in nec_ground::get_radial_wire_length() which returned radial_wire_count instead
+  of radial_wire_length.
+* Fix dangling pointer bug in ASSERT macro (nec_debug.h) — the thrown c_str() pointer
+  referred to a destroyed temporary std::string. Now throws std::string by value.
+  Also changed std::stringstream to std::ostringstream in the ASSERT macro.
+* Remove `using namespace std;` from nec2cpp.h header file.
+* Fix multi-frequency plane wave excitation: excitation_loop() returned
+  FREQ_PRINT_NORMALIZATION after completing the incidence angle loop, which caused
+  simulate() to execute `nfrq=1; mhz=1;` — killing the frequency loop after the first
+  frequency. Now returns FREQ_LOOP_CONTINUE when more frequencies remain, matching
+  the pattern used for voltage/current excitation.
 * Fix error in Sommerfeld ground interpolation thanks to Alexander Schewelew
 * Update checking for blas, so that other blas can be used like openblas.
+* Optimize safe_array::resize() to use geometric growth (doubling) instead of
+  linear (+_resize_chunk), reducing repeated incremental resizes from O(n²) to
+  O(n log n) total copy cost.
+* Refactor c_ggrid::interpolate(): replace static locals with per-instance cache
+  members (enables thread safety and correct multi-instance behavior); hoist the
+  switch(grid) out of the inner coefficient-computation loop; factor duplicated
+  cubic interpolation code into a single lambda used for all 4 functions.
+* Fix safe_array 2D bounds-check test failure: BoundsViol was guarded by
+  #ifdef NEC_ERROR_CHECK, causing an ODR violation when translation units
+  compiled with different macro settings were linked together. Moved
+  BoundsViol definition outside the #ifdef so the exception type always exists.
 
 ## Vresion 1.7.4
 * Fix bug in reading comments longer than 80 characters (issue #47)
