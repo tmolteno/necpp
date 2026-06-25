@@ -232,9 +232,19 @@ public:
     return ::norm2(_v[0], _v[1], _v[2]);
   }
   
+  /**!\brief Squared norm (Eigen-compatible alias) */
+  inline nec_float squaredNorm() const {
+    return norm2();
+  }
+  
   /**!\brief The L1-distance (often called the Manhattan norm) */
   inline nec_float normL1() const {
     return ::normL1(_v[0], _v[1], _v[2]);
+  }
+  
+  /**!\brief Cross product (Eigen-compatible alias) */
+  inline nec_3vector cross(const nec_3vector& a) const {
+    return (*this) * a;
   }
   
   inline nec_3vector& operator=(const nec_3vector& copy) {

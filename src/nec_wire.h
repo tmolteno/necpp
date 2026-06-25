@@ -20,6 +20,7 @@
 #define __nec_wire__
 
 #include <algorithm>
+#include <vector>
 #include "math_util.h"
 
 /*!\brief A class to handle properties of wires.
@@ -93,12 +94,12 @@ std::vector<nec_wire> intersect(nec_wire& b)
 /*!\brief Calculate whether the point is inside the wire
 \return true if the point x is inside the wire
 */
-bool intersect(nec_3vector& b0)
-{
-	nec_float a0x = x0.x(); nec_float a0y = x0.y(); nec_float a0z = x0.z();
-	nec_float a1x = x1.x(); nec_float a1y = x1.y(); nec_float a1z = x1.z();
-	
-	nec_float b0x = b0.x(); nec_float b0y = b0.y(); nec_float b0z = b0.z();
+	bool intersect(nec_3vector& b0)
+	{
+		nec_float a0x = x0(0); nec_float a0y = x0(1); nec_float a0z = x0(2);
+		nec_float a1x = x1(0); nec_float a1y = x1(1); nec_float a1z = x1(2);
+		
+		nec_float b0x = b0(0); nec_float b0y = b0(1); nec_float b0z = b0(2);
 	/*
 #
 #	Do the expression for intersection of a cylinder and a point
@@ -221,10 +222,10 @@ print solution
 		nec_3vector& b0, nec_3vector& b1,
 		nec_float& distance, nec_float& sa, nec_float& sb)
 	{
-		nec_float a0x = a0.x(); nec_float a0y = a0.y(); nec_float a0z = a0.z();
-		nec_float b0x = b0.x(); nec_float b0y = b0.y(); nec_float b0z = b0.z();
-		nec_float a1x = a1.x(); nec_float a1y = a1.y(); nec_float a1z = a1.z();
-		nec_float b1x = b1.x(); nec_float b1y = b1.y(); nec_float b1z = b1.z();
+		nec_float a0x = a0(0); nec_float a0y = a0(1); nec_float a0z = a0(2);
+		nec_float b0x = b0(0); nec_float b0y = b0(1); nec_float b0z = b0(2);
+		nec_float a1x = a1(0); nec_float a1y = a1(1); nec_float a1z = a1(2);
+		nec_float b1x = b1(0); nec_float b1y = b1(1); nec_float b1z = b1(2);
 
 		nec_float a01x = (a0x - a1x);
 		nec_float a01y = (a0y - a1y);

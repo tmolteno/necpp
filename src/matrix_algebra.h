@@ -40,6 +40,13 @@ void lu_decompose_lapack(nec_output_file& s_output, int64_t n, complex_array& a,
 void solve_lapack( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 #endif
 
+#if EIGEN_LU
+/** \brief LU that uses Eigen's PartialPivLU.
+ * */
+void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
+void solve_eigen( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
+#endif
+
 
 void factrs(nec_output_file& s_output,  int64_t np, int64_t nrow, complex_array& a, int_array& ip );
 void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,

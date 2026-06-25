@@ -779,12 +779,12 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
   {
     segment_tags[i]= tag_id;
     nec_3vector xs2(xs1 + dx*delz);
-    x[i]= xs1.x();
-    y[i]= xs1.y();
-    z[i]= xs1.z();
-    x2[i]= xs2.x();
-    y2[i]= xs2.y();
-    z2[i]= xs2.z();
+    x[i]= xs1(0);
+    y[i]= xs1(1);
+    z[i]= xs1(2);
+    x2[i]= xs2(0);
+    y2[i]= xs2(1);
+    z2[i]= xs2(2);
     ASSERT(0.0 != radz);
     segment_radius[i]= radz;
     delz= delz* rd;

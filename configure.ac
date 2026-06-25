@@ -99,7 +99,28 @@ LIBEIGENV=
     [AC_DEFINE([USING_EIGEN_3VECT], [1], [Define if you have eigen])],
     [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
     [])
-  ])
+	  ])
+
+
+dnl ************************************************
+dnl *** Use Eigen for LU decomposition
+dnl ************************************************
+
+AC_ARG_WITH([eigen-lu],
+  [AS_HELP_STRING([--with-eigen-lu],
+  [Use Eigen PartialPivLU for LU decomposition instead of built-in Gauss elimination])],
+  [],
+  [with_eigen_lu=no])
+
+AS_IF([test "x$with_eigen_lu" != xno],
+[
+  CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+  AC_CHECK_HEADER(
+    [Eigen/Dense],
+    [AC_DEFINE([EIGEN_LU], [1], [Define if Eigen LU is used])],
+    [AC_MSG_FAILURE([Eigen library test failed (--without-eigen-lu to disable)])],
+    [])
+])
 
 
 AC_CHECK_LIB([m],[pow])

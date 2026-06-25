@@ -524,7 +524,6 @@ void solve_lapack( int64_t n, complex_array& a, int_array& ip,
 #if EIGEN_LU
 
 #include <Eigen/Dense>
-using namespace Eigen;
 
 
 void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
@@ -540,9 +539,9 @@ void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& 
 
     /* Un-transpose the matrix for Gauss elimination */
     for (int i = 1; i < n; i++ ) {
-        int i_offset = i * ndim;
-        int j_offset = 0;
-        for (int j = 0; j < i; j++ ) {
+        int64_t i_offset = i * ndim;
+        int64_t j_offset = 0;
+        for (int64_t j = 0; j < i; j++ ) {
             nec_complex aij = a_in[i+j_offset];
             a_in[i+j_offset] = a_in[j+i_offset];
             a_in[j+i_offset] = aij;
@@ -551,38 +550,43 @@ void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& 
         }
     }
 
+    /* Factor using Eigen's PartialPivLU through an in-place Map.
+       Both nec_complex and Eigen use std::complex<double>, and both
+       use column-major storage, so the memory layout is identical. */
+    using MatrixXcd = Eigen::Matrix<std::complex<nec_float>, Eigen::Dynamic, Eigen::Dynamic>;
+    Eigen::Map<MatrixXcd> A_map(reinterpret_cast<std::complex<nec_float>*>(a_in.data()), n, n);
     
-    Eigen::PartialPivLU<MatrixXc> lu = A.partialPivLu();
-
-    Eigen::MatrixXc X = lu.matrixLU();
-    ipiv = lu.permutationP();    
+    Eigen::PartialPivLU<MatrixXcd> lu(A_map);
+    
+    /* Copy LU factors back into a_in (modifies through the Map).
+       Eigen's matrixLU() returns the combined L+U matrix with the same
+       storage convention as NEC (lower = L with implicit unit diag,
+       upper = U with explicit diagonal). */
+    A_map = lu.matrixLU();
+    
+    /* Copy pivots. Eigen uses 0-based indices in the same convention
+       as LAPACK's IPIV (row at position i came from position indices[i]),
+       while NEC uses 1-based indexing for ip[]. */
+    auto indices = lu.permutationP().indices();
+    for (int64_t i = 0; i < n; i++)
+        ip[i] = static_cast<int32_t>(indices[i]) + 1;
     
 #ifdef NEC_MATRIX_CHECK
-    cout << "atlas_solved = ";
+    cout << "eigen_solved = ";
     to_octave(a_in,n,ndim);
 
-    cout << "atlas_ip = ";
+    cout << "eigen_ip = ";
     to_octave(ip,n);
 #endif
 }
 
 
-
-/*! \brief Solve system of linear equations
-    Subroutine to solve the matrix equation lu*x=b where l is a unit
-    lower triangular matrix and u is an upper triangular matrix both
-    of which are stored in a.    the rhs vector b is input and the
-    solution is returned through vector b.     (matrix transposed)
-*/
+/* solve_eigen delegates to solve_ge — the LU factors are stored
+   in the same L+U format regardless of which factorization was used. */
 void solve_eigen( int64_t n, complex_array& a, int_array& ip,
         complex_array& b, int64_t ndim )
 {
-    DEBUG_TRACE("solve_eigen(" << n << "," << ndim << ")");
-
-    Eigen::MatrixXc soln = a.solve( b );
-
-    for (int64_t i=0;i<ndim;i++)
-        b[i] = soln[i];
+    solve_ge(n, a, ip, b, ndim);
 }
 
 #endif /* EIGEN_LU */
@@ -591,6 +595,8 @@ void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_ar
 {
 #if LAPACK
     return lu_decompose_lapack(s_output, n, a, ip, ndim);
+#elif EIGEN_LU
+    return lu_decompose_eigen(s_output, n, a, ip, ndim);
 #else
     return lu_decompose_ge(s_output, n, a, ip, ndim);
 #endif
@@ -600,6 +606,8 @@ void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_
 {
 #if LAPACK
     return solve_lapack(n, a, ip, b, ndim);
+#elif EIGEN_LU
+    return solve_eigen(n, a, ip, b, ndim);
 #else
     return solve_ge(n, a, ip, b, ndim);
 #endif

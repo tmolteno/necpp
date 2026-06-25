@@ -6,7 +6,7 @@ TEST_CASE( "Addition", "[nec_3vector]") {
     nec_3vector x(1,2,3);
     nec_3vector y(2,3,4);
 
-    REQUIRE( x.norm2() == 14.0 );
+    REQUIRE( x.squaredNorm() == 14.0 );
     REQUIRE( x.norm() > 3.5 );
 
     nec_3vector r(2,4,6);
