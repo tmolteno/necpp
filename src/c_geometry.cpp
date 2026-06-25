@@ -725,7 +725,17 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
   for (uint32_t i=0; i<m_wires.size(); i++)
   {
     nec_wire a = m_wires[i];
-    if (a.intersect(seg_midpoint))
+    nec_3vector a_start = a.parametrize(0.0);
+    nec_3vector a_end = a.parametrize(1.0);
+
+    // Skip midpoint check if the new wire shares an endpoint with
+    // the existing wire — that's a connection, not an intersection.
+    bool shares_start = (a.distance(wire_start, a_start) < a.get_radius()) ||
+                        (a.distance(wire_start, a_end) < a.get_radius());
+    bool shares_end   = (a.distance(wire_end, a_start) < a.get_radius()) ||
+                        (a.distance(wire_end, a_end) < a.get_radius());
+
+    if (!shares_start && a.intersect(seg_midpoint))
     {
       nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- FIRST SEGMENT MIDPOINT");
       nex->append(" OF WIRE #");
@@ -737,7 +747,7 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
       
       throw nex;
     }
-    if (a.intersect(end_seg_midpoint))
+    if (!shares_end && a.intersect(end_seg_midpoint))
     {
       nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- LAST SEGMENT MIDPOINT");
       nex->append(" OF WIRE #");
