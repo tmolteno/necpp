@@ -192,3 +192,33 @@ TEST_CASE( "Connected wires do not trigger false intersection", "[false_intersec
     geo->wire(2, 11, 0.0, 0.0, 0.5, 0.36, 0.36, 0.5, 0.002, 1.0, 1.0);
     REQUIRE_NOTHROW(nec.geometry_complete(0));
 }
+
+TEST_CASE( "Optional intersection check bypass", "[intersection_check]") {
+    // Regression test for #63: setting intersection check to false
+    // should allow geometries that would otherwise trigger errors.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    // Disable intersection checking
+    geo->set_intersection_check(false);
+
+    // Two overlapping parallel wires that would normally be rejected
+    // (same start point, same end point — definitely triggers intersection)
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    geo->wire(2, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    // Should succeed with intersection checking off
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Helix rejects invalid segment_count", "[helix]") {
+    // Regression test for #48: helix with segment_count < 1 must throw
+    // rather than silently returning with no wires.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    REQUIRE_THROWS(geo->helix(1, 0, 0.1, 0.1, 0.01, 0.01, 0.01, 0.01, 0.001));
+    // Verify geometry has no segments from the failed helix
+    REQUIRE(geo->n_segments == 0);
+}

@@ -42,6 +42,8 @@ c_geometry::c_geometry()
   nscon = 0;
   maxcon = 0;
   
+  _check_intersections = true;
+  
   m_context = NULL;
   m_output = NULL;
 }
@@ -490,6 +492,8 @@ void c_geometry::geometry_complete(nec_context* in_context, int gpflag)
     throw new nec_exception("Geometry has no wires or patches.");
     
   /* Check to see whether any wires intersect with one another */
+if (_check_intersections)
+{
   for (uint32_t i=0; i<m_wires.size(); i++)
   {
     nec_wire a = m_wires[i];
@@ -512,6 +516,7 @@ void c_geometry::geometry_complete(nec_context* in_context, int gpflag)
       }
     }
   }
+}
 
 // now proceed and complete the geometry setup...
   // Check here that patches form a closed surfaceAntennaInput
@@ -719,44 +724,47 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
   nec_3vector wire_start(xw1,yw1,zw1);
   nec_3vector wire_end(xw2,yw2,zw2);
   
-  nec_3vector seg_midpoint(wire_start + (dx/2)*delz);
-  nec_3vector end_seg_midpoint = wire_end - (dx*delz / 2);
-  /* Check to see whether any wires intersect with the segment_midpoint */
-  for (uint32_t i=0; i<m_wires.size(); i++)
+  if (_check_intersections)
   {
-    nec_wire a = m_wires[i];
-    nec_3vector a_start = a.parametrize(0.0);
-    nec_3vector a_end = a.parametrize(1.0);
-
-    // Skip midpoint check if the new wire shares an endpoint with
-    // the existing wire — that's a connection, not an intersection.
-    bool shares_start = (a.distance(wire_start, a_start) < a.get_radius()) ||
-                        (a.distance(wire_start, a_end) < a.get_radius());
-    bool shares_end   = (a.distance(wire_end, a_start) < a.get_radius()) ||
-                        (a.distance(wire_end, a_end) < a.get_radius());
-
-    if (!shares_start && a.intersect(seg_midpoint))
+    nec_3vector seg_midpoint(wire_start + (dx/2)*delz);
+    nec_3vector end_seg_midpoint = wire_end - (dx*delz / 2);
+    /* Check to see whether any wires intersect with the segment_midpoint */
+    for (uint32_t i=0; i<m_wires.size(); i++)
     {
-      nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- FIRST SEGMENT MIDPOINT");
-      nex->append(" OF WIRE #");
-      nex->append(m_wires.size()+1);
-      nex->append(" (TAG ID #"); nex->append(tag_id);
-      nex->append(") INTERSECTS WIRE #");
-      nex->append(i+1);
-      nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
-      
-      throw nex;
-    }
-    if (!shares_end && a.intersect(end_seg_midpoint))
-    {
-      nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- LAST SEGMENT MIDPOINT");
-      nex->append(" OF WIRE #");
-      nex->append(m_wires.size()+1);
-      nex->append(" (TAG ID #"); nex->append(tag_id);
-      nex->append(") INTERSECTS WIRE #");
-      nex->append(i+1);
-      nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
-      throw nex;
+      nec_wire a = m_wires[i];
+      nec_3vector a_start = a.parametrize(0.0);
+      nec_3vector a_end = a.parametrize(1.0);
+
+      // Skip midpoint check if the new wire shares an endpoint with
+      // the existing wire — that's a connection, not an intersection.
+      bool shares_start = (a.distance(wire_start, a_start) < a.get_radius()) ||
+                          (a.distance(wire_start, a_end) < a.get_radius());
+      bool shares_end   = (a.distance(wire_end, a_start) < a.get_radius()) ||
+                          (a.distance(wire_end, a_end) < a.get_radius());
+
+      if (!shares_start && a.intersect(seg_midpoint))
+      {
+        nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- FIRST SEGMENT MIDPOINT");
+        nex->append(" OF WIRE #");
+        nex->append(m_wires.size()+1);
+        nex->append(" (TAG ID #"); nex->append(tag_id);
+        nex->append(") INTERSECTS WIRE #");
+        nex->append(i+1);
+        nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
+        
+        throw nex;
+      }
+      if (!shares_end && a.intersect(end_seg_midpoint))
+      {
+        nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- LAST SEGMENT MIDPOINT");
+        nex->append(" OF WIRE #");
+        nex->append(m_wires.size()+1);
+        nex->append(" (TAG ID #"); nex->append(tag_id);
+        nex->append(") INTERSECTS WIRE #");
+        nex->append(i+1);
+        nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
+        throw nex;
+      }
     }
   }
   
@@ -811,13 +819,14 @@ void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl,
   nec_float zinc, sangle, hdia, turn, pitch, hmaj, hmin;
   
   ist= n_segments;
+  
+  if ( segment_count < 1)
+    throw new nec_exception("HELIX: segment count must be >= 1");
+
   n_segments += segment_count;
   np= n_segments;
   mp= m;
   m_ipsym=0;
-  
-  if ( segment_count < 1)
-    return;
   
   zinc= fabs( hl/ segment_count);
   
