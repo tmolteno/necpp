@@ -54,6 +54,11 @@ public:
 		return _tag_id;
 	}
 
+	nec_float get_radius() const
+	{
+		return radius;
+	}
+
 /*!\brief Calculate whether two wires intersect.
 \return A list of the wires that should be created.
 */
