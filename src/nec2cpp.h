@@ -4,8 +4,6 @@
 
 #include "math_util.h"
 
-using namespace std;
-
 int 	main(int argc, char **argv);
 void 	fblock(int nrow, int ncol, int imax, int ipsym);
 

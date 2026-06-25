@@ -25,9 +25,8 @@
 
 #include "nec_exception.h"
 
-#ifdef NEC_ERROR_CHECK
-
-
+/* BoundsViol is always defined so that the throw target is consistent
+   across translation units, regardless of NEC_ERROR_CHECK. */
 class BoundsViol : public nec_exception {
 public:
   BoundsViol(const char* message, int64_t index, int64_t bound)
@@ -36,7 +35,6 @@ public:
     m_message << "array index: " << index << " exceeds " << bound << std::endl;
   }
 };
-#endif
 
 /*! \brief A Safe Array class for nec2++ that performs bounds checking 
  * 
@@ -113,9 +111,9 @@ public:
       throw new nec_exception("attempt to resize data we do not own");
 #endif
     if (new_length > _data_size) {
-      // We allocate _resize_chunk more bytes than we need to avoid
-      // resizing too often. 
-      _data_size = new_length + _resize_chunk;
+      // geometric growth to avoid O(n²) reallocation when repeatedly
+      // growing by small increments.
+      _data_size = new_length * 2;
       try {
         T* new_data_ = new T[_data_size];
         if (0 != _len)

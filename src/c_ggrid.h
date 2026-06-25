@@ -47,6 +47,17 @@ public:
     m_ar1.resize(11*10*4);
     m_ar2.resize(17*5*4);
     m_ar3.resize(9*8*4);
+
+    // initialize interpolation cache
+    m_ip_ixs = -10;
+    m_ip_iys = -10;
+    m_ip_igrs = -10;
+    m_ip_ixeg = 0;
+    m_ip_iyeg = 0;
+    m_ip_dx = 1.0;
+    m_ip_dy = 1.0;
+    m_ip_xs = 0.0;
+    m_ip_ys = 0.0;
   }
 
   void interpolate( nec_float x, nec_float y, 
@@ -54,6 +65,13 @@ public:
     nec_complex *f3, nec_complex *f4 );
 
   void sommerfeld( nec_float epr, nec_float sig, nec_float wavelength );
+
+private:
+  // interpolation cache (per-instance, thread-safe)
+  int m_ip_ix, m_ip_iy, m_ip_ixs, m_ip_iys, m_ip_igrs, m_ip_ixeg, m_ip_iyeg;
+  int m_ip_nxm2, m_ip_nym2, m_ip_nxms, m_ip_nyms, m_ip_nd, m_ip_ndp;
+  nec_float m_ip_dx, m_ip_dy, m_ip_xs, m_ip_ys, m_ip_xz, m_ip_yz;
+  nec_complex m_ip_a[4][4], m_ip_b[4][4], m_ip_c[4][4], m_ip_d[4][4];
 };
 
 class c_ground_wave

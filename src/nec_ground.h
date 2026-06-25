@@ -138,7 +138,7 @@ public:
   
   /*! \brief Returns the length of radial wires used in the ground screen approximation - provided this approximation has been used. */
   nec_float get_radial_wire_length() const {
-    return this->radial_wire_count;
+    return this->radial_wire_length;
   }
   
   
