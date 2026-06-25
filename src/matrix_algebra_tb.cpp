@@ -176,3 +176,72 @@ TEST_CASE( "LU Decomposition EIGEN", "[lu_decompose]") {
 }
 
 #endif /* #if USING_EIGEN_3VECT */
+
+/*-----------------------------------------------------------------------*/
+
+/*
+ * Comprehensive test: factor a complex 12×12 matrix via factrs(),
+ * solve Ax=b via solves(), and verify the solution reconstructs correctly.
+ *
+ * This exercises the full pipeline: transpose handling, LU decomposition,
+ * partial pivoting, forward/back substitution, symmetry dispatch (nop=1,
+ * the common no-symmetry path), all with complex arithmetic.
+ */
+TEST_CASE( "LU Factor+Solve 12x12 complex (factrs/solves)", "[factrs_solves]") {
+    const int N = 12;
+    nec_output_file s_output;
+    complex_matrix A(N, N);
+    int_array piv(N);
+
+    // --- Build a well-conditioned 12×12 complex matrix ---
+    // Diagonal-dominant to prevent near-singular pivots.
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            if (i == j) {
+                // Strong diagonal: magnitude grows with row index
+                A(i, j) = nec_complex(3.0 * (i + 1), 1.0 * (i + 1));
+            } else {
+                // Off-diagonal: small magnitude, deterministic pattern
+                nec_float re = 0.1 * (i - j);
+                nec_float im = 0.05 * ((i + 1) * (j + 1)) / (N * N);
+                A(i, j) = nec_complex(re, im);
+            }
+        }
+    }
+
+    // --- Known solution x (deterministic, all entries non-zero) ---
+    complex_array x(N);
+    for (int i = 0; i < N; i++) {
+        x[i] = nec_complex(i + 1, -(i + 1) * 0.5);
+    }
+
+    // --- Compute b = A * x using conceptual A (before transpose) ---
+    complex_array b(N);
+    for (int i = 0; i < N; i++) {
+        b[i] = nec_complex(0.0, 0.0);
+        for (int j = 0; j < N; j++) {
+            b[i] += A(i, j) * x[j];
+        }
+    }
+
+    // --- Transpose A for NEC column-major storage convention ---
+    // (same as matrix_setup() does for the 4×4 LU tests)
+    for (int i = 1; i < N; i++) {
+        for (int j = 0; j < i; j++) {
+            std::swap(A(i, j), A(j, i));
+        }
+    }
+
+    // --- Factor and solve ---
+    // nop=1, mp=m=0 (no symmetry, no patches) — the common path
+    factrs(s_output, N, N, A, piv);
+
+    complex_array sym(1);  // dummy symmetry array, unused when nop==1
+    solves(A, piv, b, N, 1, N, N, 0, 0, 1, sym);
+
+    // --- Verify solution: b now contains the computed x', should match x ---
+    for (int i = 0; i < N; i++) {
+        REQUIRE_APPROX_EQUAL(b[i].real(), x[i].real());
+        REQUIRE_APPROX_EQUAL(b[i].imag(), x[i].imag());
+    }
+}
