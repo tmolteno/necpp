@@ -104,8 +104,33 @@ LIBEIGENV=
 
 AC_CHECK_LIB([m],[pow])
 
+dnl ************************************************
+dnl *** Check for LAPACK
+dnl ************************************************
+
+AC_ARG_WITH([lapack],
+  [AS_HELP_STRING([--with-lapack],
+  [Enable LAPACK support for faster LU decomposition (requires LAPACKE)])],
+  [],
+  [with_lapack=no])
+
 EXPLICIT_LIBS=""
-PRIVATE_LIBS=" $LDFLAGS -lstdc++ -llapack -lblas -lpthread -lm"
+PRIVATE_LIBS=" $LDFLAGS -lstdc++ -lpthread -lm"
+
+AS_IF([test "x$with_lapack" != xno],
+[
+  AC_CHECK_HEADER(
+    [lapacke.h],
+    [AC_DEFINE([LAPACK], [1], [Define if LAPACKE is available])],
+    [AC_MSG_FAILURE([LAPACKE header not found (--without-lapack to disable)])],
+    [])
+  AC_CHECK_LIB([lapacke], [LAPACKE_zgetrf],
+    [],
+    [AC_MSG_FAILURE([LAPACKE library not found (--without-lapack to disable)])],
+    [-llapack -lblas])
+  PRIVATE_LIBS=" $LDFLAGS -lstdc++ -llapacke -llapack -lblas -lpthread -lm"
+  EXPLICIT_LIBS="-llapacke"
+])
 
 AC_SUBST(EXPLICIT_LIBS)
 AC_SUBST(PRIVATE_LIBS)
