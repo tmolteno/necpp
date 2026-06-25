@@ -14,6 +14,12 @@
 * Add comprehensive 12×12 complex matrix factor+ solve test (factrs/solves)
   validating the full linear algebra pipeline: transpose handling, LU decomposition,
   partial pivoting, and forward/back substitution with complex arithmetic.
+* Add Eigen LU decomposition support via `./configure --with-eigen-lu`:
+  rewrites broken `lu_decompose_eigen()` using `Eigen::Map` + `PartialPivLU`
+  with zero-copy in-place factorization, storing results in NEC-compatible format.
+* Prepare 3-vector for Eigen (`./configure --with-eigenv`): changed all `.x()`/`.y()`/`.z()`
+  calls to `operator()(0)`/`(1)`/`(2)`, added `squaredNorm()` and `cross()` aliases
+  for Eigen API compatibility. Fixed missing `#include <vector>` in `nec_wire.h`.
 
 ## Version 1.7.6
 
