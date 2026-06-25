@@ -1,3 +1,17 @@
+## Version 1.7.7
+
+* Add `set_intersection_check(bool)` API to c_geometry allowing users to bypass
+  the O(n²) segment intersection check — useful for closely-spaced parallel wires
+  (e.g., phasing stubs, boom models) that trigger false positives (#63).
+* Fix helix validation: calling `helix()` with `segment_count < 1` now throws a
+  descriptive `nec_exception` instead of silently returning with no wires (#48).
+* Switch LAPACK support from Atlas-specific `clapack` to standard `lapacke.h`
+  bindings. LAPACK is now enabled via `./configure --with-lapack` (#75).
+* Fix pkg-config: `necpp.pc` no longer hardcodes `-llapack -lblas` when LAPACK
+  is disabled (#76).
+* Fix typos in K5332187.nec test data: erroneous apostrophe before PL card and
+  "Richtanzenne" → "Richtantenne" (#77).
+
 ## Version 1.7.6
 
 * Fix bug in nec_ground::get_radial_wire_length() which returned radial_wire_count instead
