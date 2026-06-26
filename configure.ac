@@ -63,12 +63,20 @@ AC_LANG([C++])
 AC_PROG_CXX
 LT_INIT
 
-CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-AC_CHECK_HEADER(
-  [Eigen/Dense],
-  [],
-  [AC_MSG_FAILURE([Eigen library not found. Install libeigen3-dev.])],
-  [])
+dnl *** Check for Eigen (bundled copy preferred, then system)
+EIGEN_DIR=""
+AS_IF([test -d "$srcdir/src/eigen3/Eigen"],
+  [EIGEN_DIR="$srcdir/src/eigen3"],
+  [AS_IF([test -d /usr/include/eigen3/Eigen],
+    [EIGEN_DIR="/usr/include/eigen3"],
+    [AS_IF([test -d /usr/local/include/eigen3/Eigen],
+      [EIGEN_DIR="/usr/local/include/eigen3"],
+      [AC_MSG_FAILURE([Eigen library not found. Install libeigen3-dev or ensure src/eigen3/ is present.])]
+    )]
+  )]
+)
+CPPFLAGS="$CPPFLAGS -I$EIGEN_DIR"
+AC_MSG_NOTICE([Using Eigen from: $EIGEN_DIR])
 
 dnl Eigen is now the default for all components.
 CPPFLAGS="$CPPFLAGS -DUSING_EIGEN_ARRAY=1 -DUSING_EIGEN_3VECT=1 -DEIGEN_LU=1"
