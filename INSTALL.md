@@ -65,13 +65,14 @@ To use necpp in an Xcode project:
 
 ## Compiling for a specific architecture
 
-Particularly using gcc-4.0 it is important to specify the architecture you
-are using (this will produce approximately a 50% speedup on the athlon-xp
-for example. The following configure options will do this:
+For best performance, compile with optimizations tuned to your CPU:
 
-  1. ./configure CXX=g++-4.0 CXXFLAGS="-O3 -march=athlon-xp"
-  2. make
-  3. make install
+    make CXXFLAGS="-std=c++17 -O3 -march=native -Wall -Wextra -Wshadow"
+
+With autotools:
+
+    ./configure CXXFLAGS="-O3 -march=native"
+    make
 
 ## About Eigen
 
