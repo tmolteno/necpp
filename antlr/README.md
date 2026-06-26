@@ -1,5 +1,18 @@
 ## Modern nec2++ grammar for antenna geometry.
 
+**DEPRECATED — this is experimental, abandoned code.** The ANTLR-based parser
+was a proof-of-concept and is far from complete. The production parser lives in
+`src/nec2cpp.cpp` and uses a simple `load_line()` + card dispatch approach.
+
+If revived, it would need:
+- ANTLR 4 (ANTLR 2.x C++ target is discontinued)
+- Full card coverage (SP, GM, GR, NE, NH, KH, etc.)
+- Integration with the Eigen-backed math layer
+
+---
+
+Original README follows:
+
 This is a parser for NEC antenna geometry files written for the ANTLR parser
 generator. At the moment it is rudimentary.
 
@@ -10,13 +23,9 @@ In addition, this will replace the terrible parser code that currently exists,
 and will hopefully catch errors like wires accidentally intersecting as
 at parse time.
 
-Requires ANTLR
+Requires ANTLR (legacy v2):
 
-	aptitude install libantlr-dev libantlr-java
-
-Also requires lapack libraries.
-
-	aptitude install math-atlas-dev
+    aptitude install libantlr-dev libantlr-java
 
 ### Testing
 
