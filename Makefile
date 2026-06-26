@@ -35,7 +35,7 @@ BUILD_DIR = build/simple
 VERSION   = 2.0.0
 BUILD_DATE = $(shell date +"%Y-%m-%d")
 
-INCLUDES  = -I $(SRC_DIR) -I $(EIGEN_DIR) -I $(BUILD_DIR)
+INCLUDES  = -I $(SRC_DIR) -isystem $(EIGEN_DIR) -I $(BUILD_DIR)
 
 LIB_SRCS  = c_evlcom c_geometry c_ggrid c_plot_card electromag libNEC \
             matrix_algebra misc nec_context nec_exception nec_ground \

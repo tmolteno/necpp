@@ -46,7 +46,7 @@ NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 CPP_SRC  = test_cpp.cpp
 CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
-CXXFLAGS = -std=c++17 -I ../src/ -I ../src/eigen3 -I . -O2 -Wall
+CXXFLAGS = -std=c++17 -I ../src/ -isystem ../src/eigen3 -I . -O2 -Wall
 
 test_cpp: $(CONFIG_H) ${CPP_OBJS} ${NECPP_OBJS}
 	$(CXX) -o test_cpp ${CPP_OBJS} ${NECPP_OBJS} -lstdc++ -lm

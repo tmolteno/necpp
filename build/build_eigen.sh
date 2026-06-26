@@ -15,7 +15,7 @@ cp "$BUILD_DIR/config_eigen.h" "$BUILD_DIR/config.h"
 CXX="g++"
 CXXFLAGS="-std=c++17 -O0 -g3 -Wall -Wextra -Wshadow -DNEC_ERROR_CHECK=1"
 CXXFLAGS="$CXXFLAGS -Dnec_build_date=\"2025-06-25\""
-INCLUDES="-I $SRC_DIR -I $BUILD_DIR -I $EIGEN_DIR"
+INCLUDES="-I $SRC_DIR -I $BUILD_DIR -isystem $EIGEN_DIR"
 
 echo "=== Building Eigen version (v2.0.0) ==="
 
