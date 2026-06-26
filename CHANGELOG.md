@@ -13,6 +13,7 @@
 * Eigen::Map used for in-place zero-copy factorization
 * `set_intersection_check(bool)` API to bypass O(n²) segment intersection checks (#63)
 * `squaredNorm()` and `cross()` aliases on 3-vector for Eigen API compatibility
+* Table-driven NEC card parser: `nec_card_parser.h` with clean `parse_nec_card()` replacing the FORTRAN-style `readmn()` C-string parser. Adding a card now touches one place (handler table) instead of three.
 
 ### Bug Fixes
 * Fix safe_array const operator[] infinite recursion
