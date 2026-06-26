@@ -22,30 +22,17 @@
 #include "math_util.h"
 #include "nec_output.h"
 
-/** \brief LU that uses either lapack or built in
- * */
+/** \brief LU decomposition and solve using Eigen PartialPivLU. */
 void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
 void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
-/** \brief LU that uses built in functions (no library dependency)
- * */
+/** \brief Built-in Gauss-Doolittle LU (reference implementation). */
 void lu_decompose_ge(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
 void solve_ge( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
-#if LAPACK
-/** \brief LU that uses LAPACK. These are not built unless a LAPACK is chosen at
- * compile time.
- * */
-void lu_decompose_lapack(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
-void solve_lapack( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
-#endif
-
-#if EIGEN_LU
-/** \brief LU that uses Eigen's PartialPivLU.
- * */
+/** \brief Eigen PartialPivLU wrapper (used internally by lu_decompose). */
 void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
 void solve_eigen( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
-#endif
 
 
 void factrs(nec_output_file& s_output,  int64_t np, int64_t nrow, complex_array& a, int_array& ip );

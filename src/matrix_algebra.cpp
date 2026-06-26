@@ -403,130 +403,10 @@ void solve_ge( int64_t n, complex_array& a, int_array& ip,
 }
 
 
-#if LAPACK
-
-#include <lapacke.h>
-
-
-
-/*! \brief Use lapack to perform LU decomposition
-*/
-void lu_decompose_lapack(nec_output_file& s_output,    int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
-{
-    UNUSED(s_output);
-    DEBUG_TRACE("lu_decompose_lapack(" << n << "," << ndim << ")");
-    ASSERT(n <= ndim);
-
-#ifdef NEC_MATRIX_CHECK
-    cout << "atlas_a = ";
-    to_octave(a_in,n,ndim);
-#endif
-
-    /* Un-transpose the matrix for Gauss elimination */
-    for (int i = 1; i < n; i++ ) {
-        int64_t i_offset = i * ndim;
-        int64_t j_offset = 0;
-        for (int64_t j = 0; j < i; j++ ) {
-            nec_complex aij = a_in[i+j_offset];
-            a_in[i+j_offset] = a_in[j+i_offset];
-            a_in[j+i_offset] = aij;
-            
-            j_offset += ndim;
-        }
-    }
-    
-                    
-    /* Now call the LAPACK LU-Decomposition
-    ZGETRF computes an LU factorization of a general M-by-N matrix A
-    *    using partial pivoting with row interchanges.
-    *
-    *    The factorization has the form
-    *         A = P * L * U
-    *    where P is a permutation matrix, L is lower triangular with unit
-    *    diagonal elements (lower trapezoidal if m > n), and U is upper
-    *    triangular (upper trapezoidal if m < n).
-
-    Arguments
-    *    =========
-    *
-    *    M             (input) INTEGER
-    *                    The number of rows of the matrix A.    M >= 0.
-    *
-    *    N             (input) INTEGER
-    *                    The number of columns of the matrix A.    N >= 0.
-    *
-    *    A             (input/output) COMPLEX*16 array, dimension (LDA,N)
-    *                    On entry, the M-by-N matrix to be factored.
-    *                    On exit, the factors L and U from the factorization
-    *                    A = P*L*U; the unit diagonal elements of L are not stored.
-    *
-    *    LDA         (input) INTEGER
-    *                    The leading dimension of the array A.    LDA >= max(1,M).
-    *
-    *    IPIV        (output) INTEGER array, dimension (min(M,N))
-    *                    The pivot indices; for 1 <= i <= min(M,N), row i of the
-    *                    matrix was interchanged with row IPIV(i).
-    *
-    *    INFO        (output) INTEGER
-    *                    = 0:    successful exit
-    *                    < 0:    if INFO = -i, the i-th argument had an illegal value
-    *                    > 0:    if INFO = i, U(i,i) is exactly zero. The factorization
-    *                                has been completed, but the factor U is exactly
-    *                                singular, and division by zero will occur if it is used
-    *                                to solve a system of equations.
-    */
-    int32_t info = LAPACKE_zgetrf (LAPACK_COL_MAJOR, int32_t(n), int32_t(n), 
-                    reinterpret_cast<lapack_complex_double*>(a_in.data()), int32_t(ndim), ip.data());
-    
-    if (0 != info) {
-        /*
-            The factorization has been completed, but the factor U is exactly singular,
-            and division by zero will occur if it is used to solve a system of equations. 
-        */
-        throw new nec_exception("nec++:    LU Decomposition Failed: ",info);
-    }
-    
-    
-#ifdef NEC_MATRIX_CHECK
-    cout << "atlas_solved = ";
-    to_octave(a_in,n,ndim);
-
-    cout << "atlas_ip = ";
-    to_octave(ip,n);
-#endif
-} 
-
-/*! \brief Solve system of linear equations
-    Subroutine to solve the matrix equation lu*x=b where l is a unit
-    lower triangular matrix and u is an upper triangular matrix both
-    of which are stored in a.    the rhs vector b is input and the
-    solution is returned through vector b.     (matrix transposed)
-*/
-void solve_lapack( int64_t n, complex_array& a, int_array& ip,
-        complex_array& b, int64_t ndim )
-{
-    DEBUG_TRACE("solve_lapack(" << n << "," << ndim << ")");
-
-    int info = LAPACKE_zgetrs (LAPACK_COL_MAJOR, 'N', 
-        static_cast<int>(n), 1, reinterpret_cast<lapack_complex_double*>(a.data()), static_cast<int>(ndim), ip.data(), b.data(), static_cast<int>(n));
-    
-    if (0 != info) {
-        /*
-            The factorization has been completed, but the factor U is exactly singular,
-            and division by zero will occur if it is used to solve a system of equations. 
-        */
-        throw new nec_exception("nec++: Solving Failed: ",info);
-    }
-}
-
-#endif /*    LAPACK */
-
-#if EIGEN_LU
-
-#include <Eigen/Dense>
-
-
-void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
+/*! \brief Use Eigen PartialPivLU to perform LU decomposition.
+    The input matrix a_in is in NEC column-major transposed format.
+    On return, a_in contains L+U factors and ip contains 1-indexed pivots. */
+void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
 {
     UNUSED(s_output);
     DEBUG_TRACE("lu_decompose_eigen(" << n << "," << ndim << ")");
@@ -545,7 +425,6 @@ void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& 
             nec_complex aij = a_in[i+j_offset];
             a_in[i+j_offset] = a_in[j+i_offset];
             a_in[j+i_offset] = aij;
-            
             j_offset += ndim;
         }
     }
@@ -558,15 +437,10 @@ void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& 
     
     Eigen::PartialPivLU<MatrixXcd> lu(A_map);
     
-    /* Copy LU factors back into a_in (modifies through the Map).
-       Eigen's matrixLU() returns the combined L+U matrix with the same
-       storage convention as NEC (lower = L with implicit unit diag,
-       upper = U with explicit diagonal). */
+    /* Copy LU factors back into a_in (modifies through the Map). */
     A_map = lu.matrixLU();
     
-    /* Copy pivots. Eigen uses 0-based indices in the same convention
-       as LAPACK's IPIV (row at position i came from position indices[i]),
-       while NEC uses 1-based indexing for ip[]. */
+    /* Copy pivots (0-based to 1-based). */
     auto indices = lu.permutationP().indices();
     for (int64_t i = 0; i < n; i++)
         ip[i] = static_cast<int32_t>(indices[i]) + 1;
@@ -574,7 +448,6 @@ void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& 
 #ifdef NEC_MATRIX_CHECK
     cout << "eigen_solved = ";
     to_octave(a_in,n,ndim);
-
     cout << "eigen_ip = ";
     to_octave(ip,n);
 #endif
@@ -582,35 +455,22 @@ void lu_decompose_eigen(nec_output_file& s_output,    int64_t n, complex_array& 
 
 
 /* solve_eigen delegates to solve_ge — the LU factors are stored
-   in the same L+U format regardless of which factorization was used. */
+   in the same L+U format regardless of factorization method. */
 void solve_eigen( int64_t n, complex_array& a, int_array& ip,
         complex_array& b, int64_t ndim )
 {
     solve_ge(n, a, ip, b, ndim);
 }
 
-#endif /* EIGEN_LU */
 
 void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
 {
-#if LAPACK
-    return lu_decompose_lapack(s_output, n, a, ip, ndim);
-#elif EIGEN_LU
     return lu_decompose_eigen(s_output, n, a, ip, ndim);
-#else
-    return lu_decompose_ge(s_output, n, a, ip, ndim);
-#endif
 }
 
 void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim )
 {
-#if LAPACK
-    return solve_lapack(n, a, ip, b, ndim);
-#elif EIGEN_LU
     return solve_eigen(n, a, ip, b, ndim);
-#else
-    return solve_ge(n, a, ip, b, ndim);
-#endif
 }
 
 /*-----------------------------------------------------------------------*/

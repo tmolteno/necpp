@@ -85,7 +85,7 @@ TEST_CASE( "LU Decomposition Gauss-Doolittle", "[lu_decompose_ge]") {
 }
 
 
-TEST_CASE( "LU Decomposition LAPACK", "[lu_decompose]") {
+TEST_CASE( "LU Decomposition (Eigen)", "[lu_decompose]") {
     int N=4;
     nec_output_file s_output;
     complex_matrix A(N,N);
@@ -122,60 +122,28 @@ TEST_CASE( "LU Decomposition LAPACK", "[lu_decompose]") {
     REQUIRE_APPROX_EQUAL(A(3,3), 5.72973);
 }
 
-#if USING_EIGEN_3VECT
 
-#include <Eigen/Dense>
-using namespace Eigen;
-#include <iostream>
-using namespace std;
-
-TEST_CASE( "LU Decomposition EIGEN", "[lu_decompose]") {
-  
+TEST_CASE( "LU Decomposition (Eigen self-check)", "[lu_decompose]") {
+  using namespace Eigen;
   MatrixXcd A(4,4);
 
-  A(0,0) = 3.0;
-  A(0,1) =1.0;
-  A(0,2) = -4.0;
-  A(0,3) =2.0;
-  
-  A(1,0) =3.0;
-  A(1,1) =1.0;
-  A(1,2) =0.0;
-  A(1,3) =2.0;
-  
-  A(2,0) =2.0;
-  A(2,1) =13.0;
-  A(2,2) = -1.0;
-  A(2,3) =0.0;
-  
-  A(3,0) = -2.0;
-  A(3,1) =3.0;
-  A(3,2) = -1.0;
-  A(3,3) =4.0;
+  A(0,0) = 3.0;  A(0,1) = 1.0;  A(0,2) = -4.0;  A(0,3) = 2.0;
+  A(1,0) = 3.0;  A(1,1) = 1.0;  A(1,2) =  0.0;  A(1,3) = 2.0;
+  A(2,0) = 2.0;  A(2,1) =13.0;  A(2,2) = -1.0;  A(2,3) = 0.0;
+  A(3,0) =-2.0;  A(3,1) = 3.0;  A(3,2) = -1.0;  A(3,3) = 4.0;
 
-  cout << "Here is the matrix A:" << endl << A << endl;
-  
-  Eigen::PartialPivLU<MatrixXcd> lu(A);
-  cout << "Here is, up to permutations, its LU decomposition matrix:"
-  << endl << lu.matrixLU() << endl;
-  cout << "Here is the L part:" << endl;
+  PartialPivLU<MatrixXcd> lu(A);
   MatrixXcd l = MatrixXcd::Identity(4,4);
   l.triangularView<StrictlyLower>() = lu.matrixLU();
-  cout << l << endl;
-  cout << "Here is the U part:" << endl;
   MatrixXcd u = lu.matrixLU().triangularView<Upper>();
-  cout << u << endl;
-  cout << "Let us now reconstruct the original matrix m:" << endl;
   MatrixXcd B = lu.permutationP().inverse() * l * u;
-  cout << B << endl;
+
   for (int i=0;i<4;i++) {
     for (int j=0; j<4; j++) {
       REQUIRE_APPROX_EQUAL(B(i,j), A(i,j));
     }
   }
 }
-
-#endif /* #if USING_EIGEN_3VECT */
 
 /*-----------------------------------------------------------------------*/
 
