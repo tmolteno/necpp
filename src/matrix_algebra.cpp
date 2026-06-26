@@ -524,7 +524,7 @@ void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_
 void factrs(nec_output_file& s_output,    int64_t np, int64_t nrow, complex_array& a, int_array& ip )
 {
     DEBUG_TRACE("factrs(" << np << "," << nrow << ")");
-    if (nrow == np) { // no symmetry
+    if (nrow == np) { // no symmetry: skip segment()/loop overhead
         lu_decompose(s_output,    np, a, ip, nrow );
         return;
     }
@@ -603,14 +603,12 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
 
             /* transform matrix eq. rhs vector according to symmetry modes */
             for (int64_t i = 0; i < npeq; i++ ) {
-                for (int64_t k = 0; k < nop; k++ ) {
+                nec_complex sum_normal(b[i+column_offset]);
+                for (int64_t k = 1; k < nop; k++ ) {
                     int64_t ia= i+ k* npeq;
                     scm[k]= b[ia+column_offset];
-                }
-
-                nec_complex sum_normal(scm[0]);
-                for (int64_t k = 1; k < nop; k++ )
                     sum_normal += scm[k];
+                }
 
                 b[i+column_offset]= sum_normal * fnorm;
 
@@ -648,14 +646,12 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
     for (int64_t ic = 0; ic < nrh; ic++ ) {
         int64_t column_offset = ic*neq;
         for (int64_t i = 0; i < npeq; i++ ) {
-            for (int64_t k = 0; k < nop; k++ ) {
+            nec_complex sum_normal(b[i+column_offset]);
+            for (int64_t k = 1; k < nop; k++ ) {
                 int64_t ia= i+ k* npeq;
                 scm[k]= b[ia+column_offset];
-            }
-
-            nec_complex sum_normal(scm[0]);
-            for (int64_t k = 1; k < nop; k++ )
                 sum_normal += scm[k];
+            }
 
             b[i+column_offset]= sum_normal;
             
@@ -688,7 +684,7 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
                     b[ia+column_offset]= scm[j];
                 }
 
-                if ( k == nop)
+                if ( k == (nop-1) )
                     continue;
             } /* if ( k != 0 ) */
 

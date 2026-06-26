@@ -60,7 +60,8 @@ void secnds( nec_float *x)
 /*  load_line()
  *
  *  loads a line from a file, aborts on failure. lines beginning
- *  with a '#' are ignored as comments. at the end of file EOF is
+ *  with a '#' are ignored as comments. A single-quote (') starts an
+ *  inline comment (4nec2 compatibility). at the end of file EOF is
  *  returned.
  */
 
@@ -94,11 +95,19 @@ int load_line( char *buff, FILE *pfile )
 	
 	while( num_chr < LINE_LEN ) {
 		/* if lf/cr reached before filling buffer, return */
-		if( (chr == CR) || (chr == LF) )
-			break;
-	
-		/* enter new char to buffer */
-		buff[num_chr++] = static_cast<char>(chr);
+			if( (chr == CR) || (chr == LF) )
+				break;
+		
+			/* if single-quote, treat rest of line as comment (4nec2 compat) */
+			if( chr == '\'' ) {
+				while( (chr != CR) && (chr != LF) )
+					if( (chr = fgetc(pfile)) == EOF )
+						return( EOF );
+				break;
+			}
+		
+			/* enter new char to buffer */
+			buff[num_chr++] = static_cast<char>(chr);
 	
 		/* terminate buffer as a string on EOF */
 		if( (chr = fgetc(pfile)) == EOF ) {
