@@ -49,9 +49,18 @@
 * LU decomposition solve-verify test (Eigen path)
 * Intersection check bypass test (#63)
 * Helix validation test (#48)
-* All 10 test cases pass (126 assertions)
+* All 42 test cases pass (405 assertions)
 
 *Numerical output verified identical between Eigen v2.0.0 and pre-Eigen v1.7.7 builds.*
+
+### Code Quality
+* pragma once on all 26 headers (removes reserved-identifier UB)
+* 22 C-style casts converted to static_cast
+* 12 override specifiers added to virtual functions
+* 14 blocks of dead code removed
+* Raw new/delete replaced with std::unique_ptr (3 sites)
+* Table-driven NEC card parser with clean parse_nec_card()
+* CI workflow: simple Makefile build, 405 unit tests, smoke test
 
 ## Version 1.7.7
 

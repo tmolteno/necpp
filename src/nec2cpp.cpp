@@ -91,11 +91,11 @@ int main( int argc, char **argv )
 		s_output.line(message);
 		exit(1);
 	}
-	catch (nec_exception* nex)
+	catch (const nec_exception& nex)
 	{
 		nec_error_mode nem(s_output);
 		s_output.line("NEC++ Runtime Error: ");
-		s_output.line(nex->get_message().c_str());
+		s_output.line(nex.get_message().c_str());
 		exit(1);
 	}
 	catch(...)
@@ -125,10 +125,10 @@ void benchmark()
 		cout << message << endl;
 		exit(1);
 	}
-	catch (nec_exception* nex)
+	catch (const nec_exception& nex)
 	{
 		cout << "NEC++ Runtime Error: " << endl;
-		cout << nex->get_message().c_str() << endl;
+		cout << nex.get_message().c_str() << endl;
 		exit(1);
 	}
 }
@@ -315,7 +315,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 
 		/* read a line from input file */
 		if ( load_line(line_buf, input_fp) == EOF )
-			throw new nec_exception("Error reading input file.");
+			throw nec_exception("Error reading input file.");
 
 		/* separate card's id mnemonic */
 		strncpy( ain, line_buf, 2 );
@@ -342,7 +342,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 			{
 				/* read a line from input file */
 				if ( load_line(line_buf, input_fp) == EOF )
-					throw new nec_exception("Error reading input file (comments not terminated?)");
+					throw nec_exception("Error reading input file (comments not terminated?)");
 
 				/* separate card's id mnemonic */
 				strncpy( ain, line_buf, 2 );
@@ -355,7 +355,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 			/* no "ce" card at end of comments */
 			if ( strcmp(ain, "CE") != 0 )
 			{
-				throw new nec_exception("ERROR: INCORRECT LABEL FOR A COMMENT CARD");
+				throw nec_exception("ERROR: INCORRECT LABEL FOR A COMMENT CARD");
 			}
 		}
 		else
@@ -521,7 +521,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 				continue; /* continue card input loop */
 
 			case 19: /* "wg" card, not supported */
-				throw new nec_exception("\"WG\" card, not supported.");
+				throw nec_exception("\"WG\" card, not supported.");
 
 			case 20: /* "MP" card. Material Parameters */
 				s_context.medium_parameters(tmp1, tmp2);
@@ -530,7 +530,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 			default:
 				if ( ain_num != 18 ) // EN card
 				{
-					throw new nec_exception("FAULTY DATA CARD LABEL AFTER GEOMETRY SECTION.");
+					throw nec_exception("FAULTY DATA CARD LABEL AFTER GEOMETRY SECTION.");
 				}
 
 				/******************************************************
@@ -888,7 +888,7 @@ void handle_en(nec_context& ctx, const nec_card&) {
     ctx.all_jobs_completed();
 }
 void handle_wg(nec_context&, const nec_card&) {
-    throw new nec_exception("\"WG\" card, not supported.");
+    throw nec_exception("\"WG\" card, not supported.");
 }
 void handle_mp(nec_context& ctx, const nec_card& c) {
     ctx.medium_parameters(c.f[0], c.f[1]);

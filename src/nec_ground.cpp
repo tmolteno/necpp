@@ -98,7 +98,7 @@ void nec_ground::parse_gn(int itmp1, int itmp2,
 
   if (radial_wire_count != 0) {
     if ( iperf == 2) {
-      throw new nec_exception("RADIAL WIRE G.S. APPROXIMATION MAY NOT BE USED WITH SOMMERFELD GROUND OPTION");
+      throw nec_exception("RADIAL WIRE G.S. APPROXIMATION MAY NOT BE USED WITH SOMMERFELD GROUND OPTION");
     }
 
     radial_wire_length= tmp3;
@@ -108,10 +108,10 @@ void nec_ground::parse_gn(int itmp1, int itmp2,
 
   if (0 == iperf) {
     if (epsr == 0.0) {
-      throw new nec_exception("GROUND DIELECTRIC CONSTANT IS ZERO");
+      throw nec_exception("GROUND DIELECTRIC CONSTANT IS ZERO");
     }
     if (sig == 0.0) {
-      throw new nec_exception("GROUND CONDUCTIVITY IS ZERO");
+      throw nec_exception("GROUND CONDUCTIVITY IS ZERO");
     }
   }
   

@@ -67,7 +67,7 @@ int c_geometry::get_segment_number( int in_tag, int in_m)
   
   if (in_m <= 0)
   {
-    throw new nec_exception("CHECK DATA, PARAMETER SPECIFYING SEGMENT POSITION IN A GROUP OF EQUAL TAGS MUST NOT BE ZERO" );
+    throw nec_exception("CHECK DATA, PARAMETER SPECIFYING SEGMENT POSITION IN A GROUP OF EQUAL TAGS MUST NOT BE ZERO" );
   }
   
   if ( 0 == in_tag)
@@ -88,7 +88,7 @@ int c_geometry::get_segment_number( int in_tag, int in_m)
     }
   }
   
-  throw new nec_exception("NO SEGMENT HAS AN ITAG OF ", in_tag);
+  throw nec_exception("NO SEGMENT HAS AN ITAG OF ", in_tag);
   
   return 0;
 }
@@ -202,7 +202,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
       
         if ( strcmp(gm, "GC" ) != 0 )
         {
-          throw new nec_exception("GEOMETRY DATA CARD ERROR" );
+          throw nec_exception("GEOMETRY DATA CARD ERROR" );
         }
       
         m_output->nec_printf(
@@ -212,7 +212,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
       
         if ( (ys1 == 0) || (zs1 == 0) )
         {
-          throw new nec_exception("GEOMETRY DATA CARD ERROR" );
+          throw nec_exception("GEOMETRY DATA CARD ERROR" );
         }
       
         rad= ys1;
@@ -283,7 +283,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     
       if ( card_int_1 != 0)
       {
-        throw new nec_exception("PATCH DATA ERROR" );
+        throw nec_exception("PATCH DATA ERROR" );
       }
     
       m_output->nec_printf( "\n"
@@ -312,7 +312,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
       
         if ( strcmp(gm, "SC") != 0 )
         {
-          throw new nec_exception("PATCH DATA ERROR" );
+          throw nec_exception("PATCH DATA ERROR" );
         }
       } /* if ( card_int_2 > 1) */
       else
@@ -335,7 +335,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     
       if ( (card_int_1 < 1) || (card_int_2 < 1) )
       {
-        throw new nec_exception("PATCH DATA ERROR" );
+        throw nec_exception("PATCH DATA ERROR" );
       }
     
       int ix,iy;
@@ -354,7 +354,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     
       if ( strcmp(gm, "SC" ) != 0 )
       {
-        throw new nec_exception("PATCH DATA ERROR" );
+        throw nec_exception("PATCH DATA ERROR" );
       }
     
       patch( card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, x3, y3, z3, x4, y4, z4);
@@ -380,7 +380,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     {
       if ( isct == 0)
       {
-        throw new nec_exception("PATCH DATA ERROR" );
+        throw nec_exception("PATCH DATA ERROR" );
       }
     
       i1= m+1;
@@ -388,7 +388,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     
       if ( (card_int_1 != 0) || ((card_int_2 != 2) && (card_int_2 != 4)) )
       {
-        throw new nec_exception("PATCH DATA ERROR" );
+        throw nec_exception("PATCH DATA ERROR" );
       }
     
       xs1= x4;
@@ -460,7 +460,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 
     /* "gf" card, not supported */
     else if (card_id == "GF")
-      throw new nec_exception("NGF solution option not supported");
+      throw nec_exception("NGF solution option not supported");
   
     /* error message */
     else
@@ -470,7 +470,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
         " %2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
         gm, card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, rad );
     
-      throw new nec_exception("GEOMETRY DATA CARD ERROR");
+      throw nec_exception("GEOMETRY DATA CARD ERROR");
     }
  
   } /* do */
@@ -485,7 +485,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 void c_geometry::geometry_complete(nec_context* in_context, int gpflag)
 {
   if (0 == np + mp)
-    throw new nec_exception("Geometry has no wires or patches.");
+    throw nec_exception("Geometry has no wires or patches.");
     
   /* Check to see whether any wires intersect with one another */
 if (_check_intersections)
@@ -501,12 +501,12 @@ if (_check_intersections)
         vector<nec_wire> wires = a.intersect(b);
         if (wires.size() > 2)
         {
-          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- WIRE #");
-          nex->append(j+1);
-          nex->append(" (TAG ID #"); nex->append(b.tag_id());
-          nex->append(") INTERSECTS WIRE #");
-          nex->append(i+1);
-          nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
+          nec_exception nex("GEOMETRY DATA ERROR -- WIRE #");
+          nex.append(j+1);
+          nex.append(" (TAG ID #"); nex.append(b.tag_id());
+          nex.append(") INTERSECTS WIRE #");
+          nex.append(i+1);
+          nex.append(" (TAG ID #"); nex.append(a.tag_id()); nex.append(")");
           throw nex;
         }
       }
@@ -593,7 +593,7 @@ if (_check_intersections)
   
       if ( (segment_length[i] <= 1.e-20) || (segment_radius[i] <= 0.) )
       {
-        throw new nec_exception("SEGMENT DATA ERROR" );
+        throw nec_exception("SEGMENT DATA ERROR" );
       }
     } /* for( i = 0; i < n_segments; i++ ) */
   } /* if ( n_segments != 0) */
@@ -740,25 +740,25 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
 
       if (!shares_start && a.intersect(seg_midpoint))
       {
-        nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- FIRST SEGMENT MIDPOINT");
-        nex->append(" OF WIRE #");
-        nex->append(m_wires.size()+1);
-        nex->append(" (TAG ID #"); nex->append(tag_id);
-        nex->append(") INTERSECTS WIRE #");
-        nex->append(i+1);
-        nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
+        nec_exception nex("GEOMETRY DATA ERROR -- FIRST SEGMENT MIDPOINT");
+        nex.append(" OF WIRE #");
+        nex.append(m_wires.size()+1);
+        nex.append(" (TAG ID #"); nex.append(tag_id);
+        nex.append(") INTERSECTS WIRE #");
+        nex.append(i+1);
+        nex.append(" (TAG ID #"); nex.append(a.tag_id()); nex.append(")");
         
         throw nex;
       }
       if (!shares_end && a.intersect(end_seg_midpoint))
       {
-        nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR -- LAST SEGMENT MIDPOINT");
-        nex->append(" OF WIRE #");
-        nex->append(m_wires.size()+1);
-        nex->append(" (TAG ID #"); nex->append(tag_id);
-        nex->append(") INTERSECTS WIRE #");
-        nex->append(i+1);
-        nex->append(" (TAG ID #"); nex->append(a.tag_id()); nex->append(")");
+        nec_exception nex("GEOMETRY DATA ERROR -- LAST SEGMENT MIDPOINT");
+        nex.append(" OF WIRE #");
+        nex.append(m_wires.size()+1);
+        nex.append(" (TAG ID #"); nex.append(tag_id);
+        nex.append(") INTERSECTS WIRE #");
+        nex.append(i+1);
+        nex.append(" (TAG ID #"); nex.append(a.tag_id()); nex.append(")");
         throw nex;
       }
     }
@@ -817,7 +817,7 @@ void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl,
   ist= n_segments;
   
   if ( segment_count < 1)
-    throw new nec_exception("HELIX: segment count must be >= 1");
+    throw nec_exception("HELIX: segment count must be >= 1");
 
   n_segments += segment_count;
   np= n_segments;
@@ -1119,9 +1119,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
   
     if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
     {
-      nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-      nex->append(i+1);
-      nex->append("LIES IN PLANE OF SYMMETRY");
+      nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+      nex.append(i+1);
+      nex.append("LIES IN PLANE OF SYMMETRY");
       throw nex;
     }
   
@@ -1168,9 +1168,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
       nx = i+m;
       if ( fabs(pz[i]) <= 1.0e-10)
       {
-        nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--PATCH ");
-        nex->append(i+1);
-        nex->append("LIES IN PLANE OF SYMMETRY");
+        nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
+        nex.append(i+1);
+        nex.append("LIES IN PLANE OF SYMMETRY");
         throw nex;
       }
   
@@ -1215,9 +1215,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
         e2= y2[i];
       
         if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )  {
-          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-          nex->append(i+1);
-          nex->append("LIES IN PLANE OF SYMMETRY");
+          nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+          nex.append(i+1);
+          nex.append("LIES IN PLANE OF SYMMETRY");
           throw nex;
         }
       
@@ -1259,9 +1259,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
       for( i = 0; i < m; i++ )  {
         nx= i+m;
         if ( fabs( py[i]) <= 1.0e-10)  {
-          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--PATCH ");
-          nex->append(i+1);
-          nex->append("LIES IN PLANE OF SYMMETRY");
+          nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
+          nex.append(i+1);
+          nex.append("LIES IN PLANE OF SYMMETRY");
           throw nex;
         }
       
@@ -1308,9 +1308,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
       
         if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
         {
-          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-          nex->append(i+1);
-          nex->append("LIES IN PLANE OF SYMMETRY");
+          nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+          nex.append(i+1);
+          nex.append("LIES IN PLANE OF SYMMETRY");
           throw nex;
         }
       
@@ -1354,9 +1354,9 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
     for( i = 0; i < m; i++ )  {
       nx= i+m;
       if ( fabs( px[i]) <= 1.0e-10)  {
-        nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--PATCH ");
-        nex->append(i+1);
-        nex->append("LIES IN PLANE OF SYMMETRY");
+        nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
+        nex.append(i+1);
+        nex.append("LIES IN PLANE OF SYMMETRY");
         throw nex;
       }
     
@@ -1503,7 +1503,7 @@ void c_geometry::connect_segments( int ignd )
   maxcon = 1;
   
   if (n_segments <= 1 && np == 0) {
-    throw new nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS and no patches. Please send bug report. This causes an error that we're trying to fix.");
+    throw nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS and no patches. Please send bug report. This causes an error that we're trying to fix.");
   }
   
   if ( ignd != 0) {
@@ -1525,7 +1525,7 @@ void c_geometry::connect_segments( int ignd )
     }
   
     if ( np > n_segments) {
-      throw new nec_exception("ERROR: NP > N IN c_geometry::connect_segments()" );
+      throw nec_exception("ERROR: NP > N IN c_geometry::connect_segments()" );
     }
   
     if ( (np == n_segments) && (mp == m) )
@@ -1551,9 +1551,9 @@ void c_geometry::connect_segments( int ignd )
       bool segment_on_ground = false;
       if ( ignd > 0) {
         if ( zi1 <= -slen) {
-          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-          nex->append(iz);
-          nex->append("EXTENDS BELOW GROUND");
+          nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+          nex.append(iz);
+          nex.append("EXTENDS BELOW GROUND");
           throw nex;
         }
       
@@ -1596,17 +1596,17 @@ void c_geometry::connect_segments( int ignd )
       /* determine connection data for end 2 of segment. */
       if ( (ignd > 0) || segment_on_ground ) {
         if ( zi2 <= -slen) {
-          nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-          nex->append(iz);
-          nex->append("EXTENDS BELOW GROUND");
+          nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+          nex.append(iz);
+          nex.append("EXTENDS BELOW GROUND");
           throw nex;
         }
       
         if ( zi2 <= slen) {
           if ( icon1[i] == iz ) {
-            nec_exception* nex = new nec_exception("GEOMETRY DATA ERROR--SEGMENT ");
-            nex->append(iz);
-            nex->append("LIES IN GROUND PLANE");
+            nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+            nex.append(iz);
+            nex.append("LIES IN GROUND PLANE");
             throw nex;
           }
         
@@ -1690,7 +1690,7 @@ void c_geometry::connect_segments( int ignd )
   
   
   if (0 == np + mp)
-    throw new nec_exception("connect_segments Geometry has zero wires and zero patches.");
+    throw nec_exception("connect_segments Geometry has zero wires and zero patches.");
   
   int symmetry = (n_segments+m)/(np+mp); /* was iseg */
   if ( symmetry != 1)  {
@@ -1699,7 +1699,7 @@ void c_geometry::connect_segments( int ignd )
       nec_error_mode nem(*m_output);
       m_output->endl();
       m_output->line("ERROR: IPSYM=0 IN connect_segments()" );
-      throw new nec_exception("ERROR: IPSYM=0 IN connect_segments()");
+      throw nec_exception("ERROR: IPSYM=0 IN connect_segments()");
     }
   
     if ( m_ipsym < 0 )
@@ -1742,8 +1742,8 @@ void c_geometry::connect_segments( int ignd )
         do {
           
           if ( ix == 0 ) {
-            nec_exception* nex = new nec_exception("CONNECT - SEGMENT CONNECTION ERROR FOR SEGMENT: ");
-            nex->append(ix);
+            nec_exception nex("CONNECT - SEGMENT CONNECTION ERROR FOR SEGMENT: ");
+            nex.append(ix);
             throw nex;
           }
         
@@ -1775,8 +1775,8 @@ void c_geometry::connect_segments( int ignd )
         
           int ixx = ix-1;
           if (ixx < 0 || ixx >= n_segments) {
-            nec_exception* nex = new nec_exception("CONNECT - SEGMENT CONNECTION ERROR (bad index): ");
-            nex->append(ix);
+            nec_exception nex("CONNECT - SEGMENT CONNECTION ERROR (bad index): ");
+            nex.append(ix);
             throw nex;
           }
           if ( jend != 1) {
@@ -1819,8 +1819,8 @@ void c_geometry::connect_segments( int ignd )
             ix = - ix;
             int ixx = ix-1;
             if (ixx < 0 || ixx >= n_segments) {
-              nec_exception* nex = new nec_exception("CONNECT - JUNCTION INDEX ERROR: ");
-              nex->append(ix);
+              nec_exception nex("CONNECT - JUNCTION INDEX ERROR: ");
+              nex.append(ix);
               throw nex;
             }
             x[ixx]= xa;
@@ -1831,8 +1831,8 @@ void c_geometry::connect_segments( int ignd )
         
           int ixx = ix-1;
           if (ixx < 0 || ixx >= n_segments) {
-            nec_exception* nex = new nec_exception("CONNECT - JUNCTION INDEX ERROR: ");
-            nex->append(ix);
+            nec_exception nex("CONNECT - JUNCTION INDEX ERROR: ");
+            nex.append(ix);
             throw nex;
           }
           x2[ixx]= xa;
@@ -1894,7 +1894,7 @@ void c_geometry::arc( int tag_id, int segment_count, nec_float rada,
   
   if ( fabs(ang2 - ang1) > 360.0)
   {
-    throw new nec_exception("ERROR -- ARC ANGLE EXCEEDS 360 DEGREES");
+    throw nec_exception("ERROR -- ARC ANGLE EXCEEDS 360 DEGREES");
   }
   
   /* Reallocate tags buffer */
@@ -1961,7 +1961,7 @@ void c_geometry::sp_card(int ns,
       break;
       
     default:
-      throw new nec_exception("PATCH DATA ERROR ns ",ns );
+      throw nec_exception("PATCH DATA ERROR ns ",ns );
   }
   _prev_sc = false;
 }
@@ -2018,7 +2018,7 @@ void c_geometry::sc_card(int i2,
 
   switch (this->patch_type) {
     case 0:  // Arbritrary
-      throw new nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=0) ");
+      throw nec_exception("PATCH DATA ERROR: SC CARD FOR ARBITRARY PATCH TYPE (NS=0) ");
       break;
     
     case 1:  // Rectangular
@@ -2032,7 +2032,7 @@ void c_geometry::sc_card(int i2,
       break;
       
     default:
-      throw new nec_exception("PATCH DATA ERROR ns ", this->patch_type );
+      throw nec_exception("PATCH DATA ERROR ns ", this->patch_type );
   }
   patch( this->patch_type, i2, 
           this->patch_x1(0), this->patch_x1(1), this->patch_x1(2), 
@@ -2064,10 +2064,10 @@ void c_geometry::sc_multiple_card(int i2,
   const char ipt[4] = { 'P', 'R', 'T', 'Q' };
   switch (i2) {
     case 0:  // Arbritrary
-      throw new nec_exception("PATCH DATA ERROR: MULTIPLE SC CARDS FOR ARBITRARY PATCH TYPE (NS=0) ");
+      throw nec_exception("PATCH DATA ERROR: MULTIPLE SC CARDS FOR ARBITRARY PATCH TYPE (NS=0) ");
       break;
     case 2:  // Triangular
-      throw new nec_exception("PATCH DATA ERROR: MULTIPLE SC CARDS FOR TRIANGULAR PATCH (NS=2) ");
+      throw nec_exception("PATCH DATA ERROR: MULTIPLE SC CARDS FOR TRIANGULAR PATCH (NS=2) ");
       break;
     
     case 1:  // Rectangular
@@ -2085,7 +2085,7 @@ void c_geometry::sc_multiple_card(int i2,
       break;
       
     default:
-      throw new nec_exception("PATCH DATA ERROR i2 = ", i2 );
+      throw nec_exception("PATCH DATA ERROR i2 = ", i2 );
   }
   
   patch( this->patch_type, i2, 
@@ -2240,7 +2240,7 @@ void c_geometry::patch( int nx, int ny,
       
         if ( s1x <= 0.9998)
         {
-          throw new nec_exception("ERROR -- CORNERS OF QUADRILATERAL PATCH DO NOT LIE IN A PLANE");
+          throw nec_exception("ERROR -- CORNERS OF QUADRILATERAL PATCH DO NOT LIE IN A PLANE");
         }
       } /* if ( ntp != 4) */
     } /* if ( ntp <= 2) */
@@ -2427,8 +2427,8 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
   /* abort if card's mnemonic too short or missing */
   if ( line_length < 2 )
   {
-    nec_exception* nex = new nec_exception("GEOMETRY DATA CARD ERROR:");
-    nex->append(" CARD'S MNEMONIC CODE TOO SHORT OR MISSING.");
+    nec_exception nex("GEOMETRY DATA CARD ERROR:");
+    nex.append(" CARD'S MNEMONIC CODE TOO SHORT OR MISSING.");
     throw nex;
   }
   
@@ -2439,7 +2439,7 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
   /* Exit if "XT" command read (for testing) */
   if ( strcmp( gm, "XT" ) == 0 )
   {
-      nec_exception* nex = new nec_exception("Exiting after an \"XT\" command in read_geometry_card()");
+      nec_exception nex("Exiting after an \"XT\" command in read_geometry_card()");
       throw nex;
   }
   
@@ -2658,8 +2658,8 @@ void c_geometry::tbf( int i, int icap )
             continue;
           else
           {
-            nec_exception* nex = new nec_exception("TBF - SEGMENT CONNECTION ERROR FOR SEGMENT ");
-            nex->append(i);
+            nec_exception nex("TBF - SEGMENT CONNECTION ERROR FOR SEGMENT ");
+            nex.append(i);
             throw nex;
           }
         }
@@ -2881,8 +2881,8 @@ void c_geometry::trio( int j )  {
         jcox= icon2[jcoxx];
     
       if ( jcox == 0 )  {
-        nec_exception* nex = new nec_exception("TRIO - SEGMENT CONNENTION ERROR FOR SEGMENT ");
-        nex->append(j);
+        nec_exception nex("TRIO - SEGMENT CONNENTION ERROR FOR SEGMENT ");
+        nex.append(j);
         throw nex;
       }
       else
@@ -2996,8 +2996,8 @@ void c_geometry::sbf( int i, int is, nec_float *aa, nec_float *bb, nec_float *cc
       
         if ( abs(jcox) != i )  {
           if ( jcox == 0 )  {
-            nec_exception* nex = new nec_exception("SBF - SEGMENT CONNECTION ERROR FOR SEGMENT ");
-            nex->append(i);
+            nec_exception nex("SBF - SEGMENT CONNECTION ERROR FOR SEGMENT ");
+            nex.append(i);
             throw nex;
           }
           else
@@ -3231,11 +3231,11 @@ void c_geometry::frequency_scale(nec_float freq_mhz)  {
     segment_radius[i]= bi_unscaled[i]* fr;
     if (segment_length[i] < 0.02)  {
       m_output->nec_printf( "WARNING- SEGMENT[%i] LENGTH TOO SMALL (%f)\n",i,segment_length[i]);
-/*      nec_exception* nex = new nec_exception("SCALE - SEGMENT[");
-      nex->append(i);
-      nex->append("] LENGTH TOO SMALL (");
-      nex->append(segment_length[i]);
-      nex->append(") WAVELENGTHS ");
+/*      nec_exception nex("SCALE - SEGMENT[");
+      nex.append(i);
+      nex.append("] LENGTH TOO SMALL (");
+      nex.append(segment_length[i]);
+      nex.append(") WAVELENGTHS ");
       throw nex;*/
     }
   }

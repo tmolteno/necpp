@@ -40,16 +40,20 @@ public:
 	{
 		m_message << message << code;
 	}
-	
+
+	nec_exception(const nec_exception& other)
+	{
+		m_message << other.m_message.str();
+	}
+
 	template <class T> void append(const T& message)
 	{
 		m_message << message;
 	}
-	
-	std::string get_message()
+
+	std::string get_message() const
 	{
-		std::string ret = m_message.str();
-		return ret;
+		return m_message.str();
 	}
 
 	static std::string string_printf(const char* fmt, ...);
@@ -65,15 +69,15 @@ protected:
 */
 inline void nec_stop(const char* __fmt, ...)
 {
-	 nec_exception* __nex = new nec_exception("Undefined Error");
+	 nec_exception __nex("Undefined Error");
 	// __nex->os_printf(__fmt, __VA_ARGS__);
 	 throw __nex;
 }
 #else
 #define nec_stop(__fmt, ...)\
-{	nec_exception* __nex = new nec_exception();\
+{    nec_exception __nex;\
 	std::string _mess = nec_exception::string_printf(__fmt, __VA_ARGS__); \
-	__nex->append(_mess.c_str()); \
+	__nex.append(_mess.c_str()); \
 	throw __nex; \
 }
 #endif

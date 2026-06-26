@@ -73,8 +73,8 @@ int main(int argc, char **argv) {
       }
     }
   }
-  catch (nec_exception* e) {
-    cout << e->get_message() << endl;
+  catch (const nec_exception& e) {
+    cout << e.get_message() << endl;
   }
   return 0;
 }

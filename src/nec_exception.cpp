@@ -98,7 +98,7 @@ string nec_exception::string_printf(const char* fmt, ...)
 				_sstream << "%%";
 				break;
 			default:
-				throw new nec_exception("Invalid format specifier in os_printf()");
+				throw nec_exception("Invalid format specifier in os_printf()");
 			}
 		}
 	}

@@ -78,7 +78,7 @@ std::string nec_structure_currents::hpol(enum excitation_type e)
     case EXCITATION_CIRC_RIGHT:  return std::string("RIGHT");
     case EXCITATION_CIRC_LEFT:  return std::string("LEFT");
     default:
-    {  nec_exception* nex = new nec_exception("Unknown Excitation type");
+    {  nec_exception nex("Unknown Excitation type");
       throw nex;
     }
   }

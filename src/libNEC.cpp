@@ -26,8 +26,8 @@
 
 static std::string _err_message;
 
-#define NEC_ERROR_HANDLE(__x)   { try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); return 1; } return 0;}
-#define NEC_VOID_HANDLE(__x)    { try { __x; } catch (nec_exception* _ex) {  _err_message = _ex->get_message(); }}
+#define NEC_ERROR_HANDLE(__x)   { try { __x; } catch (const nec_exception& _ex) {  _err_message = _ex.get_message(); return 1; } return 0;}
+#define NEC_VOID_HANDLE(__x)    { try { __x; } catch (const nec_exception& _ex) {  _err_message = _ex.get_message(); }}
 
 
 nec_context* nec_create(void) {

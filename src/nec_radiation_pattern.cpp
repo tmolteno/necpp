@@ -23,9 +23,9 @@
 
 int nec_radiation_pattern::get_index(int theta_index, int phi_index) const  {
   if (theta_index >= n_theta) 
-    throw new nec_exception("nec_radiation_pattern: Theta index too large");
+    throw nec_exception("nec_radiation_pattern: Theta index too large");
   if (phi_index >= n_phi) 
-    throw new nec_exception("nec_radiation_pattern: Phi index too large");
+    throw nec_exception("nec_radiation_pattern: Phi index too large");
           
   return phi_index*n_theta + theta_index;
 }
@@ -90,7 +90,7 @@ nec_radiation_pattern::nec_radiation_pattern(int in_n_theta, int in_n_phi,
 void nec_radiation_pattern::write_to_file_aux(ostream& os)
 {
   if (false == m_analysis_done)
-    throw new nec_exception("Internal Error: Radiation Pattern Analysis not done");
+    throw nec_exception("Internal Error: Radiation Pattern Analysis not done");
   
   static const char  *hpol[4] = { "LINEAR", "RIGHT ", "LEFT  ", " " };
   static const char  *gain_type[2] = { "----- POWER GAINS ----- ", "--- DIRECTIVE GAINS ---" };
@@ -359,7 +359,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
             break;
             
           default:
-            throw new nec_exception("Unknown Gain Normalization Encountered.");
+            throw nec_exception("Unknown Gain Normalization Encountered.");
           }
         
           _gain(kth, kph) = temp_gain;
@@ -451,7 +451,7 @@ nec_float nec_radiation_pattern::get_gain_normalization_factor(nec_float gnor)  
     return gnor;
     
   if (false == m_analysis_done)
-    throw new nec_exception("Internal Error: Radiation Pattern Analysis not done");
+    throw nec_exception("Internal Error: Radiation Pattern Analysis not done");
     
   return _maximum_gain;
 }
@@ -476,7 +476,7 @@ void nec_radiation_pattern::write_normalized_gain(ostream& os)
     case 5:
       norm_type = "TOTAL "; break;
     
-    default: throw new nec_exception("Unknown Gain Normalization Encountered.");
+    default: throw nec_exception("Unknown Gain Normalization Encountered.");
   }
   
   output_helper oh(os,_result_format);

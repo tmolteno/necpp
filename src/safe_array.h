@@ -91,7 +91,7 @@ public:
   void resize(int64_t new_length) {
 #ifdef NEC_ERROR_CHECK
     if (!_own_data)
-      throw new nec_exception("attempt to resize data we do not own");
+      throw nec_exception("attempt to resize data we do not own");
 #endif
     if (new_length > _capacity) {
       _capacity = new_length + new_length / 2;  // 1.5x growth
@@ -101,7 +101,7 @@ public:
           new_storage.head(_len) = _storage.head(_len);
         _storage.swap(new_storage);
       } catch (std::bad_alloc& ba) {
-        throw new nec_exception("Error: Out of Memory ");
+        throw nec_exception("Error: Out of Memory ");
       }
     }
     _len = new_length;
@@ -109,13 +109,13 @@ public:
 
   T maxCoeff() const {
     if (0 == _len)
-      throw new nec_exception("No elements in maxCoeff");
+      throw nec_exception("No elements in maxCoeff");
     return _eigen_view().maxCoeff();
   }
 
   T minCoeff() const {
     if (0 == _len)
-      throw new nec_exception("No elements in minCoeff");
+      throw nec_exception("No elements in minCoeff");
     return _eigen_view().minCoeff();
   }
 
@@ -228,7 +228,7 @@ protected:
   inline int64_t check(int64_t i) const {
 #ifdef NEC_ERROR_CHECK
     if (i < 0 || i >= _len)
-      throw new BoundsViol("safe_array: ", i, _len);
+      throw BoundsViol("safe_array: ", i, _len);
 #endif
     return i;
   }
@@ -236,9 +236,9 @@ protected:
   inline int64_t check(int64_t row, int64_t col) const {
 #ifdef NEC_ERROR_CHECK
     if (row < 0 || row >= _rows)
-      throw new BoundsViol("safe_array: ", row, _rows);
+      throw BoundsViol("safe_array: ", row, _rows);
     if (col < 0 || col >= _cols)
-      throw new BoundsViol("safe_array: ", col, _cols);
+      throw BoundsViol("safe_array: ", col, _cols);
 #endif
     return check(int64_t(col) * _rows + row);
   }

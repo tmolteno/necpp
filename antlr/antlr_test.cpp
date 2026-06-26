@@ -153,11 +153,11 @@ int option;
 		s_output.line(message);
 		exit(1);
 	}
-	catch (nec_exception* nex)
+	catch (const nec_exception& nex)
 	{
 		nec_error_mode nem(s_output);
 		s_output.line("NEC++ Runtime Error: ");
-		s_output.line(nex->get_message().c_str());
+		s_output.line(nex.get_message().c_str());
 		exit(1);
 	}
 }

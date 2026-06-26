@@ -216,7 +216,7 @@ void nec_output_file::nec_printf(const char* fmt, ...)
 					count += fprintf(m_output_fp, "%%");
 					break;
 				default:
-					throw new nec_exception("Invalid format specifier in nec_printf()");
+					throw nec_exception("Invalid format specifier in nec_printf()");
 			}
 		}
 	}

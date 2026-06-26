@@ -544,9 +544,9 @@ void nec_context::ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int 
     
       int seg_number = m_geometry->get_segment_number( itmp2, itmp3);
       if (seg_number > m_geometry->segment_length.size())  {
-        nec_exception* nex = new nec_exception("CHECK DATA, PARAMETER SPECIFYING EXCITATION SOURCE SEGMENT [");
-        nex->append(seg_number);
-        nex->append("] IS TOO LARGE" );
+        nec_exception nex("CHECK DATA, PARAMETER SPECIFYING EXCITATION SOURCE SEGMENT [");
+        nex.append(seg_number);
+        nex.append("] IS TOO LARGE" );
         throw nex;
       }
       source_segment_array[indx] = seg_number;
@@ -1975,8 +1975,8 @@ void nec_context::load()
     
     if ( ichk == 0 )
     {
-      nec_exception* nex = new nec_exception("LOADING DATA CARD ERROR, NO SEGMENT HAS AN ITAG = ");
-      nex->append(ldtags);
+      nec_exception nex("LOADING DATA CARD ERROR, NO SEGMENT HAS AN ITAG = ");
+      nex.append(ldtags);
       throw nex;
     }
   
@@ -5688,7 +5688,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   nec_float _s = b - a;
   if ( _s < 0.0)
   {
-    throw new nec_exception("ERROR - B LESS THAN A IN ROM2");
+    throw nec_exception("ERROR - B LESS THAN A IN ROM2");
   }
 
 
@@ -5954,7 +5954,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   
   if ( _s < 0.0)
   {
-    throw new nec_exception("ERROR - B LESS THAN A IN ROM2");
+    throw nec_exception("ERROR - B LESS THAN A IN ROM2");
   }
   
   /*! tolerance for hitting upper limit */

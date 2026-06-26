@@ -209,7 +209,7 @@ void c_evlcom::gshank( nec_complex start, nec_complex dela, complex_array& sum,
 	} /* for ( intx = 1; intx <= maxh; intx++ ) */
 	
 	/* No convergence */
-	throw new nec_exception("No convergence in gshank() - aborting");
+	throw nec_exception("No convergence in gshank() - aborting");
 }
 
 
@@ -780,7 +780,7 @@ void hankel( nec_complex z, nec_complex *h0, nec_complex *h0p )
 	nec_float zms = norm(z);
 
 	if (zms == 0.0)
-		throw new nec_exception("hankel not valid for z=0.");
+		throw nec_exception("hankel not valid for z=0.");
 
 	nec_complex y0(0,0);
 	nec_complex y0p(0,0);
