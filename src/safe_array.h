@@ -95,7 +95,7 @@ public:
       throw new nec_exception("attempt to resize data we do not own");
 #endif
     if (new_length > _capacity) {
-      _capacity = new_length * 2;
+      _capacity = new_length + new_length / 2;  // 1.5x growth
       try {
         Vector new_storage(_capacity);
         if (_len > 0)
