@@ -31,6 +31,7 @@ AM_CPPFLAGS = $(all_includes)
 
 # the library search path.
 nec2___LDADD = libnecpp.la
+nec2___DEPENDENCIES = libnecpp.la
 
 lib_LTLIBRARIES = libnecpp.la
 
