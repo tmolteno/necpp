@@ -54,6 +54,7 @@
 *Numerical output verified identical between Eigen v2.0.0 and pre-Eigen v1.7.7 builds.*
 
 ### Code Quality
+* Fixed exception memory leak: throw-by-pointer → throw-by-value (55+ sites, 15 files)
 * pragma once on all 26 headers (removes reserved-identifier UB)
 * 22 C-style casts converted to static_cast
 * 12 override specifiers added to virtual functions
