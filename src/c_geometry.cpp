@@ -1745,7 +1745,7 @@ void c_geometry::connect_segments( int ignd )
     nec_float za = z[j];
   
     while ( true )  {
-      if ( (ix != 0) && (ix != (j+1)) && (ix <= PCHCON) )  {
+      if ( (ix != 0) && (ix != (j+1)) && (ix <= n_segments) )  {
         bool jump = false;
         // int nsflg = 0;  // will be set to 1 if the junction includes any new segments when NGF is in use.
         // NOTE nsflg is not used correctly as we don't use Numerical Greens Functions
@@ -1784,8 +1784,13 @@ void c_geometry::connect_segments( int ignd )
           //  nsflg=1;
         
           int ixx = ix-1;
+          if (ixx < 0 || ixx >= n_segments) {
+            nec_exception* nex = new nec_exception("CONNECT - SEGMENT CONNECTION ERROR (bad index): ");
+            nex->append(ix);
+            throw nex;
+          }
           if ( jend != 1) {
-            xa= xa+ x[ixx]; // dies here if n_segments == 1. ix is totally fried.
+            xa= xa+ x[ixx];
             ya= ya+ y[ixx];
             za= za+ z[ixx];
             ix= icon1[ixx];
@@ -1822,7 +1827,12 @@ void c_geometry::connect_segments( int ignd )
           ix= jco[i];
           if ( ix <= 0) {
             ix = - ix;
-            int ixx = ix-1; // TODO if ix == 0 we have a problem
+            int ixx = ix-1;
+            if (ixx < 0 || ixx >= n_segments) {
+              nec_exception* nex = new nec_exception("CONNECT - JUNCTION INDEX ERROR: ");
+              nex->append(ix);
+              throw nex;
+            }
             x[ixx]= xa;
             y[ixx]= ya;
             z[ixx]= za;
@@ -1830,6 +1840,11 @@ void c_geometry::connect_segments( int ignd )
           }
         
           int ixx = ix-1;
+          if (ixx < 0 || ixx >= n_segments) {
+            nec_exception* nex = new nec_exception("CONNECT - JUNCTION INDEX ERROR: ");
+            nex->append(ix);
+            throw nex;
+          }
           x2[ixx]= xa;
           y2[ixx]= ya;
           z2[ixx]= za;  
