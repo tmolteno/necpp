@@ -37,6 +37,17 @@ public:
 	segment(istream& m_stream)
 	{
 	}
+
+	nec_float diff(const segment& other) const
+	{
+		nec_float ret = 0.0;
+		ret += std::fabs(x - other.x);
+		ret += std::fabs(y - other.y);
+		ret += std::fabs(z - other.z);
+		ret += std::fabs(length - other.length);
+		ret += std::abs(current - other.current);
+		return ret;
+	}
 };
 
 class CurrentInput : public BaseInput

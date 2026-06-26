@@ -36,6 +36,21 @@ conflicting with the system toolchain. Run:
 
 then rebuild. You can re-link binutils afterwards with `brew link binutils`.
 
+### Building with Xcode
+
+To use necpp in an Xcode project:
+
+1. Add all `.cpp` and `.h` files from `src/` to your project (except
+   `nec2cpp.cpp` which contains its own `main()`).
+2. Add `src/eigen3/` to your header search paths (`-I src/eigen3`).
+3. Create a minimal `config.h`:
+   ```c
+   #define VERSION "2.0.0"
+   #define BUILD_DATE "unknown"
+   ```
+4. Set C++ Language Dialect to C++17.
+5. Link with `-lm` (libm). No other external libraries are needed.
+
 ## Compiling for a specific architecture
 
 Particularly using gcc-4.0 it is important to specify the architecture you
