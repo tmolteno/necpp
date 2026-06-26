@@ -11,6 +11,9 @@
 #
 #####################################################################################
 
+# Default target (must be first)
+all: nec2++ nec2diff
+
 CXX      ?= g++
 CXXFLAGS ?= -std=c++17 -O2 -Wall -Wextra -Wshadow
 LDFLAGS  ?= -lm
@@ -66,7 +69,6 @@ nec2diff: $(SRC_DIR)/necDiff.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $(SRC_DIR)/necDiff.cpp $(LDFLAGS) -lstdc++
 
 # --- Default targets ---
-all: nec2++ nec2diff
 
 clean:
 	rm -rf $(BUILD_DIR) nec2++ nec2diff
