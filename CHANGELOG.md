@@ -1,7 +1,7 @@
 ## Version 2.0.0
 
 ### Breaking Changes
-* **Eigen is now mandatory**. libeigen3-dev required. All `--with-eigen*` options removed.
+* **Eigen is now mandatory** (but bundled in `src/eigen3/` — no external install needed). All `--with-eigen*` options removed.
 * **LAPACK support removed**. `--with-lapack` option removed. Eigen's PartialPivLU replaces it.
 * **nec_3vector is now Eigen::Matrix<nec_float,3,1>**. The hand-written class removed.
   `.x()`/`.y()`/`.z()` replaced by `operator()(0)/(1)/(2)` throughout.
@@ -24,6 +24,9 @@
 * Fix missing #include <vector> in nec_wire.h
 * Fix false positive intersection errors for connected wires (#87)
 * Fix left-handed helix start point (#91)
+
+### Distribution
+* Eigen 3.4.0 headers bundled in `src/eigen3/` — no external Eigen dependency needed
 
 ### Tests
 * 12×12 complex factrs/solves pipeline test
