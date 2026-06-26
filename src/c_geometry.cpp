@@ -1074,395 +1074,360 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
 
 /*-----------------------------------------------------------------------*/
 
+/* reflect geometry across one symmetry plane (planar) or rotate    */
+/* to complete a cylindrical structure.                               */
+/* sym_plane > 0: bitmask of axes to negate (1=X, 2=Y, 4=Z)          */
+/* sym_plane < 0: rotational symmetry with nop = -sym_plane          */
+void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
+{
+  int i, nx, itagi, k;
+  nec_float e1, e2, xk, yk;
+
+  if ( sym_plane < 0 )
+  {
+    /* --- rotational symmetry --- */
+    int nop = -sym_plane;
+    nec_float fnop = static_cast<nec_float>(nop);
+    nec_float sam = two_pi() / fnop;
+    nec_float cs = cos( sam );
+    nec_float ss = sin( sam );
+    int iti = tag_increment;
+
+    if ( n_segments > 0 )
+    {
+      int new_n = n_segments * nop;
+      nx = np;
+
+      /* Reallocate tags buffer */
+      segment_tags.resize( new_n + m );
+
+      /* Reallocate wire buffers */
+      x.resize( new_n );
+      y.resize( new_n );
+      z.resize( new_n );
+      x2.resize( new_n );
+      y2.resize( new_n );
+      z2.resize( new_n );
+      segment_radius.resize( new_n );
+
+      for( i = nx; i < new_n; i++ )
+      {
+	k = i - np;
+	xk = x[k];
+	yk = y[k];
+	x[i]  = xk * cs - yk * ss;
+	y[i]  = xk * ss + yk * cs;
+	z[i]  = z[k];
+	xk = x2[k];
+	yk = y2[k];
+	x2[i] = xk * cs - yk * ss;
+	y2[i] = xk * ss + yk * cs;
+	z2[i] = z2[k];
+	segment_radius[i] = segment_radius[k];
+	itagi = segment_tags[k];
+
+	if ( itagi == 0 )
+	  segment_tags[i] = 0;
+	if ( itagi != 0 )
+	  segment_tags[i] = itagi + iti;
+      }
+
+      n_segments = new_n;
+    }
+
+    if ( m == 0 )
+      return;
+
+    int new_m = m * nop;
+    nx = mp;
+
+    /* Reallocate patch buffers */
+    px.resize( new_m );
+    py.resize( new_m );
+    pz.resize( new_m );
+    t1x.resize( new_m );
+    t1y.resize( new_m );
+    t1z.resize( new_m );
+    t2x.resize( new_m );
+    t2y.resize( new_m );
+    t2z.resize( new_m );
+    pbi.resize( new_m );
+    psalp.resize( new_m );
+
+    for( i = nx; i < new_m; i++ )
+    {
+      k = i - mp;
+      xk = px[k];
+      yk = py[k];
+      px[i]  = xk * cs - yk * ss;
+      py[i]  = xk * ss + yk * cs;
+      pz[i]  = pz[k];
+      xk = t1x[k];
+      yk = t1y[k];
+      t1x[i] = xk * cs - yk * ss;
+      t1y[i] = xk * ss + yk * cs;
+      t1z[i] = t1z[k];
+      xk = t2x[k];
+      yk = t2y[k];
+      t2x[i] = xk * cs - yk * ss;
+      t2y[i] = xk * ss + yk * cs;
+      t2z[i] = t2z[k];
+      psalp[i] = psalp[k];
+      pbi[i] = pbi[k];
+    }
+
+    m = new_m;
+    return;
+  }
+
+  /* --- planar symmetry --- */
+  /* sym_plane bits: 0 = negate X, 1 = negate Y, 2 = negate Z */
+  int mask = sym_plane;
+  bool neg_x = mask & 1;
+  bool neg_y = mask & 2;
+  bool neg_z = mask & 4;
+  int num_axes = (neg_x?1:0) + (neg_y?1:0) + (neg_z?1:0);
+  int num_copies = 1 << num_axes;   /* 2 for single axis, 4 for two axes */
+
+  int orig_n = n_segments;
+  int orig_m = m;
+  int itx = tag_increment;
+
+  /* Axis priority: Z (bit 2) > Y (bit 1) > X (bit 0).
+     For two-axis combos, copy order is: original, axis1-neg, axis2-neg, both-neg.
+     Tag increments: +0, +itx, +2*itx, +3*itx. */
+  int axis1_mask = 0, axis2_mask = 0;
+  if ( neg_z ) { axis1_mask = 4; axis2_mask = neg_y ? 2 : (neg_x ? 1 : 0); }
+  else if ( neg_y ) { axis1_mask = 2; axis2_mask = neg_x ? 1 : 0; }
+  else if ( neg_x ) { axis1_mask = 1; }
+
+  int tag_inc[4] = { 0, itx, 2*itx, 3*itx };
+
+  /* Final tag_increment: X never doubles, Z and Y always double */
+  tag_increment = itx << ( (neg_z ? 1 : 0) + (neg_y ? 1 : 0) );
+
+  /* --- SEGMENTS --- */
+  if ( orig_n > 0 )
+  {
+    int new_n = orig_n * num_copies;
+
+    /* Reallocate tags buffer (match original sizing) */
+    segment_tags.resize( new_n + orig_m * (num_copies / 2) );
+
+    /* Reallocate wire buffers */
+    x.resize( new_n );
+    y.resize( new_n );
+    z.resize( new_n );
+    x2.resize( new_n );
+    y2.resize( new_n );
+    z2.resize( new_n );
+    segment_radius.resize( new_n );
+
+    for( int copy = 1; copy < num_copies; copy++ )
+    {
+      /* Determine which axes to negate for this copy */
+      bool cx = false, cy = false, cz = false;
+      if ( copy == 1 )
+      {
+	if ( axis1_mask == 4 ) cz = true;
+	else if ( axis1_mask == 2 ) cy = true;
+	else if ( axis1_mask == 1 ) cx = true;
+      }
+      else if ( copy == 2 )
+      {
+	if ( axis2_mask == 4 ) cz = true;
+	else if ( axis2_mask == 2 ) cy = true;
+	else if ( axis2_mask == 1 ) cx = true;
+      }
+      else if ( copy == 3 )
+      {
+	cx = neg_x; cy = neg_y; cz = neg_z;
+      }
+
+      int base = copy * orig_n;
+
+      for( i = 0; i < orig_n; i++ )
+      {
+	nx = base + i;
+
+	/* Validate: segment must not lie in the symmetry plane */
+	if ( cz )
+	{
+	  e1 = z[i];
+	  e2 = z2[i];
+	  if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
+	  {
+	    nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+	    nex.append(i+1);
+	    nex.append("LIES IN PLANE OF SYMMETRY");
+	    throw nex;
+	  }
+	}
+	if ( cy )
+	{
+	  e1 = y[i];
+	  e2 = y2[i];
+	  if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
+	  {
+	    nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+	    nex.append(i+1);
+	    nex.append("LIES IN PLANE OF SYMMETRY");
+	    throw nex;
+	  }
+	}
+	if ( cx )
+	{
+	  e1 = x[i];
+	  e2 = x2[i];
+	  if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
+	  {
+	    nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
+	    nex.append(i+1);
+	    nex.append("LIES IN PLANE OF SYMMETRY");
+	    throw nex;
+	  }
+	}
+
+	x[nx]  = cx ? -x[i]  : x[i];
+	y[nx]  = cy ? -y[i]  : y[i];
+	z[nx]  = cz ? -z[i]  : z[i];
+	x2[nx] = cx ? -x2[i] : x2[i];
+	y2[nx] = cy ? -y2[i] : y2[i];
+	z2[nx] = cz ? -z2[i] : z2[i];
+
+	itagi = segment_tags[i];
+	if ( itagi == 0 )
+	  segment_tags[nx] = 0;
+	if ( itagi != 0 )
+	  segment_tags[nx] = itagi + tag_inc[copy];
+
+	segment_radius[nx] = segment_radius[i];
+      }
+    }
+
+    n_segments = new_n;
+  }
+
+  /* --- PATCHES --- */
+  if ( orig_m > 0 )
+  {
+    int new_m = orig_m * num_copies;
+
+    /* Reallocate patch buffers */
+    px.resize( new_m );
+    py.resize( new_m );
+    pz.resize( new_m );
+    t1x.resize( new_m );
+    t1y.resize( new_m );
+    t1z.resize( new_m );
+    t2x.resize( new_m );
+    t2y.resize( new_m );
+    t2z.resize( new_m );
+    pbi.resize( new_m );
+    psalp.resize( new_m );
+
+    for( int copy = 1; copy < num_copies; copy++ )
+    {
+      bool cx = false, cy = false, cz = false;
+      if ( copy == 1 )
+      {
+	if ( axis1_mask == 4 ) cz = true;
+	else if ( axis1_mask == 2 ) cy = true;
+	else if ( axis1_mask == 1 ) cx = true;
+      }
+      else if ( copy == 2 )
+      {
+	if ( axis2_mask == 4 ) cz = true;
+	else if ( axis2_mask == 2 ) cy = true;
+	else if ( axis2_mask == 1 ) cx = true;
+      }
+      else if ( copy == 3 )
+      {
+	cx = neg_x; cy = neg_y; cz = neg_z;
+      }
+
+      int neg_count = (cx?1:0) + (cy?1:0) + (cz?1:0);
+      bool neg_psalp = (neg_count % 2 == 1);
+
+      int base = copy * orig_m;
+
+      for( i = 0; i < orig_m; i++ )
+      {
+	nx = base + i;
+
+	if ( cz && fabs(pz[i]) <= 1.0e-10 )
+	{
+	  nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
+	  nex.append(i+1);
+	  nex.append("LIES IN PLANE OF SYMMETRY");
+	  throw nex;
+	}
+	if ( cy && fabs(py[i]) <= 1.0e-10 )
+	{
+	  nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
+	  nex.append(i+1);
+	  nex.append("LIES IN PLANE OF SYMMETRY");
+	  throw nex;
+	}
+	if ( cx && fabs(px[i]) <= 1.0e-10 )
+	{
+	  nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
+	  nex.append(i+1);
+	  nex.append("LIES IN PLANE OF SYMMETRY");
+	  throw nex;
+	}
+
+	px[nx]   = cx ? -px[i]   : px[i];
+	py[nx]   = cy ? -py[i]   : py[i];
+	pz[nx]   = cz ? -pz[i]   : pz[i];
+	t1x[nx]  = cx ? -t1x[i]  : t1x[i];
+	t1y[nx]  = cy ? -t1y[i]  : t1y[i];
+	t1z[nx]  = cz ? -t1z[i]  : t1z[i];
+	t2x[nx]  = cx ? -t2x[i]  : t2x[i];
+	t2y[nx]  = cy ? -t2y[i]  : t2y[i];
+	t2z[nx]  = cz ? -t2z[i]  : t2z[i];
+	psalp[nx] = neg_psalp ? -psalp[i] : psalp[i];
+	pbi[nx]   = pbi[i];
+      }
+    }
+
+    m = new_m;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* reflects partial structure along x,y, or z axes or rotates */
 /* structure to complete a symmetric structure. */
 void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
-  int iti, i, nx, itagi, k;
-  nec_float e1, e2, fnop, sam, cs, ss, xk, yk;
-  
+  int iti;
+
   np= n_segments;
   mp= m;
   m_ipsym=0;
   iti= itx;
-  
+
   if ( ix >= 0) {
     if ( nop == 0)
     return;
-  
+
     m_ipsym=1;
-  
-    /* reflect along z axis */
-    if ( iz != 0)
-    {
-    m_ipsym=2;
-  
-    if ( n_segments > 0 )
-    {
-    /* Reallocate tags buffer */
-    segment_tags.resize(2*n_segments + m);
-  
-    /* Reallocate wire buffers */
-    int new_size = 2*n_segments;
-    x.resize(new_size);
-    y.resize(new_size);
-    z.resize(new_size);
-    x2.resize(new_size);
-    y2.resize(new_size);
-    z2.resize(new_size);
-    segment_radius.resize(new_size);
-  
-    for( i = 0; i < n_segments; i++ )
-    {
-    nx= i+ n_segments;
-    e1= z[i];
-    e2= z2[i];
-  
-    if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
-    {
-      nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
-      nex.append(i+1);
-      nex.append("LIES IN PLANE OF SYMMETRY");
-      throw nex;
-    }
-  
-    x[nx]= x[i];
-    y[nx]= y[i];
-    z[nx] = - e1;
-    x2[nx]= x2[i];
-    y2[nx]= y2[i];
-    z2[nx] = - e2;
-    itagi= segment_tags[i];
-  
-    if ( itagi == 0)
-      segment_tags[nx]=0;
-    if ( itagi != 0)
-      segment_tags[nx]= itagi+ iti;
-  
-    segment_radius[nx]= segment_radius[i];
-  
-    } /* for( i = 0; i < n_segments; i++ ) */
-  
-    n_segments= n_segments*2;
-    iti= iti*2;
-  
-    } /* if ( n_segments > 0) */
-  
-    if ( m > 0 )
-    {
-    /* Reallocate patch buffers */
-    int new_size = 2*m;
-    px.resize(new_size);
-    py.resize(new_size);
-    pz.resize(new_size);
-    t1x.resize(new_size);
-    t1y.resize(new_size);
-    t1z.resize(new_size);
-    t2x.resize(new_size);
-    t2y.resize(new_size);
-    t2z.resize(new_size);
-    pbi.resize(new_size);
-    psalp.resize(new_size);
-  
-    for( i = 0; i < m; i++ )
-    {
-      nx = i+m;
-      if ( fabs(pz[i]) <= 1.0e-10)
-      {
-        nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
-        nex.append(i+1);
-        nex.append("LIES IN PLANE OF SYMMETRY");
-        throw nex;
-      }
-  
-      px[nx]= px[i];
-      py[nx]= py[i];
-      pz[nx] = - pz[i];
-      t1x[nx]= t1x[i];
-      t1y[nx]= t1y[i];
-      t1z[nx] = - t1z[i];
-      t2x[nx]= t2x[i];
-      t2y[nx]= t2y[i];
-      t2z[nx] = - t2z[i];
-      psalp[nx] = - psalp[i];
-      pbi[nx]= pbi[i];
-    }
-  
-    m= m*2;
-  
-    } /* if ( m >= m2) */
-  
-    } /* if ( iz != 0) */
-  
-    /* reflect along y axis */
-    if ( iy != 0)  {
-      if ( n_segments > 0)  {
-      /* Reallocate tags buffer */
-      segment_tags.resize(2*n_segments + m);
-    
-      /* Reallocate wire buffers */
-      int new_size = 2*n_segments;
-      x.resize(new_size);
-      y.resize(new_size);
-      z.resize(new_size);
-      x2.resize(new_size);
-      y2.resize(new_size);
-      z2.resize(new_size);
-      segment_radius.resize(new_size);
-    
-      for( i = 0; i < n_segments; i++ )  {
-        nx= i+ n_segments;
-        e1= y[i];
-        e2= y2[i];
-      
-        if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )  {
-          nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
-          nex.append(i+1);
-          nex.append("LIES IN PLANE OF SYMMETRY");
-          throw nex;
-        }
-      
-        x[nx]= x[i];
-        y[nx] = - e1;
-        z[nx]= z[i];
-        x2[nx]= x2[i];
-        y2[nx] = - e2;
-        z2[nx]= z2[i];
-        itagi= segment_tags[i];
-      
-        if ( itagi == 0)
-          segment_tags[nx]=0;
-        if ( itagi != 0)
-          segment_tags[nx]= itagi+ iti;
-      
-        segment_radius[nx]= segment_radius[i];
-      } /* for( i = n2-1; i < n_segments; i++ ) */
-    
-      n_segments= n_segments*2;
-      iti= iti*2;
-    } /* if ( n_segments >= n2) */
-  
-    if ( m > 0 )  {
-      /* Reallocate patch buffers */
-      int new_size = 2*m;
-      px.resize(new_size);
-      py.resize(new_size);
-      pz.resize(new_size);
-      t1x.resize(new_size);
-      t1y.resize(new_size);
-      t1z.resize(new_size);
-      t2x.resize(new_size);
-      t2y.resize(new_size);
-      t2z.resize(new_size);
-      pbi.resize(new_size);
-      psalp.resize(new_size);
-    
-      for( i = 0; i < m; i++ )  {
-        nx= i+m;
-        if ( fabs( py[i]) <= 1.0e-10)  {
-          nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
-          nex.append(i+1);
-          nex.append("LIES IN PLANE OF SYMMETRY");
-          throw nex;
-        }
-      
-        px[nx]= px[i];
-        py[nx] = - py[i];
-        pz[nx]= pz[i];
-        t1x[nx]= t1x[i];
-        t1y[nx] = - t1y[i];
-        t1z[nx]= t1z[i];
-        t2x[nx]= t2x[i];
-        t2y[nx] = - t2y[i];
-        t2z[nx]= t2z[i];
-        psalp[nx] = - psalp[i];
-        pbi[nx]= pbi[i];
-      } /* for( i = m2; i <= m; i++ ) */
-    
-      m= m*2;
-    } /* if ( m >= m2) */
-  
-    } /* if ( iy != 0) */
-  
-    /* reflect along x axis */
-    if ( ix == 0 )
-      return;
-  
-    if ( n_segments > 0 )  {
-      /* Reallocate tags buffer */
-      segment_tags.resize(2*n_segments + m);
-    
-      /* Reallocate wire buffers */
-      int new_size = 2*n_segments;
-      x.resize(new_size);
-      y.resize(new_size);
-      z.resize(new_size);
-      x2.resize(new_size);
-      y2.resize(new_size);
-      z2.resize(new_size);
-      segment_radius.resize(new_size);
-    
-      for( i = 0; i < n_segments; i++ )  {
-        nx= i+ n_segments;
-        e1= x[i];
-        e2= x2[i];
-      
-        if ( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
-        {
-          nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
-          nex.append(i+1);
-          nex.append("LIES IN PLANE OF SYMMETRY");
-          throw nex;
-        }
-      
-        x[nx] = - e1;
-        y[nx]= y[i];
-        z[nx]= z[i];
-        x2[nx] = - e2;
-        y2[nx]= y2[i];
-        z2[nx]= z2[i];
-        itagi= segment_tags[i];
-      
-        if ( itagi == 0)
-        segment_tags[nx]=0;
-        if ( itagi != 0)
-        segment_tags[nx]= itagi+ iti;
-      
-        segment_radius[nx]= segment_radius[i];
-      }
-    
-      n_segments= n_segments*2;
-  
-    } /* if ( n_segments > 0) */
-  
-    if ( m == 0 )
-      return;
-  
-    /* Reallocate patch buffers */
-    int new_size = 2*m;
-    px.resize(new_size);
-    py.resize(new_size);
-    pz.resize(new_size);
-    t1x.resize(new_size);
-    t1y.resize(new_size);
-    t1z.resize(new_size);
-    t2x.resize(new_size);
-    t2y.resize(new_size);
-    t2z.resize(new_size);
-    pbi.resize(new_size);
-    psalp.resize(new_size);
-  
-    for( i = 0; i < m; i++ )  {
-      nx= i+m;
-      if ( fabs( px[i]) <= 1.0e-10)  {
-        nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
-        nex.append(i+1);
-        nex.append("LIES IN PLANE OF SYMMETRY");
-        throw nex;
-      }
-    
-      px[nx] = - px[i];
-      py[nx]= py[i];
-      pz[nx]= pz[i];
-      t1x[nx] = - t1x[i];
-      t1y[nx]= t1y[i];
-      t1z[nx]= t1z[i];
-      t2x[nx] = - t2x[i];
-      t2y[nx]= t2y[i];
-      t2z[nx]= t2z[i];
-      psalp[nx] = - psalp[i];
-      pbi[nx]= pbi[i];
-    }
-  
-    m= m*2;
+
+    /* Build axis mask: bit 0=X, bit 1=Y, bit 2=Z */
+    int sym_plane = (iz ? 4 : 0) | (iy ? 2 : 0) | (ix ? 1 : 0);
+
+    if ( iz != 0 )
+      m_ipsym=2;
+
+    if ( sym_plane != 0 )
+      reflect_plane( sym_plane, iti );
+
     return;
   } /* if ( ix >= 0) */
-  
+
   /* reproduce structure with rotation to form cylindrical structure */
-  fnop= static_cast<nec_float>(nop);
   m_ipsym = -1;
-  sam=two_pi() / fnop;
-  cs= cos( sam);
-  ss= sin( sam);
-  
-  if ( n_segments > 0)  {
-    n_segments *= nop;
-    nx= np;
-  
-    /* Reallocate tags buffer */
-    segment_tags.resize(n_segments + m);
-  
-    /* Reallocate wire buffers */
-    x.resize(n_segments);
-    y.resize(n_segments);
-    z.resize(n_segments);
-    x2.resize(n_segments);
-    y2.resize(n_segments);
-    z2.resize(n_segments);
-    segment_radius.resize(n_segments);
-  
-    for( i = nx; i < n_segments; i++ )  {
-      k= i- np;
-      xk= x[k];
-      yk= y[k];
-      x[i]= xk* cs- yk* ss;
-      y[i]= xk* ss+ yk* cs;
-      z[i]= z[k];
-      xk= x2[k];
-      yk= y2[k];
-      x2[i]= xk* cs- yk* ss;
-      y2[i]= xk* ss+ yk* cs;
-      z2[i]= z2[k];
-      segment_radius[i]= segment_radius[k];
-      itagi= segment_tags[k];
-    
-      if ( itagi == 0)
-        segment_tags[i]=0;
-      if ( itagi != 0)
-        segment_tags[i]= itagi+ iti;
-    }
-  
-  } /* if ( n_segments >= n2) */
-  
-  if ( m == 0 )
-    return;
-  
-  m *= nop;
-  nx= mp;
-  
-  /* Reallocate patch buffers */
-  px.resize(m);
-  py.resize(m);
-  pz.resize(m);
-  t1x.resize(m);
-  t1y.resize(m);
-  t1z.resize(m);
-  t2x.resize(m);
-  t2y.resize(m);
-  t2z.resize(m);
-  pbi.resize(m);
-  psalp.resize(m);
-  
-  for( i = nx; i < m; i++ )  {
-    k = i-mp;
-    xk= px[k];
-    yk= py[k];
-    px[i]= xk* cs- yk* ss;
-    py[i]= xk* ss+ yk* cs;
-    pz[i]= pz[k];
-    xk= t1x[k];
-    yk= t1y[k];
-    t1x[i]= xk* cs- yk* ss;
-    t1y[i]= xk* ss+ yk* cs;
-    t1z[i]= t1z[k];
-    xk= t2x[k];
-    yk= t2y[k];
-    t2x[i]= xk* cs- yk* ss;
-    t2y[i]= xk* ss+ yk* cs;
-    t2z[i]= t2z[k];
-    psalp[i]= psalp[k];
-    pbi[i]= pbi[k];
-  
-  } /* for( i = nx; i < m; i++ ) */
+  reflect_plane( -nop, iti );
 }
   
 /*-----------------------------------------------------------------------*/
@@ -1506,6 +1471,17 @@ void c_geometry::connect_segments( int ignd )
     throw nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS and no patches. Please send bug report. This causes an error that we're trying to fix.");
   }
   
+  build_connections(ignd);
+  
+  if ( n_segments == 0)
+    return;
+  
+  resolve_junctions();
+}
+
+
+void c_geometry::build_connections( int ignd )
+{
   if ( ignd != 0) {
     m_output->nec_printf( "\n\n     GROUND PLANE SPECIFIED." );
   
@@ -1525,7 +1501,7 @@ void c_geometry::connect_segments( int ignd )
     }
   
     if ( np > n_segments) {
-      throw nec_exception("ERROR: NP > N IN c_geometry::connect_segments()" );
+      throw nec_exception("ERROR: NP > N IN c_geometry::build_connections()" );
     }
   
     if ( (np == n_segments) && (mp == m) )
@@ -1646,7 +1622,7 @@ void c_geometry::connect_segments( int ignd )
     
     } /* for( i = 0; i < n_segments; i++ ) */
     
-
+	
     /* find wire-surface connections for new patches */
     for (int ix=0; ix <m; ix++) {
 //      DEBUG_TRACE("i: " << ix+1 << " ix: " << ix << " m: " << m);    
@@ -1698,8 +1674,8 @@ void c_geometry::connect_segments( int ignd )
     if ( m_ipsym == 0 )  {
       nec_error_mode nem(*m_output);
       m_output->endl();
-      m_output->line("ERROR: IPSYM=0 IN connect_segments()" );
-      throw nec_exception("ERROR: IPSYM=0 IN connect_segments()");
+      m_output->line("ERROR: IPSYM=0 IN build_connections()" );
+      throw nec_exception("ERROR: IPSYM=0 IN build_connections()");
     }
   
     if ( m_ipsym < 0 )
@@ -1714,10 +1690,11 @@ void c_geometry::connect_segments( int ignd )
     } /* if ( m_ipsym < 0 ) */
   
   } /* if ( symmetry == 1) */
-    
-  if ( n_segments == 0)
-    return;
-  
+}
+
+
+void c_geometry::resolve_junctions()
+{
   /* Allocate to connection buffers */
   jco.resize(maxcon);
   
@@ -1737,8 +1714,6 @@ void c_geometry::connect_segments( int ignd )
     while ( true )  {
       if ( (ix != 0) && (ix != (j+1)) && (ix <= n_segments) )  {
         bool jump = false;
-        // int nsflg = 0;  // will be set to 1 if the junction includes any new segments when NGF is in use.
-        // NOTE nsflg is not used correctly as we don't use Numerical Greens Functions
         do {
           
           if ( ix == 0 ) {
@@ -1769,9 +1744,6 @@ void c_geometry::connect_segments( int ignd )
             jco.resize(maxcon);
           }
           jco[ic-1]= ix* jend;
-        
-          // if ( ix > 0)
-          //  nsflg=1;
         
           int ixx = ix-1;
           if (ixx < 0 || ixx >= n_segments) {

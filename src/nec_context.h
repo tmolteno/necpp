@@ -950,10 +950,22 @@ private:
       int ij, int inx1, int inx2, nec_complex *ezs,
       nec_complex *ers, nec_complex *ezc, nec_complex *erc,
       nec_complex *ezk, nec_complex *erk);
-  void etmns(nec_float p1, nec_float p2, nec_float p3, nec_float p4, nec_float p5,
-      nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e);
-
-  void fblock( int nrow, int ncol, int64_t imax, int ipsym );
+	  void etmns(nec_float p1, nec_float p2, nec_float p3, nec_float p4, nec_float p5,
+	      nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e);
+	
+	  void etmns_voltage_source(complex_array& e);
+	  void etmns_linear_wave(nec_float cth, nec_float sth, nec_float cph, nec_float sph,
+	      nec_float pxl, nec_float pyl, nec_float pzl, nec_float wx, nec_float wy, nec_float wz,
+	      nec_float qx, nec_float qy, nec_float qz, nec_complex rrv, nec_complex rrh,
+	      nec_float incident_amplitude, complex_array& e);
+	  void etmns_circular_wave(nec_float cth, nec_float sth, nec_float cph, nec_float sph,
+	      nec_float pxl, nec_float pyl, nec_float pzl, nec_float wx, nec_float wy, nec_float wz,
+	      nec_float qx, nec_float qy, nec_float qz, nec_complex rrv, nec_complex rrh,
+	      nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e);
+	  void etmns_current_source(nec_float p1, nec_float p2, nec_float p3, nec_float p4,
+	      nec_float p5, nec_float p6, complex_array& e);
+	
+	  void fblock( int nrow, int ncol, int64_t imax, int ipsym );
 
   void gf(nec_float zk, nec_float *co, nec_float *si);
   void gh(nec_float zk, nec_float *hr, nec_float *hi);
@@ -974,7 +986,20 @@ private:
 
   void nefld(nec_float xob, nec_float yob, nec_float zob, nec_complex *ex,
       nec_complex *ey, nec_complex *ez);
+  struct netwk_state {
+    int_array  ipnt, nteqa, ntsca;
+    complex_array vsrc, rhs, cmn, rhnt, rhnx;
+    int nteq  = 0;
+    int ntsc  = 0;
+    int ndimn = 0;
+    int neqz2 = 0;
+    int neqt  = 0;
+  };
   void netwk(complex_array& in_cm, int_array& in_ip, complex_array& einc);
+  void netwk_build_matrix(complex_array& in_cm, int_array& in_ip, netwk_state& st);
+  void netwk_solve_and_check(complex_array& in_cm, int_array& in_ip, netwk_state& st);
+  void netwk_compute_currents(complex_array& in_cm, int_array& in_ip, complex_array& einc, netwk_state& st);
+  void netwk_compute_inputs(complex_array& einc, netwk_state& st);
   void nfpat(void);
   void nhfld(nec_float xob, nec_float yob, nec_float zob, nec_complex *hx,
       nec_complex *hy, nec_complex *hz);

@@ -3185,266 +3185,219 @@ void nec_context::ekscx( nec_float bx, nec_float s, nec_float z,
 
 /*-----------------------------------------------------------------------*/
 
-/*!\brief Fills the array e with the negative of the electric field tangent to the segments and the tangential magnetic field on the surfaces
-
-\param e is the right hand side of the matrix equation.
-*/
-void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
-    nec_float p5, nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e )
+/*!\brief Applied field of voltage sources for the transmitting case. */
+void nec_context::etmns_voltage_source( complex_array& e )
 {
-  nec_float cth, sth, cph, sph, cet, set, pxl, pyl, pzl, wx;
-  nec_float wy, wz, qx, qy, qz, ds, dsh, rs, r;
-  nec_complex er, et, ezh, erh, rrv, rrh, tt1, tt2;
-  
+  vector_fill(e,0,neq,cplx_00());
+
+  for (int i = 0; i < voltage_source_count; i++ )
+  {
+    int source_index = source_segment_array[i]-1;
+    e[source_index] = -source_voltage_array[i]/(m_geometry->segment_length[source_index]* _wavelength);
+  }
+
+  if ( nvqd == 0)
+    return;
+
+  for (int i = 0; i < nvqd; i++ )
+  {
+    qdsrc( ivqd[i], vqd[i], e);
+  }
+}
+
+/*!\brief Incident plane wave, linearly polarized. */
+void nec_context::etmns_linear_wave( nec_float cth, nec_float sth, nec_float cph, nec_float sph,
+    nec_float pxl, nec_float pyl, nec_float pzl, nec_float wx, nec_float wy, nec_float wz,
+    nec_float qx, nec_float qy, nec_float qz, nec_complex rrv, nec_complex rrh,
+    nec_float incident_amplitude, complex_array& e )
+{
   int n = m_geometry->n_segments;
   int m = m_geometry->m;
-  
-//  int neq= n+2*m;
-  ASSERT(neq == n+2*m);
-  
-  nqds=0;
-  
-  ASSERT(excite_type >= 0);
-    
-  /* applied field of voltage sources for transmitting case */
-  if ( (excite_type == EXCITATION_VOLTAGE) || (excite_type == EXCITATION_VOLTAGE_DISC) )
+
+  if ( n != 0)
   {
-    vector_fill(e,0,neq,cplx_00());
-  
-    for (int i = 0; i < voltage_source_count; i++ )
+    for (int i = 0; i < n; i++ )
     {
-      int source_index = source_segment_array[i]-1;
-      e[source_index] = -source_voltage_array[i]/(m_geometry->segment_length[source_index]* _wavelength);
+      nec_float arg = - two_pi() *( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
+      nec_complex e_amplitude(cos(arg), sin(arg));
+      
+      e[i] = -(pxl*m_geometry->cab[i]+ pyl*m_geometry->sab[i]+ pzl*m_geometry->salp[i]) * e_amplitude * incident_amplitude;
     }
   
-    if ( nvqd == 0)
-      return;
-  
-    for (int i = 0; i < nvqd; i++ )
-    {
-      qdsrc( ivqd[i], vqd[i], e);
-    }
-    return;
-  } /* if ( (excite_type == EXCITATION_VOLTAGE) || (excite_type == EXCITATION_VOLTAGE_DISC) ) */
-
-  /* incident plane wave, linearly polarized. */
-  if ((excite_type == EXCITATION_LINEAR) ||
-    (excite_type == EXCITATION_CIRC_RIGHT) ||
-    (excite_type == EXCITATION_CIRC_LEFT))
-  {
-    cth= cos( p1);
-    sth= sin( p1);
-    cph= cos( p2);
-    sph= sin( p2);
-    cet= cos( p3);
-    set= sin( p3);
-    pxl= cth* cph* cet- sph* set;
-    pyl= cth* sph* cet+ cph* set;
-    pzl = - sth* cet;
-    wx = - sth* cph;
-    wy = - sth* sph;
-    wz = - cth;
-    qx= wy* pzl- wz* pyl;
-    qy= wz* pxl- wx* pzl;
-    qz= wx* pyl- wy* pxl;
-
     if (ground.present())
     {
-      if (ground.type_perfect())
-      {
-        rrv = -cplx_10();
-        rrh = -cplx_10();
-      }
-      else
-      {
-        rrv= sqrt(1.0 - ground.get_zrati_sqr() * sth*sth);
-        rrh= ground.zrati* cth;
-        rrh=( rrh- rrv)/( rrh+ rrv);
-        rrv= ground.zrati* rrv;
-        rrv = -( cth- rrv)/( cth+ rrv);
-      }
-    }
-  
-    if ( excite_type == EXCITATION_LINEAR)
-    {
-      if ( n != 0)
-      {
-        for (int i = 0; i < n; i++ )
-        {
-          nec_float arg = - two_pi() *( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
-          nec_complex e_amplitude(cos(arg), sin(arg));
-          
-          e[i] = -(pxl*m_geometry->cab[i]+ pyl*m_geometry->sab[i]+ pzl*m_geometry->salp[i]) * e_amplitude * incident_amplitude;
-        }
-      
-        if (ground.present())
-        {
-          tt1=( pyl* cph- pxl* sph)*( rrh- rrv);
-          nec_complex cx= rrv* pxl- tt1* sph;
-          nec_complex cy= rrv* pyl+ tt1* cph;
-          nec_complex cz = - rrv* pzl;
-        
-          for (int i = 0; i < n; i++ )
-          {
-            nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
-            nec_complex e_amplitude(cos(arg), sin(arg));
-            e[i] -= ( cx* m_geometry->cab[i]+ cy* m_geometry->sab[i]+ cz* m_geometry->salp[i])* e_amplitude * incident_amplitude;
-          }
-        }
-      } /* if ( n != 0) */
-  
-      if ( m == 0) // if no surface patches we're done!
-        return;
-  
-      {
-        int i= -1;
-        int i1= n-2;
-        for (int is = 0; is < m; is++ )
-        {
-          i++;
-          ASSERT(is == i);
-          i1 += 2;
-          int i2 = i1+1;
-          nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
-          ASSERT( arg == (- two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]+ wz* m_geometry->pz[i])));
-          
-          nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
-          e[i2]=( qx* m_geometry->t1x[i]+ qy* m_geometry->t1y[i]+ qz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
-          e[i1]=( qx* m_geometry->t2x[i]+ qy* m_geometry->t2y[i]+ qz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
-        }
-      }
-      
-      if (ground.present())
-      {
-        tt1=( qy* cph- qx* sph)*( rrv- rrh);
-        nec_complex cx = -( rrh* qx- tt1* sph);
-        nec_complex cy = -( rrh* qy+ tt1* cph);
-        nec_complex cz= rrh* qz;
-        
-        int i= -1;
-        int i1= n-2;
-        for (int is = 0; is < m; is++ )
-        {
-          i++;
-          i1 += 2;
-          int i2 = i1+1;
-          nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
-          ASSERT((-two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]- wz* m_geometry->pz[i])) == arg);
-          
-          nec_complex e_amplitude = cplx_exp(arg) * m_geometry->psalp[i] * em::inverse_impedance();
-          
-          e[i2]= e[i2]+( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
-          e[i1]= e[i1]+( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
-        }
-      }
-      return;
-    } /* if ( excite_type == EXCITATION_LINEAR) */
-
-    /* incident plane wave, elliptic polarization. */
-    tt1 = -(cplx_01())* p6;
-    if ( excite_type == EXCITATION_CIRC_LEFT)
-      tt1 = - tt1;
-  
-    if ( n != 0)
-    {
-      nec_complex cx= pxl+ tt1* qx;
-      nec_complex cy= pyl+ tt1* qy;
-      nec_complex cz= pzl+ tt1* qz;
+      nec_complex tt1=( pyl* cph- pxl* sph)*( rrh- rrv);
+      nec_complex cx= rrv* pxl- tt1* sph;
+      nec_complex cy= rrv* pyl+ tt1* cph;
+      nec_complex cz = - rrv* pzl;
     
       for (int i = 0; i < n; i++ )
       {
-        nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
+        nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
         nec_complex e_amplitude(cos(arg), sin(arg));
-        e[i] = -(cx* m_geometry->cab[i] + cy* m_geometry->sab[i] + cz*m_geometry->salp[i])* e_amplitude * incident_amplitude;
+        e[i] -= ( cx* m_geometry->cab[i]+ cy* m_geometry->sab[i]+ cz* m_geometry->salp[i])* e_amplitude * incident_amplitude;
       }
-      
-      
-      if (ground.present())
-      {
-        tt2=( cy* cph- cx* sph)*( rrh- rrv);
-        nec_complex ccx= rrv* cx- tt2* sph;
-        nec_complex ccy= rrv* cy+ tt2* cph;
-        nec_complex ccz = - rrv* cz;
-      
-        for (int i = 0; i < n; i++ )
-        {
-          nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
-          nec_complex e_amplitude(cos(arg), sin(arg));
-          e[i] -= (ccx* m_geometry->cab[i]+ ccy* m_geometry->sab[i]+ ccz* m_geometry->salp[i]) * e_amplitude * incident_amplitude;
-        }
-      }
-    } /* if ( n != 0) */
+    }
+  } /* if ( n != 0) */
 
-    if ( m == 0)
-      return;
+  if ( m == 0) // if no surface patches we're done!
+    return;
 
-    nec_complex cx= qx- tt1* pxl;
-    nec_complex cy= qy- tt1* pyl;
-    nec_complex cz= qz- tt1* pzl;
-  
+  {
+    int i= -1;
+    int i1= n-2;
+    for (int is = 0; is < m; is++ )
     {
-      int i= -1;
-      int i1= n-2;
-      for (int is = 0; is < m; is++ )
-      {
-        i++;
-        i1 += 2;
-        int i2 = i1+1;
-        
-        nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
-        ASSERT(arg == -two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]+ wz* m_geometry->pz[i]));
+      i++;
+      ASSERT(is == i);
+      i1 += 2;
+      int i2 = i1+1;
+      nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
+      ASSERT( arg == (- two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]+ wz* m_geometry->pz[i])));
+      
+      nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
+      e[i2]=( qx* m_geometry->t1x[i]+ qy* m_geometry->t1y[i]+ qz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
+      e[i1]=( qx* m_geometry->t2x[i]+ qy* m_geometry->t2y[i]+ qz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
+    }
+  }
+  
+  if (ground.present())
+  {
+    nec_complex tt1=( qy* cph- qx* sph)*( rrv- rrh);
+    nec_complex cx = -( rrh* qx- tt1* sph);
+    nec_complex cy = -( rrh* qy+ tt1* cph);
+    nec_complex cz= rrh* qz;
+    
+    int i= -1;
+    int i1= n-2;
+    for (int is = 0; is < m; is++ )
+    {
+      i++;
+      i1 += 2;
+      int i2 = i1+1;
+      nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
+      ASSERT((-two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]- wz* m_geometry->pz[i])) == arg);
+      
+      nec_complex e_amplitude = cplx_exp(arg) * m_geometry->psalp[i] * em::inverse_impedance();
+      
+      e[i2]= e[i2]+( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
+      e[i1]= e[i1]+( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
+    }
+  }
+}
 
-        nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
-        
-        e[i2]=( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
-        e[i1]=( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
-      }
+/*!\brief Incident plane wave, elliptic polarization. */
+void nec_context::etmns_circular_wave( nec_float cth, nec_float sth, nec_float cph, nec_float sph,
+    nec_float pxl, nec_float pyl, nec_float pzl, nec_float wx, nec_float wy, nec_float wz,
+    nec_float qx, nec_float qy, nec_float qz, nec_complex rrv, nec_complex rrh,
+    nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e )
+{
+  int n = m_geometry->n_segments;
+  int m = m_geometry->m;
+
+  nec_complex tt1 = -(cplx_01())* p6;
+  if ( excite_type == EXCITATION_CIRC_LEFT)
+    tt1 = - tt1;
+
+  if ( n != 0)
+  {
+    nec_complex cx= pxl+ tt1* qx;
+    nec_complex cy= pyl+ tt1* qy;
+    nec_complex cz= pzl+ tt1* qz;
+  
+    for (int i = 0; i < n; i++ )
+    {
+      nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]+ wz* m_geometry->z[i]);
+      nec_complex e_amplitude(cos(arg), sin(arg));
+      e[i] = -(cx* m_geometry->cab[i] + cy* m_geometry->sab[i] + cz*m_geometry->salp[i])* e_amplitude * incident_amplitude;
     }
     
     if (ground.present())
     {
-      tt1=( cy* cph- cx* sph)*( rrv- rrh);
-      cx = -( rrh* cx- tt1* sph);
-      cy = -( rrh* cy+ tt1* cph);
-      cz= rrh* cz;
-
-      int i= -1;
-      int i1= n-2;
-      for (int is=0; is < m; is++ )
+      nec_complex tt2=( cy* cph- cx* sph)*( rrh- rrv);
+      nec_complex ccx= rrv* cx- tt2* sph;
+      nec_complex ccy= rrv* cy+ tt2* cph;
+      nec_complex ccz = - rrv* cz;
+    
+      for (int i = 0; i < n; i++ )
       {
-        i++;
-        i1 += 2;
-        int i2 = i1+1;
-        nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
-        ASSERT(arg == -two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]- wz* m_geometry->pz[i]));
-        
-        nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
-        
-        e[i2] += ( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
-        e[i1] += ( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
+        nec_float arg = - two_pi()*( wx* m_geometry->x[i]+ wy* m_geometry->y[i]- wz* m_geometry->z[i]);
+        nec_complex e_amplitude(cos(arg), sin(arg));
+        e[i] -= (ccx* m_geometry->cab[i]+ ccy* m_geometry->sab[i]+ ccz* m_geometry->salp[i]) * e_amplitude * incident_amplitude;
       }
     }
-  
-    return;
-  
-  } /* if ( excite_type <= 3) */
+  } /* if ( n != 0) */
 
-  ASSERT(excite_type == EXCITATION_CURRENT);
-  /* incident field of an elementary current source. */
+  if ( m == 0)
+    return;
+
+  nec_complex cx= qx- tt1* pxl;
+  nec_complex cy= qy- tt1* pyl;
+  nec_complex cz= qz- tt1* pzl;
+
+  {
+    int i= -1;
+    int i1= n-2;
+    for (int is = 0; is < m; is++ )
+    {
+      i++;
+      i1 += 2;
+      int i2 = i1+1;
+      
+      nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
+      ASSERT(arg == -two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]+ wz* m_geometry->pz[i]));
+
+      nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
+      
+      e[i2]=( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
+      e[i1]=( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
+    }
+  }
+  
+  if (ground.present())
+  {
+    tt1=( cy* cph- cx* sph)*( rrv- rrh);
+    cx = -( rrh* cx- tt1* sph);
+    cy = -( rrh* cy+ tt1* cph);
+    cz= rrh* cz;
+
+    int i= -1;
+    int i1= n-2;
+    for (int is=0; is < m; is++ )
+    {
+      i++;
+      i1 += 2;
+      int i2 = i1+1;
+      nec_float arg = -m_geometry->patch_angle(i,wx,wy,wz);
+      ASSERT(arg == -two_pi()*( wx* m_geometry->px[i]+ wy* m_geometry->py[i]- wz* m_geometry->pz[i]));
+      
+      nec_complex e_amplitude = nec_complex(cos(arg), sin(arg)) * m_geometry->psalp[i] * em::inverse_impedance();
+      
+      e[i2] += ( cx* m_geometry->t1x[i]+ cy* m_geometry->t1y[i]+ cz* m_geometry->t1z[i])* e_amplitude * incident_amplitude;
+      e[i1] += ( cx* m_geometry->t2x[i]+ cy* m_geometry->t2y[i]+ cz* m_geometry->t2z[i])* e_amplitude * incident_amplitude;
+    }
+  }
+}
+
+/*!\brief Incident field of an elementary current source. */
+void nec_context::etmns_current_source( nec_float p1, nec_float p2, nec_float p3,
+    nec_float p4, nec_float p5, nec_float p6, complex_array& e )
+{
+  int n = m_geometry->n_segments;
 
   nec_float cosp4 = cos(p4);
-  
-  wx = cosp4 * cos(p5);
-  wy = cosp4 * sin(p5);
-  wz = sin(p4);
-  ds = p6*em::impedance_over_2pi();
-  dsh= p6/(2.0 * two_pi());
+  nec_float wx = cosp4 * cos(p5);
+  nec_float wy = cosp4 * sin(p5);
+  nec_float wz = sin(p4);
+  nec_float ds = p6*em::impedance_over_2pi();
+  nec_float dsh= p6/(2.0 * two_pi());
     
   // TODO: Split the following loop up into two loops i=1:n and i=1:m
   // to loop over the patches and the segments seperately
   
   for (int i = 0; i < m_geometry->n_plus_m(); i++ )
   {
+    nec_float pxl, pyl, pzl;
     if ( i < n )
     {
       pxl = m_geometry->x[i] - p1;
@@ -3459,19 +3412,19 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
       pzl = m_geometry->pz[patch_index] - p3;
     }
     
-    rs = norm2(pxl,pyl,pzl);
+    nec_float rs = norm2(pxl,pyl,pzl);
     if ( rs < 1.0e-30)
       continue;
   
-    r = sqrt(rs);
+    nec_float r = sqrt(rs);
     pxl = pxl/r;
     pyl = pyl/r;
     pzl = pzl/r;
-    cth = pxl*wx + pyl*wy + pzl*wz;
-    sth = sqrt(1.0 - cth*cth);
-    qx = pxl - wx*cth;
-    qy = pyl - wy*cth;
-    qz = pzl - wz*cth;
+    nec_float cth = pxl*wx + pyl*wy + pzl*wz;
+    nec_float sth = sqrt(1.0 - cth*cth);
+    nec_float qx = pxl - wx*cth;
+    nec_float qy = pyl - wy*cth;
+    nec_float qz = pzl - wz*cth;
   
     nec_float arg = norm(qx,qy,qz);
     if ( arg >= 1.e-30)
@@ -3488,15 +3441,15 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     } /* if ( arg >= 1.e-30) */
   
     arg = two_pi() * r;
-    tt1 = nec_complex(cos(arg), -sin(arg));
+    nec_complex tt1 = nec_complex(cos(arg), -sin(arg));
   
     if ( i < n )
     {
-      tt2 = nec_complex(1.0,-1.0/arg) / rs;
-      er = ds* tt1* tt2* cth;
-      et = 0.5 * ds * tt1 *((cplx_01()) * two_pi()/r + tt2)* sth;
-      ezh= er*cth - et*sth;
-      erh= er*sth + et*cth;
+      nec_complex tt2 = nec_complex(1.0,-1.0/arg) / rs;
+      nec_complex er = ds* tt1* tt2* cth;
+      nec_complex et = 0.5 * ds * tt1 *((cplx_01()) * two_pi()/r + tt2)* sth;
+      nec_complex ezh= er*cth - et*sth;
+      nec_complex erh= er*sth + et*cth;
       nec_complex cx = ezh*wx + erh*qx;
       nec_complex cy = ezh*wy + erh*qy;
       nec_complex cz = ezh*wz + erh*qz;
@@ -3512,7 +3465,7 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
       pyl = wz*qx - wx*qz;
       pzl = wx*qy - wy*qx;
       
-      tt2= dsh* tt1* nec_complex(1.0/r, two_pi())/ r* sth* m_geometry->psalp[patch_index];
+      nec_complex tt2= dsh* tt1* nec_complex(1.0/r, two_pi())/ r* sth* m_geometry->psalp[patch_index];
       nec_complex cx= tt2* pxl;
       nec_complex cy= tt2* pyl;
       nec_complex cz= tt2* pzl;
@@ -3520,6 +3473,73 @@ void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
       e[i1] = cx*m_geometry->t2x[patch_index] + cy*m_geometry->t2y[patch_index] + cz*m_geometry->t2z[patch_index];
     } /* if ( i < n) */
   } /* for( i = 0; i < m_geometry->n_plus_m(); i++ ) */
+}
+
+/*-----------------------------------------------------------------------*/
+
+/*!\brief Fills the array e with the negative of the electric field tangent to the segments and the tangential magnetic field on the surfaces
+
+\param e is the right hand side of the matrix equation.
+*/
+void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
+    nec_float p5, nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e )
+{
+  int n = m_geometry->n_segments;
+  int m = m_geometry->m;
+  ASSERT(neq == n+2*m);
+  nqds=0;
+  ASSERT(excite_type >= 0);
+
+  /* applied field of voltage sources for transmitting case */
+  if ( (excite_type == EXCITATION_VOLTAGE) || (excite_type == EXCITATION_VOLTAGE_DISC) )
+  {
+    etmns_voltage_source(e);
+    return;
+  }
+
+  if ( excite_type == EXCITATION_CURRENT )
+  {
+    etmns_current_source(p1, p2, p3, p4, p5, p6, e);
+    return;
+  }
+
+  /* incident plane wave, linearly or elliptically polarized. */
+  nec_float cth = cos( p1), sth = sin( p1);
+  nec_float cph = cos( p2), sph = sin( p2);
+  nec_float cet = cos( p3), set = sin( p3);
+  nec_float pxl = cth* cph* cet - sph* set;
+  nec_float pyl = cth* sph* cet + cph* set;
+  nec_float pzl = - sth* cet;
+  nec_float wx = - sth* cph, wy = - sth* sph, wz = - cth;
+  nec_float qx = wy* pzl - wz* pyl;
+  nec_float qy = wz* pxl - wx* pzl;
+  nec_float qz = wx* pyl - wy* pxl;
+
+  nec_complex rrv, rrh;
+  if (ground.present())
+  {
+    if (ground.type_perfect())
+    {
+      rrv = -cplx_10();
+      rrh = -cplx_10();
+    }
+    else
+    {
+      rrv= sqrt(1.0 - ground.get_zrati_sqr() * sth*sth);
+      rrh= ground.zrati* cth;
+      rrh=( rrh- rrv)/( rrh+ rrv);
+      rrv= ground.zrati* rrv;
+      rrv = -( cth- rrv)/( cth+ rrv);
+    }
+  }
+
+  if ( excite_type == EXCITATION_LINEAR)
+  {
+    etmns_linear_wave(cth, sth, cph, sph, pxl, pyl, pzl, wx, wy, wz, qx, qy, qz, rrv, rrh, incident_amplitude, e);
+    return;
+  }
+
+  etmns_circular_wave(cth, sth, cph, sph, pxl, pyl, pzl, wx, wy, wz, qx, qy, qz, rrv, rrh, p6, incident_amplitude, excite_type, e);
 }
 
 
@@ -4464,686 +4484,558 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
 /* subroutine netwk solves for structure currents for a given */
 /* excitation including the effect of non-radiating networks if */
 /* present. */
-void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
-    complex_array& einc )
-  /*
-    The parameters cmb, cmc, cmd appear to be Numerical Green's Functions 
-    Related. N.G.F are not implemented in this version of NEC.
-    
-    The evidence for the above opinion is from the NEC-PC code that does
-    implement the N.G.F.
-  */
+/*-----------------------------------------------------------------------*/
+
+// Section 1: buffer allocation and asymmetry matrix computation.
+void nec_context::netwk_build_matrix( complex_array& in_cm, int_array& in_ip,
+    netwk_state& st )
 {
-  /* Network buffers */
-  int_array ipnt, nteqa, ntsca;
-  complex_array vsrc, rhs, cmn, rhnt, rhnx;
-  
-  bool jump1, jump2;
-  
-  int nteq=0, ntsc=0, nseg2, irow2=0;
-  int neqz2, neqt, irow1=0, i, nseg1, isc1=0, isc2=0;
-  nec_float asmx, asa, y11r, y11i, y12r, y12i, y22r, y22i;
-  nec_complex ymit, vlt, cux;
-  
-  neqz2= neq2;
-  if ( neqz2 == 0)
-    neqz2=1;
-  
+  st.neqz2 = neq2;
+  if ( st.neqz2 == 0)
+    st.neqz2 = 1;
+
   input_power = 0.0;
   network_power_loss = 0.0;
-  neqt= neq+ neq2;
-  
-  int ndimn = (2*network_count + voltage_source_count);
-  
+  st.neqt = neq + neq2;
+
+  st.ndimn = (2*network_count + voltage_source_count);
+
   /* Allocate network buffers */
   if ( network_count > 0 )
   {
-    rhs.resize( m_geometry->n_plus_3m ); // this should probably be ndimn!
-  
-    rhnt.resize( ndimn );
-    rhnx.resize( ndimn);
-    cmn.resize( ndimn * ndimn );
-  
-    ntsca.resize( ndimn );
-    nteqa.resize( ndimn );
-    ipnt.resize( ndimn );
-  
-    vsrc.resize( voltage_source_count );
+    st.rhs.resize( m_geometry->n_plus_3m ); // this should probably be ndimn!
+
+    st.rhnt.resize( st.ndimn );
+    st.rhnx.resize( st.ndimn );
+    st.cmn.resize( st.ndimn * st.ndimn );
+
+    st.ntsca.resize( st.ndimn );
+    st.nteqa.resize( st.ndimn );
+    st.ipnt.resize( st.ndimn );
+
+    st.vsrc.resize( voltage_source_count );
   }
-  
+
   if ( ntsol == 0)
   {
     /* compute relative matrix asymmetry */
     if ( masym != 0)
     {
-      irow1=0;
-      for( i = 0; i < network_count; i++ )
+      int irow1 = 0;
+      int isc1  = 0;
+      for( int i = 0; i < network_count; i++ )
       {
-        nseg1= iseg1[i];
+        int nseg1 = iseg1[i];
         for( isc1 = 0; isc1 < 2; isc1++ )
         {
           if ( irow1 == 0)
           {
-            ipnt[irow1]= nseg1;
-            nseg1= iseg2[i];
+            st.ipnt[irow1] = nseg1;
+            nseg1 = iseg2[i];
             irow1++;
             continue;
           }
-      
+
           int j = 0;
           for( j = 0; j < irow1; j++ )
-            if ( nseg1 == ipnt[j])
+            if ( nseg1 == st.ipnt[j])
               break;
-      
+
           if ( j == irow1 )
           {
-            ipnt[irow1]= nseg1;
+            st.ipnt[irow1] = nseg1;
             irow1++;
           }
-      
-          nseg1= iseg2[i];
+
+          nseg1 = iseg2[i];
         } /* for( isc1 = 0; isc1 < 2; isc1++ ) */
       } /* for( i = 0; i < network_count; i++ ) */
-  
+
       ASSERT(voltage_source_count >= 0);
-      for( i = 0; i < voltage_source_count; i++ )
+      for( int i = 0; i < voltage_source_count; i++ )
       {
-        nseg1= source_segment_array[i];
+        int nseg1 = source_segment_array[i];
         if ( irow1 == 0)
         {
-          ipnt[irow1]= nseg1;
+          st.ipnt[irow1] = nseg1;
           irow1++;
           continue;
         }
-      
+
         int j = 0;
         for( j = 0; j < irow1; j++ )
-          if ( nseg1 == ipnt[j])
+          if ( nseg1 == st.ipnt[j])
             break;
-      
+
         if ( j == irow1 )
         {
-          ipnt[irow1]= nseg1;
+          st.ipnt[irow1] = nseg1;
           irow1++;
         }
       } /* for( i = 0; i < voltage_source_count; i++ ) */
-    
+
       if ( irow1 >= 2)
       {
-        for( i = 0; i < irow1; i++ )
+        int max_seg_a = 0, max_seg_b = 0;
+        nec_float asmx;
+        for( int i = 0; i < irow1; i++ )
         {
-          isc1 = ipnt[i]-1;
-          asmx= m_geometry->segment_length[isc1];
-        
-          vector_fill(rhs,0,neqt,cplx_00());
-        
-          rhs[isc1] = cplx_10();
-          solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-          m_geometry->get_current_coefficients(_wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
-        
+          isc1 = st.ipnt[i]-1;
+          asmx = m_geometry->segment_length[isc1];
+
+          vector_fill(st.rhs, 0, st.neqt, cplx_00());
+
+          st.rhs[isc1] = cplx_10();
+          solves( in_cm, in_ip, st.rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+          m_geometry->get_current_coefficients(_wavelength, st.rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+
           for (int j = 0; j < irow1; j++ )
           {
-            isc1= ipnt[j]-1;
-            cmn[j+i*ndimn]= rhs[isc1]/ asmx;
+            isc1 = st.ipnt[j]-1;
+            st.cmn[j+i*st.ndimn] = st.rhs[isc1] / asmx;
           }
         } /* for( i = 0; i < irow1; i++ ) */
-      
-        asmx=0.0;
-        asa=0.0;
-      
-        for( i = 1; i < irow1; i++ )
+
+        asmx = 0.0;
+        nec_float asa = 0.0;
+
+        for( int i = 1; i < irow1; i++ )
         {
           for (int j = 0; j < i; j++ )
           {
-            cux = cmn[i+j*ndimn];
-            nec_float pwr= abs(( cux- cmn[j+i*ndimn])/ cux);
+            nec_complex cux = st.cmn[i+j*st.ndimn];
+            nec_float pwr = abs(( cux- st.cmn[j+i*st.ndimn])/ cux);
             asa += pwr* pwr;
-        
+
             if ( pwr >= asmx)
             {
-              asmx= pwr;
-              nteq= ipnt[i];
-              ntsc= ipnt[j];
+              asmx = pwr;
+              max_seg_a = st.ipnt[i];
+              max_seg_b = st.ipnt[j];
             }
-          } /* for( j = 0; j < i; j++ ) */  
+          } /* for( j = 0; j < i; j++ ) */
         } /* for( i = 1; i < irow1; i++ ) */
-  
-        asa= sqrt( asa*2./ static_cast<nec_float>( irow1*( irow1-1)));
+
+        asa = sqrt( asa*2./ static_cast<nec_float>( irow1*( irow1-1)));
         m_output.nec_printf( "\n\n"
           "   MAXIMUM RELATIVE ASYMMETRY OF THE DRIVING POINT ADMITTANCE\n"
           "   MATRIX IS %10.3E FOR SEGMENTS %d AND %d\n"
           "   RMS RELATIVE ASYMMETRY IS %10.3E",
-          asmx, nteq, ntsc, asa );
+          asmx, max_seg_a, max_seg_b, asa );
       } /* if ( irow1 >= 2) */
     } /* if ( masym != 0) */
-  
-    /* solution of network equations */
-    if ( network_count != 0)
-    {
-      // zero the cmn array, and the rhnx array
-      cmn.setConstant(cplx_00());
-      rhnx.setConstant(cplx_00());
-      
-      nteq=0;
-      ntsc=0;
-  
-      /*  sort network and source data and
-        assign equation numbers to segments */
-      for (int j = 0; j < network_count; j++ )
-      {
-        nseg1= iseg1[j];
-        nseg2= iseg2[j];
-      
-        // Calculate the admittance yXX for this network element
-        if ( ntyp[j] <= 1) // if not transmission line
-        {
-          y11r= x11r[j];
-          y11i= x11i[j];
-          y12r= x12r[j];
-          y12i= x12i[j];
-          y22r= x22r[j];
-          y22i= x22i[j];
-        }
-        else
-        {
-          y22r= two_pi() * x11i[j]/ _wavelength;
-          y12r=0.;
-          y12i=1./( x11r[j]* sin( y22r));
-          y11r= x12r[j];
-          y11i = - y12i* cos( y22r);
-          y22r= x22r[j];
-          y22i= y11i+ x22i[j];
-          y11i= y11i+ x12i[j];
-        
-          if ( ntyp[j] != 2) // ntype == 3, must be crossed element
-          {
-            y12r = -y12r;
-            y12i = -y12i;
-          }
-        } /* if ( ntyp[j] <= 1) */
-    
-        jump1 = false;
-        for( i = 0; i < voltage_source_count; i++ )
-        {
-          if ( nseg1 == source_segment_array[i])
-          {
-            isc1 = i;
-            jump1 = true;
-            break;
-          }
-        }
-    
-        jump2 = false;
-        if ( ! jump1 )
-        {
-          isc1 = -1;
-      
-          for( i = 0; i < nteq; i++ )
-          {
-            if ( nseg1 == nteqa[i])
-            {
-              irow1 = i;
-              jump2 = true;
-              break;
-            }
-          }
-      
-          if ( ! jump2 )
-          {
-            irow1= nteq;
-            nteqa[nteq]= nseg1;
-            nteq++;
-          }
-        } /* if ( ! jump1 ) */
-        else
-        {
-          for( i = 0; i < ntsc; i++ )
-          {
-            if ( nseg1 == ntsca[i])
-            {
-              irow1 = ndimn- (i+1);
-              jump2 = true;
-              break;
-            }
-          }
-      
-          if ( ! jump2 )
-          {
-            irow1= ndimn- (ntsc+1);
-            ntsca[ntsc]= nseg1;
-            vsrc[ntsc]= source_voltage_array[isc1];
-            ntsc++;
-          }
-      
-        } /* if ( ! jump1 ) */
-    
-        jump1 = false;
-        for( i = 0; i < voltage_source_count; i++ )
-        {
-          if ( nseg2 == source_segment_array[i])
-          {
-            isc2= i;
-            jump1 = true;
-            break;
-          }
-        }
-    
-        jump2 = false;
-        if ( ! jump1 )
-        {
-          isc2 = -1;
-      
-          for( i = 0; i < nteq; i++ )
-          {
-            if ( nseg2 == nteqa[i])
-            {
-              irow2= i;
-              jump2 = true;
-              break;
-            }
-          }
-      
-          if ( ! jump2 )
-          {
-            irow2= nteq;
-            nteqa[nteq]= nseg2;
-            nteq++;
-          }
-        }  /* if ( ! jump1 ) */
-        else
-        {
-          for( i = 0; i < ntsc; i++ )
-          {
-            if ( nseg2 == ntsca[i])
-            {
-              irow2 = ndimn- (i+1);
-              jump2 = true;
-              break;
-            }
-          }
-    
-          if ( ! jump2 )
-          {
-            irow2= ndimn- (ntsc+1);
-            ntsca[ntsc]= nseg2;
-            vsrc[ntsc]= source_voltage_array[isc2];
-            ntsc++;
-          }
-        } /* if ( ! jump1 ) */
-    
-        /*
-          Fill network equation matrix and right hand side vector with
-          network short-circuit admittance matrix coefficients.
-        */
-        if ( isc1 == -1)
-        {
-          cmn[irow1+irow1*ndimn] -= nec_complex( y11r, y11i)* m_geometry->segment_length[nseg1-1];
-          cmn[irow1+irow2*ndimn] -= nec_complex( y12r, y12i)* m_geometry->segment_length[nseg1-1];
-        }
-        else
-        {
-          rhnx[irow1] += nec_complex( y11r, y11i)* source_voltage_array[isc1]/_wavelength;
-          rhnx[irow2] += nec_complex( y12r, y12i)* source_voltage_array[isc1]/_wavelength;
-        }
-      
-        if ( isc2 == -1)
-        {
-          cmn[irow2+irow2*ndimn] -= nec_complex( y22r, y22i)* m_geometry->segment_length[nseg2-1];
-          cmn[irow2+irow1*ndimn] -= nec_complex( y12r, y12i)* m_geometry->segment_length[nseg2-1];
-        }
-        else
-        {
-          rhnx[irow1] += nec_complex( y12r, y12i)* source_voltage_array[isc2]/_wavelength;
-          rhnx[irow2] += nec_complex( y22r, y22i)* source_voltage_array[isc2]/_wavelength;
-        }
-      } /* for( j = 0; j < network_count; j++ ) */
-  
-      /*  add interaction matrix admittance
-        elements to network equation matrix */
-      for( i = 0; i < nteq; i++ )
-      {
-        vector_fill(rhs, 0, neqt, cplx_00());
-        
-        irow1= nteqa[i]-1;
-        rhs[irow1]=cplx_10();
-        solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-        m_geometry->get_current_coefficients(_wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
-        
-        for (int j = 0; j < nteq; j++ )
-        {
-          irow1= nteqa[j]-1;
-          cmn[i+j*ndimn] += rhs[irow1];
-        }
-      } /* for( i = 0; i < nteq; i++ ) */
-    
-      /* factor network equation matrix */
-      lu_decompose(m_output, nteq, cmn, ipnt, ndimn);
-      
-    } /* if ( network_count != 0) */
-  } /* if ( ntsol != 0) */
+  } /* if ( ntsol == 0) */
+}
 
+/*-----------------------------------------------------------------------*/
+
+// Section 2: network equation sorting, matrix fill, and factorisation.
+void nec_context::netwk_solve_and_check( complex_array& in_cm, int_array& in_ip,
+    netwk_state& st )
+{
+  /* solution of network equations */
+  // zero the cmn array, and the rhnx array
+  st.cmn.setConstant(cplx_00());
+  st.rhnx.setConstant(cplx_00());
+
+  st.nteq = 0;
+  st.ntsc = 0;
+
+  nec_float y11r, y11i, y12r, y12i, y22r, y22i;
+  int irow1, irow2, isc1, isc2;
+  bool jump1, jump2;
+
+  /*  sort network and source data and
+    assign equation numbers to segments */
+  for (int j = 0; j < network_count; j++ )
+  {
+    int nseg1 = iseg1[j];
+    int nseg2 = iseg2[j];
+
+    // Calculate the admittance yXX for this network element
+    if ( ntyp[j] <= 1) // if not transmission line
+    {
+      y11r = x11r[j];
+      y11i = x11i[j];
+      y12r = x12r[j];
+      y12i = x12i[j];
+      y22r = x22r[j];
+      y22i = x22i[j];
+    }
+    else
+    {
+      y22r = two_pi() * x11i[j]/ _wavelength;
+      y12r = 0.;
+      y12i = 1./( x11r[j]* sin( y22r));
+      y11r = x12r[j];
+      y11i = - y12i* cos( y22r);
+      y22r = x22r[j];
+      y22i = y11i+ x22i[j];
+      y11i = y11i+ x12i[j];
+
+      if ( ntyp[j] != 2) // ntype == 3, must be crossed element
+      {
+        y12r = -y12r;
+        y12i = -y12i;
+      }
+    } /* if ( ntyp[j] <= 1) */
+
+    jump1 = false;
+    for( int i = 0; i < voltage_source_count; i++ )
+    {
+      if ( nseg1 == source_segment_array[i])
+      {
+        isc1 = i;
+        jump1 = true;
+        break;
+      }
+    }
+
+    jump2 = false;
+    if ( ! jump1 )
+    {
+      isc1 = -1;
+
+      for( int i = 0; i < st.nteq; i++ )
+      {
+        if ( nseg1 == st.nteqa[i])
+        {
+          irow1 = i;
+          jump2 = true;
+          break;
+        }
+      }
+
+      if ( ! jump2 )
+      {
+        irow1 = st.nteq;
+        st.nteqa[st.nteq] = nseg1;
+        st.nteq++;
+      }
+    } /* if ( ! jump1 ) */
+    else
+    {
+      for( int i = 0; i < st.ntsc; i++ )
+      {
+        if ( nseg1 == st.ntsca[i])
+        {
+          irow1 = st.ndimn - (i+1);
+          jump2 = true;
+          break;
+        }
+      }
+
+      if ( ! jump2 )
+      {
+        irow1 = st.ndimn - (st.ntsc+1);
+        st.ntsca[st.ntsc] = nseg1;
+        st.vsrc[st.ntsc] = source_voltage_array[isc1];
+        st.ntsc++;
+      }
+
+    } /* if ( ! jump1 ) */
+
+    jump1 = false;
+    for( int i = 0; i < voltage_source_count; i++ )
+    {
+      if ( nseg2 == source_segment_array[i])
+      {
+        isc2 = i;
+        jump1 = true;
+        break;
+      }
+    }
+
+    jump2 = false;
+    if ( ! jump1 )
+    {
+      isc2 = -1;
+
+      for( int i = 0; i < st.nteq; i++ )
+      {
+        if ( nseg2 == st.nteqa[i])
+        {
+          irow2 = i;
+          jump2 = true;
+          break;
+        }
+      }
+
+      if ( ! jump2 )
+      {
+        irow2 = st.nteq;
+        st.nteqa[st.nteq] = nseg2;
+        st.nteq++;
+      }
+    }  /* if ( ! jump1 ) */
+    else
+    {
+      for( int i = 0; i < st.ntsc; i++ )
+      {
+        if ( nseg2 == st.ntsca[i])
+        {
+          irow2 = st.ndimn - (i+1);
+          jump2 = true;
+          break;
+        }
+      }
+
+      if ( ! jump2 )
+      {
+        irow2 = st.ndimn - (st.ntsc+1);
+        st.ntsca[st.ntsc] = nseg2;
+        st.vsrc[st.ntsc] = source_voltage_array[isc2];
+        st.ntsc++;
+      }
+    } /* if ( ! jump1 ) */
+
+    /*
+      Fill network equation matrix and right hand side vector with
+      network short-circuit admittance matrix coefficients.
+    */
+    if ( isc1 == -1)
+    {
+      st.cmn[irow1+irow1*st.ndimn] -= nec_complex( y11r, y11i)* m_geometry->segment_length[nseg1-1];
+      st.cmn[irow1+irow2*st.ndimn] -= nec_complex( y12r, y12i)* m_geometry->segment_length[nseg1-1];
+    }
+    else
+    {
+      st.rhnx[irow1] += nec_complex( y11r, y11i)* source_voltage_array[isc1]/_wavelength;
+      st.rhnx[irow2] += nec_complex( y12r, y12i)* source_voltage_array[isc1]/_wavelength;
+    }
+
+    if ( isc2 == -1)
+    {
+      st.cmn[irow2+irow2*st.ndimn] -= nec_complex( y22r, y22i)* m_geometry->segment_length[nseg2-1];
+      st.cmn[irow2+irow1*st.ndimn] -= nec_complex( y12r, y12i)* m_geometry->segment_length[nseg2-1];
+    }
+    else
+    {
+      st.rhnx[irow1] += nec_complex( y12r, y12i)* source_voltage_array[isc2]/_wavelength;
+      st.rhnx[irow2] += nec_complex( y22r, y22i)* source_voltage_array[isc2]/_wavelength;
+    }
+  } /* for( j = 0; j < network_count; j++ ) */
+
+  /*  add interaction matrix admittance
+    elements to network equation matrix */
+  for( int i = 0; i < st.nteq; i++ )
+  {
+    vector_fill(st.rhs, 0, st.neqt, cplx_00());
+
+    irow1 = st.nteqa[i]-1;
+    st.rhs[irow1] = cplx_10();
+    solves( in_cm, in_ip, st.rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+    m_geometry->get_current_coefficients(_wavelength, st.rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+
+    for (int j = 0; j < st.nteq; j++ )
+    {
+      irow1 = st.nteqa[j]-1;
+      st.cmn[i+j*st.ndimn] += st.rhs[irow1];
+    }
+  } /* for( i = 0; i < st.nteq; i++ ) */
+
+  /* factor network equation matrix */
+  lu_decompose(m_output, st.nteq, st.cmn, st.ipnt, st.ndimn);
+}
+
+/*-----------------------------------------------------------------------*/
+
+// Section 3: solve for structure currents (with or without networks).
+void nec_context::netwk_compute_currents( complex_array& in_cm, int_array& in_ip,
+    complex_array& einc, netwk_state& st )
+{
   if (0 == network_count)
   {
     /* solve for currents when no networks are present */
     solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
     m_geometry->get_current_coefficients(_wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
-    ntsc=0;
+    st.ntsc = 0;
+    return;
   }
-  else // if ( network_count != 0)
+
+  /*
+    Add to network equation right hand side
+    the terms due to element interactions
+  */
+  for (int i = 0; i < st.neqt; i++)
+    st.rhs[i] = einc[i];
+
+  solves( in_cm, in_ip, st.rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+  m_geometry->get_current_coefficients(_wavelength, st.rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+
+  for( int i = 0; i < st.nteq; i++ )
   {
-    /*
-      Add to network equation right hand side
-      the terms due to element interactions
-    */
-    for (i = 0; i < neqt; i++)
-      rhs[i]= einc[i];
-  
-    solves( in_cm, in_ip, rhs, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-    m_geometry->get_current_coefficients(_wavelength, rhs, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
-  
-    for( i = 0; i < nteq; i++ )
-    {
-      irow1= nteqa[i]-1;
-      rhnt[i]= rhnx[i]+ rhs[irow1];
-    }
+    int irow1 = st.nteqa[i]-1;
+    st.rhnt[i] = st.rhnx[i] + st.rhs[irow1];
+  }
 
-    /* solve network equations */
-    solve( nteq, cmn, ipnt, rhnt, ndimn);
-  
-    /*
-      Add fields due to network voltages to electric fields
-      applied to structure and solve for induced current
-    */
-    for( i = 0; i < nteq; i++ )
-    {
-      irow1= nteqa[i]-1;
-      einc[irow1] -= rhnt[i];
-    }
-  
-    solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
-    m_geometry->get_current_coefficients(_wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
+  /* solve network equations */
+  solve( st.nteq, st.cmn, st.ipnt, st.rhnt, st.ndimn);
+
+  /*
+    Add fields due to network voltages to electric fields
+    applied to structure and solve for induced current
+  */
+  for( int i = 0; i < st.nteq; i++ )
+  {
+    int irow1 = st.nteqa[i]-1;
+    einc[irow1] -= st.rhnt[i];
+  }
+
+  solves( in_cm, in_ip, einc, neq, 1, m_geometry->np, m_geometry->n_segments, m_geometry->mp, m_geometry->m, nop, symmetry_array);
+  m_geometry->get_current_coefficients(_wavelength, einc, air, aii, bir, bii, cir, cii, vqds, nqds, iqds);
 
 
-    nec_structure_excitation* seo = new nec_structure_excitation();
-    
-    for( i = 0; i < nteq; i++ )
-    {
-      int segment_number = nteqa[i];
-      int segment_index = segment_number-1;
-      nec_complex voltage = rhnt[i]* m_geometry->segment_length[segment_index]* _wavelength;
-      nec_complex current = einc[segment_index]* _wavelength;
-      nec_float power = em::power(voltage,current);
-      network_power_loss = network_power_loss - power;
-      
-      int segment_tag = m_geometry->segment_tags[segment_index];
-      seo->add(segment_number, segment_tag, voltage, current, power);
-    }
-    
-    for ( i = 0; i < ntsc; i++ )
-    {
-      int segment_number = ntsca[i];
-      int segment_index = segment_number-1;
-      nec_complex voltage = vsrc[i];
-      nec_complex current = einc[segment_index]* _wavelength;
-      nec_float power = em::power(voltage,current);
-      network_power_loss = network_power_loss - power;
-      
-      int segment_tag = m_geometry->segment_tags[segment_index];
-      seo->add(segment_number, segment_tag, voltage, current, power);
-    } /* for( i = 0; i < ntsc; i++ ) */
-    
-    if ( nprint == 0)
-    {
-      std::stringstream ss;
-      seo->write_to_file(ss);
-      m_output.line(ss.str().c_str());
-    }
-    
-    seo->set_frequency(freq_mhz/(1.e-6));
-    m_results.add(seo);
+  nec_structure_excitation* seo = new nec_structure_excitation();
 
-      
-/*    if ( nprint == 0)
-    {
-      m_output.nec_printf( "\n\n\n"
-        "                          "
-        "--------- STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS --------" );
-    
-      m_output.nec_printf( "\n"
-        "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)        "
-        " IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER\n"
-        "  No:   No:     REAL      IMAGINARY     REAL      IMAGINARY    "
-        " REAL      IMAGINARY     REAL      IMAGINARY   (WATTS)" );
-    }
+  for( int i = 0; i < st.nteq; i++ )
+  {
+    int segment_number = st.nteqa[i];
+    int segment_index = segment_number-1;
+    nec_complex voltage = st.rhnt[i]* m_geometry->segment_length[segment_index]* _wavelength;
+    nec_complex current = einc[segment_index]* _wavelength;
+    nec_float power = em::power(voltage,current);
+    network_power_loss = network_power_loss - power;
 
-    for( i = 0; i < nteq; i++ )
-    {
-      int segment_number = nteqa[i];
-      int segment_index = segment_number-1;
-      nec_complex voltage = rhnt[i]* m_geometry->segment_length[segment_index]* _wavelength;
-      nec_complex current = einc[segment_index]* _wavelength;
-      nec_complex admittance = current / voltage;
-      nec_complex impedance = voltage / current;
-      int segment_tag = m_geometry->segment_tags[segment_number];
-      nec_float power = em::power(voltage,current);
-      network_power_loss = network_power_loss - power;
-      
-      if ( nprint == 0)
-        m_output.nec_printf( "\n"
-          " %4d %5d %11.4E %11.4E %11.4E %11.4E"
-          " %11.4E %11.4E %11.4E %11.4E %11.4E",
-          segment_tag, segment_number, real(voltage), imag(voltage), real(current), imag(current),
-          real(impedance), imag(impedance), real(admittance), imag(admittance), power );
-    }
+    int segment_tag = m_geometry->segment_tags[segment_index];
+    seo->add(segment_number, segment_tag, voltage, current, power);
+  }
 
-    for( i = 0; i < ntsc; i++ )
-    {
-      irow1= ntsca[i]-1;
-      vlt= vsrc[i];
-      cux= einc[irow1]* _wavelength;
-      ymit= cux/ vlt;
-      zped= vlt/ cux;
-      irow2= m_geometry->segment_tags[irow1];
-      
-      nec_float pwr= em::power(vlt,cux);
-      network_power_loss= network_power_loss- pwr;
-    
-      if ( nprint == 0)
-        m_output.nec_printf( "\n"
-          " %4d %5d %11.4E %11.4E %11.4E %11.4E"
-          " %11.4E %11.4E %11.4E %11.4E %11.4E",
-          irow2, irow1+1, real(vlt), imag(vlt), real(cux), imag(cux),
-          real(zped), imag(zped), real(ymit), imag(ymit), pwr );
-    } // for( i = 0; i < ntsc; i++ )
-*/
-  } // if ( network_count != 0)
+  for ( int i = 0; i < st.ntsc; i++ )
+  {
+    int segment_number = st.ntsca[i];
+    int segment_index = segment_number-1;
+    nec_complex voltage = st.vsrc[i];
+    nec_complex current = einc[segment_index]* _wavelength;
+    nec_float power = em::power(voltage,current);
+    network_power_loss = network_power_loss - power;
 
+    int segment_tag = m_geometry->segment_tags[segment_index];
+    seo->add(segment_number, segment_tag, voltage, current, power);
+  } /* for( i = 0; i < st.ntsc; i++ ) */
+
+  if ( nprint == 0)
+  {
+    std::stringstream ss;
+    seo->write_to_file(ss);
+    m_output.line(ss.str().c_str());
+  }
+
+  seo->set_frequency(freq_mhz/(1.e-6));
+  m_results.add(seo);
+}
+
+/*-----------------------------------------------------------------------*/
+
+// Section 4: antenna input parameters (voltage sources and VQD sources).
+void nec_context::netwk_compute_inputs( complex_array& einc, netwk_state& st )
+{
   if ( (voltage_source_count+nvqd) == 0) {
     DEBUG_TRACE("voltage_source_count+nvqd) == 0")
     return;
   }
-  
-  
+
   // Create an antenna_input results object to hold the antenna input results.
   nec_antenna_input* antenna_input = new nec_antenna_input();
   antenna_input->set_frequency(freq_mhz/(1.e-6));
   m_results.add(antenna_input);
   DEBUG_TRACE("Creating new antenna input")
-/*  m_output.end_section();
-  m_output.nec_printf( 
-    "                        "
-    "--------- ANTENNA INPUT PARAMETERS ---------" );
-  
-  m_output.nec_printf( "\n"
-    "  TAG   SEG       VOLTAGE (VOLTS)         "
-    "CURRENT (AMPS)         IMPEDANCE (OHMS)    "
-    "    ADMITTANCE (MHOS)     POWER\n"
-    "  NO.   NO.     REAL      IMAGINARY"
-    "     REAL      IMAGINARY     REAL      "
-    "IMAGINARY    REAL       IMAGINARY   (WATTS)" );
-*/  
-  for( i = 0; i < voltage_source_count; i++ )
+
+  for( int i = 0; i < voltage_source_count; i++ )
   {
     DEBUG_TRACE("Voltage Source " << i)
     int segment_index = source_segment_array[i]-1;
     nec_complex voltage = source_voltage_array[i];
     nec_complex current = einc[segment_index] * _wavelength;
-    
+
     bool add_as_network_loss = false;
-    
-    if( ntsc != 0)
+
+    if( st.ntsc != 0)
     {
       int j = 0;
-      for (j = 0; j < ntsc; j++ )
-        if (ntsca[j] == segment_index+1)
+      for (j = 0; j < st.ntsc; j++ )
+        if (st.ntsca[j] == segment_index+1)
           break;
-      
-      int row_index = ndimn - (j+1);
-      int row_offset = row_index*ndimn;
-      
-      nec_complex temp = rhnx[row_index];
-      for (int k = 0; k < nteq; k++ )
-        temp -= cmn[k+row_offset]*rhnt[k];
-        
+
+      int row_index = st.ndimn - (j+1);
+      int row_offset = row_index*st.ndimn;
+
+      nec_complex temp = st.rhnx[row_index];
+      for (int k = 0; k < st.nteq; k++ )
+        temp -= st.cmn[k+row_offset]*st.rhnt[k];
+
       current = (einc[segment_index] + temp) * _wavelength;
       add_as_network_loss = true;
     }
-    
-/*
-  The following Code provided by Neoklis Kyriazis as a replacement for
-  the broken code below.
 
-  if( ntsc == 0)
-  {
-    cux= einc[isc1]* wlam;
-    irow1=0;
-  }
-  else
-  {
-    for( j = 0; j < ntsc; j++ )
-      if( ntsca[j] == isc1+1)
-        break;
-
-    irow1= ndimn- (j+1);
-    cux= rhnx[irow1];
-    for( j = 0; j < nteq; j++ )
-      cux -= cmn[j+irow1*ndimn]*rhnt[j];
-    cux=(einc[isc1]+ cux)* wlam;
-    irow1++;
-
-  } // if( ntsc == 0)
-    
-    // the following loop is completely mysterious!
-    for (int j = 0; j < ntsc; j++ )
-    {
-      // I am now almost sure that the following code is not correct.
-      // This modifies the current, however if the inner loop is executed more
-      // than once, then only the last current modification is kept!
-       
-      if ( ntsca[j] == segment_index+1)
-      {
-        int row_index = ndimn - (j+1);
-        int row_offset = row_index*ndimn;
-        
-        // I wish I knew what was going on here...
-        nec_complex temp = rhnx[row_index]; // renamed current -> temp to avoid confusion
-        for (int k = 0; k < nteq; k++ )
-          temp -= cmn[k + row_offset]*rhnt[k];
-          
-        current = (temp + einc[segment_index])* _wavelength;
-        add_as_network_loss = true;
-          
-#warning "This loop is messed up. The j is inside another j loop"
-        // I have removed the j from the "for (int k = 0; k < nteq; k++ )" loop 
-        // and placed this"j=nteq" statement here.
-        j = nteq;
-      }
-    }
-*/
     nec_complex admittance = current / voltage;
     nec_complex impedance = voltage / current;
     nec_float power = em::power(voltage,current);
-    
+
     if ( add_as_network_loss )
       network_power_loss += power;
-      
+
     input_power += power;
-    
+
     int segment_tag = m_geometry->segment_tags[segment_index];
-  
+
     antenna_input->set_input(
       segment_tag, segment_index+1,
       voltage, current, impedance, admittance, power);
-    
-/*    m_output.nec_printf(  "\n"
-      " %4d %5d %11.4E %11.4E %11.4E %11.4E"
-      " %11.4E %11.4E %11.4E %11.4E %11.4E",
-      segment_tag, segment_index+1, real(voltage), imag(voltage), real(current), imag(current),
-      real(impedance), imag(impedance), real(admittance), imag(admittance), power ); */
-    
+
   } /* for( i = 0; i < voltage_source_count; i++ ) */
 
-  
-  for( i = 0; i < nvqd; i++ )
+
+  for( int i = 0; i < nvqd; i++ )
   {
     DEBUG_TRACE("nvqd " << i)
-/*
-    isc1= ivqd[i]-1;
-    vlt= vqd[i];
-    cux= cmplx( air[isc1], aii[isc1]);
-    ymit= cmplx( bir[isc1], bii[isc1]);
-    zped= cmplx( cir[isc1], cii[isc1]);
-    pwr= si[isc1]* TP*.5;
-    cux=( cux- ymit* sin( pwr)+ zped* cos( pwr))* wlam;
-    ymit= cux/ vlt;
-    zped= vlt/ cux;
-    pwr=.5* creal( vlt* conj( cux));
-    pin= pin+ pwr;
-    irow2= itag[isc1];
 
-    fprintf( output_fp,  "\n"
-  " %4d %5d %11.4E %11.4E %11.4E %11.4E"
-  " %11.4E %11.4E %11.4E %11.4E %11.4E",
-  irow2, isc1+1, creal(vlt), cimag(vlt), creal(cux), cimag(cux),
-  creal(zped), cimag(zped), creal(ymit), cimag(ymit), pwr );
-*/
     int segment_index = ivqd[i]-1;
     nec_complex voltage = vqd[i];
-    
+
     nec_complex _ai( air[segment_index], aii[segment_index]);
     nec_complex _bi( bir[segment_index], bii[segment_index]);
     nec_complex _ci( cir[segment_index], cii[segment_index]);
-    
+
     // segment length is measured in wavelengths. The phase is therefore the length in wavelengths
     // multiplied by pi().// TCAM CHANGED TO pi() (from TP*.5)!!
-    nec_float segment_length_phase = m_geometry->segment_length[segment_index] * pi(); 
-    
+    nec_float segment_length_phase = m_geometry->segment_length[segment_index] * pi();
+
     nec_complex current = (_ai - _bi* sin(segment_length_phase) + _ci * cos(segment_length_phase)) * _wavelength;
-    
+
     nec_complex admittance = current / voltage;
     nec_complex impedance = voltage / current;
     nec_float power = em::power(voltage,current);
-    
+
     input_power += power;
-    
+
     int segment_tag = m_geometry->segment_tags[segment_index];
-  
+
     antenna_input->set_input(
       segment_tag, segment_index+1,
       voltage, current, impedance, admittance, power);
-    
-/*    m_output.nec_printf(  "\n"
-      " %4d %5d %11.4E %11.4E %11.4E %11.4E"
-      " %11.4E %11.4E %11.4E %11.4E %11.4E",
-      segment_tag, segment_index+1, real(voltage), imag(voltage), real(current), imag(current),
-      real(impedance), imag(impedance), real(admittance), imag(admittance), power ); */
-    
+
   } /* for( i = 0; i < nvqd; i++ ) */
   DEBUG_TRACE("netwk complete")
 
   std::stringstream ss;
   antenna_input->write_to_file(ss);
   m_output.line(ss.str().c_str());
+}
+
+/*-----------------------------------------------------------------------*/
+
+// Coordinator: dispatches the netwk pipeline in sequence.
+void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
+    complex_array& einc )
+{
+  netwk_state st;
+
+  netwk_build_matrix(in_cm, in_ip, st);
+  if ( ntsol == 0 && network_count != 0 )
+    netwk_solve_and_check(in_cm, in_ip, st);
+  netwk_compute_currents(in_cm, in_ip, einc, st);
+  netwk_compute_inputs(einc, st);
 }
 
 

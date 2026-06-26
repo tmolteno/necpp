@@ -207,6 +207,8 @@ private:
   void divide_patch( int nx );
 
   void connect_segments( int ignd );
+  void build_connections( int ignd );
+  void resolve_junctions();
 
   void read_geometry_card(FILE* input_fp, char *gm,
           int *i1, int *i2, 
@@ -220,6 +222,8 @@ private:
 
   	std::vector<nec_wire> m_wires;
   
+  void reflect_plane(int sym_plane, int& tag_increment);
+
   int patch_type;
   nec_3vector patch_x1, patch_x2, patch_x3, patch_x4;
   bool   _prev_sc;
