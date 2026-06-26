@@ -1,3 +1,37 @@
+## Version 2.0.0
+
+### Breaking Changes
+* **Eigen is now mandatory**. libeigen3-dev required. All `--with-eigen*` options removed.
+* **LAPACK support removed**. `--with-lapack` option removed. Eigen's PartialPivLU replaces it.
+* **nec_3vector is now Eigen::Matrix<nec_float,3,1>**. The hand-written class removed.
+  `.x()`/`.y()`/`.z()` replaced by `operator()(0)/(1)/(2)` throughout.
+* **safe_array backed by Eigen::Matrix**. Raw new[]/delete[] replaced by Eigen for SIMD ops.
+* pkg-config no longer links lapack/blas.
+
+### New Features
+* LU decomposition uses Eigen::PartialPivLU (blocked, SIMD-accelerated)
+* Eigen::Map used for in-place zero-copy factorization
+* `set_intersection_check(bool)` API to bypass O(n²) segment intersection checks (#63)
+* `squaredNorm()` and `cross()` aliases on 3-vector for Eigen API compatibility
+
+### Bug Fixes
+* Fix safe_array const operator[] infinite recursion
+* Fix Eigen LU pivot format: solve_eigen now applies P*b permutation directly
+* Fix Eigen::Map stride with OuterStride<>(ndim) for padded matrices
+* Fix helix validation: segment_count < 1 throws instead of silent return (#48)
+* Fix pkg-config hardcoded -llapack -lblas (#76)
+* Fix K5332187.nec test data typos (#77)
+* Fix missing #include <vector> in nec_wire.h
+* Fix false positive intersection errors for connected wires (#87)
+* Fix left-handed helix start point (#91)
+
+### Tests
+* 12×12 complex factrs/solves pipeline test
+* LU decomposition solve-verify test (Eigen path)
+* Intersection check bypass test (#63)
+* Helix validation test (#48)
+* All 20 test cases pass (213 assertions)
+
 ## Version 1.7.7
 
 * Add `set_intersection_check(bool)` API to c_geometry allowing users to bypass
