@@ -15,8 +15,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __c_geometry__
-#define __c_geometry__
+#pragma once
 #include "math_util.h"
 #include <vector>
 #include <iostream>
@@ -225,6 +224,3 @@ private:
   nec_3vector patch_x1, patch_x2, patch_x3, patch_x4;
   bool   _prev_sc;
 };
-
-
-#endif /* __c_geometry__ */

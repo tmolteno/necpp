@@ -144,10 +144,6 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     /* identify card id mnemonic */
     std::string card_id(gm);
     str_toupper(card_id);
-//    int gm_num;
-//    for( gm_num = 0; gm_num < GM_NUM; gm_num++ )
-//      if ( strncmp( gm, atst[gm_num], 2) == 0 )
-//        break;
 
     if ( print_structure_spec )
     {
@@ -276,7 +272,7 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
       yw1= degrees_to_rad(yw1);
       zw1= degrees_to_rad(zw1);
     
-      move( xw1, yw1, zw1, xw2, yw2, zw2, (int)( rad+.5), card_int_2, card_int_1);
+      move( xw1, yw1, zw1, xw2, yw2, zw2, static_cast<int>( rad+.5), card_int_2, card_int_1);
     }
     
     /* "sp" card, generate single new patch */
@@ -977,8 +973,6 @@ void c_geometry::move( nec_float rox, nec_float roy, nec_float roz, nec_float xs
       k= n_segments;
       /* Reallocate tags buffer */
       segment_tags.resize(n_segments+m + (n_segments+1-i1)*nrpt);
-      // mreq = n_segments+m + (n_segments+1-i1)*nrpt;
-      // segment_tags.resize(mreq);
 
       /* Reallocate wire buffers */
       int new_size = (n_segments+(n_segments+1-i1)*nrpt);
@@ -1106,7 +1100,6 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
     {
     /* Reallocate tags buffer */
     segment_tags.resize(2*n_segments + m);
-    // segment_tags.resize((2*n_segments+m));
   
     /* Reallocate wire buffers */
     int new_size = 2*n_segments;
@@ -1205,7 +1198,6 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
       if ( n_segments > 0)  {
       /* Reallocate tags buffer */
       segment_tags.resize(2*n_segments + m);
-      // segment_tags.resize((2*n_segments+m));/*????*/
     
       /* Reallocate wire buffers */
       int new_size = 2*n_segments;
@@ -1298,7 +1290,6 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
     if ( n_segments > 0 )  {
       /* Reallocate tags buffer */
       segment_tags.resize(2*n_segments + m);
-      // segment_tags.resize((2*n_segments+m));/*????*/
     
       /* Reallocate wire buffers */
       int new_size = 2*n_segments;
@@ -1387,7 +1378,7 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
   } /* if ( ix >= 0) */
   
   /* reproduce structure with rotation to form cylindrical structure */
-  fnop= (nec_float)nop;
+  fnop= static_cast<nec_float>(nop);
   m_ipsym = -1;
   sam=two_pi() / fnop;
   cs= cos( sam);
@@ -1399,7 +1390,6 @@ void c_geometry::reflect( int ix, int iy, int iz, int itx, int nop ) {
   
     /* Reallocate tags buffer */
     segment_tags.resize(n_segments + m);
-    //segment_tags.resize((n_segments+m));/*????*/
   
     /* Reallocate wire buffers */
     x.resize(n_segments);
@@ -1818,7 +1808,7 @@ void c_geometry::connect_segments( int ignd )
             continue;
           }
       
-        nec_float sep = (nec_float)ic;
+        nec_float sep = static_cast<nec_float>(ic);
         xa = xa / sep;
         ya = ya / sep;
         za = za / sep;
@@ -2297,7 +2287,7 @@ void c_geometry::patch( int nx, int ny,
     
       for( ix = 1; ix <= nx; ix++ )
       {
-        xst= (nec_float)ix;
+        xst= static_cast<nec_float>(ix);
         px[mi]= xn2+ xst* s1x;
         py[mi]= yn2+ xst* s1y;
         pz[mi]= zn2+ xst* s1z;
@@ -2432,7 +2422,7 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
   load_line( line_buf, input_fp );
   
   /* get line length */
-  int line_length = (int)strlen( line_buf );
+  int line_length = static_cast<int>(strlen( line_buf ));
   
   /* abort if card's mnemonic too short or missing */
   if ( line_length < 2 )

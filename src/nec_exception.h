@@ -17,8 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef __nec_exception__
-#define __nec_exception__
+#pragma once
 
 #include <string>
 #include <sstream>
@@ -78,6 +77,3 @@ inline void nec_stop(const char* __fmt, ...)
 	throw __nex; \
 }
 #endif
-
-
-#endif /* __nec_exception__ */

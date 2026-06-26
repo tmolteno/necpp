@@ -544,7 +544,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 				/* time the process */
 				secnds( &tmp1 );
 				tmp1 -= ex_timer;
-				fprintf( output_fp, "\n\n  TOTAL RUN TIME: %d msec", (int)tmp1 );
+				            fprintf( output_fp, "\n\n  TOTAL RUN TIME: %d msec", static_cast<int>(tmp1) );
 
 				if( input_fp != NULL )
 					fclose( input_fp );
@@ -592,7 +592,7 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	int eof = load_line( line_buf, input_fp );
 
 	/* get line length */
-	int line_length = (int) strlen(line_buf );
+	    int line_length = static_cast<int>(strlen( line_buf ));
 
 	/* abort if card's mnemonic too short or missing */
 	if ( line_length < 2 )

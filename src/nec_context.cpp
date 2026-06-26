@@ -21,10 +21,11 @@
 #include "nec_exception.h"
 
 #include <cstdlib>
+#include <memory>
 
 nec_context::nec_context() : fnorm(0,0), current_vector(0) {
   m_output_fp=NULL;
-  m_geometry = new c_geometry();
+  m_geometry = std::make_unique<c_geometry>();
   inc=0;
   isave=0;
   nthic=0;
@@ -46,7 +47,6 @@ nec_context::nec_context() : fnorm(0,0), current_vector(0) {
 }
 
 nec_context::~nec_context() {
-  delete m_geometry;
 }
 
 /*! \brief
@@ -572,7 +572,6 @@ void nec_context::ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int 
   xpr4= tmp4;
   xpr5= tmp5;
   xpr6= tmp6;
-  // xpr7= tmp7; Put this in here once we are parsing NEC4 excitation stuff.
   voltage_source_count=0;
   nvqd=0;
   thetis= xpr1;
@@ -1574,7 +1573,6 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
       if ( (inc > 1) && (iptflg > 0) )
         nprint=1;
 
-      // c_network::net_solve( cm, &cm[ib11], &cm[ic11], &cm[id11], ip, current_vector );
       netwk( cm, ip, current_vector );
       ntsol=1;
 
@@ -1719,8 +1717,8 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
     
     if ( ifar != -1)
     {
-      nec_radiation_pattern* rad_pat =
-        new nec_radiation_pattern(nth, nph,
+      auto rad_pat =
+        std::make_unique<nec_radiation_pattern>(nth, nph,
             thets, phis, dth, dph,
             rfld, ground,
             ifar, _wavelength,
@@ -1736,18 +1734,18 @@ enum excitation_return nec_context::excitation_loop(enum processing_state in_fre
       if (m_output_flags.get_gain_flag())
       {
         rad_pat->write_gain_normalization();
-        delete rad_pat;
       }
       else
       {
         rad_pat->set_frequency(freq_mhz/(1.e-6));
-        m_results.add(rad_pat);
         
         // write the results to the ordinary NEC output file.
         
         std::stringstream ss;
         rad_pat->write_to_file(ss);
         m_output.line(ss.str().c_str());
+
+        m_results.add(rad_pat.release());
       }
     }
 
@@ -4610,7 +4608,7 @@ void nec_context::netwk( complex_array& in_cm, int_array& in_ip,
           } /* for( j = 0; j < i; j++ ) */  
         } /* for( i = 1; i < irow1; i++ ) */
   
-        asa= sqrt( asa*2./ (nec_float)( irow1*( irow1-1)));
+        asa= sqrt( asa*2./ static_cast<nec_float>( irow1*( irow1-1)));
         m_output.nec_printf( "\n\n"
           "   MAXIMUM RELATIVE ASYMMETRY OF THE DRIVING POINT ADMITTANCE\n"
           "   MATRIX IS %10.3E FOR SEGMENTS %d AND %d\n"
@@ -5360,7 +5358,7 @@ void nec_context::pcint( nec_float xi, nec_float yi, nec_float zi, nec_float cab
   
   int nint = 10;
   d = sqrt(m_s)*0.5;
-  ds=4.* d/ (nec_float) nint;
+  ds=4.* d/ static_cast<nec_float>( nint);
   da= ds* ds;
   gcon=1./ m_s;
   fcon=1./(2.* two_pi() * d);

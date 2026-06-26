@@ -16,8 +16,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __nec_radiation_pattern__
-#define __nec_radiation_pattern__
+#pragma once
 
 #include "nec_results.h"
 #include "math_util.h"
@@ -61,11 +60,11 @@ public:
           nec_float in_gnor,
           c_plot_card& in_plot_card);
           
-  virtual void write_to_file(ostream& os)  {
+  virtual void write_to_file(ostream& os) override {
     write_to_file_aux(os);
   }
 
-  virtual enum nec_result_type get_result_type()  {
+  virtual enum nec_result_type get_result_type() override {
     return RESULT_RADIATION_PATTERN;
   }
           
@@ -463,5 +462,3 @@ private:
   nec_ground m_ground;
   c_plot_card m_plot_card;
 };
-
-#endif /* __nec_radiation_pattern__ */

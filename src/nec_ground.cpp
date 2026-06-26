@@ -199,8 +199,8 @@ void nec_ground::calculate_antenna_environment(c_ground_wave& ground_wave, nec_f
   if (  radial_wire_count != 0) {
     scrwl=  radial_wire_length/ wavelength;
     scrwr=  radial_wire_radius/ wavelength;
-    m_t1 = cplx_01()*2367.067/ (nec_float) radial_wire_count;
-    t2 = scrwr * (nec_float) radial_wire_count;
+    m_t1 = cplx_01()*2367.067/ static_cast<nec_float>(radial_wire_count);
+    t2 = scrwr * static_cast<nec_float>(radial_wire_count);
   }
 
   if (type_sommerfeld_norton()) {

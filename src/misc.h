@@ -1,5 +1,4 @@
-#ifndef __MISC__
-#define __MISC__
+#pragma once
 
 #include <stdio.h>
 #include "math_util.h"
@@ -27,7 +26,3 @@ void secnds( nec_float *x);
  *  returned.
  */
 int load_line( char *buff, FILE *pfile );
-
-
-
-#endif /* __MISC__ */

@@ -13,6 +13,9 @@ src/nec2++
 src/nec2diff
 src/test_manager
 src/necpp_test
+/nec2++
+/nec2diff
+build/
 
 # Packages #
 ############

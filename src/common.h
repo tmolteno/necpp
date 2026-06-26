@@ -1,5 +1,4 @@
-#ifndef __common__
-#define __common__
+#pragma once
 /*
   Various Definitions for nec2++
   
@@ -76,5 +75,3 @@ enum excitation_type
   EXCITATION_CURRENT = 4,
   EXCITATION_VOLTAGE_DISC = 5
 };
-
-#endif /* __common__ */

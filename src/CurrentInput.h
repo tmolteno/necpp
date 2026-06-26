@@ -15,8 +15,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __Current_Input__
-#define __Current_Input__
+#pragma once
 
 #include "math_util.h"
 #include <vector>
@@ -119,5 +118,3 @@ public:
 		return  ret;
 	};
 };
-
-#endif /* __Current_Input__ */

@@ -1,5 +1,4 @@
-#ifndef __nec_output__
-#define __nec_output__
+#pragma once
 
 /*
   Copyright (C) 2004-2015  Timothy C.A. Molteno
@@ -116,5 +115,3 @@ public:
 private:
   nec_output_file& m_of;  
 };
-
-#endif /* __nec_output__ */

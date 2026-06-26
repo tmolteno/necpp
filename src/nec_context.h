@@ -1,5 +1,4 @@
-#ifndef __nec_context__
-#define __nec_context__
+#pragma once
 
 /*
   Copyright (C) 2004-2008,2015  Timothy C.A. Molteno
@@ -19,6 +18,8 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
+#include <memory>
 
 #include "common.h"
 #include "c_ggrid.h"
@@ -115,7 +116,7 @@ public:
   }
 
   inline c_geometry* get_geometry()  {
-      return m_geometry;
+      return m_geometry.get();
   }
   
   /*! \brief Get the maximum gain in dB.
@@ -748,7 +749,7 @@ public:
   //! an object to pipe output through...
   nec_output_file m_output;
   nec_ground ground;
-  c_geometry* m_geometry;
+  std::unique_ptr<c_geometry> m_geometry;
   c_plot_card plot_card;
   
   c_ground_wave ground_wave;
@@ -995,6 +996,4 @@ private:
   void init_voltage_sources();
 
 }; /* nec_context */
-
-#endif /* __nec_context__ */
 

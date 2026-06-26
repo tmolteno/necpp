@@ -1,5 +1,4 @@
-#ifndef __matrix_algebra__
-#define __matrix_algebra__
+#pragma once
 
 /*
   Copyright (C) 2004, 2015  Timothy C.A. Molteno
@@ -56,5 +55,3 @@ void to_octave(complex_array& a, int n, int ndim);
 void to_octave(int* a, int n);
 void to_octave(int_array& a, int n);
 #endif /*  NEC_ERROR_CHECK */
-
-#endif /* __matrix_algebra__ */

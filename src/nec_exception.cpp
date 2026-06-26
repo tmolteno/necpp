@@ -75,7 +75,7 @@ string nec_exception::string_printf(const char* fmt, ...)
 				_sstream << u;
 				break;
 			case 'c':
-				c = (char) va_arg(ap, int);          /* must cast!                   */
+				            c = static_cast<char>(va_arg(ap, int));          /* must cast!                   */
 				_sstream << c;
 				break;
 			case 's':

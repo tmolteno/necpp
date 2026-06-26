@@ -15,8 +15,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __c_ggrid__
-#define __c_ggrid__
+#pragma once
 
 #include "math_util.h"
 #include "common.h"
@@ -90,6 +89,3 @@ public:
 void gwave( nec_complex& erv, nec_complex& ezv,
   nec_complex& erh, nec_complex& ezh, nec_complex& eph,
   c_ground_wave& ground_wave);
-
-
-#endif

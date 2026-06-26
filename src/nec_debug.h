@@ -17,8 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef __nec_debug__
-#define __nec_debug__
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -39,5 +38,3 @@
   #define ASSERT(__x)
   #define ASSERT_EQUAL(__x, __y)
 #endif /* NEC_ERROR_CHECK */
-
-#endif /* __nec_debug__ */

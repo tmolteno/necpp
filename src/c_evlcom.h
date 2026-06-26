@@ -15,8 +15,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __c_evlcom__
-#define __c_evlcom__
+#pragma once
 
 #include "math_util.h"
 
@@ -62,5 +61,3 @@ private:
 	/*! \brief Flag to select Bessel or Hankel function form (was jh) */
 	bool m_bessel_flag;
 };
-
-#endif /* __c_evlcom__ */

@@ -430,18 +430,10 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
   } /* for( kph = 1; kph <= n_phi; kph++ ) */
 
   if ( m_rp_power_average != 0)  {
-/*    nec_float tmp3 = degrees_to_rad(m_theta_start);
-    tmp4 = tmp3 + degrees_to_rad(delta_theta) * (nec_float)(n_theta-1);
-    tmp3 = fabs( degrees_to_rad(delta_phi) * (nec_float)( n_phi-1)*( cos( tmp3)- cos( tmp4)));
-    pint /= tmp3;
-    tmp3 /= pi();
-    _average_power_gain = pint;
-    _average_power_solid_angle = tmp3; */
-
     // We now compute the solid angle over which the power is averaged
     nec_float theta_start_rad = degrees_to_rad(m_theta_start);
-    nec_float theta_range = degrees_to_rad(delta_theta) * (nec_float)(n_theta-1);
-    nec_float phi_range = degrees_to_rad(delta_phi) * (nec_float)(n_phi-1);
+    nec_float theta_range = degrees_to_rad(delta_theta) * static_cast<nec_float>(n_theta-1);
+    nec_float phi_range = degrees_to_rad(delta_phi) * static_cast<nec_float>(n_phi-1);
     nec_float total_theta = theta_start_rad + theta_range;
     nec_float solid_angle = fabs(phi_range * (cos(theta_start_rad) - cos(total_theta)) );
             

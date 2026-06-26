@@ -1,5 +1,4 @@
-#ifndef __math_util__
-#define __math_util__
+#pragma once
 
 /*
   Various Useful Math Utilities for nec2++
@@ -185,5 +184,3 @@ inline nec_float norm(const nec_3vector& v) {
 inline nec_float normL1(const nec_3vector& v) {
   return normL1(v(0), v(1), v(2));
 }
-
-#endif /* __math_util__ */

@@ -15,8 +15,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __nec_results__
-#define __nec_results__
+#pragma once
 
 #include <vector>
 #include <ostream>
@@ -295,10 +294,10 @@ public:
     _mag.resize(n_theta, n_phi);
   }
 
-  virtual ~nec_norm_rx_pattern()  {
+  virtual ~nec_norm_rx_pattern() override {
   }
   
-  virtual enum nec_result_type get_result_type()  {
+  virtual enum nec_result_type get_result_type() override {
     return RESULT_NORMALIZED_RECEIVING_PATTERN;
   }
                   
@@ -363,7 +362,7 @@ public:
     return _mag.maxCoeff();
   }
   
-  virtual void write_to_file(ostream& os)  {
+  virtual void write_to_file(ostream& os) override {
     if (n_theta == 0)
       return;
     if (n_phi == 0)
@@ -406,44 +405,6 @@ public:
   }
 };
 
-/* No more used...*/
-
-class structure_excitation_data
-{
-private:
-  int m_segment_number, m_segment_tag;
-  nec_complex m_voltage, m_current;
-  nec_float m_power;
-  
-public:
-  structure_excitation_data(int segment_number, int segment_tag, nec_complex voltage, nec_complex current, nec_float power)  {
-    m_segment_number = segment_number;
-    m_segment_tag = segment_tag;
-    m_voltage = voltage;
-    m_current = current;
-    m_power = power;
-  }
-  
-  void write(output_helper& oh)  {
-    nec_complex admittance = m_current / m_voltage;
-    nec_complex impedance = m_voltage / m_current;
-    
-/*    o.nec_printf(" %4d %5d %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E %11.4E",
-      segment_tag, m_segment_number, real(m_voltage), imag(m_voltage), real(m_current), imag(m_current),
-      real(impedance), imag(impedance), real(admittance), imag(admittance), m_power);
-*/      
-    oh.start_record();
-    oh.int_out(4, m_segment_tag);      oh.separator();
-    oh.int_out(5, m_segment_number);    oh.separator();
-    oh.complex_out(11,4, m_voltage);    oh.separator();
-    oh.complex_out(11,4, m_current);    oh.separator();
-    oh.complex_out(11,4, impedance);    oh.separator();
-    oh.complex_out(11,4, admittance);    oh.separator();
-    oh.real_out(11,4, m_power);
-    oh.end_record();
-  }
-};
-
 
 
 /*!\brief Holds structure excitation data at network connection points
@@ -462,35 +423,14 @@ public:
     n_items = 0;
   }
   
-  virtual ~nec_structure_excitation()  { }
+  virtual ~nec_structure_excitation() override { }
   
   
-  virtual enum nec_result_type get_result_type()  {
+  virtual enum nec_result_type get_result_type() override {
     return RESULT_STRUCTURE_EXCITATION;
   }
   
   /*The two methods bellow have been modified to get rid of "nec_structure_excitation_data" */
-    
-  /*void add(int segment_number, int segment_tag, nec_complex voltage, nec_complex current, nec_float power)
-  {
-    structure_excitation_data sed(segment_number, segment_tag, voltage, current, power);
-    m_data.push_back(sed);
-    n_items++;
-  }
-  
-  virtual void write_to_file(ostream& os)
-  {
-    output_helper oh(os,_result_format);
-    oh.section_start();
-    os << "                          --------- STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS --------" << endl;
-    os << "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)         IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER" << endl;
-    os << "  No:   No:     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY     REAL      IMAGINARY   (WATTS)" << endl;
-      
-    for (int i = 0; i < n_items; i++ )
-    {
-      m_data[i].write(oh);
-    }
-  }*/
     
   void add(int segment, int tag, nec_complex voltage, nec_complex current, nec_float power)  {
     n_items++;
@@ -504,7 +444,7 @@ public:
     
   }
   
-  virtual void write_to_file(ostream& os)  {
+  virtual void write_to_file(ostream& os) override {
     output_helper oh(os,_result_format);
     oh.section_start("STRUCTURE EXCITATION DATA AT NETWORK CONNECTION POINTS");
     os << "  TAG   SEG       VOLTAGE (VOLTS)          CURRENT (AMPS)         IMPEDANCE (OHMS)       ADMITTANCE (MHOS)     POWER" << endl;
@@ -563,16 +503,16 @@ public:
     n_items = 0;
   }
 
-  virtual ~nec_antenna_input()  {
+  virtual ~nec_antenna_input() override {
   }
   
-  virtual enum nec_result_type get_result_type()  {
+  virtual enum nec_result_type get_result_type() override {
     return RESULT_ANTENNA_INPUT;
   }
   
   void set_input(int tag, int segment, nec_complex voltage, nec_complex current, nec_complex impedance, nec_complex admittance, nec_float power);
   
-  virtual void write_to_file(ostream& os)  {
+  virtual void write_to_file(ostream& os) override {
     if (n_items == 0)
       return;
       
@@ -635,16 +575,16 @@ public:
     n_items = 0;
   }
       
-  virtual ~nec_near_field_pattern()  {
+  virtual ~nec_near_field_pattern() override {
   }
     
-  virtual enum nec_result_type get_result_type()  {
+  virtual enum nec_result_type get_result_type() override {
     return RESULT_NEAR_FIELD_PATTERN;
   }
   
   void set_input(nec_float x, nec_float y, nec_float z, nec_complex field_x, nec_complex field_y, nec_complex field_z);
   
-  virtual void write_to_file(ostream& os)  {
+  virtual void write_to_file(ostream& os) override {
     if (n_items == 0)
       return;
       
@@ -844,6 +784,4 @@ public:
     }
   }
 };
-
-#endif /* __nec_results__ */
 

@@ -26,8 +26,7 @@
  * \example test_nec.c
 */
 
-#ifndef __libnecpp__
-#define __libnecpp__
+#pragma once
 
 /*! A Struct to represent the nec_context class.*/
 #ifdef __cplusplus
@@ -603,5 +602,3 @@ double nec_impedance_imag(nec_context* in_context, int freq_index);
 }
 #endif
 
-
-#endif /* __libnecpp__ */

@@ -15,8 +15,7 @@
   this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __safe_array__
-#define __safe_array__
+#pragma once
 
 #include <iostream>
 #include <cstring>
@@ -266,5 +265,3 @@ public:
 private:
   using safe_array<T>::operator[];
 };
-
-#endif /* __safe_array__ */

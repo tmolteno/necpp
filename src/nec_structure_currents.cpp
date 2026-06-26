@@ -34,7 +34,7 @@ nec_structure_currents::nec_structure_currents(nec_context * in_context, enum ex
   nec_float in_xpr3, nec_float in_xpr6)
 {
   m_context = in_context;
-  m_geometry = m_context->m_geometry;
+  m_geometry = m_context->m_geometry.get();
   pattype = in_pattype;
   
   iptflg = m_context->iptflg;

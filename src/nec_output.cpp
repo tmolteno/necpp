@@ -190,7 +190,7 @@ void nec_output_file::nec_printf(const char* fmt, ...)
 					count += fprintf(m_output_fp, format.data(), u);
 					break;
 				case 'c':
-					c = (char) va_arg(ap, int);          /* must cast!                   */
+					            c = static_cast<char>(va_arg(ap, int));          /* must cast!                   */
 					count += fprintf(m_output_fp, format.data(), c);
 					break;
 				case 's':

@@ -15,8 +15,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __nec_ground__
-#define __nec_ground__
+#pragma once
 
 #include <ostream>
 #include "common.h"
@@ -279,5 +278,3 @@ private:
   
 
 };
-
-#endif /* __nec_ground__ */

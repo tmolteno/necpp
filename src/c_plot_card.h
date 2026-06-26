@@ -15,8 +15,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __c_plot_card__
-#define __c_plot_card__
+#pragma once
 
 
 #include "math_util.h"
@@ -90,5 +89,3 @@ private:
 	int p1, p2, p3, p4;
 	FILE* plot_fp;
 };
-
-#endif /* __c_plot_card__ */

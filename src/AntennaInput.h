@@ -15,8 +15,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __Antenna_Input__
-#define __Antenna_Input__
+#pragma once
 
 #include <vector>
 #include "BaseInput.h"
@@ -113,5 +112,3 @@ public:
 		return ret;
 	};
 };
-
-#endif /* __Antenna_Input__ */

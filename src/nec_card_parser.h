@@ -1,5 +1,4 @@
-#ifndef __nec_card_parser__
-#define __nec_card_parser__
+#pragma once
 
 /*
   Clean NEC card parser — replaces the FORTRAN-style readmn() with
@@ -130,5 +129,3 @@ inline const card_handler* find_handler(const std::string& mnemonic) {
             return &h;
     return nullptr;
 }
-
-#endif /* __nec_card_parser__ */

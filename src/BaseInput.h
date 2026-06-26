@@ -15,8 +15,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef __Base_Input__
-#define __Base_Input__
+#pragma once
 
 #include "math_util.h"
 
@@ -106,5 +105,3 @@ protected:
 		return x;
 	}
 };
-
-#endif /* __Base_Input__ */

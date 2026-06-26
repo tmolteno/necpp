@@ -219,7 +219,7 @@ void c_network::net_solve( complex_array& cm, nec_complex *cmb,
 					} /* for( j = 0; j < i; j++ ) */	
 				} /* for( i = 1; i < irow1; i++ ) */
 	
-				asa= sqrt( asa*2./ (nec_float)( irow1*( irow1-1)));
+				            asa= sqrt( asa*2./ static_cast<nec_float>( irow1*( irow1-1)));
 				fprintf( output_fp, "\n\n"
 					"   MAXIMUM RELATIVE ASYMMETRY OF THE DRIVING POINT ADMITTANCE\n"
 					"   MATRIX IS %10.3E FOR SEGMENTS %d AND %d\n"

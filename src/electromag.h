@@ -1,5 +1,4 @@
-#ifndef __electromag__
-#define __electromag__
+#pragma once
 
 /*
 	Various Useful Electromagnetism Utilities for nec2cpp
@@ -63,5 +62,3 @@ namespace em
   
 
 }
-
-#endif /* __electromag__ */

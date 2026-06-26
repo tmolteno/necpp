@@ -21,6 +21,7 @@
 #include "libnecpp.h"
 #include "nec_context.h"
 #include "nec_exception.h"
+#include <memory>
 #include <string>
 
 static std::string _err_message;
@@ -30,10 +31,10 @@ static std::string _err_message;
 
 
 nec_context* nec_create(void) {
-  nec_context* ret = new nec_context();
+  auto ret = std::make_unique<nec_context>();
   ret->initialize();
   
-  return ret;
+  return ret.release();
 }
  
 long nec_delete(nec_context* in_context) {

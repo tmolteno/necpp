@@ -43,8 +43,8 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
     bool recalculate = true;
 
     if( (x >= m_ip_xs) && (y >= m_ip_ys) ) {
-        m_ip_ix = (int)((x - m_ip_xs) / m_ip_dx) + 1;
-        m_ip_iy = (int)((y - m_ip_ys) / m_ip_dy) + 1;
+        m_ip_ix = static_cast<int>((x - m_ip_xs) / m_ip_dx) + 1;
+        m_ip_iy = static_cast<int>((y - m_ip_ys) / m_ip_dy) + 1;
     } else {
         /* if point lies in same 4 by 4 point region */
         /* as previous point, old values are reused. */
@@ -78,8 +78,8 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
             m_ip_nyms = (( m_ip_nym2 + 1) / 3) * 3 + 1;
             m_ip_nd = nda[m_ip_igrs];
             m_ip_ndp = ndpa[m_ip_igrs];
-            m_ip_ix = (int)(( x - m_ip_xs) / m_ip_dx) + 1;
-            m_ip_iy = (int)(( y - m_ip_ys) / m_ip_dy) + 1;
+            m_ip_ix = static_cast<int>(( x - m_ip_xs) / m_ip_dx) + 1;
+            m_ip_iy = static_cast<int>(( y - m_ip_ys) / m_ip_dy) + 1;
         } /* if( igr != m_ip_igrs) */
 
         m_ip_ixs = (( m_ip_ix - 1) / 3) * 3 + 2;
@@ -303,7 +303,7 @@ nec_complex    fbar(const nec_complex& p )    {
         pow= z;
     
         for (int i = 1; i <= 100; i++ ) {
-            pow = - pow* zs/ (nec_float)i;
+            pow = - pow* zs/ static_cast<nec_float>(i);
             term= pow/(2.* i+1.);
             sum = sum + term;
             tms = norm(term);
