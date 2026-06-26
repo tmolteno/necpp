@@ -25,14 +25,11 @@
 #include "common.h"
 
 
-/*! \brief      Use the Eigen package for arrays 
-    \todo Work through how this should be done.
+/*! \brief      Use the Eigen package for arrays and vectors.
 */
-//#define USING_EIGEN_3VECT 1
 
-// Always use safe_array — it delegates to Eigen internally when
-// USING_EIGEN_ARRAY is defined at compile time.
 #include "safe_array.h"
+
 typedef safe_array<int32_t>    int_array;
 typedef safe_array<nec_float>  real_array;
 typedef safe_array<nec_complex> complex_array;
@@ -41,14 +38,13 @@ typedef safe_matrix<int32_t>    int_matrix;
 typedef safe_matrix<nec_float>  real_matrix;
 typedef safe_matrix<nec_complex> complex_matrix;
 
+/** \brief 3-vector backed by Eigen (SIMD-accelerated). */
+typedef Eigen::Matrix<nec_float,3,1>  nec_3vector;
+typedef Eigen::Matrix<nec_complex,3,1> nec_c3vector;
+
 inline void vector_fill(complex_array& x, int64_t start, int64_t N, const nec_complex& y) {
   x.fill(start, N, y);
 }
-
-
-// inline void vector_fill(complex_array& x, int64_t start, int64_t N, const nec_complex& y) {
-//   x.fill(start, N, y);
-// }
 
 
 inline nec_complex cplx_00() {
@@ -179,150 +175,6 @@ inline nec_float normL1(const nec_float x, const nec_float y, const nec_float z)
 
 
 
-
-#if USING_EIGEN_3VECT
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wshadow"
-    #pragma GCC diagnostic ignored "-Wconversion"
-    #include <Eigen/Dense>
-    #pragma GCC diagnostic pop
-
-
-    typedef Eigen::Matrix<nec_float,3,1> nec_3vector;
-    typedef Eigen::Matrix<nec_complex,3,1> nec_c3vector;
-#else
-
-/** \brief A Class for handling 3 dimensional vectors */
-class nec_3vector
-{
-public:
-    
-  nec_3vector(const nec_float& in_x, const nec_float& in_y, const nec_float& in_z) {
-    _v[0] = in_x;
-    _v[1] = in_y;
-    _v[2] = in_z;
-  }
-  
-  nec_3vector(const nec_3vector&) = default;
-  
-  /**!\brief The Euclidian norm */
-  inline nec_float norm() const {
-    return ::norm(_v[0], _v[1], _v[2]);
-  }
-  
-  inline nec_float norm2() const {
-    return ::norm2(_v[0], _v[1], _v[2]);
-  }
-  
-  /**!\brief Squared norm (Eigen-compatible alias) */
-  inline nec_float squaredNorm() const {
-    return norm2();
-  }
-  
-  /**!\brief The L1-distance (often called the Manhattan norm) */
-  inline nec_float normL1() const {
-    return ::normL1(_v[0], _v[1], _v[2]);
-  }
-  
-  /**!\brief Cross product (Eigen-compatible alias) */
-  inline nec_3vector cross(const nec_3vector& a) const {
-    return (*this) * a;
-  }
-  
-  inline nec_3vector& operator=(const nec_3vector& copy) {
-    _v[0] = copy._v[0];
-    _v[1] = copy._v[1];
-    _v[2] = copy._v[2];
-    return *this;
-  }
-  
-  inline int operator==(const nec_3vector& copy) const {
-    if (_v[0] != copy._v[0])
-      return 0;
-    if (_v[1] != copy._v[1])
-      return 0;
-    if (_v[2] != copy._v[2])
-      return 0;
-
-    return 1;
-  }
-  
-  inline nec_3vector& operator+=(const nec_3vector& a) {
-    _v[0] += a._v[0];
-    _v[1] += a._v[1];
-    _v[2] += a._v[2];
-    return *this;
-  }
-  
-  inline nec_3vector operator+(nec_float a) const {
-    return nec_3vector(_v[0] + a, _v[1] + a, _v[2] + a);
-  }
-  
-  inline nec_3vector operator+(const nec_3vector& a) const {
-    return nec_3vector(_v[0] + a._v[0], _v[1] + a._v[1], _v[2] + a._v[2]);
-  }
-  
-  inline nec_3vector& operator-=(const nec_3vector& a) {
-    _v[0] -= a._v[0];
-    _v[1] -= a._v[1];
-    _v[2] -= a._v[2];
-    return *this;
-  }
-  
-  inline nec_3vector operator-(const nec_3vector& a) const {
-    return nec_3vector(_v[0] - a._v[0], _v[1] - a._v[1], _v[2] - a._v[2]);
-  }
-  
-  
-  inline nec_3vector& operator/=(const nec_float& a) {
-    _v[0] /= a;
-    _v[1] /= a;
-    _v[2] /= a;
-    return *this;
-  }
-  inline nec_3vector operator/(nec_float a) const {
-    return nec_3vector(_v[0] / a, _v[1] / a, _v[2] / a);
-  }
-  
-  inline nec_float dot(const nec_3vector& a) const {
-    return (_v[0] * a._v[0]) + (_v[1] * a._v[1]) + (_v[2] * a._v[2]);
-  }
-  
-  inline nec_3vector& operator*=(const nec_float& a) {
-    _v[0] *= a;
-    _v[1] *= a;
-    _v[2] *= a;
-    return *this;
-  }
-  inline nec_3vector operator*(nec_float a) const {
-    return nec_3vector(_v[0] * a, _v[1] * a, _v[2] * a);
-  }
-  
-  inline nec_float& operator()(int i) {
-    return _v[i];
-  }
-  
-  inline const nec_float& operator()(int i) const {
-    return _v[i];
-  }
-  
-  /**\brief Cross-product */
-  nec_3vector operator*(const nec_3vector& a) const {
-    return nec_3vector(
-      _v[1]*a._v[2] - _v[2]*a._v[1],
-      _v[2]*a._v[0] - _v[0]*a._v[2],
-      _v[0]*a._v[1] - _v[1]*a._v[0]);
-  }
-  
-  inline nec_float x() const	{ return _v[0]; }
-  inline nec_float y() const	{ return _v[1]; }
-  inline nec_float z() const	{ return _v[2]; }
-  
-  
-private:
-  nec_float _v[3];
-};
-#endif
 
 /**!\brief The Euclidian norm */
 inline nec_float norm(const nec_3vector& v) {

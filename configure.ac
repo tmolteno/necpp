@@ -13,7 +13,6 @@ dnl ************************************************
 dnl *** Check for Array Bounds
 dnl ************************************************
 
-
 AC_ARG_WITH([bounds],
   [AS_HELP_STRING([--with-bounds],
   [Enable support for bounds-checking])],
@@ -30,7 +29,6 @@ dnl ************************************************
 dnl *** Trigger typesafe integer checking
 dnl ************************************************
 
-
 AC_ARG_WITH([typecheck],
   [AS_HELP_STRING([--with-typecheck],
   [Enable support for typesafe integer checking])],
@@ -42,7 +40,6 @@ AS_IF([test "x$with_typecheck" = xyes],
   AC_SUBST([AM_CPPFLAGS], ["-DTYPESAFE_PEDANTIC=1"])
   AC_SUBST([CXXFLAGS], ["-g3 -O0 -DTYPESAFE_PEDANTIC=1"])
 ])
-
 
 dnl ************************************************
 dnl *** Add an automatic build date
@@ -59,99 +56,27 @@ else
 fi
 
 dnl ************************************************
-dnl *** Check for Eigen library
+dnl *** Check for Eigen (mandatory)
 dnl ************************************************
 
 AC_LANG([C++])
 AC_PROG_CXX
 LT_INIT
 
-
-AC_ARG_WITH([eigen],
-  [AS_HELP_STRING([--without-eigen],
-  [disable support for eigen])],
+CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
+AC_CHECK_HEADER(
+  [Eigen/Dense],
   [],
-  [with_eigen=no])
+  [AC_MSG_FAILURE([Eigen library not found. Install libeigen3-dev.])],
+  [])
 
-AC_ARG_WITH([eigenv],
-  [AS_HELP_STRING([--without-eigenv],
-  [disable support for eigen])],
-  [],
-  [with_eigenv=no])
-
-LIBEIGEN=
-  AS_IF([test "x$with_eigen" != xno],
-  [
-    CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-    AC_CHECK_HEADER(
-    [Eigen/Core],
-    [AC_DEFINE([USING_EIGEN_ARRAY], [1], [Define if you have eigen])],
-    [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
-    [])
-  ])
-
-LIBEIGENV=
-  AS_IF([test "x$with_eigenv" != xno],
-  [
-    CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-    AC_CHECK_HEADER(
-    [Eigen/Core],
-    [AC_DEFINE([USING_EIGEN_3VECT], [1], [Define if you have eigen])],
-    [AC_MSG_FAILURE([Eigen library test failed (--without-eigen to disable)])],
-    [])
-	  ])
-
-
-dnl ************************************************
-dnl *** Use Eigen for LU decomposition
-dnl ************************************************
-
-AC_ARG_WITH([eigen-lu],
-  [AS_HELP_STRING([--with-eigen-lu],
-  [Use Eigen PartialPivLU for LU decomposition instead of built-in Gauss elimination])],
-  [],
-  [with_eigen_lu=no])
-
-AS_IF([test "x$with_eigen_lu" != xno],
-[
-  CPPFLAGS="$CPPFLAGS -I/usr/include/eigen3"
-  AC_CHECK_HEADER(
-    [Eigen/Dense],
-    [AC_DEFINE([EIGEN_LU], [1], [Define if Eigen LU is used])],
-    [AC_MSG_FAILURE([Eigen library test failed (--without-eigen-lu to disable)])],
-    [])
-])
-
+dnl Eigen is now the default for all components.
+CPPFLAGS="$CPPFLAGS -DUSING_EIGEN_ARRAY=1 -DUSING_EIGEN_3VECT=1 -DEIGEN_LU=1"
 
 AC_CHECK_LIB([m],[pow])
 
-dnl ************************************************
-dnl *** Check for LAPACK
-dnl ************************************************
-
-AC_ARG_WITH([lapack],
-  [AS_HELP_STRING([--with-lapack],
-  [Enable LAPACK support for faster LU decomposition (requires LAPACKE)])],
-  [],
-  [with_lapack=no])
-
 EXPLICIT_LIBS=""
 PRIVATE_LIBS=" $LDFLAGS -lstdc++ -lpthread -lm"
-
-AS_IF([test "x$with_lapack" != xno],
-[
-  AC_CHECK_HEADER(
-    [lapacke.h],
-    [AC_DEFINE([LAPACK], [1], [Define if LAPACKE is available])],
-    [AC_MSG_FAILURE([LAPACKE header not found (--without-lapack to disable)])],
-    [])
-  AC_CHECK_LIB([lapacke], [LAPACKE_zgetrf],
-    [],
-    [AC_MSG_FAILURE([LAPACKE library not found (--without-lapack to disable)])],
-    [-llapack -lblas])
-  PRIVATE_LIBS=" $LDFLAGS -lstdc++ -llapacke -llapack -lblas -lpthread -lm"
-  EXPLICIT_LIBS="-llapacke"
-])
 
 AC_SUBST(EXPLICIT_LIBS)
 AC_SUBST(PRIVATE_LIBS)
