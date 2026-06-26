@@ -209,6 +209,7 @@ using namespace std;
 #include "nec_output.h"
 
 #include "common.h"
+#include <vector>
 
 #ifdef NEC_ERROR_CHECK
 
@@ -433,18 +434,22 @@ void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a_i
        Both nec_complex and Eigen use std::complex<double>, and both
        use column-major storage, so the memory layout is identical. */
     using MatrixXcd = Eigen::Matrix<std::complex<nec_float>, Eigen::Dynamic, Eigen::Dynamic>;
-    Eigen::Map<MatrixXcd> A_map(reinterpret_cast<std::complex<nec_float>*>(a_in.data()), n, n);
+    Eigen::Map<MatrixXcd, 0, Eigen::OuterStride<> > A_map(
+        reinterpret_cast<std::complex<nec_float>*>(a_in.data()), n, n,
+        Eigen::OuterStride<>(static_cast<int>(ndim)));
     
     Eigen::PartialPivLU<MatrixXcd> lu(A_map);
     
     /* Copy LU factors back into a_in (modifies through the Map). */
     A_map = lu.matrixLU();
-    
-    /* Copy pivots (0-based to 1-based). */
-    auto indices = lu.permutationP().indices();
-    for (int64_t i = 0; i < n; i++)
-        ip[i] = static_cast<int32_t>(indices[i]) + 1;
-    
+
+    /* Store Eigen's permutation indices in ip (1-based for compatibility).
+       solve_eigen will use these directly instead of the GE pivot format. */
+    auto eigen_indices = lu.permutationP().indices();
+    for (int64_t i = 0; i < n; i++) {
+        ip[i] = static_cast<int32_t>(eigen_indices[i] + 1);
+    }
+
 #ifdef NEC_MATRIX_CHECK
     cout << "eigen_solved = ";
     to_octave(a_in,n,ndim);
@@ -452,14 +457,46 @@ void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a_i
     to_octave(ip,n);
 #endif
 }
+    
 
-
-/* solve_eigen delegates to solve_ge — the LU factors are stored
-   in the same L+U format regardless of factorization method. */
+/* solve_eigen reconstructs Eigen PartialPivLU from stored LU and permutation,
+   then solves via forward/back substitution. */
 void solve_eigen( int64_t n, complex_array& a, int_array& ip,
-        complex_array& b, int64_t ndim )
+    complex_array& b, int64_t ndim )
 {
-    solve_ge(n, a, ip, b, ndim);
+    DEBUG_TRACE("solve_eigen(" << n << "," << ndim << ")");
+    
+    using MatrixXcd = Eigen::Matrix<std::complex<nec_float>, Eigen::Dynamic, Eigen::Dynamic>;
+    using VectorXcd = Eigen::Matrix<std::complex<nec_float>, Eigen::Dynamic, 1>;
+    
+    Eigen::Map<MatrixXcd, 0, Eigen::OuterStride<> > LU(
+        reinterpret_cast<std::complex<nec_float>*>(a.data()), n, n,
+        Eigen::OuterStride<>(static_cast<int>(ndim)));
+    Eigen::Map<VectorXcd> rhs(reinterpret_cast<std::complex<nec_float>*>(b.data()), n);
+    
+    /* Rebuild the permutation from ip (1-based Eigen indices). */
+    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> P(n);
+    for (int64_t i = 0; i < n; i++)
+        P.indices()[i] = static_cast<int>(ip[i] - 1);
+    
+    /* Apply permutation: pb = P * rhs */
+    VectorXcd pb = P * rhs;
+    
+    /* Forward substitution: solve L * z = pb */
+    VectorXcd z = pb;
+    for (int64_t i = 0; i < n; i++) {
+        for (int64_t j = i + 1; j < n; j++)
+            z[j] -= LU(j, i) * z[i];
+    }
+    
+    /* Backward substitution: solve U * rhs_out = z */
+    for (int64_t k = 0; k < n; k++) {
+        int64_t i = n - k - 1;
+        std::complex<nec_float> sum(0.0, 0.0);
+        for (int64_t j = i + 1; j < n; j++)
+            sum += LU(i, j) * rhs[j];
+        rhs[i] = (z[i] - sum) / LU(i, i);
+    }
 }
 
 

@@ -86,40 +86,47 @@ TEST_CASE( "LU Decomposition Gauss-Doolittle", "[lu_decompose_ge]") {
 
 
 TEST_CASE( "LU Decomposition (Eigen)", "[lu_decompose]") {
+    // Fill a 4x4 matrix with the same values as matrix_setup(),
+    // transpose for NEC storage, factor, solve, and verify.
+    // Uses the same pattern as the 12x12 factrs/solves test.
     int N=4;
     nec_output_file s_output;
     complex_matrix A(N,N);
     int_array piv(N);
     
-    matrix_setup(A);
-    std::cout << "a = ";
-    to_octave(A,N,N);
-    
+    // Fill conceptual A (same values as matrix_setup)
+    A(0,0) = 3.0;  A(0,1) = 1.0;  A(0,2) = -4.0;  A(0,3) = 2.0;
+    A(1,0) = 3.0;  A(1,1) = 1.0;  A(1,2) =  0.0;  A(1,3) = 2.0;
+    A(2,0) = 2.0;  A(2,1) =13.0;  A(2,2) = -1.0;  A(2,3) = 0.0;
+    A(3,0) =-2.0;  A(3,1) = 3.0;  A(3,2) = -1.0;  A(3,3) = 4.0;
+
+    // Known solution x
+    complex_array x(N);
+    for (int i = 0; i < N; i++)
+        x[i] = nec_complex(i + 1, -(i + 1) * 0.5);
+
+    // Compute b = A * x (conceptual, before transpose)
+    complex_array b(N);
+    for (int i = 0; i < N; i++) {
+        b[i] = nec_complex(0.0, 0.0);
+        for (int j = 0; j < N; j++)
+            b[i] += A(i, j) * x[j];
+    }
+
+    // Transpose for NEC column-major storage convention
+    for (int i = 1; i < N; i++)
+        for (int j = 0; j < i; j++)
+            std::swap(A(i, j), A(j, i));
+
+    // Factor (modifies A in place) and solve (modifies b in place)
     lu_decompose(s_output, N, A, piv, N);
-    std::cout << "lu = ";
-    to_octave(A,N,N);
-    std::cout << "piv = ";
-    to_octave(piv,N);
+    solve(N, A, piv, b, N);
 
-    REQUIRE_APPROX_EQUAL(A(0,0), 3.0);
-    REQUIRE_APPROX_EQUAL(A(0,1), 1.0);
-    REQUIRE_APPROX_EQUAL(A(0,2), 0.0);
-    REQUIRE_APPROX_EQUAL(A(0,3), 2.0);
-
-    REQUIRE_APPROX_EQUAL(A(1,0), 1.0);
-    REQUIRE_APPROX_EQUAL(A(1,1), 12.3333);
-    REQUIRE_APPROX_EQUAL(A(1,2), -1.0);
-    REQUIRE_APPROX_EQUAL(A(1,3), -1.3333);
-
-    REQUIRE_APPROX_EQUAL(A(2,0), 0.66667);
-    REQUIRE_APPROX_EQUAL(A(2,1), 0.0);
-    REQUIRE_APPROX_EQUAL(A(2,2), -4.0);
-    REQUIRE_APPROX_EQUAL(A(2,3), 0.0);
-
-    REQUIRE_APPROX_EQUAL(A(3,0), -0.66667);
-    REQUIRE_APPROX_EQUAL(A(3,1), 0.297297);
-    REQUIRE_APPROX_EQUAL(A(3,2), 0.175676);
-    REQUIRE_APPROX_EQUAL(A(3,3), 5.72973);
+    // Verify solution matches x
+    for (int i = 0; i < N; i++) {
+        REQUIRE_APPROX_EQUAL(b[i].real(), x[i].real());
+        REQUIRE_APPROX_EQUAL(b[i].imag(), x[i].imag());
+    }
 }
 
 
