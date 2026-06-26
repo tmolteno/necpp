@@ -3,17 +3,29 @@
 If nec2++ isn't available precompiled in your system, here are the instructions for
 building from source code.
 
-## Pre-requisites
+## Quick Build (no autotools needed)
 
-Nec2++ requires a C++17 compiler and uses the GNU autoconf packages for
-keeping track of dependencies. Eigen 3.4.0 is bundled in `src/eigen3/` — no external
-linear algebra libraries are needed.
+Eigen 3.4.0 is bundled in `src/eigen3/` — no external libraries required. Just a
+C++17 compiler and `make`:
+
+    sudo apt install g++ make      # Debian/Ubuntu
+    make -j4
+    sudo make install
+
+Options:
+
+    make DEBUG=1        # bounds-checked debug build
+    make TYPECHECK=1    # typesafe integer checking
+
+## Autotools Build (traditional)
+
+### Pre-requisites
 
 On Debian or a derivative, you can install the build tools with:
 
     aptitude install g++ make automake autoconf libtool
 
-## Installation Steps
+### Installation Steps
 
   1. Install the autoconf and libtool packages.
      On Debian:  `aptitude install automake autoconf libtool`
