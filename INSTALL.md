@@ -26,6 +26,16 @@ On Debian or a derivative, you can install the build tools with:
         `make -j 4`
         `sudo make install`
 
+## macOS Notes
+
+If you see a linker error like "file was built for archive which is not the
+architecture being linked", this is usually caused by Homebrew's binutils
+conflicting with the system toolchain. Run:
+
+    brew unlink binutils
+
+then rebuild. You can re-link binutils afterwards with `brew link binutils`.
+
 ## Compiling for a specific architecture
 
 Particularly using gcc-4.0 it is important to specify the architecture you

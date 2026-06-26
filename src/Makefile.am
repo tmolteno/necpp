@@ -45,8 +45,8 @@ libnecpp_la_SOURCES = c_evlcom.cpp c_geometry.cpp c_ggrid.cpp c_plot_card.cpp \
 libnecpp_la_CXXFLAGS = -O2 -g0 -Wall -Wextra -Wshadow -Wconversion
 
 
-libnecpp_la_LDFLAGS = -lm -lstdc++
-nec2___LDFLAGS = -all-static
+libnecpp_la_LDFLAGS = -lm
+nec2___LDFLAGS =
 
 # Unit tests
 noinst_PROGRAMS = test_manager
