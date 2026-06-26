@@ -15,7 +15,7 @@ Nec2++ is developed on Debian linux, but will work on a variety of other operati
 * Large designs can be simulated with tens of thousands of elements (to the limit of 64-bit address space)
 * Geometry error detection. Throws exceptions if wires intersect or lie too close to one another.
 * Simulate in different media (for example antennas in seawater) by modifying the dielectric properties.
-* Uses fast numerical routines (BLAS and LAPACK). Can use the Intel MKL or OpenBLAS.
+* Uses Eigen 3.4.0 (bundled) for fast linear algebra — no external BLAS/LAPACK needed.
 
 ## Citing NEC2++
 

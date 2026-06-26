@@ -5,26 +5,26 @@ building from source code.
 
 ## Pre-requisites
 
-Nec2++ requires a C++ compiler and uses the GNU autoconf packages for
-keeping track of dependencies. On Debian or a derivative, you can
-install these with the following command.
+Nec2++ requires a C++17 compiler and uses the GNU autoconf packages for
+keeping track of dependencies. Eigen 3.4.0 is bundled in `src/eigen3/` — no external
+linear algebra libraries are needed.
+
+On Debian or a derivative, you can install the build tools with:
 
     aptitude install g++ make automake autoconf libtool
 
 ## Installation Steps
 
   1. Install the autoconf and libtool packages.
-     On Debian this is done with 
-       `aptitude install automake autoconf libtool'
-     on other systems you will have to find the appropriate way to do this.
+     On Debian:  `aptitude install automake autoconf libtool`
 
-  2. Cenerate the ./configure script. To do this, type
-       `make -f Makefile.git'
+  2. Generate the `./configure` script:
+        `make -f Makefile.git`
 
-  3. Then do the usual thing 
-       ./configure
-       make -j 4
-       sudo make install
+  3. Configure, build, and install:
+        `./configure`
+        `make -j 4`
+        `sudo make install`
 
 ## Compiling for a specific architecture
 
@@ -36,12 +36,12 @@ for example. The following configure options will do this:
   2. make
   3. make install
 
-## [Testing only] Using Eigen
+## About Eigen
 
-Eigen is a fast matrix library for C++. Nec2++ can be build to use eigen rather than its own safe_array class for vectors.
-
-    sudo aptitude install libeigen3-dev
-    ./configure --with-eigen
+Nec2++ 2.0.0+ uses **Eigen 3.4.0** (bundled in `src/eigen3/`) for all linear
+algebra — safe arrays, 3-vectors, and LU decomposition. No external Eigen, LAPACK,
+or BLAS installation is required. The old `--with-eigen`, `--with-lapack`, and
+`--with-atlas` configure options have been removed.
 
 ## Building for Windows
 
@@ -69,3 +69,4 @@ are intentionally header-only and should be included directly:
 * `math_util.h` — math constants and the `nec_3vector` class
 * `nec_wire.h` — wire intersection geometry
 * `safe_array.h` — bounds-checked array template
+* `src/eigen3/` — bundled Eigen 3.4.0 headers (include via `-I src/eigen3`)
