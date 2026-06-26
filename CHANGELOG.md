@@ -24,16 +24,33 @@
 * Fix missing #include <vector> in nec_wire.h
 * Fix false positive intersection errors for connected wires (#87)
 * Fix left-handed helix start point (#91)
+* Fix average gain computation: 1-based to 0-based index error in integration boundary checks (#72, PR #73)
+* Fix segfault in connect_segments: bounds check tightened from PCHCON to n_segments (#35)
+* Fix memory allocator doubling (2x→1.5x growth) to reduce peak memory for large models (#29)
+* Fix unreachable code in solves(): `k==nop` corrected to `k==(nop-1)` (#49)
+* Merge redundant read+sum loops in solves() (#50)
+* Fix missing `segment::diff()` method in CurrentInput.h for macOS/Xcode builds (#86)
+* Add explicit `nec2___DEPENDENCIES` in Makefile.am to fix autotools link order (#70)
+* Add `#include <cctype>` in misc.cpp for MSVC compatibility (#51)
+* Add single-quote (`'`) inline comment support for 4nec2 compatible NEC cards (#28)
+* Remove `-all-static` from LDFLAGS for macOS compatibility (#58)
+* Remove LAPACK/Atlas configure options and references (#66, #62, #57, #52, #18, #83, #68)
+* Fix `config.h` generation for example builds (#60)
 
 ### Distribution
 * Eigen 3.4.0 headers bundled in `src/eigen3/` — no external Eigen dependency needed
+* Updated README.md and INSTALL.md for v2.0.0 (removed LAPACK/BLAS references)
+* Added macOS/Xcode build instructions to INSTALL.md
+* Updated example Makefile for bundled Eigen, no LAPACK
 
 ### Tests
 * 12×12 complex factrs/solves pipeline test
 * LU decomposition solve-verify test (Eigen path)
 * Intersection check bypass test (#63)
 * Helix validation test (#48)
-* All 20 test cases pass (213 assertions)
+* All 10 test cases pass (126 assertions)
+
+*Numerical output verified identical between Eigen v2.0.0 and pre-Eigen v1.7.7 builds.*
 
 ## Version 1.7.7
 
