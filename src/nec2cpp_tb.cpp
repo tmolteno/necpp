@@ -5,6 +5,8 @@
 #include "nec_exception.h"
 #include "c_geometry.h"
 
+#include "nec_card_parser.h"
+
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -178,4 +180,95 @@ TEST_CASE("load_line handles inline ' comment (4nec2 compat)", "[load_line]") {
     REQUIRE(std::string(buf).find("inline") == std::string::npos);
     REQUIRE(strncmp(buf, "FR", 2) == 0);
     fclose(f);
+}
+
+/*-----------------------------------------------------------------------*/
+/* Tests: new parse_nec_card() (Options 1+2 refactor)                   */
+
+TEST_CASE("parse_nec_card parses FR card", "[parse_nec_card]") {
+    auto c = parse_nec_card("FR 0 1 0 0 300.0 0.0");
+    REQUIRE(c.mnemonic == "FR");
+    REQUIRE(c.i[0] == 0);
+    REQUIRE(c.i[1] == 1);
+    REQUIRE(c.f[0] == 300.0);
+    REQUIRE(c.f[1] == 0.0);
+    REQUIRE(c.parameter_count == 6);
+}
+
+TEST_CASE("parse_nec_card handles inline comment", "[parse_nec_card]") {
+    auto c = parse_nec_card("EX 0 1 5 0 1.0 ' comment");
+    REQUIRE(c.mnemonic == "EX");
+    REQUIRE(c.i[0] == 0);
+    REQUIRE(c.f[0] == 1.0);
+    REQUIRE(c.parameter_count == 5);
+}
+
+TEST_CASE("parse_nec_card handles comma separators", "[parse_nec_card]") {
+    auto c = parse_nec_card("FR,0,1,0,0,300.0,0.0");
+    REQUIRE(c.mnemonic == "FR");
+    REQUIRE(c.f[0] == 300.0);
+    REQUIRE(c.parameter_count == 6);
+}
+
+TEST_CASE("parse_nec_card handles empty line", "[parse_nec_card]") {
+    auto c = parse_nec_card("");
+    REQUIRE(c.mnemonic == "");
+    REQUIRE(c.parameter_count == 0);
+}
+
+TEST_CASE("parse_nec_card handles # comment", "[parse_nec_card]") {
+    auto c = parse_nec_card("# this is a comment");
+    REQUIRE(c.mnemonic == "");
+    REQUIRE(c.parameter_count == 0);
+}
+
+TEST_CASE("parse_nec_card handles negative floats", "[parse_nec_card]") {
+    auto c = parse_nec_card("GN -1 0 0 0 -0.5 1.0e3");
+    REQUIRE(c.mnemonic == "GN");
+    REQUIRE(c.i[0] == -1);
+    REQUIRE(c.f[0] == -0.5);
+    REQUIRE(c.f[1] == 1000.0);
+}
+
+TEST_CASE("card handler table has 21 entries", "[card_handler]") {
+    REQUIRE(sizeof(card_handlers)/sizeof(card_handlers[0]) == 21);
+}
+
+TEST_CASE("find_handler finds all known cards", "[card_handler]") {
+    const char* names[] = {"FR","LD","GN","EX","NT","TL","XQ","GD","RP",
+        "NX","PT","KH","NE","NH","PQ","EK","CP","PL","EN","WG","MP"};
+    for (auto n : names) {
+        auto* h = find_handler(n);
+        REQUIRE(h != nullptr);
+        REQUIRE(h->name[0] == n[0]);
+        REQUIRE(h->name[1] == n[1]);
+    }
+}
+
+TEST_CASE("find_handler returns null for unknown card", "[card_handler]") {
+    REQUIRE(find_handler("ZZ") == nullptr);
+}
+
+TEST_CASE("parse_nec_card matches old readmn for FR", "[compat]") {
+    auto c_new = parse_nec_card("FR 0 1 0 0 300.0 0.0");
+    auto c_old = parse_card_line("FR 0 1 0 0 300.0 0.0\n");
+    REQUIRE(c_new.mnemonic == c_old.mnemonic);
+    REQUIRE(c_new.i[0] == c_old.i[0]);
+    REQUIRE(c_new.i[1] == c_old.i[1]);
+    REQUIRE(c_new.i[2] == c_old.i[2]);
+    REQUIRE(c_new.i[3] == c_old.i[3]);
+    REQUIRE(c_new.f[0] == c_old.f[0]);
+    REQUIRE(c_new.f[1] == c_old.f[1]);
+}
+
+TEST_CASE("parse_nec_card matches old readmn for EX", "[compat]") {
+    auto c_new = parse_nec_card("EX 0 1 5 0 1.0 0.0 0.0 0.0 0.0 0.0");
+    auto c_old = parse_card_line("EX 0 1 5 0 1.0 0.0 0.0 0.0 0.0 0.0\n");
+    REQUIRE(c_new.mnemonic == c_old.mnemonic);
+    REQUIRE(c_new.i[0] == c_old.i[0]);
+    REQUIRE(c_new.i[1] == c_old.i[1]);
+    REQUIRE(c_new.i[2] == c_old.i[2]);
+    REQUIRE(c_new.i[3] == c_old.i[3]);
+    for (int n = 0; n < 6; n++)
+        REQUIRE(c_new.f[n] == c_old.f[n]);
 }

@@ -812,3 +812,84 @@ static void sig_handler(int signal )
 	}
 }
 #endif
+
+/*-----------------------------------------------------------------------*/
+/* Table-driven card handlers (replaces atst[] + switch dispatch)       */
+/* See nec_card_parser.h for the handler table declaration.             */
+/*-----------------------------------------------------------------------*/
+
+#include "nec_card_parser.h"
+
+void handle_fr(nec_context& ctx, const nec_card& c) {
+    ctx.fr_card(c.i[0], c.i[1], c.f[0], c.f[1]);
+}
+void handle_ld(nec_context& ctx, const nec_card& c) {
+    ctx.ld_card(c.i[0], c.i[1], c.i[2], c.i[3], c.f[0], c.f[1], c.f[2]);
+}
+void handle_gn(nec_context& ctx, const nec_card& c) {
+    ctx.gn_card(c.i[0], c.i[1], c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_ex(nec_context& ctx, const nec_card& c) {
+    ctx.ex_card((enum excitation_type)c.i[0], c.i[1], c.i[2], c.i[3],
+                c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_nt(nec_context& ctx, const nec_card& c) {
+    ctx.nt_card(c.i[0], c.i[1], c.i[2], c.i[3],
+                c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_tl(nec_context& ctx, const nec_card& c) {
+    ctx.tl_card(c.i[0], c.i[1], c.i[2], c.i[3],
+                c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_xq(nec_context& ctx, const nec_card& c) {
+    ctx.xq_card(c.i[0]);
+}
+void handle_gd(nec_context& ctx, const nec_card& c) {
+    ctx.gd_card(c.f[0], c.f[1], c.f[2], c.f[3]);
+}
+void handle_rp(nec_context& ctx, const nec_card& c) {
+    int XNDA = c.i[3];
+    ctx.rp_card(c.i[0], c.i[1], c.i[2],
+                XNDA / 1000, (XNDA / 100) % 10, (XNDA / 10) % 10, XNDA % 10,
+                c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_nx(nec_context&, const nec_card&) {
+    /* NX sets next_job flag — handled in the dispatch loop */
+}
+void handle_pt(nec_context& ctx, const nec_card& c) {
+    ctx.pt_card(c.i[0], c.i[1], c.i[2], c.i[3]);
+}
+void handle_kh(nec_context& ctx, const nec_card& c) {
+    ctx.kh_card(c.f[0]);
+}
+void handle_ne(nec_context& ctx, const nec_card& c) {
+    ctx.ne_card(c.i[0], c.i[1], c.i[2], c.i[3],
+                c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_nh(nec_context& ctx, const nec_card& c) {
+    ctx.nh_card(c.i[0], c.i[1], c.i[2], c.i[3],
+                c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5]);
+}
+void handle_pq(nec_context& ctx, const nec_card& c) {
+    ctx.pq_card(c.i[0], c.i[1], c.i[2], c.i[3]);
+}
+void handle_ek(nec_context& ctx, const nec_card& c) {
+    ctx.set_extended_thin_wire_kernel(c.i[0] != -1);
+}
+void handle_cp(nec_context& ctx, const nec_card& c) {
+    ctx.cp_card(c.i[0], c.i[1], c.i[2], c.i[3]);
+}
+void handle_pl(nec_context& ctx, const nec_card& c) {
+    /* PL requires filename — not cleanly supported via table dispatch yet.
+       Falls back to the old switch-based handler in nec_main. */
+    (void)ctx; (void)c;
+}
+void handle_en(nec_context& ctx, const nec_card&) {
+    ctx.all_jobs_completed();
+}
+void handle_wg(nec_context&, const nec_card&) {
+    throw new nec_exception("\"WG\" card, not supported.");
+}
+void handle_mp(nec_context& ctx, const nec_card& c) {
+    ctx.medium_parameters(c.f[0], c.f[1]);
+}
