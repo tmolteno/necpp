@@ -11,21 +11,61 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y g++ make automake autoconf libtool gfortran
-    
-    - name: Generate configure script
-      run: make -f Makefile.git
-    
-    - name: Configure
-      run: ./configure --without-lapack
-    
+        sudo apt-get install -y g++ make
+
     - name: Build
-      run: make -j 4
+      run: make -j$(nproc)
+
+    - name: Run unit tests
+      run: |
+        # Recompile library objects with NEC_ERROR_CHECK for test coverage
+        for src in c_evlcom c_geometry c_ggrid c_plot_card electromag libNEC \
+                   matrix_algebra misc nec_context nec_exception nec_ground \
+                   nec_output nec_radiation_pattern nec_results nec_structure_currents XGetopt; do
+          g++ -std=c++17 -I src -isystem src/eigen3 -I build/simple \
+            -DNEC_ERROR_CHECK=1 -g -c src/${src}.cpp -o build/test_${src}.o
+        done
+        # Compile nec2cpp with renamed main
+        g++ -std=c++17 -I src -isystem src/eigen3 -I build/simple \
+          -DNEC_ERROR_CHECK=1 -Dmain=nec2cpp_main_renamed \
+          -c src/nec2cpp.cpp -o build/test_nec2cpp.o
+        # Build test .o files
+        for tb in safe_array_tb matrix_algebra_tb c_geometry_tb c_evlcom_tb nec_context_tb nec2cpp_tb; do
+          g++ -std=c++17 -I src -isystem src/eigen3 -I build/simple \
+            -DNEC_ERROR_CHECK=1 -c src/${tb}.cpp -o build/${tb}.o
+        done
+        # Separate Catch2 main
+        cat > build/test_main.cpp << 'EOF'
+#define CATCH_CONFIG_MAIN
+#include "catch.hpp"
+EOF
+        g++ -std=c++17 -I src -isystem src/eigen3 -I build/simple \
+          -DNEC_ERROR_CHECK=1 -c build/test_main.cpp -o build/test_main.o
+        # Link all test objects
+        g++ -std=c++17 -o build/test_runner \
+          build/test_main.o \
+          build/safe_array_tb.o build/matrix_algebra_tb.o \
+          build/c_geometry_tb.o build/c_evlcom_tb.o \
+          build/nec_context_tb.o build/nec2cpp_tb.o \
+          build/test_nec2cpp.o \
+          build/test_c_evlcom.o build/test_c_geometry.o build/test_c_ggrid.o \
+          build/test_c_plot_card.o build/test_electromag.o build/test_libNEC.o \
+          build/test_matrix_algebra.o build/test_misc.o build/test_nec_context.o \
+          build/test_nec_exception.o build/test_nec_ground.o build/test_nec_output.o \
+          build/test_nec_radiation_pattern.o build/test_nec_results.o \
+          build/test_nec_structure_currents.o build/test_XGetopt.o \
+          -Wl,--allow-multiple-definition -lm -lstdc++
+        ./build/test_runner -s
+
+    - name: Run simulation smoke test
+      run: |
+        ./nec2++ -i testharness/data/herzian_dipole.nec -o /tmp/nec2_test_output.txt
+        grep -q "TOTAL RUN TIME" /tmp/nec2_test_output.txt && echo "Smoke test passed"
