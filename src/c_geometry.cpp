@@ -1512,8 +1512,8 @@ void c_geometry::connect_segments( int ignd )
   nscon= -1;
   maxcon = 1;
   
-  if (n_segments <= 1) {
-    throw new nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS. Please send bug report. This causes an error that we're trying to fix.");
+  if (n_segments <= 1 && np == 0) {
+    throw new nec_exception("GEOMETRY HAS ONE OR FEWER SEGMENTS and no patches. Please send bug report. This causes an error that we're trying to fix.");
   }
   
   if ( ignd != 0) {
