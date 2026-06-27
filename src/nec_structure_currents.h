@@ -31,7 +31,6 @@ class nec_structure_currents : public nec_base_result
 public:
 	/*Structure currents*/
 	nec_structure_currents(nec_context * in_context, enum excitation_type in_pattype,
-			int in_nload,
 			nec_float in_xpr3, nec_float in_xpr6);
 	
 	static std::string hpol(enum excitation_type e);
@@ -201,9 +200,7 @@ private:
 	int iptag, iptagf, iptagt;
 	int iptflq;
 	int iptaq, iptaqf, iptaqt;
-	
-	int nload;
-	
+
 	nec_float xpr3, xpr6;
 	nec_float wavelength;
 	nec_float freq_mhz;

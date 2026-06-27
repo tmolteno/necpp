@@ -1652,7 +1652,7 @@ excitation_return nec_context::excitation_process_inner(int mhz)
     if((iptflg < 1 || iptflg == 3 || ((iptflg == 1 || iptflg == 2) && inc <= 1)) || (iptflg == -1 && iptflq != -1))
     {
       structure_currents = new nec_structure_currents(this, m_excitation_type,
-      nload, xpr3, xpr6);
+      xpr3, xpr6);
 
       if(iptflg != 3)
       {

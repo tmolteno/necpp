@@ -30,7 +30,6 @@ int nec_structure_currents::get_m() {
 
 
 nec_structure_currents::nec_structure_currents(nec_context * in_context, enum excitation_type in_pattype,
-  int in_nload,
   nec_float in_xpr3, nec_float in_xpr6)
 {
   m_context = in_context;
@@ -45,9 +44,7 @@ nec_structure_currents::nec_structure_currents(nec_context * in_context, enum ex
   iptaq = m_context->iptaq;
   iptaqf = m_context->iptaqf;
   iptaqt = m_context->iptaqt;
-  
-  nload = in_nload;
-    
+
   xpr3 = in_xpr3;
   xpr6 = in_xpr6;
   
