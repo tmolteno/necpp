@@ -1552,240 +1552,239 @@ void nec_context::setup_excitation()
   etmns( tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, incident_amplitude, m_excitation_type, current_vector);
 }
 
+/* Phase 1 of excitation_loop: network solve, current printing, power budget.
+   Returns FREQ_INNER_LOOP_CONTINUE for 'continue', a FREQ_* return code,
+   or FREQ_PHASE_COMPLETE when falling through to near/far field phases. */
+excitation_return nec_context::excitation_process_inner(int mhz)
+{
+  setup_excitation();
+
+  calculate_network_data();
+  print_network_data();
+
+  if ( (inc > 1) && (iptflg > 0) )
+    nprint=1;
+
+  netwk( cm, ip, current_vector );
+  ntsol=1;
+
+  if ( iped != 0)
+  {
+    int itmp1= ( mhz-1);
+    DEBUG_TRACE("Index = " << itmp1);
+    fnorm(itmp1,0) = real( zped);
+    fnorm(itmp1,1) = imag( zped);
+    fnorm(itmp1,2) = abs( zped);
+    fnorm(itmp1,3) = arg_degrees( zped);
+
+    if ( iped != 2 )
+    {
+        if ( fnorm(itmp1,2) > impedance_norm_factor)
+         impedance_norm_factor = fnorm(itmp1,2);
+    }
+  }
+
+  /* printing structure currents */
+  if((iptflg <-2)||(iptflg > 3))
+  {
+    m_output.line("Warning : The print control flag for currents was incorrect ; it has been set to -1 (no printing for currents).");
+    iptflg = -1;
+  }
+
+  if((iptflq <-2)||(iptflq > 0))
+  {
+    m_output.line("Warning : The print control flag for charge densities was incorrect ; it has been set to -1 (no printing for charge densities).");
+    iptflq = -1;
+  }
+
+  if(m_excitation_type != 1 && m_excitation_type != 2 && m_excitation_type != 3)
+  {
+    if (iptflg == 2 || iptflg == 3)
+    {
+      m_output.line("Warning : The output format chosen for currents was incompatible with the excitation type. No currents has been printed.");
+      iptflg = -1;
+    }
+  }
+
+  if (iptflg != -1 || iptflq != -1)
+  {
+    if((iptflg < 1 || iptflg == 3 || ((iptflg == 1 || iptflg == 2) && inc <= 1)) || (iptflg == -1 && iptflq != -1))
+    {
+      structure_currents = new nec_structure_currents(this, m_excitation_type,
+      nload, xpr3, xpr6);
+
+      if(iptflg != 3)
+      {
+        structure_currents->set_frequency(freq_mhz/(1.e-6));
+        m_results.add(structure_currents);
+      }
+    }
+    structure_currents->analyze();
+
+    if(iptflg != 3)
+    {
+      std::stringstream ss;
+      structure_currents->write_to_file(ss);
+      m_output.string(ss.str().c_str(), false);
+    }
+  }
+
+  print_power_budget();
+
+  processing_state = PROCESSING_EXCITATION_LOOP;
+
+  if ( ncoup > 0)
+    couple( current_vector, _wavelength );
+
+  if ( iflow == 7)
+  {
+    DEBUG_TRACE("iflow == 7, nfrq =" << nfrq)
+    if ( (m_excitation_type >= 1) && (m_excitation_type <= 3) )
+    {
+      nthic++;
+      inc++;
+      xpr1 += xpr4;
+
+      if ( nthic <= nthi )
+        return FREQ_INNER_LOOP_CONTINUE;
+
+      nthic=1;
+      xpr1= thetis;
+      xpr2= xpr2+ xpr5;
+      nphic++;
+
+      if ( nphic <= nphi )
+        return FREQ_INNER_LOOP_CONTINUE;
+
+      return FREQ_PRINT_NORMALIZATION;
+    }
+
+    if ( nfrq != 1)
+      return FREQ_LOOP_CONTINUE;
+
+    m_output.end_section();
+    return FREQ_LOOP_CARD_CONTINUE;
+  }
+
+  return FREQ_PHASE_COMPLETE;
+}
+
+/* Phase 2 of excitation_loop: near field computation. */
+excitation_return nec_context::excitation_compute_near_field(int mhz)
+{
+  if ( m_near != -1)
+  {
+    if((nrx*nry*nrz) != 0)
+      nfpat();
+
+    if ( mhz == nfrq)
+      m_near = -1;
+
+    if ( nfrq == 1)
+    {
+      m_output.end_section();
+      return FREQ_LOOP_CARD_CONTINUE;
+    }
+  }
+  return FREQ_PHASE_COMPLETE;
+}
+
+/* Phase 3 of excitation_loop: standard far-field (radiation pattern) calculation. */
+void nec_context::excitation_compute_far_field()
+{
+  if ( ifar != -1)
+  {
+    auto rad_pat =
+      std::make_unique<nec_radiation_pattern>(nth, nph,
+          thets, phis, dth, dph,
+          rfld, ground,
+          ifar, _wavelength,
+          input_power, network_power_loss,
+          m_rp_output_format, m_rp_normalization, ipd, iavp,
+          gnor, plot_card);
+
+    rad_pat->analyze(this);
+
+    if (m_output_flags.get_gain_flag())
+    {
+      rad_pat->write_gain_normalization();
+    }
+    else
+    {
+      rad_pat->set_frequency(freq_mhz/(1.e-6));
+
+      std::stringstream ss;
+      rad_pat->write_to_file(ss);
+      m_output.line(ss.str().c_str());
+
+      m_results.add(rad_pat.release());
+    }
+  }
+}
+
 enum excitation_return nec_context::excitation_loop(enum processing_state in_freq_loop_state, int mhz)
 {
-  /** TODO This is horrendous code. It needs a complete refactor and rewrite.
-   * 
-   * See Issue #43
-   **/
   do
   {
     DEBUG_TRACE("excitation_loop: state=" << in_freq_loop_state << " processing_state = " << processing_state << "mHz=" << mhz << " iflow=" << iflow);
     DEBUG_TRACE("nthic = " << nthic << " nthi = " << nthi);
+
     if (in_freq_loop_state < 4)
     {
-      setup_excitation();
-
-      /* matrix solving  (netwk calls solves) */
-      calculate_network_data();
-      print_network_data();
-
-      if ( (inc > 1) && (iptflg > 0) )
-        nprint=1;
-
-      netwk( cm, ip, current_vector );
-      ntsol=1;
-
-      if ( iped != 0)
-      {
-        int itmp1= ( mhz-1);
-        DEBUG_TRACE("Index = " << itmp1);
-        fnorm(itmp1,0) = real( zped);
-        fnorm(itmp1,1) = imag( zped);
-        fnorm(itmp1,2) = abs( zped);
-        fnorm(itmp1,3) = arg_degrees( zped);
-
-        if ( iped != 2 )
-        {
-            if ( fnorm(itmp1,2) > impedance_norm_factor)
-             impedance_norm_factor = fnorm(itmp1,2);
-        }
-      } /* if ( iped != 0) */
-
-      /* printing structure currents */
-      
-      /* The printing of currents is now managed by a dedicated nec_base_result : nec_structure_currents*/
-      
-      /* Check that the flag for currents and charge densities don't have unexpected values */ 
-      if((iptflg <-2)||(iptflg > 3))
-      {
-        m_output.line("Warning : The print control flag for currents was incorrect ; it has been set to -1 (no printing for currents).");
-        iptflg = -1;
-      }
-      
-      if((iptflq <-2)||(iptflq > 0))
-      {
-        m_output.line("Warning : The print control flag for charge densities was incorrect ; it has been set to -1 (no printing for charge densities).");
-        iptflq = -1;
-      }
-      
-      /* Check for compatibility between the excitation type and the output format for currents */      
-      if(m_excitation_type != 1 && m_excitation_type != 2 && m_excitation_type != 3)
-      {
-        if (iptflg == 2 || iptflg == 3)
-        {
-          m_output.line("Warning : The output format chosen for currents was incompatible with the excitation type. No currents has been printed.");
-          iptflg = -1;
-        }
-      }
-      
-      /* Now proceed with the printing of currents */      
-      if (iptflg != -1 || iptflq != -1)
-      {
-        if((iptflg < 1 || iptflg == 3 || ((iptflg == 1 || iptflg == 2) && inc <= 1)) || (iptflg == -1 && iptflq != -1))
-        {
-          structure_currents = new nec_structure_currents(this, m_excitation_type,
-          nload, xpr3, xpr6);
-        
-          if(iptflg != 3)
-          {
-            structure_currents->set_frequency(freq_mhz/(1.e-6));
-            m_results.add(structure_currents);
-          }
-        }
-        structure_currents->analyze();
-        
-        if(iptflg != 3)
-        {  
-          std::stringstream ss;
-          structure_currents->write_to_file(ss);
-          m_output.string(ss.str().c_str(), false);
-        }
-      
-      } /* if (iptflg != -1 || iptflq != -1) */
-                
-      
-      /*print_structure_currents(hpol[m_excitation_type-1], iptflg, iptflq,
-        iptag, iptagf, iptagt, iptaq, iptaqf, iptaqt);*/
-            
-      print_power_budget();
-
-      processing_state = PROCESSING_EXCITATION_LOOP; // 4
-
-      if ( ncoup > 0)
-        couple( current_vector, _wavelength );
-
-      if ( iflow == 7)
-      {
-        DEBUG_TRACE("iflow == 7, nfrq =" << nfrq)
-        if ( (m_excitation_type >= 1) && (m_excitation_type <= 3) )
-        {
-          nthic++;
-          inc++;
-          xpr1 += xpr4;
-
-          if ( nthic <= nthi )
-            continue; /* continue excitation loop */
-
-          nthic=1;
-          xpr1= thetis;
-          xpr2= xpr2+ xpr5;
-          nphic++;
-
-          if ( nphic <= nphi )
-            continue; /* continue excitation loop */
-
-          return FREQ_PRINT_NORMALIZATION;
-        } /* if ( (m_excitation_type >= 1) && (m_excitation_type <= 3) ) */
-
-        if ( nfrq != 1) 
-        {
-          return FREQ_LOOP_CONTINUE; /* continue the freq loop */
-        }
-
-        m_output.end_section();
-        return FREQ_LOOP_CARD_CONTINUE; /* continue card input loop */
-
-      } /*if ( iflow == 7) */
-
+      excitation_return ret = excitation_process_inner(mhz);
+      if (FREQ_INNER_LOOP_CONTINUE == ret)
+        continue;
+      if (FREQ_PHASE_COMPLETE != ret)
+        return ret;
     }
-    
+
     if (in_freq_loop_state < 5)
       processing_state = PROCESSING_NEAR_FIELD;
 
-    
-    /* near field calculation */
-    if (in_freq_loop_state != PROCESSING_FAR_FIELD) // 6
+    if (in_freq_loop_state != PROCESSING_FAR_FIELD)
     {
-      if ( m_near != -1)
-      {
-        if((nrx*nry*nrz) != 0)
-          nfpat();
-
-        if ( mhz == nfrq)
-          m_near = -1;
-
-        if ( nfrq == 1)
-        {
-          m_output.end_section();
-            return FREQ_LOOP_CARD_CONTINUE; /* continue card input loop */
-        }
-      } /* if ( near != -1) */
-    }
-    
-    /* Standard far-field calculation */
-    
-    if ( ifar != -1)
-    {
-      auto rad_pat =
-        std::make_unique<nec_radiation_pattern>(nth, nph,
-            thets, phis, dth, dph,
-            rfld, ground,
-            ifar, _wavelength,
-            input_power, network_power_loss,
-            m_rp_output_format, m_rp_normalization, ipd, iavp,
-            gnor, plot_card);
-
-      rad_pat->analyze(this);
-      
-      /* Here we write the largest gain to the standard output
-        if the user has specified this on the command line.
-      */
-      if (m_output_flags.get_gain_flag())
-      {
-        rad_pat->write_gain_normalization();
-      }
-      else
-      {
-        rad_pat->set_frequency(freq_mhz/(1.e-6));
-        
-        // write the results to the ordinary NEC output file.
-        
-        std::stringstream ss;
-        rad_pat->write_to_file(ss);
-        m_output.line(ss.str().c_str());
-
-        m_results.add(rad_pat.release());
-      }
+      excitation_return ret = excitation_compute_near_field(mhz);
+      if (FREQ_PHASE_COMPLETE != ret)
+        return ret;
     }
 
-    if ( (m_excitation_type == EXCITATION_VOLTAGE) 
+    excitation_compute_far_field();
+
+    if ( (m_excitation_type == EXCITATION_VOLTAGE)
       || (m_excitation_type == EXCITATION_CURRENT)
-      || (m_excitation_type == EXCITATION_VOLTAGE_DISC) ) // >= 4
+      || (m_excitation_type == EXCITATION_VOLTAGE_DISC) )
     {
       if ( mhz == nfrq )
         ifar = -1;
 
       if ( nfrq != 1)
-      {
-        return FREQ_LOOP_CONTINUE;  /* continue the freq loop */
-      }
+        return FREQ_LOOP_CONTINUE;
 
       m_output.end_section();
-      return FREQ_LOOP_CARD_CONTINUE;  /* continue card input loop */
+      return FREQ_LOOP_CARD_CONTINUE;
     }
-    
+
     nthic++;
     inc++;
     xpr1 += xpr4;
 
     if ( nthic <= nthi )
-      continue; /* continue excitation loop */
+      continue;
 
     nthic = 1;
     xpr1  = thetis;
     xpr2 += xpr5;
     nphic++;
 
-	    if ( nphic > nphi ) {
-	      if ( nfrq != 1)
-	        return FREQ_LOOP_CONTINUE;
-	      return FREQ_PRINT_NORMALIZATION;
-	    }
+    if ( nphic > nphi ) {
+      if ( nfrq != 1)
+        return FREQ_LOOP_CONTINUE;
+      return FREQ_PRINT_NORMALIZATION;
+    }
 
   }
   while( true );
-} /* excitation_loop */
+}
 
 
 
@@ -2707,6 +2706,77 @@ void nec_context::couple( complex_array& in_currents, nec_float in_wavelength )
 }
 
 
+/*! \brief Compute the field contribution (direct or reflected) for efld().
+
+\param xij,yij Relative x,y position of evaluation point minus source.
+\param ai Radius of the segment.
+\param salpr Sine of the segment orientation angle (sign differs for direct/reflected).
+\param zij Z-offset (sign differs for direct/reflected).
+\param ijx 0 for direct field, 1 for reflected.
+\param egnd Output array: [0]=txk [1]=tyk [2]=tzk [3]=txs [4]=tys [5]=tzs [6]=txc [7]=tyc [8]=tzc
+*/
+nec_float nec_context::efld_compute(
+    nec_float xij, nec_float yij, nec_float ai,
+    nec_float salpr, nec_float zij, bool ijx,
+    complex_array& egnd)
+{
+  nec_complex tezs, ters, tezc, terc, tezk, terk;
+
+  nec_float zp = xij*cabj + yij*sabj + zij*salpr;
+  nec_float rhox = xij - cabj*zp;
+  nec_float rhoy = yij - sabj*zp;
+  nec_float rhoz = zij - salpr*zp;
+
+  nec_float rh = sqrt( rhox*rhox + rhoy*rhoy + rhoz*rhoz + ai*ai);
+  if ( rh <= 1.e-10) {
+    rhox = 0.0; rhoy = 0.0; rhoz = 0.0;
+  } else {
+    rhox /= rh; rhoy /= rh; rhoz /= rh;
+  }
+
+  /* lumped current element approx. for large separations */
+  nec_float r = sqrt( zp*zp + rh*rh);
+  if ( r >= rkh) {
+    nec_float rmag = two_pi() * r;
+    nec_float cth = zp / r;
+    nec_float px = rh / r;
+    egnd[0] = nec_complex( cos( rmag),- sin( rmag));
+    nec_float py = two_pi() * r* r;
+    egnd[1] = em::impedance() * cth* egnd[0]* nec_complex(1.0,-1.0/ rmag)/ py;
+    egnd[2] = em::impedance() * px* egnd[0]* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
+    tezk = egnd[1]* cth- egnd[2]* px;
+    terk = egnd[1]* px+ egnd[2]* cth;
+    rmag = sin( pi()* m_s)/ pi();
+    tezc = tezk* rmag;
+    terc = terk* rmag;
+    tezk = tezk* m_s;
+    terk = terk* m_s;
+    egnd[3]=cplx_00();
+    egnd[4]=cplx_00();
+    egnd[5]=cplx_00();
+  }
+
+  if ( r < rkh) {
+    if ( m_use_exk == false)
+      eksc( m_s, zp, rh, two_pi(), ijx, &tezs, &ters, &tezc, &terc, &tezk, &terk );
+    else
+      ekscx( m_b, m_s, zp, rh, two_pi(), ijx, ind1, ind2, &tezs, &ters, &tezc, &terc, &tezk, &terk);
+
+    egnd[3]= tezs* cabj+ ters* rhox;
+    egnd[4]= tezs* sabj+ ters* rhoy;
+    egnd[5]= tezs* salpr+ ters* rhoz;
+  }
+
+  egnd[0]= tezk* cabj+ terk* rhox;
+  egnd[1]= tezk* sabj+ terk* rhoy;
+  egnd[2]= tezk* salpr+ terk* rhoz;
+  egnd[6]= tezc* cabj+ terc* rhox;
+  egnd[7]= tezc* sabj+ terc* rhoy;
+  egnd[8]= tezc* salpr+ terc* rhoz;
+
+  return r;
+}
+
 /*! \brief Compute near E-fields of a segment due to constant sine and cosine currents distributions.  The ground effect is included.
 
 \param xi,yi,zi x,y,z components of the field evaluation point.
@@ -2729,160 +2799,31 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
   nec_float rhoy, rhoz, rh, r, rmag, cth, px, py;
   nec_float xymag, xspec, yspec, rhospc, dmin, shaf;
   nec_complex epx, epy, refs, refps, zrsin, zratx, zscrn;
-  nec_complex tezs, ters, tezc, terc, tezk, terk;
+  nec_complex ters, terc, terk;  // used in Sommerfeld/Norton section
   complex_array egnd(9);
-  
+
   nec_float xij = xi - xj;
   nec_float yij = yi - yj;
-  bool ijx = not_on_source_segment;
-  
-  {
-    // calculate the direct field.
-    salpr= salpj;
-    zij= zi- zj;
-    zp= xij* cabj+ yij* sabj+ zij* salpr;
-    rhox= xij- cabj* zp;
-    rhoy= yij- sabj* zp;
-    rhoz= zij- salpr* zp;
-  
-    rh = sqrt( rhox*rhox + rhoy*rhoy + rhoz*rhoz + ai*ai);
-    if ( rh <= 1.e-10)
-    {
-      rhox=0.0;
-      rhoy=0.0;
-      rhoz=0.0;
-    }
-    else
-    {
-      rhox= rhox/ rh;
-      rhoy= rhoy/ rh;
-      rhoz= rhoz/ rh;
-    }
-  
-    /* lumped current element approx. for large separations */
-    r= sqrt( zp*zp + rh*rh);
-    if ( r >= rkh)
-    {
-      rmag = two_pi() * r;
-      cth = zp/ r;
-      px = rh/ r;
-      txk = nec_complex( cos( rmag),- sin( rmag));
-      py= two_pi() * r* r;
-      tyk= em::impedance() * cth* txk* nec_complex(1.0,-1.0/ rmag)/ py;
-      tzk= em::impedance() * px* txk* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
-      tezk= tyk* cth- tzk* px;
-      terk= tyk* px+ tzk* cth;
-      rmag= sin( pi()* m_s)/ pi();
-      tezc= tezk* rmag;
-      terc= terk* rmag;
-      tezk= tezk* m_s;
-      terk= terk* m_s;
-      txs=cplx_00();
-      tys=cplx_00();
-      tzs=cplx_00();
-    
-    } /* if ( r >= rkh) */
-  
-    if ( r < rkh)
-    {
-      /* eksc for thin wire approx. or ekscx for extended t.w. approx. */
-      if ( m_use_exk == false)
-        eksc( m_s, zp, rh, two_pi(), ijx, &tezs, &ters, &tezc, &terc, &tezk, &terk );
-      else
-        ekscx( m_b, m_s, zp, rh, two_pi(), ijx, ind1, ind2, &tezs, &ters, &tezc, &terc, &tezk, &terk);
-    
-      txs= tezs* cabj+ ters* rhox;
-      tys= tezs* sabj+ ters* rhoy;
-      tzs= tezs* salpr+ ters* rhoz;
-    }
-  
-    txk= tezk* cabj+ terk* rhox;
-    tyk= tezk* sabj+ terk* rhoy;
-    tzk= tezk* salpr+ terk* rhoz;
-    txc= tezc* cabj+ terc* rhox;
-    tyc= tezc* sabj+ terc* rhoy;
-    tzc= tezc* salpr+ terc* rhoz;
-  
-    exk= txk;
-    eyk= tyk;
-    ezk= tzk;
-    exs= txs;
-    eys= tys;
-    ezs= tzs;
-    exc= txc;
-    eyc= tyc;
-    ezc= tzc;
-  }
+
+  /* direct field */
+  efld_compute(xij, yij, ai, salpj, zi - zj, not_on_source_segment, egnd);
+  exk = egnd[0];
+  eyk = egnd[1];
+  ezk = egnd[2];
+  exs = egnd[3];
+  eys = egnd[4];
+  ezs = egnd[5];
+  exc = egnd[6];
+  eyc = egnd[7];
+  ezc = egnd[8];
   
   if (ground.present())
   {
     // Now do the reflected field...
-    ijx=1;
-    salpr= -salpj;
-    zij= zi + zj;
-    zp= xij* cabj+ yij* sabj+ zij* salpr;
-    rhox= xij- cabj* zp;
-    rhoy= yij- sabj* zp;
-    rhoz= zij- salpr* zp;
-  
-    rh = sqrt( rhox*rhox + rhoy*rhoy + rhoz*rhoz + ai*ai);
-    if ( rh <= 1.e-10)
-    {
-      rhox=0.0;
-      rhoy=0.0;
-      rhoz=0.0;
-    }
-    else
-    {
-      rhox= rhox/ rh;
-      rhoy= rhoy/ rh;
-      rhoz= rhoz/ rh;
-    }
-  
-    /* lumped current element approx. for large separations */
-    r= sqrt( zp*zp + rh*rh);
-    if ( r >= rkh)
-    {
-      rmag = two_pi() * r;
-      cth = zp/ r;
-      px = rh/ r;
-      txk = nec_complex( cos( rmag),- sin( rmag));
-      py= two_pi() * r* r;
-      tyk= em::impedance() * cth* txk* nec_complex(1.0,-1.0/ rmag)/ py;
-      tzk= em::impedance() * px* txk* nec_complex(1.0, rmag-1.0/ rmag)/(2.* py);
-      tezk= tyk* cth- tzk* px;
-      terk= tyk* px+ tzk* cth;
-      rmag= sin( pi()* m_s)/ pi();
-      tezc= tezk* rmag;
-      terc= terk* rmag;
-      tezk= tezk* m_s;
-      terk= terk* m_s;
-      txs=cplx_00();
-      tys=cplx_00();
-      tzs=cplx_00();
-    
-    } /* if ( r >= rkh) */
-  
-    if ( r < rkh)
-    {
-      /* eksc for thin wire approx. or ekscx for extended t.w. approx. */
-      if ( m_use_exk == false)
-        eksc( m_s, zp, rh, two_pi(), ijx, &tezs, &ters, &tezc, &terc, &tezk, &terk );
-      else
-        ekscx( m_b, m_s, zp, rh, two_pi(), ijx, ind1, ind2, &tezs, &ters, &tezc, &terc, &tezk, &terk);
-    
-      txs= tezs* cabj+ ters* rhox;
-      tys= tezs* sabj+ ters* rhoy;
-      tzs= tezs* salpr+ ters* rhoz;
-    }
-  
-    txk= tezk* cabj+ terk* rhox;
-    tyk= tezk* sabj+ terk* rhoy;
-    tzk= tezk* salpr+ terk* rhoz;
-    txc= tezc* cabj+ terc* rhox;
-    tyc= tezc* sabj+ terc* rhoy;
-    tzc= tezc* salpr+ terc* rhoz;
-  
+    /* reflected field */
+    zij = zi + zj;
+    r = efld_compute(xij, yij, ai, -salpj, zij, true, egnd);
+
     ASSERT(ground.is_valid());
     if (ground.type_finite_reflection())
     {
