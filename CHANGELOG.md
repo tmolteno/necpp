@@ -62,6 +62,10 @@
 * 14 blocks of dead code removed
 * Raw new/delete replaced with std::unique_ptr (3 sites)
 * Table-driven NEC card parser with clean parse_nec_card()
+* Refactor efld(): extract efld_compute() to eliminate ~140 lines of near-duplicate direct/reflected field computation
+* Refactor excitation_loop(): decompose ~200-line do-while(true) monolith into excitation_process_inner(),
+  excitation_compute_near_field(), and excitation_compute_far_field() helpers
+* Expand nec_card f[] array from 6 to 7 floats for additional RP card field support
 * CI workflow: simple Makefile build, 405 unit tests, smoke test
 
 ## Version 1.7.7
