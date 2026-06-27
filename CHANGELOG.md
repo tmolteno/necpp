@@ -37,6 +37,8 @@
 * Remove `-all-static` from LDFLAGS for macOS compatibility (#58)
 * Remove LAPACK/Atlas configure options and references (#66, #62, #57, #52, #18, #83, #68)
 * Fix `config.h` generation for example builds (#60)
+* Fix nondeterministic power budget: uninitialised `structure_power_loss` produced run-to-run NaN/denormal RADIATED POWER and EFFICIENCY values
+* Fix structure loss reported as zero when current printing is disabled (`PT -1`): ohmic loss is now computed independent of the print flag, matching NEC-2 (loaded models with suppressed printing reported false 100% efficiency)
 
 ### Distribution
 * Eigen 3.4.0 headers bundled in `src/eigen3/` — no external Eigen dependency needed
@@ -65,6 +67,8 @@
 * Refactor efld(): extract efld_compute() to eliminate ~140 lines of near-duplicate direct/reflected field computation
 * Refactor excitation_loop(): decompose ~200-line do-while(true) monolith into excitation_process_inner(),
   excitation_compute_near_field(), and excitation_compute_far_field() helpers
+* Refactor parse_geometry(): 370-line do-while dispatcher split into per-card handlers (GW/GX/GR/GS/GM/SP/SM/GA/SC/GH) sharing a geometry_parse_state struct
+* Move structure power loss to nec_context::compute_structure_power_loss(); remove dead nload member from nec_structure_currents
 * Expand nec_card f[] array from 6 to 7 floats for additional RP card field support
 * CI workflow: simple Makefile build, 405 unit tests, smoke test
 
