@@ -1,4 +1,4 @@
-AC_INIT([necpp],[2.0.0])
+AC_INIT([necpp],[2.1.0])
 AC_CONFIG_AUX_DIR([m4])
 AC_CONFIG_MACRO_DIR([config/m4])
 AC_CONFIG_HEADERS(config.h)

@@ -1,4 +1,4 @@
-## Version 2.0.0
+## Version 2.1.0
 
 ### Breaking Changes
 * **Eigen is now mandatory** (but bundled in `src/eigen3/` — no external install needed). All `--with-eigen*` options removed.
@@ -55,6 +55,7 @@
 
 ### Code Quality
 * Fixed exception memory leak: throw-by-pointer → throw-by-value (55+ sites, 15 files)
+* Split 4 monolithic functions: netwk() 680→13, reflect() 391→30, connect_segments() 380→16, etmns() 331→55 (#107)
 * pragma once on all 26 headers (removes reserved-identifier UB)
 * 22 C-style casts converted to static_cast
 * 12 override specifiers added to virtual functions
