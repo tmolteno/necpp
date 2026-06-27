@@ -224,6 +224,32 @@ private:
   
   void reflect_plane(int sym_plane, int& tag_increment);
 
+  /*! \brief Mutable state threaded through the per-card geometry parse handlers.
+   *  Bundles the values read from the current geometry card with the data that
+   *  must persist between cards: the patch corners shared by an SP/SM card and a
+   *  following SC card, the running element count, and the patch-continuation flag.
+   */
+  struct geometry_parse_state {
+    char gm[3] = {0,0,0};
+    int card_int_1 = 0, card_int_2 = 0;
+    nec_float xw1=0, yw1=0, zw1=0, xw2=0, yw2=0, zw2=0, rad=0;
+    nec_float x3=0, y3=0, z3=0, x4=0, y4=0, z4=0; // patch corners carried SP/SM -> SC
+    int isct = 0;   // patch continuation flag (set by SP, consumed by following SC)
+    int nwire = 0;  // running count of wire/arc/helix elements
+  };
+
+  void parse_structure_header();
+  void parse_gw_card(FILE* input_fp, geometry_parse_state& st);
+  void parse_gr_card(geometry_parse_state& st);
+  void parse_gs_card(geometry_parse_state& st);
+  void parse_gm_card(geometry_parse_state& st);
+  void parse_sp_card(FILE* input_fp, geometry_parse_state& st);
+  void parse_sm_card(FILE* input_fp, geometry_parse_state& st);
+  void parse_ga_card(geometry_parse_state& st);
+  void parse_sc_card(geometry_parse_state& st);
+  void parse_gh_card(geometry_parse_state& st);
+  void parse_geometry_error(const geometry_parse_state& st);
+
   int patch_type;
   nec_3vector patch_x1, patch_x2, patch_x3, patch_x4;
   bool   _prev_sc;

@@ -105,376 +105,333 @@ void str_toupper(std::string &str)
     str.begin(),
     ::toupper);
 }
+/* input card mnemonic list (for reference):
+   "GW", "GX", "GR", "GS", "GE", "GM", "SP", "SM", "GA", "SC", "GH", "GF" */
 void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
 {
-  char gm[3];
-  const char ipt[4] = { 'P', 'R', 'T', 'Q' };
-  
-  /* input card mnemonic list */
-  /* "XT" stands for "exit", added for testing */
-/*  #define GM_NUM  12
-  char *atst[GM_NUM] =
-  {
-    "GW", "GX", "GR", "GS", "GE", "GM", \
-    "SP", "SM", "GA", "SC", "GH", "GF"
-  };*/
-  
-  bool print_structure_spec = true;
-  
-  int nwire, isct, i1, i2;
-  int card_int_1, card_int_2; /* The two integer parameters from the geometry card */
-  nec_float rad, xs1, xs2, ys1, ys2, zs1, zs2, x4=0, y4=0, z4=0;
-  nec_float x3=0, y3=0, z3=0, xw1, xw2, yw1, yw2, zw1, zw2;
-  nec_float dummy;
-  
+  geometry_parse_state st;
+
   m_ipsym=0;
-  nwire=0;
   n_segments=0;
   np=0;
   m=0;
   mp=0;
-  isct=0;
-  
-  /* read geometry data card and branch to */
-  /* section for operation requested */
+
+  bool print_structure_spec = true;
+
+  /* read geometry data card and dispatch to the handler for the requested operation */
   do
   {
-    read_geometry_card(input_fp, gm, &card_int_1, &card_int_2, &xw1, &yw1, &zw1, &xw2, &yw2, &zw2, &rad);
-  
-    /* identify card id mnemonic */
-    std::string card_id(gm);
+    read_geometry_card(input_fp, st.gm, &st.card_int_1, &st.card_int_2,
+                       &st.xw1, &st.yw1, &st.zw1, &st.xw2, &st.yw2, &st.zw2, &st.rad);
+
+    std::string card_id(st.gm);
     str_toupper(card_id);
 
     if ( print_structure_spec )
     {
-      m_output->end_section();
-      m_output->set_indent(32);
-      m_output->line("-------- STRUCTURE SPECIFICATION --------");
-      m_output->line("COORDINATES MUST BE INPUT IN" );
-      m_output->line("METERS OR BE SCALED TO METERS" );
-      m_output->line("BEFORE STRUCTURE INPUT IS ENDED" );
-      m_output->set_indent(0);
-    
-      m_output->line("  WIRE                                                                                 SEG FIRST  LAST  TAG");
-      m_output->line("   No:        X1         Y1         Z1         X2         Y2         Z2       RADIUS   No:   SEG   SEG  No:" );
-    
+      parse_structure_header();
       print_structure_spec = false;
     }
 
-    if ( card_id != "SC") // gm_num != 10 )
-      isct=0;
+    if ( card_id != "SC")
+      st.isct = 0;
 
-    /* "gw" card, generate segment data for straight wire.
-      GW    STRAIGHT WIRE, ENDS 1,2
-        card_int_1- TAG NO.
-        card_int_2- NO. SEGMENTS
-        xw1- X1
-        F2- Y1
-        F3- Z1
-        F4- X2
-        F5- Y2
-        F6- Z2
-        F7- WIRE RAD., 0=USE GC FOR TAPERED WIRE
-    */
-    if (card_id == "GW")
-    {
-      int wire_segment_count = card_int_2;
-      int wire_tag = card_int_1;
-      
-      nwire++;
-    
-      // output some wire diagnostics.
-      m_output->nec_printf( "\n"
-        " %5d  %10.4f %10.4f %10.4f %10.4f"
-        " %10.4f %10.4f %10.4f %5d %5d %5d %4d",
-        nwire, xw1, yw1, zw1, xw2, yw2, zw2, rad, wire_segment_count, n_segments+1, n_segments + wire_segment_count, wire_tag );
-    
-      if ( rad != 0.0)  // rad == 0 implies a tapered wire
-      {
-        xs1 = 1.0;
-        ys1 = 1.0;
-      }
-      else
-      {
-        int ix,iy;
-        read_geometry_card(input_fp, gm, &ix, &iy, &xs1, &ys1, &zs1,
-          &dummy, &dummy, &dummy, &dummy);
-      
-        if ( strcmp(gm, "GC" ) != 0 )
-        {
-          throw nec_exception("GEOMETRY DATA CARD ERROR" );
-        }
-      
-        m_output->nec_printf(
-          "\n  ABOVE WIRE IS TAPERED.  SEGMENT LENGTH RATIO: %9.5f\n"
-          "                                 "
-          "RADIUS FROM: %9.5f TO: %9.5f", xs1, ys1, zs1 );
-      
-        if ( (ys1 == 0) || (zs1 == 0) )
-        {
-          throw nec_exception("GEOMETRY DATA CARD ERROR" );
-        }
-      
-        rad= ys1;
-        ys1= pow( (zs1/ys1), (1./(wire_segment_count-1.)) );
-      }
-    
-      wire(wire_tag, wire_segment_count, xw1, yw1, zw1, xw2, yw2, zw2, rad, xs1, ys1);
-    }
-
-    /* reflect structure along x,y, or z */
-    /* axes or rotate to form cylinder.  */
-    /* "gx" card */
-    else if (card_id == "GX")
-    {  gx_card(card_int_1, card_int_2);
-    }
-  
-    /* "gr" card */
-    else if (card_id == "GR")
-    {
-    
-      m_output->nec_printf(
-        "\n  STRUCTURE ROTATED ABOUT Z-AXIS %d TIMES"
-        " - LABELS INCREMENTED BY %d\n", card_int_2, card_int_1 );
-    
-      int ix = -1;
-      int iy = 0;
-      int iz = 0;
-      reflect( ix, iy, iz, card_int_1, card_int_2);
-    }
-  
-    /* "gs" card, scale structure dimensions by factor xw1. */
-    else if (card_id == "GS")
-    {      
-      m_output->nec_printf(
-        "\n     STRUCTURE SCALED BY FACTOR: %10.5f", xw1 );
-      
-      scale(xw1);  
-    }
-
-    /* "ge" card, terminate structure geometry input. */
-    else if (card_id == "GE")
-    {
-      geometry_complete(in_context, card_int_1);
-      return;
-    }
-
-    /* "gm" card, move structure or reproduce */
-    /* original structure in new positions.   */
-    else if (card_id == "GM")
-    {
-      m_output->nec_printf(
-        "\n     THE STRUCTURE HAS BEEN MOVED, MOVE DATA CARD IS:\n"
-        "   %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
-        card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, rad );
-    
-      xw1= degrees_to_rad(xw1);
-      yw1= degrees_to_rad(yw1);
-      zw1= degrees_to_rad(zw1);
-    
-      move( xw1, yw1, zw1, xw2, yw2, zw2, static_cast<int>( rad+.5), card_int_2, card_int_1);
-    }
-    
-    /* "sp" card, generate single new patch */
-    else if (card_id == "SP")
-    {
-      i1= m+1;
-      card_int_2++;
-    
-      if ( card_int_1 != 0)
-      {
-        throw nec_exception("PATCH DATA ERROR" );
-      }
-    
-      m_output->nec_printf( "\n"
-        " %5d%c %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
-        i1, ipt[card_int_2-1], xw1, yw1, zw1, xw2, yw2, zw2 );
-    
-      if ( (card_int_2 == 2) || (card_int_2 == 4) )
-        isct=1;
-    
-      if ( card_int_2 > 1)
-      {
-        // read another geometry card for the rest of the patch data. 
-        int ix,iy;
-        read_geometry_card(input_fp, gm, &ix, &iy, &x3, &y3, &z3, &x4, &y4, &z4, &dummy);
-      
-        if ( (card_int_2 == 2) || (card_int_1 > 0) )
-        {
-          x4= xw1+ x3- xw2;
-          y4= yw1+ y3- yw2;
-          z4= zw1+ z3- zw2;
-        }
-      
-        m_output->nec_printf( "\n"
-          "      %11.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
-          x3, y3, z3, x4, y4, z4 );
-      
-        if ( strcmp(gm, "SC") != 0 )
-        {
-          throw nec_exception("PATCH DATA ERROR" );
-        }
-      } /* if ( card_int_2 > 1) */
-      else
-      {
-        xw2= degrees_to_rad(xw2);
-        yw2= degrees_to_rad(yw2);
-      }
-    
-      patch( card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, x3, y3, z3, x4, y4, z4);
-    }
-  
-    /* "sm" card, generate multiple-patch surface */
-    else if (card_id == "SM")
-    {
-      i1= m+1;
-      m_output->nec_printf( "\n"
-        " %5d%c %10.5f %11.5f %11.5f %11.5f %11.5f %11.5f"
-        "     SURFACE - %d BY %d PATCHES",
-        i1, ipt[1], xw1, yw1, zw1, xw2, yw2, zw2, card_int_1, card_int_2 );
-    
-      if ( (card_int_1 < 1) || (card_int_2 < 1) )
-      {
-        throw nec_exception("PATCH DATA ERROR" );
-      }
-    
-      int ix,iy;
-      read_geometry_card(input_fp, gm, &ix, &iy, &x3, &y3, &z3, &x4, &y4, &z4, &dummy);
-    
-      if ( (card_int_2 == 2) || (card_int_1 > 0) )
-      {
-        x4= xw1+ x3- xw2;
-        y4= yw1+ y3- yw2;
-        z4= zw1+ z3- zw2;
-      }
-    
-      m_output->nec_printf( "\n"
-        "      %11.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
-        x3, y3, z3, x4, y4, z4 );
-    
-      if ( strcmp(gm, "SC" ) != 0 )
-      {
-        throw nec_exception("PATCH DATA ERROR" );
-      }
-    
-      patch( card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, x3, y3, z3, x4, y4, z4);
-    }
-    
-    /* "ga" card, generate segment data for wire arc */
-    else if (card_id == "GA")
-    {
-      nwire++;
-      i1= n_segments+1;
-      i2= n_segments+ card_int_2;
-    
-      m_output->nec_printf( "\n"
-        " %5d  ARC RADIUS: %9.5f  FROM: %8.3f TO: %8.3f DEGREES"
-        "       %11.5f %5d %5d %5d %4d",
-        nwire, xw1, yw1, zw1, xw2, card_int_2, i1, i2, card_int_1 );
-    
-      arc( card_int_1, card_int_2, xw1, yw1, zw1, xw2);
-    }
-  
-    /* "sc" card */
-    else if (card_id == "SC")
-    {
-      if ( isct == 0)
-      {
-        throw nec_exception("PATCH DATA ERROR" );
-      }
-    
-      i1= m+1;
-      card_int_2++;
-    
-      if ( (card_int_1 != 0) || ((card_int_2 != 2) && (card_int_2 != 4)) )
-      {
-        throw nec_exception("PATCH DATA ERROR" );
-      }
-    
-      xs1= x4;
-      ys1= y4;
-      zs1= z4;
-      xs2= x3;
-      ys2= y3;
-      zs2= z3;
-      x3= xw1;
-      y3= yw1;
-      z3= zw1;
-    
-      if ( card_int_2 == 4)
-      {
-        x4= xw2;
-        y4= yw2;
-        z4= zw2;
-      }
-    
-      xw1= xs1;
-      yw1= ys1;
-      zw1= zs1;
-      xw2= xs2;
-      yw2= ys2;
-      zw2= zs2;
-    
-      if ( card_int_2 != 4)
-      {
-        x4= xw1+ x3- xw2;
-        y4= yw1+ y3- yw2;
-        z4= zw1+ z3- zw2;
-      }
-    
-      m_output->nec_printf( "\n"
-        " %5d%c %10.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
-        i1, ipt[card_int_2-1], xw1, yw1, zw1, xw2, yw2, zw2 );
-    
-      m_output->nec_printf( "\n"
-        "      %11.5f %11.5f %11.5f  %11.5f %11.5f %11.5f",
-        x3, y3, z3, x4, y4, z4 );
-    
-      patch( card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, x3, y3, z3, x4, y4, z4);
-    }
-  
-    /* "gh" card, generate helix */
-    else if (card_id == "GH")
-    {
-      nwire++;
-      i1= n_segments+1;
-      i2= n_segments+ card_int_2;
-    
-      m_output->nec_printf( "\n"
-        " %5d HELIX STRUCTURE - SPACING OF TURNS: %8.3f AXIAL"
-        " LENGTH: %8.3f  %8.3f %5d %5d %5d %4d\n      "
-        " RADIUS X1:%8.3f Y1:%8.3f X2:%8.3f Y2:%8.3f ",
-        nwire, xw1, yw1, rad, card_int_2, i1, i2, card_int_1, zw1, xw2, yw2, zw2 );
-      int tag_id(card_int_1);
-      int segment_count(card_int_2);
-      nec_float s(xw1);
-      nec_float hl(yw1);
-      nec_float a1(zw1);
-      nec_float b1(xw2);
-      nec_float a2(yw2);
-      nec_float b2(zw2);
-      
-      helix(tag_id, segment_count,
-            s, hl, a1, b1, a2, b2, rad);
-    }
-
-    /* "gf" card, not supported */
-    else if (card_id == "GF")
-      throw nec_exception("NGF solution option not supported");
-  
-    /* error message */
-    else
-    {
-      m_output->nec_printf( "\n  GEOMETRY DATA CARD ERROR" );
-      m_output->nec_printf( "\n"
-        " %2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
-        gm, card_int_1, card_int_2, xw1, yw1, zw1, xw2, yw2, zw2, rad );
-    
-      throw nec_exception("GEOMETRY DATA CARD ERROR");
-    }
- 
-  } /* do */
+    if      (card_id == "GW") parse_gw_card(input_fp, st);
+    else if (card_id == "GX") gx_card(st.card_int_1, st.card_int_2);
+    else if (card_id == "GR") parse_gr_card(st);
+    else if (card_id == "GS") parse_gs_card(st);
+    else if (card_id == "GE") { geometry_complete(in_context, st.card_int_1); return; }
+    else if (card_id == "GM") parse_gm_card(st);
+    else if (card_id == "SP") parse_sp_card(input_fp, st);
+    else if (card_id == "SM") parse_sm_card(input_fp, st);
+    else if (card_id == "GA") parse_ga_card(st);
+    else if (card_id == "SC") parse_sc_card(st);
+    else if (card_id == "GH") parse_gh_card(st);
+    else if (card_id == "GF") throw nec_exception("NGF solution option not supported");
+    else                      parse_geometry_error(st);
+  }
   while( true );
+}
+
+/* Print the one-time "STRUCTURE SPECIFICATION" banner. */
+void c_geometry::parse_structure_header()
+{
+  m_output->end_section();
+  m_output->set_indent(32);
+  m_output->line("-------- STRUCTURE SPECIFICATION --------");
+  m_output->line("COORDINATES MUST BE INPUT IN" );
+  m_output->line("METERS OR BE SCALED TO METERS" );
+  m_output->line("BEFORE STRUCTURE INPUT IS ENDED" );
+  m_output->set_indent(0);
+
+  m_output->line("  WIRE                                                                                 SEG FIRST  LAST  TAG");
+  m_output->line("   No:        X1         Y1         Z1         X2         Y2         Z2       RADIUS   No:   SEG   SEG  No:" );
+}
+
+/* "GW" card: straight wire (ends 1,2). A zero radius signals a tapered wire,
+   whose taper ratio and end radii follow on a "GC" continuation card.
+     card_int_1 - tag no.    card_int_2 - no. segments
+     xw1,yw1,zw1 - end 1      xw2,yw2,zw2 - end 2      rad - wire radius */
+void c_geometry::parse_gw_card(FILE* input_fp, geometry_parse_state& st)
+{
+  int wire_segment_count = st.card_int_2;
+  int wire_tag = st.card_int_1;
+
+  st.nwire++;
+
+  // output some wire diagnostics.
+  m_output->nec_printf( "\n"
+    " %5d  %10.4f %10.4f %10.4f %10.4f"
+    " %10.4f %10.4f %10.4f %5d %5d %5d %4d",
+    st.nwire, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.rad,
+    wire_segment_count, n_segments+1, n_segments + wire_segment_count, wire_tag );
+
+  nec_float xs1, ys1;
+  if ( st.rad != 0.0)  // rad == 0 implies a tapered wire
+  {
+    xs1 = 1.0;
+    ys1 = 1.0;
+  }
+  else
+  {
+    int ix,iy;
+    nec_float zs1, dummy;
+    char gm[3];
+    read_geometry_card(input_fp, gm, &ix, &iy, &xs1, &ys1, &zs1,
+      &dummy, &dummy, &dummy, &dummy);
+
+    if ( strcmp(gm, "GC" ) != 0 )
+      throw nec_exception("GEOMETRY DATA CARD ERROR" );
+
+    m_output->nec_printf(
+      "\n  ABOVE WIRE IS TAPERED.  SEGMENT LENGTH RATIO: %9.5f\n"
+      "                                 "
+      "RADIUS FROM: %9.5f TO: %9.5f", xs1, ys1, zs1 );
+
+    if ( (ys1 == 0) || (zs1 == 0) )
+      throw nec_exception("GEOMETRY DATA CARD ERROR" );
+
+    st.rad= ys1;
+    ys1= pow( (zs1/ys1), (1./(wire_segment_count-1.)) );
+  }
+
+  wire(wire_tag, wire_segment_count, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.rad, xs1, ys1);
+}
+
+/* "GR" card: rotate the structure about the z-axis to form a cylinder. */
+void c_geometry::parse_gr_card(geometry_parse_state& st)
+{
+  m_output->nec_printf(
+    "\n  STRUCTURE ROTATED ABOUT Z-AXIS %d TIMES"
+    " - LABELS INCREMENTED BY %d\n", st.card_int_2, st.card_int_1 );
+
+  reflect( -1, 0, 0, st.card_int_1, st.card_int_2);
+}
+
+/* "GS" card: scale all structure dimensions by the factor in xw1. */
+void c_geometry::parse_gs_card(geometry_parse_state& st)
+{
+  m_output->nec_printf(
+    "\n     STRUCTURE SCALED BY FACTOR: %10.5f", st.xw1 );
+
+  scale(st.xw1);
+}
+
+/* "GM" card: move the structure or reproduce it in new positions.
+   The three angles are supplied in degrees and converted to radians. */
+void c_geometry::parse_gm_card(geometry_parse_state& st)
+{
+  m_output->nec_printf(
+    "\n     THE STRUCTURE HAS BEEN MOVED, MOVE DATA CARD IS:\n"
+    "   %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
+    st.card_int_1, st.card_int_2, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.rad );
+
+  nec_float rox = degrees_to_rad(st.xw1);
+  nec_float roy = degrees_to_rad(st.yw1);
+  nec_float roz = degrees_to_rad(st.zw1);
+
+  move( rox, roy, roz, st.xw2, st.yw2, st.zw2, static_cast<int>( st.rad+.5), st.card_int_2, st.card_int_1);
+}
+
+/* "SP" card: generate a single new surface patch. For multi-corner patches the
+   remaining corner data follows on an "SC" continuation card. */
+void c_geometry::parse_sp_card(FILE* input_fp, geometry_parse_state& st)
+{
+  const char ipt[4] = { 'P', 'R', 'T', 'Q' };
+  int i1= m+1;
+  st.card_int_2++;
+
+  if ( st.card_int_1 != 0)
+    throw nec_exception("PATCH DATA ERROR" );
+
+  m_output->nec_printf( "\n"
+    " %5d%c %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
+    i1, ipt[st.card_int_2-1], st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2 );
+
+  if ( (st.card_int_2 == 2) || (st.card_int_2 == 4) )
+    st.isct=1;
+
+  if ( st.card_int_2 > 1)
+  {
+    // read another geometry card for the rest of the patch data.
+    int ix,iy;
+    nec_float dummy;
+    char gm[3];
+    read_geometry_card(input_fp, gm, &ix, &iy, &st.x3, &st.y3, &st.z3, &st.x4, &st.y4, &st.z4, &dummy);
+
+    if ( (st.card_int_2 == 2) || (st.card_int_1 > 0) )
+    {
+      st.x4= st.xw1+ st.x3- st.xw2;
+      st.y4= st.yw1+ st.y3- st.yw2;
+      st.z4= st.zw1+ st.z3- st.zw2;
+    }
+
+    m_output->nec_printf( "\n"
+      "      %11.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
+      st.x3, st.y3, st.z3, st.x4, st.y4, st.z4 );
+
+    if ( strcmp(gm, "SC") != 0 )
+      throw nec_exception("PATCH DATA ERROR" );
+  }
+  else
+  {
+    st.xw2= degrees_to_rad(st.xw2);
+    st.yw2= degrees_to_rad(st.yw2);
+  }
+
+  patch( st.card_int_1, st.card_int_2, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.x3, st.y3, st.z3, st.x4, st.y4, st.z4);
+}
+
+/* "SM" card: generate a multiple-patch surface. The opposite-corner data
+   follows on an "SC" continuation card. */
+void c_geometry::parse_sm_card(FILE* input_fp, geometry_parse_state& st)
+{
+  const char ipt[4] = { 'P', 'R', 'T', 'Q' };
+  int i1= m+1;
+  m_output->nec_printf( "\n"
+    " %5d%c %10.5f %11.5f %11.5f %11.5f %11.5f %11.5f"
+    "     SURFACE - %d BY %d PATCHES",
+    i1, ipt[1], st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.card_int_1, st.card_int_2 );
+
+  if ( (st.card_int_1 < 1) || (st.card_int_2 < 1) )
+    throw nec_exception("PATCH DATA ERROR" );
+
+  int ix,iy;
+  nec_float dummy;
+  char gm[3];
+  read_geometry_card(input_fp, gm, &ix, &iy, &st.x3, &st.y3, &st.z3, &st.x4, &st.y4, &st.z4, &dummy);
+
+  if ( (st.card_int_2 == 2) || (st.card_int_1 > 0) )
+  {
+    st.x4= st.xw1+ st.x3- st.xw2;
+    st.y4= st.yw1+ st.y3- st.yw2;
+    st.z4= st.zw1+ st.z3- st.zw2;
+  }
+
+  m_output->nec_printf( "\n"
+    "      %11.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
+    st.x3, st.y3, st.z3, st.x4, st.y4, st.z4 );
+
+  if ( strcmp(gm, "SC" ) != 0 )
+    throw nec_exception("PATCH DATA ERROR" );
+
+  patch( st.card_int_1, st.card_int_2, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.x3, st.y3, st.z3, st.x4, st.y4, st.z4);
+}
+
+/* "GA" card: generate segment data for a wire arc. */
+void c_geometry::parse_ga_card(geometry_parse_state& st)
+{
+  st.nwire++;
+  int i1= n_segments+1;
+  int i2= n_segments+ st.card_int_2;
+
+  m_output->nec_printf( "\n"
+    " %5d  ARC RADIUS: %9.5f  FROM: %8.3f TO: %8.3f DEGREES"
+    "       %11.5f %5d %5d %5d %4d",
+    st.nwire, st.xw1, st.yw1, st.zw1, st.xw2, st.card_int_2, i1, i2, st.card_int_1 );
+
+  arc( st.card_int_1, st.card_int_2, st.xw1, st.yw1, st.zw1, st.xw2);
+}
+
+/* "SC" card: continuation of a preceding SP/SM patch, carrying its remaining
+   corners (held in st) into the next patch. Requires st.isct set by the SP card. */
+void c_geometry::parse_sc_card(geometry_parse_state& st)
+{
+  const char ipt[4] = { 'P', 'R', 'T', 'Q' };
+  if ( st.isct == 0)
+    throw nec_exception("PATCH DATA ERROR" );
+
+  int i1= m+1;
+  st.card_int_2++;
+
+  if ( (st.card_int_1 != 0) || ((st.card_int_2 != 2) && (st.card_int_2 != 4)) )
+    throw nec_exception("PATCH DATA ERROR" );
+
+  nec_float xs1= st.x4, ys1= st.y4, zs1= st.z4;
+  nec_float xs2= st.x3, ys2= st.y3, zs2= st.z3;
+  st.x3= st.xw1;
+  st.y3= st.yw1;
+  st.z3= st.zw1;
+
+  if ( st.card_int_2 == 4)
+  {
+    st.x4= st.xw2;
+    st.y4= st.yw2;
+    st.z4= st.zw2;
+  }
+
+  st.xw1= xs1;
+  st.yw1= ys1;
+  st.zw1= zs1;
+  st.xw2= xs2;
+  st.yw2= ys2;
+  st.zw2= zs2;
+
+  if ( st.card_int_2 != 4)
+  {
+    st.x4= st.xw1+ st.x3- st.xw2;
+    st.y4= st.yw1+ st.y3- st.yw2;
+    st.z4= st.zw1+ st.z3- st.zw2;
+  }
+
+  m_output->nec_printf( "\n"
+    " %5d%c %10.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
+    i1, ipt[st.card_int_2-1], st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2 );
+
+  m_output->nec_printf( "\n"
+    "      %11.5f %11.5f %11.5f  %11.5f %11.5f %11.5f",
+    st.x3, st.y3, st.z3, st.x4, st.y4, st.z4 );
+
+  patch( st.card_int_1, st.card_int_2, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.x3, st.y3, st.z3, st.x4, st.y4, st.z4);
+}
+
+/* "GH" card: generate a helix. */
+void c_geometry::parse_gh_card(geometry_parse_state& st)
+{
+  st.nwire++;
+  int i1= n_segments+1;
+  int i2= n_segments+ st.card_int_2;
+
+  m_output->nec_printf( "\n"
+    " %5d HELIX STRUCTURE - SPACING OF TURNS: %8.3f AXIAL"
+    " LENGTH: %8.3f  %8.3f %5d %5d %5d %4d\n      "
+    " RADIUS X1:%8.3f Y1:%8.3f X2:%8.3f Y2:%8.3f ",
+    st.nwire, st.xw1, st.yw1, st.rad, st.card_int_2, i1, i2, st.card_int_1, st.zw1, st.xw2, st.yw2, st.zw2 );
+
+  helix(st.card_int_1, st.card_int_2,
+        st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.rad);
+}
+
+/* Unrecognised geometry card: report the offending data and abort. */
+void c_geometry::parse_geometry_error(const geometry_parse_state& st)
+{
+  m_output->nec_printf( "\n  GEOMETRY DATA CARD ERROR" );
+  m_output->nec_printf( "\n"
+    " %2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f",
+    st.gm, st.card_int_1, st.card_int_2, st.xw1, st.yw1, st.zw1, st.xw2, st.yw2, st.zw2, st.rad );
+
+  throw nec_exception("GEOMETRY DATA CARD ERROR");
 }
 
 #include "nec_wire.h"
