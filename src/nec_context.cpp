@@ -38,7 +38,16 @@ nec_context::nec_context() : fnorm(0,0), current_vector(0) {
   xpr4=0.0;
   xpr5=0.0;
   xpr7=0.0;
-  
+
+  // Power-budget accumulators. structure_power_loss is only written by
+  // nec_structure_currents::analyze() when current printing is enabled
+  // (iptflg != -1); with printing suppressed it is never set, so it must
+  // start at zero or print_power_budget() reads uninitialised memory
+  // (producing nondeterministic NaN / denormal RADIATED POWER values).
+  input_power = 0.0;
+  network_power_loss = 0.0;
+  structure_power_loss = 0.0;
+
   /*structure_currents is a pointer to the "nec_base_result" which takes care of storing and printing of the currents*/
   structure_currents = NULL;
           
