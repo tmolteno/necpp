@@ -2781,7 +2781,7 @@ nec_float nec_context::efld_compute(
 
 \param xi,yi,zi x,y,z components of the field evaluation point.
 \param ai  Radius of the segment on which the field is evaluated.
-\param on_source_segment  Flag to indicate if the field evaluation point is not on the source segment (i != j)
+\param not_on_source_segment  True when the field evaluation point is not on the source segment (i != j)
 */
 void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, bool not_on_source_segment)
 {

@@ -948,7 +948,7 @@ private:
       complex_array& cw, int64_t nw, int itrp);
   void couple(complex_array& cur, nec_float wlam);
 
-  void efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, bool on_source_segment);
+  void efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, bool not_on_source_segment);
   nec_float efld_compute(nec_float xij, nec_float yij, nec_float ai, nec_float salpr,
       nec_float zij, bool ijx, complex_array& egnd);
   void eksc(nec_float s, nec_float z, nec_float rh, nec_float xk, int ij,
