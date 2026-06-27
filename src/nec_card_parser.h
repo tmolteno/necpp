@@ -26,7 +26,7 @@
 struct nec_card {
     std::string mnemonic;
     int    i[4] = {0,0,0,0};
-    double f[6] = {0.,0.,0.,0.,0.,0.};
+    double f[7] = {0.,0.,0.,0.,0.,0.,0.};
     int    parameter_count = 0;
 
     bool is(const char* m) const { return mnemonic == m; }

@@ -38,7 +38,9 @@ class c_geometry;
 enum excitation_return {
     FREQ_PRINT_NORMALIZATION = 0,
     FREQ_LOOP_CONTINUE = 1,
-    FREQ_LOOP_CARD_CONTINUE = 2
+    FREQ_LOOP_CARD_CONTINUE = 2,
+    FREQ_INNER_LOOP_CONTINUE = 3,
+    FREQ_PHASE_COMPLETE = 4
 };
 
 /**
@@ -911,7 +913,11 @@ private:
   
   enum excitation_return
     excitation_loop(enum processing_state in_freq_loop_state, int mhz);
-      
+
+  excitation_return excitation_process_inner(int mhz);
+  excitation_return excitation_compute_near_field(int mhz);
+  void excitation_compute_far_field();
+
   void  setup_excitation();
   
   /* pointers to output files */
@@ -943,6 +949,8 @@ private:
   void couple(complex_array& cur, nec_float wlam);
 
   void efld(nec_float xi, nec_float yi, nec_float zi, nec_float ai, bool on_source_segment);
+  nec_float efld_compute(nec_float xij, nec_float yij, nec_float ai, nec_float salpr,
+      nec_float zij, bool ijx, complex_array& egnd);
   void eksc(nec_float s, nec_float z, nec_float rh, nec_float xk, int ij,
       nec_complex *ezs, nec_complex *ers, nec_complex *ezc,
       nec_complex *erc, nec_complex *ezk, nec_complex *erk);
