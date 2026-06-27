@@ -1389,6 +1389,34 @@ void nec_context::print_norm_rx_pattern()
 #endif
 }
 
+/* Ohmic power dissipated in the loaded segments of the structure.
+
+   In the original NEC-2 FORTRAN this accumulation (label 63, the DO 69 loop)
+   always runs whenever there are segments; the IPTFLG print flag only governs
+   whether individual segment currents are printed, not whether the loss is
+   computed. Computing it here, independent of iptflg/iptflq, keeps the power
+   budget correct for loaded models even when current printing is disabled
+   (e.g. a "PT -1" card). */
+nec_float nec_context::compute_structure_power_loss(void) const
+{
+  nec_float power_loss = 0.0;
+
+  if (nload != 0)
+  {
+    for (int i = 0; i < m_geometry->n_segments; i++ )
+    {
+      if ( fabs(real(zarray[i])) >= 1.e-20 )
+      {
+        nec_complex curi = current_vector[i] * _wavelength;
+        nec_float cmag = abs(curi);
+        power_loss += 0.5*cmag*cmag*real(zarray[i]) * m_geometry->segment_length[i];
+      }
+    }
+  }
+
+  return power_loss;
+}
+
 void nec_context::print_power_budget(void)
 {
   if ( (m_excitation_type == EXCITATION_VOLTAGE) || (m_excitation_type == EXCITATION_VOLTAGE_DISC) )
@@ -1614,6 +1642,10 @@ excitation_return nec_context::excitation_process_inner(int mhz)
       iptflg = -1;
     }
   }
+
+  // Structure power loss is a physical quantity, not a print artefact, so
+  // compute it independent of the current/charge print flags (matches NEC-2).
+  structure_power_loss = compute_structure_power_loss();
 
   if (iptflg != -1 || iptflq != -1)
   {

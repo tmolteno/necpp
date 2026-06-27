@@ -207,9 +207,7 @@ private:
 	nec_float xpr3, xpr6;
 	nec_float wavelength;
 	nec_float freq_mhz;
-	
-	nec_float structure_power_loss;
-		
+
 	int current_nb_elements;
 	int q_density_nb_elements;
 	int q_density_last_printed;

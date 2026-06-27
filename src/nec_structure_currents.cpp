@@ -53,9 +53,7 @@ nec_structure_currents::nec_structure_currents(nec_context * in_context, enum ex
   
   freq_mhz = m_context->freq_mhz;
   wavelength = m_context->_wavelength;
-  
-  structure_power_loss=0;
-    
+
   current_nb_elements = 0;
   q_density_nb_elements = 0;
   q_density_last_printed = 0;
@@ -102,10 +100,9 @@ void nec_structure_currents::analyze()
       {
         nec_complex curi= m_context->current_vector[i]* wavelength;
         cmag= abs(curi);
-    
-        if ( (nload != 0) && (fabs(real(m_context->zarray[i])) >= 1.e-20) )
-          structure_power_loss += 0.5*cmag*cmag*real( m_context->zarray[i]) * m_geometry->segment_length[i];
-  
+        // Structure power loss is now computed unconditionally in
+        // nec_context::compute_structure_power_loss(), independent of iptflg.
+
         if ( iptflg == -1) // Never true
         continue;
 
@@ -195,9 +192,7 @@ void nec_structure_currents::analyze()
         } /* iptflg == -2, all currents will be printed, using the standard format*/      
 
       } /* for( i = 0; i < n; i++ ) */
-    
-    m_context->structure_power_loss = structure_power_loss;    
-    
+
     }/* if (iptflg != -1) */
   
     if (iptflq != -1)

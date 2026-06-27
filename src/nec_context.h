@@ -908,6 +908,7 @@ private:
   void  print_norm_rx_pattern();
   void  print_input_impedance();
   void  print_power_budget(void);
+  nec_float compute_structure_power_loss(void) const;
   void  structure_segment_loading();
     
   
