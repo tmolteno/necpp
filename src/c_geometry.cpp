@@ -137,19 +137,27 @@ void c_geometry::parse_geometry(nec_context* in_context, FILE* input_fp )
     if ( card_id != "SC")
       st.isct = 0;
 
-    if      (card_id == "GW") parse_gw_card(input_fp, st);
-    else if (card_id == "GX") gx_card(st.card_int_1, st.card_int_2);
-    else if (card_id == "GR") parse_gr_card(st);
-    else if (card_id == "GS") parse_gs_card(st);
-    else if (card_id == "GE") { geometry_complete(in_context, st.card_int_1); return; }
-    else if (card_id == "GM") parse_gm_card(st);
-    else if (card_id == "SP") parse_sp_card(input_fp, st);
-    else if (card_id == "SM") parse_sm_card(input_fp, st);
-    else if (card_id == "GA") parse_ga_card(st);
-    else if (card_id == "SC") parse_sc_card(st);
-    else if (card_id == "GH") parse_gh_card(st);
-    else if (card_id == "GF") throw nec_exception("NGF solution option not supported");
-    else                      parse_geometry_error(st);
+    /* Dispatch by first character then second character */
+    char c0 = card_id[0], c1 = card_id[1];
+    if (c0 == 'G') {
+      if      (c1 == 'W') parse_gw_card(input_fp, st);
+      else if (c1 == 'X') gx_card(st.card_int_1, st.card_int_2);
+      else if (c1 == 'R') parse_gr_card(st);
+      else if (c1 == 'S') parse_gs_card(st);
+      else if (c1 == 'E') { geometry_complete(in_context, st.card_int_1); return; }
+      else if (c1 == 'M') parse_gm_card(st);
+      else if (c1 == 'H') parse_gh_card(st);
+      else if (c1 == 'F') throw nec_exception("NGF solution option not supported");
+      else if (c1 == 'A') parse_ga_card(st);
+      else parse_geometry_error(st);
+    } else if (c0 == 'S') {
+      if      (c1 == 'P') parse_sp_card(input_fp, st);
+      else if (c1 == 'M') parse_sm_card(input_fp, st);
+      else if (c1 == 'C') parse_sc_card(st);
+      else parse_geometry_error(st);
+    } else {
+      parse_geometry_error(st);
+    }
   }
   while( true );
 }
