@@ -19,6 +19,7 @@
 */
 
 #include <stdio.h>
+#include <ostream>
 #include "math_util.h"
 #include "nec_debug.h"
 
@@ -54,6 +55,7 @@ public:
   nec_output_file();
   
   void set_file(FILE* in_fp);
+  void set_stream(std::ostream& os);
 
   void endl(int n_lines = 1);
 
@@ -80,6 +82,7 @@ private:
   void do_output(const char* str);
 
   FILE* m_output_fp;
+  std::ostream* m_output_os;
   bool m_require_indent;
   int m_indent;
   

@@ -24,14 +24,22 @@
 /* ---------------------------------------------------------------------*/
 
 nec_output_file::nec_output_file()
+  : m_output_fp(NULL), m_output_os(nullptr)
 {
-	set_file(NULL);
 	set_error_mode(false);
 }
 
 void nec_output_file::set_file(FILE* in_fp)
 {
 	m_output_fp = in_fp;
+	m_output_os = nullptr;
+	set_indent(0);
+}
+
+void nec_output_file::set_stream(std::ostream& os)
+{
+	m_output_fp = NULL;
+	m_output_os = &os;
 	set_indent(0);
 }
 
@@ -43,6 +51,12 @@ void nec_output_file::set_error_mode(bool f)
 /* private */
 void nec_output_file::do_output(const char* str)
 {
+	if (m_output_os) {
+		*m_output_os << str;
+		if (m_error_mode)
+			*m_output_os << std::flush;
+		return;
+	}
 	if (NULL == m_output_fp)
 		return;
 	
