@@ -22,6 +22,4 @@ or by compiling the source code (in the directory above this one)
 
 ## C++ example
 
-This requires the LAPACK libraries to be installed. These are installable on Debian derived linux using the package libatlas-base-dev.
-
     make test_cpp

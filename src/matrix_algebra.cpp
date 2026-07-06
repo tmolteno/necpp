@@ -272,7 +272,7 @@ void lu_decompose_ge(nec_output_file& s_output, int64_t n, complex_array& a, int
     DEBUG_TRACE("lu_decompose_ge(" << n << "," << ndim << ")");
     
 #ifdef NEC_MATRIX_CHECK
-    // Debug output to try and figure out the LAPACK stuff
+    // Debug output for matrix verification
     cout << "a = ";
     to_octave(a,n,ndim);
 #endif

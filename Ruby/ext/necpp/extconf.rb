@@ -1,25 +1,14 @@
 require 'mkmf'
 
-#NECPP_SRC = "/home/tim/github/necpp/src"
+# NECPP source directory
 NECPP_SRC = "../../../src"
 $CFLAGS << " -I#{NECPP_SRC}"
-$CPPFLAGS << " -I#{NECPP_SRC}"
+$CPPFLAGS << " -I#{NECPP_SRC} -I#{NECPP_SRC}/eigen3"
 
-dir_config("lapack", "/usr/include/atlas", "/usr/lib/atlas-base/atlas")
-#unless have_header("clapack.h") and have_library("lapack", "clapack_zgetrf", %w(clapack.h))
-unless have_header("clapack.h") 
-  abort "lapack is missing. please install ATLAS"
-end
-unless have_library("lapack", "clapack_zgetrf", "clapack.h")
-  abort "lapack is missing. please install ATLAS or 
-  issue the command update-alternatives liblapack.so"
-end
-
+# Eigen is bundled — no external LAPACK/BLAS needed
 dir_config("necpp", "/usr/local/include", "/usr/local/lib")
 unless have_header("libnecpp.h") and find_library("necpp", "nec_create")
-   abort "necpp library is missing."
+   abort "necpp library is missing. Build with: cd ../../.. && make"
 end
-
-#$LDFLAGS << " -Wl,-rpath,/usr/lib/lapack"
 
 create_makefile('necpp')

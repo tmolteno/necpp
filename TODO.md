@@ -24,5 +24,5 @@
 
 ## Using Eigen
 
-* To avoid dependency on Lapack, we are going to shift the LU decomposition to using the Eigen library.
+* Eigen 3.4.0 is now fully integrated (bundled in src/eigen3/). LU decomposition uses Eigen::PartialPivLU. LAPACK/Atlas dependency removed.
 

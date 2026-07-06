@@ -1,23 +1,11 @@
 /* Translation to C++ by Tim Molteno
 
 	Based on the C port by N. Kyriazis
- 	Including some pieces from additional work by
+	Including some pieces from additional work by
 		Jeroen Vreeken <pe1rxq@amsat.org>
 
-	Fixed a few bugs in the process.
-
-	Using the std vector library in preparation
-	for moving to ATLAS for the matrix and vector
-	operations.
-
-		Debian Build Instructions
-
-	apt-get install atlas3-base atlas3-headers atlas3-base-dev
-	apt-get install refblas3-dev lapack3-dev lapack3-doc
-
-	For more information on using LAPACK for doing
-	efficient computation, see
-		http://seehuhn.de/comp/linear.html
+	Uses Eigen 3.4.0 (bundled in src/eigen3/) for linear algebra.
+	Build with: make -j4  (just g++ and make needed)
 */
 
 /* Original disclaimer that came with the FORTRAN code */
