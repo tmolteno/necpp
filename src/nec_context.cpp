@@ -116,8 +116,8 @@ void nec_context::calc_prepare()
   
   ip.resize(m_geometry->n_plus_2m);
         ASSERT((m_geometry->n_segments + m_geometry->m*3 == m_geometry->n_plus_3m));
-        // TODO FIX HERE... THIS SIZE AINT RIGHT
-  current_vector.resize(m_geometry->n_segments + m_geometry->m*4);
+  /* n + 3*m: n segments + 3 values per patch (x,y,z after t1,t2 expansion) */
+  current_vector.resize(m_geometry->n_plus_3m);
   
   /* Matrix parameters */
   neq= m_geometry->n_plus_2m;
