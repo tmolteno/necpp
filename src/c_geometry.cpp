@@ -2343,6 +2343,120 @@ void c_geometry::divide_patch(int nx)
 
 -------------------------------------------------------------------------*/
 
+/* Shared line-buffer parser: called by both FILE* and istream overloads. */
+void c_geometry::parse_geometry_card_line(const char* line_buf, char *gm,
+  int *in_i1, int *in_i2,
+  nec_float *in_x1, nec_float *in_y1, nec_float *in_z1,
+  nec_float *in_x2, nec_float *in_y2, nec_float *in_z2,
+  nec_float *in_rad )
+{
+  int i, line_idx;
+  int n_integer_params = 2, n_float_params = 7;
+  int integer_params[2] = { 0, 0 };
+  nec_float real_params[7] = { 0., 0., 0., 0., 0., 0., 0. };
+
+  int line_length = static_cast<int>(strlen( line_buf ));
+
+  if ( line_length < 2 )
+  {
+    nec_exception nex("GEOMETRY DATA CARD ERROR:");
+    nex.append(" CARD'S MNEMONIC CODE TOO SHORT OR MISSING.");
+    throw nex;
+  }
+
+  strncpy( gm, line_buf, 2 );
+  gm[2] = '\0';
+
+  if ( strcmp( gm, "XT" ) == 0 )
+  {
+      nec_exception nex("Exiting after an \"XT\" command in read_geometry_card()");
+      throw nex;
+  }
+
+  if ( line_length == 2 )
+  {
+    *in_i1 = *in_i2 = 0;
+    *in_x1 = *in_y1 = *in_z1 = *in_x2 = *in_y2 = *in_z2 = *in_rad = 0.0;
+    return;
+  }
+
+  line_idx = 1;
+  for( i = 0; i < n_integer_params; i++ )
+  {
+    while( ((line_buf[++line_idx] <  '0')  ||
+      (line_buf[  line_idx] >  '9')) &&
+      (line_buf[  line_idx] != '+')  &&
+      (line_buf[  line_idx] != '-') )
+    if ( line_buf[line_idx] == '\0' )
+    {
+      *in_i1= integer_params[0]; *in_i2= integer_params[1];
+      *in_x1= real_params[0]; *in_y1= real_params[1]; *in_z1= real_params[2];
+      *in_x2= real_params[3]; *in_y2= real_params[4]; *in_z2= real_params[5];
+      *in_rad= real_params[6];
+      return;
+    }
+
+    integer_params[i] = atoi( &line_buf[line_idx] );
+
+    line_idx--;
+    while( (line_buf[++line_idx] != ' ') && (line_buf[line_idx] != ',') && (line_buf[line_idx] != '\0') )
+    {
+      if ( ((line_buf[line_idx] < '0') || (line_buf[line_idx] > '9')) &&
+          (line_buf[line_idx] != '+') && (line_buf[line_idx] != '-') )
+      {
+        nec_stop("GEOMETRY DATA CARD \"%s\" ERROR: NON-NUMERICAL CHARACTER '%c' IN INTEGER FIELD AT CHAR. %d\n",
+          gm, line_buf[line_idx], (line_idx+1) );
+      }
+    }
+
+    if ( line_buf[line_idx] == '\0' )
+    {
+      *in_i1= integer_params[0]; *in_i2= integer_params[1];
+      *in_x1= real_params[0]; *in_y1= real_params[1]; *in_z1= real_params[2];
+      *in_x2= real_params[3]; *in_y2= real_params[4]; *in_z2= real_params[5];
+      *in_rad= real_params[6];
+      return;
+    }
+  }
+
+  for( i = 0; i < n_float_params; i++ )
+  {
+    while( ((line_buf[++line_idx] < '0') || (line_buf[line_idx] > '9')) &&
+      (line_buf[line_idx] != '+') && (line_buf[line_idx] != '-') && (line_buf[line_idx] != '.') )
+    if ( line_buf[line_idx] == '\0' )
+    {
+      *in_i1= integer_params[0]; *in_i2= integer_params[1];
+      *in_x1= real_params[0]; *in_y1= real_params[1]; *in_z1= real_params[2];
+      *in_x2= real_params[3]; *in_y2= real_params[4]; *in_z2= real_params[5];
+      *in_rad= real_params[6];
+      return;
+    }
+
+    real_params[i] = atof( &line_buf[line_idx] );
+
+    line_idx--;
+    while( (line_buf[++line_idx] != ' ') && (line_buf[line_idx] != ',') && (line_buf[line_idx] != '\0') )
+    {
+      if ( ((line_buf[line_idx] < '0') || (line_buf[line_idx] > '9')) &&
+        (line_buf[line_idx] != '.') && (line_buf[line_idx] != '+') &&
+        (line_buf[line_idx] != '-') && (line_buf[line_idx] != 'E') && (line_buf[line_idx] != 'e') )
+      {
+        nec_stop("GEOMETRY DATA CARD \"%s\" ERROR: NON-NUMERICAL CHARACTER '%c' IN FLOAT FIELD AT CHAR. %d\n",
+          gm, line_buf[line_idx], (line_idx+1) );
+      }
+    }
+
+    if ( line_buf[line_idx] == '\0' )
+    {
+      *in_i1= integer_params[0]; *in_i2= integer_params[1];
+      *in_x1= real_params[0]; *in_y1= real_params[1]; *in_z1= real_params[2];
+      *in_x2= real_params[3]; *in_y2= real_params[4]; *in_z2= real_params[5];
+      *in_rad= real_params[6];
+      return;
+    }
+  }
+}
+
 void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
   int *in_i1, int *in_i2,
   nec_float *in_x1, nec_float *in_y1, nec_float *in_z1,
@@ -2350,181 +2464,21 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
   nec_float *in_rad )
 {
   char line_buf[134];
-  int i, line_idx;
-  int n_integer_params = 2, n_float_params = 7;
-  int integer_params[2] = { 0, 0 };
-  nec_float real_params[7] = { 0., 0., 0., 0., 0., 0., 0. };
-  
-  /* read a line from input file */
   load_line( line_buf, input_fp );
-  
-  /* get line length */
-  int line_length = static_cast<int>(strlen( line_buf ));
-  
-  /* abort if card's mnemonic too short or missing */
-  if ( line_length < 2 )
-  {
-    nec_exception nex("GEOMETRY DATA CARD ERROR:");
-    nex.append(" CARD'S MNEMONIC CODE TOO SHORT OR MISSING.");
-    throw nex;
-  }
-  
-  /* extract card's mnemonic code */
-  strncpy( gm, line_buf, 2 );
-  gm[2] = '\0';
-  
-  /* Exit if "XT" command read (for testing) */
-  if ( strcmp( gm, "XT" ) == 0 )
-  {
-      nec_exception nex("Exiting after an \"XT\" command in read_geometry_card()");
-      throw nex;
-  }
-  
-  /* Return if only mnemonic on card */
-  if ( line_length == 2 )
-  {
-    *in_i1 = *in_i2 = 0;
-    *in_x1 = *in_y1 = *in_z1 = *in_x2 = *in_y2 = *in_z2 = *in_rad = 0.0;
-    return;
-  }
-  
-  /* read integers from line */
-  line_idx = 1;
-  for( i = 0; i < n_integer_params; i++ )
-  {
-    /* Find first numerical character */
-    while( ((line_buf[++line_idx] <  '0')  ||
-      (line_buf[  line_idx] >  '9')) &&
-      (line_buf[  line_idx] != '+')  &&
-      (line_buf[  line_idx] != '-') )
-    if ( line_buf[line_idx] == '\0' )
-    {
-      *in_i1= integer_params[0];
-      *in_i2= integer_params[1];
-      *in_x1= real_params[0];
-      *in_y1= real_params[1];
-      *in_z1= real_params[2];
-      *in_x2= real_params[3];
-      *in_y2= real_params[4];
-      *in_z2= real_params[5];
-      *in_rad= real_params[6];
-      return;
-    }
-  
-    /* read an integer from line */
-    integer_params[i] = atoi( &line_buf[line_idx] );
-  
-    /* traverse numerical field to next ' ' or ',' or '\0' */
-    line_idx--;
-    while(   (line_buf[++line_idx] != ' ') &&
-        (line_buf[  line_idx] != ',') &&
-        (line_buf[  line_idx] != '\0') )
-    {
-      /* test for non-numerical characters */
-      if (   ((line_buf[line_idx] <  '0')  ||
-          (line_buf[line_idx] >  '9')) &&
-          (line_buf[line_idx] != '+')  &&
-          (line_buf[line_idx] != '-') )
-      {
-        nec_stop(
-          "GEOMETRY DATA CARD \"%s\" ERROR:"
-          "\n  NON-NUMERICAL CHARACTER '%c' IN INTEGER FIELD AT CHAR. %d\n",
-          gm, line_buf[line_idx], (line_idx+1)  );
-      }
-    } /* while( (line_buff[++line_idx] ... */
-  
-    /* Return on end of line */
-    if ( line_buf[line_idx] == '\0' )
-    {
-      *in_i1= integer_params[0];
-      *in_i2= integer_params[1];
-      *in_x1= real_params[0];
-      *in_y1= real_params[1];
-      *in_z1= real_params[2];
-      *in_x2= real_params[3];
-      *in_y2= real_params[4];
-      *in_z2= real_params[5];
-      *in_rad= real_params[6];
-      return;
-    }
-  
-  } /* for( i = 0; i < n_integer_params; i++ ) */
-  
-  /* read nec_floats from line */
-  for( i = 0; i < n_float_params; i++ )
-  {
-    /* Find first numerical character */
-    while( ((line_buf[++line_idx] <  '0')  ||
-      (line_buf[  line_idx] >  '9')) &&
-      (line_buf[  line_idx] != '+')  &&
-      (line_buf[  line_idx] != '-')  &&
-      (line_buf[  line_idx] != '.') )
-    if ( line_buf[line_idx] == '\0' )
-    {
-      *in_i1= integer_params[0];
-      *in_i2= integer_params[1];
-      *in_x1= real_params[0];
-      *in_y1= real_params[1];
-      *in_z1= real_params[2];
-      *in_x2= real_params[3];
-      *in_y2= real_params[4];
-      *in_z2= real_params[5];
-      *in_rad= real_params[6];
-      return;
-    }
-  
-    /* read a nec_float from line */
-    real_params[i] = atof( &line_buf[line_idx] );
-  
-    /* traverse numerical field to next ' ' or ',' or '\0' */
-    line_idx--;
-    while(  (line_buf[++line_idx] != ' ') &&
-        (line_buf[  line_idx] != ',') &&
-        (line_buf[  line_idx] != '\0') )
-    {
-      /* test for non-numerical characters */
-      if ( ((line_buf[line_idx] <  '0')  ||
-        (line_buf[line_idx] >  '9')) &&
-        (line_buf[line_idx] != '.')  &&
-        (line_buf[line_idx] != '+')  &&
-        (line_buf[line_idx] != '-')  &&
-        (line_buf[line_idx] != 'E')  &&
-        (line_buf[line_idx] != 'e') )
-      {
-        nec_stop(
-          "\n  GEOMETRY DATA CARD \"%s\" ERROR:"
-          "\n  NON-NUMERICAL CHARACTER '%c' IN FLOAT FIELD AT CHAR. %d.\n",
-          gm, line_buf[line_idx], (line_idx+1) );
-      }
-    } /* while( (line_buff[++line_idx] ... */
-  
-    /* Return on end of line */
-    if ( line_buf[line_idx] == '\0' )
-    {
-      *in_i1= integer_params[0];
-      *in_i2= integer_params[1];
-      *in_x1= real_params[0];
-      *in_y1= real_params[1];
-      *in_z1= real_params[2];
-      *in_x2= real_params[3];
-      *in_y2= real_params[4];
-      *in_z2= real_params[5];
-      *in_rad= real_params[6];
-      return;
-    }
-  
-  } /* for( i = 0; i < n_float_params; i++ ) */
-  
-  *in_i1  = integer_params[0];
-  *in_i2  = integer_params[1];
-  *in_x1  = real_params[0];
-  *in_y1  = real_params[1];
-  *in_z1  = real_params[2];
-  *in_x2  = real_params[3];
-  *in_y2  = real_params[4];
-  *in_z2  = real_params[5];
-  *in_rad = real_params[6];
+  parse_geometry_card_line(line_buf, gm, in_i1, in_i2, in_x1, in_y1, in_z1, in_x2, in_y2, in_z2, in_rad);
 }
+
+void c_geometry::read_geometry_card(std::istream& is,  char *gm,
+  int *in_i1, int *in_i2,
+  nec_float *in_x1, nec_float *in_y1, nec_float *in_z1,
+  nec_float *in_x2, nec_float *in_y2, nec_float *in_z2,
+  nec_float *in_rad )
+{
+  char line_buf[134];
+  load_line( line_buf, is );
+  parse_geometry_card_line(line_buf, gm, in_i1, in_i2, in_x1, in_y1, in_z1, in_x2, in_y2, in_z2, in_rad);
+}
+  
 
 
 

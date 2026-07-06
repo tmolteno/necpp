@@ -19,6 +19,7 @@
 #include "math_util.h"
 #include <vector>
 #include <iostream>
+#include <istream>
 
 /* Replaces the "10000" limit used to */
 /* identify segment/patch connections */
@@ -210,7 +211,19 @@ private:
   void build_connections( int ignd );
   void resolve_junctions();
 
+  /* Parses a geometry card from a line buffer (shared by FILE* and istream overloads) */
+  void parse_geometry_card_line(const char* line_buf, char *gm,
+          int *i1, int *i2,
+          nec_float *x1, nec_float *y1,nec_float *z1,
+          nec_float *x2, nec_float *y2, nec_float *z2,
+          nec_float *rad );
+
   void read_geometry_card(FILE* input_fp, char *gm,
+          int *i1, int *i2, 
+          nec_float *x1, nec_float *y1,nec_float *z1,
+          nec_float *x2, nec_float *y2, nec_float *z2, 
+          nec_float *rad );
+  void read_geometry_card(std::istream& is, char *gm,
           int *i1, int *i2, 
           nec_float *x1, nec_float *y1,nec_float *z1,
           nec_float *x2, nec_float *y2, nec_float *z2, 
