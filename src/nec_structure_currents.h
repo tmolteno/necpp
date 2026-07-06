@@ -40,6 +40,10 @@ public:
 	virtual ~nec_structure_currents()
 	{
 	}
+
+	void add_segment_current(int i, nec_complex curi);
+
+public:
 		 
 	virtual void write_to_file(ostream& os)
 	{

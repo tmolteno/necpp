@@ -866,31 +866,20 @@ void nec_context::rp_card(int calc_mode, int n_theta, int n_phi,
 }
 
   /* "pt" card, print control for current */
-void nec_context::pt_card(int itmp1, int itmp2, int itmp3, int itmp4) {
-  iptflg= itmp1;
-  iptag= itmp2;
-  iptagf= itmp3;
-  iptagt= itmp4;
-
-  if ( (itmp3 == 0) && (iptflg != -1) )
-    iptflg = -2;
-  if ( itmp4 == 0)
-    iptagt= iptagf;
-    
+/* Helper: set print-control fields and apply defaulting rules common to PT and PQ. */
+static void set_print_control(int p1, int p2, int p3, int p4,
+                              int& flag, int& tag, int& tagf, int& tagt) {
+  flag = p1;  tag = p2;  tagf = p3;  tagt = p4;
+  if ( (p3 == 0) && (flag != -1) )  flag = -2;
+  if ( p4 == 0)  tagt = tagf;
 }
 
+void nec_context::pt_card(int itmp1, int itmp2, int itmp3, int itmp4) {
+  set_print_control(itmp1, itmp2, itmp3, itmp4, iptflg, iptag, iptagf, iptagt);
+}
 
-  /* "pq" card, print control for charge */
 void nec_context::pq_card(int itmp1, int itmp2, int itmp3, int itmp4) {
-  iptflq= itmp1;
-  iptaq= itmp2;
-  iptaqf= itmp3;
-  iptaqt= itmp4;
-
-  if ( (itmp3 == 0) && (iptflq != -1) )
-    iptflq = -2;
-  if ( itmp4 == 0)
-    iptaqt= iptaqf;
+  set_print_control(itmp1, itmp2, itmp3, itmp4, iptflq, iptaq, iptaqf, iptaqt);
 }
 
 
@@ -2051,40 +2040,23 @@ void nec_context::load()
     }
   
     /* printing the segment loading data, jump to proper print */
-/* ====================================================================
-   5. Matrix Assembly
-   ==================================================================== */
-
+    static const char* load_labels[] = {
+      nullptr, " SERIES ", "PARALLEL", "SERIES (PER METER)",
+      "PARALLEL (PER METER)", "FIXED IMPEDANCE ", "  WIRE  "
+    };
     switch( jump )
     {
-      case 1:
+      case 1: case 2: case 3: case 4:
         impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx], zlr[istepx],
-          zli[istepx], zlc[istepx],0.,0.,0.," SERIES ");
+          zli[istepx], zlc[istepx], 0.,0.,0., load_labels[jump]);
         break;
-    
-      case 2:
-        impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx], zlr[istepx],
-          zli[istepx], zlc[istepx],0.,0.,0.,"PARALLEL");
-        break;
-    
-      case 3:
-        impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx], zlr[istepx],
-          zli[istepx], zlc[istepx],0.,0.,0., "SERIES (PER METER)");
-        break;
-    
-      case 4:
-        impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx], zlr[istepx],
-          zli[istepx], zlc[istepx],0.,0.,0.,"PARALLEL (PER METER)");
-        break;
-    
       case 5:
-        impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx],0.,0.,0.,
-          zlr[istepx], zli[istepx],0.,"FIXED IMPEDANCE ");
+        impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx], 0.,0.,0.,
+          zlr[istepx], zli[istepx], 0., load_labels[5]);
         break;
-    
       case 6:
         impedance_print( ldtags, ldtagf[istepx], ldtagt[istepx],
-          0.,0.,0.,0.,0., zlr[istepx],"  WIRE  ");
+          0.,0.,0.,0.,0., zlr[istepx], load_labels[6]);
     } /* switch( jump ) */
   
   } /* while( true ) */

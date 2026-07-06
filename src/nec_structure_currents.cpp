@@ -24,6 +24,16 @@ int nec_structure_currents::get_n() {
   return m_geometry->n_segments;
 }
 
+void nec_structure_currents::add_segment_current(int i, nec_complex curi) {
+  _current_segment_number.push_back(i+1);
+  _current_segment_tag.push_back(m_geometry->segment_tags[i]);
+  _current_segment_center_x.push_back(m_geometry->x[i]);
+  _current_segment_center_y.push_back(m_geometry->y[i]);
+  _current_segment_center_z.push_back(m_geometry->z[i]);
+  _current_segment_length.push_back(m_geometry->segment_length[i]);
+  _current.push_back(curi);
+}
+
 int nec_structure_currents::get_m() {
   return m_geometry->m;
 }
@@ -145,13 +155,7 @@ void nec_structure_currents::analyze()
               real(curi), imag(curi), cmag, ph );*/
       
             current_nb_elements++;
-            _current_segment_number.push_back(i+1);
-            _current_segment_tag.push_back(m_geometry->segment_tags[i]);
-            _current_segment_center_x.push_back(m_geometry->x[i]);
-            _current_segment_center_y.push_back(m_geometry->y[i]);
-            _current_segment_center_z.push_back(m_geometry->z[i]);
-            _current_segment_length.push_back(m_geometry->segment_length[i]);
-            _current.push_back(curi);
+            add_segment_current(i, curi);
                     
             // added test for plot_card.is_valid()
             if (m_context->plot_card.is_valid() && m_context->plot_card.currents())
@@ -172,13 +176,7 @@ void nec_structure_currents::analyze()
             real(curi), imag(curi), cmag, ph );*/
       
           current_nb_elements++;
-          _current_segment_number.push_back(i+1);
-          _current_segment_tag.push_back(m_geometry->segment_tags[i]);
-          _current_segment_center_x.push_back(m_geometry->x[i]);  
-          _current_segment_center_y.push_back(m_geometry->y[i]);
-          _current_segment_center_z.push_back(m_geometry->z[i]);
-          _current_segment_length.push_back(m_geometry->segment_length[i]);
-          _current.push_back(curi);
+          add_segment_current(i, curi);
           
           // added test for plot_card.is_valid()
           if (m_context->plot_card.is_valid() && m_context->plot_card.currents())
