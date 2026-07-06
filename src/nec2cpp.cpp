@@ -446,204 +446,43 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	nec_float *f1, nec_float *f2, nec_float *f3,
 	nec_float *f4, nec_float *f5, nec_float *f6 )
 {
-	int parameter_count = 0;
 	char line_buf[134];
-	int line_idx;
-	int n_integer_params = 4, n_float_params = 6;
-	int integer_array[4] = { 0, 0, 0, 0 };
-	nec_float r_array[6] = { 0., 0., 0., 0., 0., 0. };
 
-	/* read a line from input file */
 	int eof = load_line( line_buf, input_fp );
+	int line_length = static_cast<int>(strlen( line_buf ));
 
-	/* get line length */
-	    int line_length = static_cast<int>(strlen( line_buf ));
-
-	/* abort if card's mnemonic too short or missing */
 	if ( line_length < 2 )
 	{
-		if (EOF == eof)
-		{
-			// insert an EN card if we get to an end of file
-	            memcpy( gm, "EN", 2 );
-            return 0;
+		if (EOF == eof) {
+			memcpy( gm, "EN", 2 );
+			return 0;
 		}
-		else
-		{
-			fprintf( output_fp,
-				"\n  COMMAND DATA CARD ERROR:"
-				"\n  CARD'S MNEMONIC CODE TOO SHORT OR MISSING." );
-			exit(-1);
-		}
+		fprintf( output_fp,
+			"\n  COMMAND DATA CARD ERROR:"
+			"\n  CARD'S MNEMONIC CODE TOO SHORT OR MISSING." );
+		exit(-1);
 	}
 
-	/* extract card's mnemonic code */
 	strncpy( gm, line_buf, 2 );
 	gm[2] = '\0';
 
-	/* Exit if "XT" command read (for testing) */
-	if ( strcmp( gm, "XT" ) == 0 )
-	{
-		fprintf( stderr,
-			"\nnec2++: Exiting after an \"XT\" command in read_geometry_card()\n" );
-		fprintf( output_fp,
-			"\n\n  nec2++: Exiting after an \"XT\" command in read_geometry_card()" );
+	if ( strcmp( gm, "XT" ) == 0 ) {
+		fprintf( stderr, "\nnec2++: Exiting after an \"XT\" command in read_geometry_card()\n" );
+		fprintf( output_fp, "\n\n  nec2++: Exiting after an \"XT\" command in read_geometry_card()" );
 		exit(0);
 	}
 
-	/* Return if only mnemonic on card */
-	if ( line_length == 2 )
-	{
-		*i1 = *i2 = *i3 = *i4 = 0;
-		*f1 = *f2 = *f3 = *f4 = *f5 = *f6 = 0.0;
-		return 0;
-	}
-
-	/* read integers from line */
-	line_idx = 1;
-	for (int i = 0; i < n_integer_params; i++ )
-	{
-		/* Find first numerical character */
-		while( ((line_buf[++line_idx] <  '0')  ||
-			(line_buf[  line_idx] >  '9')) &&
-			(line_buf[  line_idx] != '+')  &&
-			(line_buf[  line_idx] != '-') )
-		if ( line_buf[line_idx] == '\0' )
-		{
-			*i1= integer_array[0];
-			*i2= integer_array[1];
-			*i3= integer_array[2];
-			*i4= integer_array[3];
-			*f1= r_array[0];
-			*f2= r_array[1];
-			*f3= r_array[2];
-			*f4= r_array[3];
-			*f5= r_array[4];
-			*f6= r_array[5];
-			return parameter_count;
-		}
-
-		/* read an integer from line */
-		integer_array[i] = atoi( &line_buf[line_idx] );
-		parameter_count++;
-
-		/* traverse numerical field to next ' ' or ',' or '\0' */
-		line_idx--;
-		while( (line_buf[++line_idx] != ' ') &&
-			(line_buf[  line_idx] != ',') &&
-			(line_buf[  line_idx] != '\0') )
-		{
-			/* test for non-numerical characters */
-			if ( ((line_buf[line_idx] <  '0')  ||
-				(line_buf[line_idx] >  '9')) &&
-				(line_buf[line_idx] != '+')  &&
-				(line_buf[line_idx] != '-') )
-			{
-				fprintf( output_fp,
-				"\n  COMMAND DATA CARD \"%s\" ERROR:"
-				"\n  NON-NUMERICAL CHARACTER '%c' IN INTEGER FIELD AT CHAR. %d\n",
-				gm, line_buf[line_idx], (line_idx+1) );
-				exit(-1);
-			}
-		} /* while( (line_buff[++line_idx] ... */
-
-		/* Return on end of line */
-		if ( line_buf[line_idx] == '\0' )
-		{
-			*i1= integer_array[0];
-			*i2= integer_array[1];
-			*i3= integer_array[2];
-			*i4= integer_array[3];
-			*f1= r_array[0];
-			*f2= r_array[1];
-			*f3= r_array[2];
-			*f4= r_array[3];
-			*f5= r_array[4];
-			*f6= r_array[5];
-			return parameter_count;
-		}
-	} /* for( i = 0; i < n_integer_params; i++ ) */
-
-	/* read nec_floats from line */
-	for (int i = 0; i < n_float_params; i++ )
-	{
-		/* Find first numerical character */
-		while( ((line_buf[++line_idx] <  '0')  ||
-			(line_buf[  line_idx] >  '9')) &&
-			(line_buf[  line_idx] != '+')  &&
-			(line_buf[  line_idx] != '-')  &&
-			(line_buf[  line_idx] != '.') )
-		if ( line_buf[line_idx] == '\0' )
-		{
-			*i1= integer_array[0];
-			*i2= integer_array[1];
-			*i3= integer_array[2];
-			*i4= integer_array[3];
-			*f1= r_array[0];
-			*f2= r_array[1];
-			*f3= r_array[2];
-			*f4= r_array[3];
-			*f5= r_array[4];
-			*f6= r_array[5];
-			return parameter_count;
-		}
-
-		/* read a nec_float from line */
-		r_array[i] = atof( &line_buf[line_idx] );
-		parameter_count++;
-
-		/* traverse numerical field to next ' ' or ',' */
-		line_idx--;
-		while( (line_buf[++line_idx] != ' ') &&
-			(line_buf[  line_idx] != ',') &&
-			(line_buf[  line_idx] != '\0') )
-		{
-			/* test for non-numerical characters */
-			if ( ((line_buf[line_idx] <  '0')  ||
-				(line_buf[line_idx] >  '9')) &&
-				(line_buf[line_idx] != '.')  &&
-				(line_buf[line_idx] != '+')  &&
-				(line_buf[line_idx] != '-')  &&
-				(line_buf[line_idx] != 'E')  &&
-				(line_buf[line_idx] != 'e') )
-			{
-				fprintf( output_fp,
-				"\n  COMMAND DATA CARD \"%s\" ERROR:"
-				"\n  NON-NUMERICAL CHARACTER '%c' IN FLOAT FIELD AT CHAR. %d\n",
-				gm, line_buf[line_idx], (line_idx+1) );
-				exit(-1);
-			}
-		} /* while( (line_buff[++line_idx] ... */
-
-		/* Return on end of line */
-		if ( line_buf[line_idx] == '\0' )
-		{
-			*i1= integer_array[0];
-			*i2= integer_array[1];
-			*i3= integer_array[2];
-			*i4= integer_array[3];
-			*f1= r_array[0];
-			*f2= r_array[1];
-			*f3= r_array[2];
-			*f4= r_array[3];
-			*f5= r_array[4];
-			*f6= r_array[5];
-			return parameter_count;
-		}
-	} /* for( i = 0; i < n_float_params; i++ ) */
-
-	*i1= integer_array[0];
-	*i2= integer_array[1];
-	*i3= integer_array[2];
-	*i4= integer_array[3];
-	*f1= r_array[0];
-	*f2= r_array[1];
-	*f3= r_array[2];
-	*f4= r_array[3];
-	*f5= r_array[4];
-	*f6= r_array[5];
-
-	return parameter_count;
+	    /* Delegate to string-based parser for integer/float extraction */
+	    if ( line_length == 2 ) {
+	        *i1 = *i2 = *i3 = *i4 = 0;
+	        *f1 = *f2 = *f3 = *f4 = *f5 = *f6 = 0.0;
+	        return 0;
+	    }
+	    nec_card card = parse_nec_card(line_buf);
+	*i1 = card.i[0]; *i2 = card.i[1]; *i3 = card.i[2]; *i4 = card.i[3];
+	*f1 = card.f[0]; *f2 = card.f[1]; *f3 = card.f[2];
+	*f4 = card.f[3]; *f5 = card.f[4]; *f6 = card.f[5];
+	return card.parameter_count;
 }
 
 
