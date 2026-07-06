@@ -68,6 +68,34 @@ nec2++: $(LIB_OBJS) $(SRC_DIR)/nec2cpp.cpp
 nec2diff: $(SRC_DIR)/necDiff.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $(SRC_DIR)/necDiff.cpp $(LDFLAGS) -lstdc++
 
+# --- Test runner ---
+TEST_OBJS  = safe_array_tb matrix_algebra_tb c_geometry_tb c_evlcom_tb nec_context_tb nec2cpp_tb
+TEST_CXXFLAGS = -std=c++17 -I $(SRC_DIR) -isystem $(EIGEN_DIR) -I $(BUILD_DIR) -DNEC_ERROR_CHECK=1 -g
+
+test: $(LIB_OBJS)
+	# Recompile library with bounds checking
+	@mkdir -p $(BUILD_DIR)
+	@for src in $(LIB_SRCS) XGetopt; do \
+		$(CXX) $(TEST_CXXFLAGS) -c $(SRC_DIR)/$$src.cpp -o $(BUILD_DIR)/test_$$src.o; \
+	done
+	# Compile nec2cpp with renamed main
+	$(CXX) $(TEST_CXXFLAGS) -Dmain=nec2cpp_main_renamed -c $(SRC_DIR)/nec2cpp.cpp -o $(BUILD_DIR)/test_nec2cpp.o
+	# Compile test files
+	@for tb in $(TEST_OBJS); do \
+		$(CXX) $(TEST_CXXFLAGS) -c $(SRC_DIR)/$$tb.cpp -o $(BUILD_DIR)/$$tb.o; \
+	done
+	# Build Catch2 main
+	@printf '#define CATCH_CONFIG_MAIN\n#include "catch.hpp"\n' > $(BUILD_DIR)/test_main.cpp
+	$(CXX) $(TEST_CXXFLAGS) -c $(BUILD_DIR)/test_main.cpp -o $(BUILD_DIR)/test_main.o
+	# Link and run
+	$(CXX) -o $(BUILD_DIR)/test_runner $(BUILD_DIR)/test_main.o \
+		$(addprefix $(BUILD_DIR)/, $(TEST_OBJS:=.o)) \
+		$(BUILD_DIR)/test_nec2cpp.o \
+		$(addprefix $(BUILD_DIR)/test_, $(LIB_SRCS:=.o)) \
+		$(BUILD_DIR)/test_XGetopt.o \
+		-Wl,--allow-multiple-definition -lm -lstdc++
+	./$(BUILD_DIR)/test_runner "[safe_array],[lu_decompose],[factrs_solves],[bessel],[card_handler],[compat],[readmn],[load_line],[parser_dispatch],[helix],[intersection_check],[false_intersection],[parse_nec_card]" -s
+
 # --- Default targets ---
 
 clean:
@@ -77,4 +105,4 @@ install: nec2++
 	install -d $(DESTDIR)/usr/local/bin
 	install nec2++ $(DESTDIR)/usr/local/bin/
 
-.PHONY: all clean install
+.PHONY: all clean install test
