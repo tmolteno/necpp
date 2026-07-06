@@ -16,6 +16,24 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+
+/* ==========================================================================
+   nec_context.cpp — Numerical Electromagnetics Code (NEC-2) C++ port
+
+   Sections:
+     1.  Construction / Initialization      (lines ~60-150)
+     2.  NEC Card Input Handlers            (lines ~270-1000)
+     3.  Simulation Control                 (lines ~1000-1150)
+     4.  Network Solution (netwk)           (lines ~4470-5060)
+     5.  Matrix Assembly (cmset, fblock)    (lines ~2050-2320)
+     6.  Excitation & Currents              (lines ~1550-2050)
+     7.  Near Field (efld, nefld, nhfld)    (lines ~2750-3100, 4280-4470)
+     8.  Far Field (etmns, ffld, gfld)      (lines ~3100-3450, 6700-6850)
+     9.  Near Field for Patches (unere)     (lines ~6100-6200)
+    10.  Sommerfeld Ground (rom2, sflds)    (lines ~5550-6070)
+    11.  Results & Output                   (lines ~1150-1550)
+   ========================================================================== */
+
 #include "nec_context.h"
 #include "c_geometry.h"
 #include "nec_exception.h"
@@ -249,6 +267,10 @@ nec_float nec_context::benchmark()
       nec.fr_card(0, 2, 2400.0, 100.0);
       nec.rp_card(0, 1, 1, 0,5,0,0, 90.0, 90.0, 0.0, 0.0, 0.0, 0.0);
       nec.get_gain_max();
+/* ====================================================================
+   2. NEC Card Input Handlers
+   ==================================================================== */
+
     }
   }
   /* time the process */
@@ -983,6 +1005,10 @@ void nec_context::cp_card(int itmp1, int itmp2, int itmp3, int itmp4) {
   ncseg[ncoup-1]= itmp4;
 }
 
+/* ====================================================================
+   3. Simulation Control
+   ==================================================================== */
+
 
 /* "pl" card, plot flags 
   throws int on error.
@@ -1521,6 +1547,10 @@ void nec_context::structure_segment_loading()
   factrs(m_output, npeq, neq, cm, ip );
   secnds( &tim1 );
   tim2= tim1- tim2;
+/* ====================================================================
+   6. Excitation  Currents
+   ==================================================================== */
+
   
   m_output.end_section();
   m_output.line("                             ---------- MATRIX TIMING ----------");
@@ -2021,6 +2051,10 @@ void nec_context::load()
     }
   
     /* printing the segment loading data, jump to proper print */
+/* ====================================================================
+   5. Matrix Assembly
+   ==================================================================== */
+
     switch( jump )
     {
       case 1:
@@ -2713,6 +2747,10 @@ void nec_context::couple( complex_array& in_currents, nec_float in_wavelength )
       if ( (c >= 0.0) && (c <= 1.0) )
       {
         if ( c >= .01 )
+/* ====================================================================
+   7. Near Field
+   ==================================================================== */
+
           gmax=(1.- sqrt(1.- c*c))/c;
         else
           gmax=.5*( c+.25* c* c* c);
@@ -3153,6 +3191,10 @@ void nec_context::ekscx( nec_float bx, nec_float s, nec_float z,
   
   *in_ezs= __const1*(( gz2- gz1)* cs* xk-( gzp2+ gzp1)* ss);
   *in_ezc = - __const1*(( gz2+ gz1)* ss* xk+( gzp2- gzp1)* cs);
+/* ====================================================================
+   8. Far Field
+   ==================================================================== */
+
   *ers = - __const1*(( z2a* grp2+ z1a* grp1+ gr2+ gr1)*ss
     -( z2a* gr2- z1a* gr1)* cs* xk);
   *erc = - __const1*(( z2a* grp2- z1a* grp1+ gr2- gr1)*cs
@@ -4425,6 +4467,10 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
     m_s= m_geometry->pbi[i];
     xj= m_geometry->px[i];
     yj= m_geometry->py[i];
+/* ====================================================================
+   4. Network Solution
+   ==================================================================== */
+
     zj= m_geometry->pz[i];
     t1xj= m_geometry->t1x[i];
     t1yj= m_geometry->t1y[i];
@@ -5505,6 +5551,10 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
         etk= exk* tx+ eyk* ty+ ezk* tz;
         ets= exs* tx+ eys* ty+ ezs* tz;
         etc= exc* tx+ eyc* ty+ ezc* tz;
+/* ====================================================================
+   10. Sommerfeld Ground
+   ==================================================================== */
+
         e[i1] += ( etk* m_geometry->ax[jx]+ ets* m_geometry->bx[jx]+ etc* m_geometry->cx[jx] )* curd* m_geometry->psalp[i];
         i1++;
         tx= m_geometry->t1x[i];
