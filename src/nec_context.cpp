@@ -3440,7 +3440,7 @@ void nec_context::etmns_current_source( nec_float p1, nec_float p2, nec_float p3
     else // patches
     {
       int patch_index = i - n;
-      int i1 = i + patch_index*2; // was i1 += 2; and starts at n-2
+      int i1 = n + patch_index*2; // two e-vector slots per patch, based at n
       int i2 = i1+1;
       
       pxl = wy*qz - wz*qy; // cross product here...
