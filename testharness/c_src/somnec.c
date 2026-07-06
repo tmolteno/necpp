@@ -624,7 +624,7 @@ void gshank( complex long double start, complex long double dela, complex long d
 	if(den < denm)
 	  den=denm;
 	a1=q1[i][j]-a1;
-	amg=fabsl(creal(a1)+fabsl(cimag(a1)));
+	amg=fabsl(creal(a1))+fabsl(cimag(a1));
 	if(amg > den)
 	{
 	  brk = TRUE;

@@ -186,7 +186,7 @@ void c_evlcom::gshank( nec_complex start, nec_complex dela, complex_array& sum,
 				if (den < denm)
 					den=denm;
 				a1=q1[i][j]-a1;
-				amg=fabs(real(a1)+fabs(imag(a1)));
+				amg=fabs(real(a1))+fabs(imag(a1));
 				if (amg > den)
 				{
 					brk = true;
