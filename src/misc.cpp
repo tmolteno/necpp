@@ -79,9 +79,9 @@ int load_line( char *buff, FILE *pfile )
 		return( EOF );
 	
 	while( (chr == '#') ||
-                (chr == ' ') ||
-                (chr == CR ) ||
-                (chr == LF ) ) {
+	            (chr == ' ') ||
+	            (chr == CR ) ||
+	            (chr == LF ) ) {
 		/* go to the end of line (look for lf or cr) */
 		while( (chr != CR) && (chr != LF) )
 			if( (chr = fgetc(pfile)) == EOF )
@@ -125,4 +125,55 @@ int load_line( char *buff, FILE *pfile )
 	
 	return( eof );
 } /* end of load_line() */
+
+/* C++ stream overload: identical logic, uses std::istream::get() */
+int load_line( char *buff, std::istream& is )
+{
+	int num_chr = 0;
+	int eof = 0;
+	int chr;
+
+	buff[0] = '\0';
+
+	chr = is.get();
+	if ( !is ) return EOF;
+
+	while ( (chr == '#') || (chr == ' ') || (chr == CR) || (chr == LF) ) {
+		while ( (chr != CR) && (chr != LF) ) {
+			chr = is.get();
+			if ( !is ) return EOF;
+		}
+		while ( (chr == CR) || (chr == LF) ) {
+			chr = is.get();
+			if ( !is ) return EOF;
+		}
+	}
+
+	while ( num_chr < LINE_LEN ) {
+		if ( (chr == CR) || (chr == LF) )
+			break;
+
+		if ( chr == '\'' ) {
+			while ( (chr != CR) && (chr != LF) ) {
+				chr = is.get();
+				if ( !is ) return EOF;
+			}
+			break;
+		}
+
+		buff[num_chr++] = static_cast<char>(chr);
+
+		chr = is.get();
+		if ( !is ) {
+			buff[num_chr] = '\0';
+			eof = EOF;
+		}
+	}
+
+	buff[0] = static_cast<char>(std::toupper(buff[0]));
+	buff[1] = static_cast<char>(std::toupper(buff[1]));
+	buff[num_chr] = '\0';
+
+	return eof;
+}
 

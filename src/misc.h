@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <istream>
 #include "math_util.h"
 
 /* carriage return and line feed */
@@ -26,3 +27,4 @@ void secnds( nec_float *x);
  *  returned.
  */
 int load_line( char *buff, FILE *pfile );
+int load_line( char *buff, std::istream& is );
