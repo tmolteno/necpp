@@ -96,7 +96,9 @@ int main( int argc, char **argv )
 }
 
 #include "c_geometry.h"
-void benchmark();
+	void benchmark();
+
+	#include "nec_card_parser.h"
 
 void benchmark()
 {
@@ -137,23 +139,9 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 
 	char ain[3], line_buf[LINE_LEN+1];
 
-	/* input card mnemonic list */
-	/* "XT" stands for "exit", added for testing */
-	#define CMD_NUM  21
-	const char *atst[CMD_NUM] =
-	{
-		"FR", "LD", "GN", "EX", "NT", "TL", \
-		"XQ", "GD", "RP", "NX", "PT", "KH", \
-		"NE", "NH", "PQ", "EK", "CP", "PL", \
-		"EN", "WG", "MP"
-	};
-
-	int itmp3, itmp2, itmp4;
-
-	int ain_num;    /* ain mnemonic as a number */
-
-	nec_float tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
 	nec_float ex_timer;
+	nec_float tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
+	int itmp1, itmp2, itmp3, itmp4;
 
 	/* getopt() variables */
 	extern char *optarg;
@@ -393,165 +381,54 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 				data_card_count, ain, itmp1, itmp2, itmp3, itmp4,
 				tmp1, tmp2, tmp3, tmp4, tmp5, tmp6 );
 
-			/* identify card id mnemonic (except "ce" and "cm") */
-			for( ain_num = 0; ain_num < CMD_NUM; ain_num++ )
-				if ( strncmp( ain, atst[ain_num], 2) == 0 )
-					break;
-
-			/* take action according to card id mnemonic */
-			switch( ain_num )
-			{
-			case 0: /* "fr" card, frequency parameters */
-				s_context.fr_card(itmp1, itmp2, tmp1, tmp2);
-				continue;
-
-			case 1: /* "ld" card, loading parameters */
-				s_context.ld_card(itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3);
-				continue;
-
-			case 2: /* "gn" card, ground parameters under the antenna */
-				s_context.gn_card(itmp1, itmp2, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-				continue;
-
-			case 3: /* "ex" card, excitation parameters */
-				s_context.ex_card((enum excitation_type)itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-				continue; /* continue card input loop */
-
-			case 4: /* "nt" card, network parameters */
-				s_context.nt_card(itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-				continue; /* continue card input loop */
-
-			case 5: /* "tl" card, network parameters */
-				if (parameter_count < 10)
-				{
-					nec_error_mode em(s_output);
-					s_output.endl();
-					s_output.line("nec2++: Missing parameters in \"TL\" card. Blank parameters should be specified as zero." );
-					exit(0);
-				}
-				s_context.tl_card(itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-				continue; /* continue card input loop */
-
-			case 6: /* "xq" execute card - calc. including radiated fields */
-				s_context.xq_card(itmp1);
-				continue;
-
-			case 7: /* "gd" card, ground representation */
-				s_context.gd_card(tmp1, tmp2, tmp3, tmp4);
-				continue; /* continue card input loop */
-
-			case 8: /* "rp" card, standard observation angle parameters */
-				{
-					// pull out the XNDA parameters here...
-
-					int XNDA = itmp4;
-					int X = XNDA / 1000;
-					int N = (XNDA / 100) % 10;
-					int D = (XNDA / 10) % 10;
-					int A = XNDA % 10;
-
-					s_context.rp_card(itmp1, itmp2, itmp3, X, N, D, A, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-				}
-				continue; /* was break; followed by special code */
-
-			case 9: /* "nx" card, do next job */
+			/* NX card: start next job */
+			if ( strncmp(ain, "NX", 2) == 0 ) {
 				next_job = true;
-				continue; /* continue card input loop */
-
-			case 10: /* "pt" card, print control for current */
-				s_context.pt_card(itmp1, itmp2, itmp3, itmp4);
-				continue; /* continue card input loop */
-
-			case 11: /* "kh" card, matrix integration limit */
-				s_context.kh_card(tmp1);
-				continue; /* continue card input loop */
-
-			case 12:  /* "ne" card, near field calculation parameters */
-				s_context.ne_card(itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
 				continue;
+			}
 
-			case 13:  /* "nh" card, near field calculation parameters */
-				s_context.nh_card(itmp1, itmp2, itmp3, itmp4, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6);
-				continue;
-
-			case 14: /* "pq" card, print control for charge */
-				s_context.pq_card(itmp1, itmp2, itmp3, itmp4);
-				continue; /* continue card input loop */
-
-			case 15: /* "ek" card,  extended thin wire kernel option */
-				if (-1 == itmp1)
-					s_context.set_extended_thin_wire_kernel(false);
-				else
-					s_context.set_extended_thin_wire_kernel(true);
-				continue; /* continue card input loop */
-
-			case 16: /* "cp" card, maximum coupling between antennas */
-				s_context.cp_card(itmp1, itmp2, itmp3, itmp4);
-				continue; /* continue card input loop */
-
-			case 17: /* "pl" card, plot flags */
-				{
-					std::string ploutput_filename(input_filename);
-					ploutput_filename += ".plt";
-					try
-					{
-						s_context.pl_card(ploutput_filename.c_str(), itmp1, itmp2, itmp3, itmp4);
-					}
-					catch(...)
-					{
-						char mesg[88] = "nec2++: ";
-
-						strcat( mesg, ploutput_filename.c_str() );
-						perror( mesg );
-						exit(-1);
-					}
-				}
-				continue; /* continue card input loop */
-
-			case 19: /* "wg" card, not supported */
-				throw nec_exception("\"WG\" card, not supported.");
-
-			case 20: /* "MP" card. Material Parameters */
-				s_context.medium_parameters(tmp1, tmp2);
-				continue;
-
-			default:
-				if ( ain_num != 18 ) // EN card
-				{
-					throw nec_exception("FAULTY DATA CARD LABEL AFTER GEOMETRY SECTION.");
-				}
-
-				/******************************************************
-				*** normal exit of nec2++ when all jobs complete ok ***
-				******************************************************/
+			/* EN card: all jobs complete */
+			if ( strncmp(ain, "EN", 2) == 0 ) {
 				s_context.all_jobs_completed();
-				// put in here for the moment...
 				if (summary_to_stdout)
 					s_context.write_results(cout);
-
-				/* time the process */
 				secnds( &tmp1 );
 				tmp1 -= ex_timer;
-				            fprintf( output_fp, "\n\n  TOTAL RUN TIME: %d msec", static_cast<int>(tmp1) );
-
-				if( input_fp != NULL )
-					fclose( input_fp );
-				if( output_fp != NULL )
-					fclose(output_fp);
-
+				fprintf( output_fp, "\n\n  TOTAL RUN TIME: %d msec", static_cast<int>(tmp1) );
+				if( input_fp != NULL ) fclose( input_fp );
+				if( output_fp != NULL ) fclose(output_fp);
 				return(0);
-			} /* switch( ain_num ) */
+			}
 
-			/*
-				End of the main input section.
+			/* PL card needs special handling (requires input_filename) */
+			if ( strncmp(ain, "PL", 2) == 0 ) {
+				std::string ploutput_filename(input_filename);
+				ploutput_filename += ".plt";
+				try {
+					s_context.pl_card(ploutput_filename.c_str(), itmp1, itmp2, itmp3, itmp4);
+				} catch(...) {
+					char mesg[88] = "nec2++: ";
+					strcat( mesg, ploutput_filename.c_str() );
+					perror( mesg );
+					exit(-1);
+				}
+				continue;
+			}
 
-				far_field_flag is true if last card was XQ or RP
+			/* Table-driven dispatch for remaining 18 cards */
+			nec_card card;
+			card.mnemonic = std::string(ain, 2);
+			card.i[0]=itmp1; card.i[1]=itmp2; card.i[2]=itmp3; card.i[3]=itmp4;
+			card.f[0]=tmp1;  card.f[1]=tmp2;  card.f[2]=tmp3;
+			card.f[3]=tmp4;  card.f[4]=tmp5;  card.f[5]=tmp6;
 
-				This is no longer used, but I am leaving it in here while I iron this out
-				properly. simulate() should be called by the xq card and the rp card.
-			*/
-			ASSERT(false == ((ain_num == 6) || (ain_num == 8)));
-			s_context.simulate(false);
+			auto* h = find_handler(card.mnemonic);
+			if (h) {
+				h->dispatch(s_context, card);
+				continue;
+			}
+
+			throw nec_exception("FAULTY DATA CARD LABEL AFTER GEOMETRY SECTION.");
 		} /* while( ! next_job ) */
 
 	} /* while(true)  */
