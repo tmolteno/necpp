@@ -1191,22 +1191,22 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
     for( int copy = 1; copy < num_copies; copy++ )
     {
       /* Determine which axes to negate for this copy */
-      bool cx = false, cy = false, cz = false;
+      bool flip_x = false, flip_y = false, flip_z = false;
       if ( copy == 1 )
       {
-	if ( axis1_mask == 4 ) cz = true;
-	else if ( axis1_mask == 2 ) cy = true;
-	else if ( axis1_mask == 1 ) cx = true;
+	if ( axis1_mask == 4 ) flip_z = true;
+	else if ( axis1_mask == 2 ) flip_y = true;
+	else if ( axis1_mask == 1 ) flip_x = true;
       }
       else if ( copy == 2 )
       {
-	if ( axis2_mask == 4 ) cz = true;
-	else if ( axis2_mask == 2 ) cy = true;
-	else if ( axis2_mask == 1 ) cx = true;
+	if ( axis2_mask == 4 ) flip_z = true;
+	else if ( axis2_mask == 2 ) flip_y = true;
+	else if ( axis2_mask == 1 ) flip_x = true;
       }
       else if ( copy == 3 )
       {
-	cx = neg_x; cy = neg_y; cz = neg_z;
+	flip_x = neg_x; flip_y = neg_y; flip_z = neg_z;
       }
 
       int base = copy * orig_n;
@@ -1216,7 +1216,7 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 	nx = base + i;
 
 	/* Validate: segment must not lie in the symmetry plane */
-	if ( cz )
+	if ( flip_z )
 	{
 	  e1 = z[i];
 	  e2 = z2[i];
@@ -1228,7 +1228,7 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 	    throw nex;
 	  }
 	}
-	if ( cy )
+	if ( flip_y )
 	{
 	  e1 = y[i];
 	  e2 = y2[i];
@@ -1240,7 +1240,7 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 	    throw nex;
 	  }
 	}
-	if ( cx )
+	if ( flip_x )
 	{
 	  e1 = x[i];
 	  e2 = x2[i];
@@ -1253,12 +1253,12 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 	  }
 	}
 
-	x[nx]  = cx ? -x[i]  : x[i];
-	y[nx]  = cy ? -y[i]  : y[i];
-	z[nx]  = cz ? -z[i]  : z[i];
-	x2[nx] = cx ? -x2[i] : x2[i];
-	y2[nx] = cy ? -y2[i] : y2[i];
-	z2[nx] = cz ? -z2[i] : z2[i];
+	x[nx]  = flip_x ? -x[i]  : x[i];
+	y[nx]  = flip_y ? -y[i]  : y[i];
+	z[nx]  = flip_z ? -z[i]  : z[i];
+	x2[nx] = flip_x ? -x2[i] : x2[i];
+	y2[nx] = flip_y ? -y2[i] : y2[i];
+	z2[nx] = flip_z ? -z2[i] : z2[i];
 
 	itagi = segment_tags[i];
 	if ( itagi == 0 )
@@ -1293,25 +1293,25 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 
     for( int copy = 1; copy < num_copies; copy++ )
     {
-      bool cx = false, cy = false, cz = false;
+      bool flip_x = false, flip_y = false, flip_z = false;
       if ( copy == 1 )
       {
-	if ( axis1_mask == 4 ) cz = true;
-	else if ( axis1_mask == 2 ) cy = true;
-	else if ( axis1_mask == 1 ) cx = true;
+	if ( axis1_mask == 4 ) flip_z = true;
+	else if ( axis1_mask == 2 ) flip_y = true;
+	else if ( axis1_mask == 1 ) flip_x = true;
       }
       else if ( copy == 2 )
       {
-	if ( axis2_mask == 4 ) cz = true;
-	else if ( axis2_mask == 2 ) cy = true;
-	else if ( axis2_mask == 1 ) cx = true;
+	if ( axis2_mask == 4 ) flip_z = true;
+	else if ( axis2_mask == 2 ) flip_y = true;
+	else if ( axis2_mask == 1 ) flip_x = true;
       }
       else if ( copy == 3 )
       {
-	cx = neg_x; cy = neg_y; cz = neg_z;
+	flip_x = neg_x; flip_y = neg_y; flip_z = neg_z;
       }
 
-      int neg_count = (cx?1:0) + (cy?1:0) + (cz?1:0);
+      int neg_count = (flip_x?1:0) + (flip_y?1:0) + (flip_z?1:0);
       bool neg_psalp = (neg_count % 2 == 1);
 
       int base = copy * orig_m;
@@ -1320,21 +1320,21 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
       {
 	nx = base + i;
 
-	if ( cz && fabs(pz[i]) <= 1.0e-10 )
+	if ( flip_z && fabs(pz[i]) <= 1.0e-10 )
 	{
 	  nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
 	  nex.append(i+1);
 	  nex.append("LIES IN PLANE OF SYMMETRY");
 	  throw nex;
 	}
-	if ( cy && fabs(py[i]) <= 1.0e-10 )
+	if ( flip_y && fabs(py[i]) <= 1.0e-10 )
 	{
 	  nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
 	  nex.append(i+1);
 	  nex.append("LIES IN PLANE OF SYMMETRY");
 	  throw nex;
 	}
-	if ( cx && fabs(px[i]) <= 1.0e-10 )
+	if ( flip_x && fabs(px[i]) <= 1.0e-10 )
 	{
 	  nec_exception nex("GEOMETRY DATA ERROR--PATCH ");
 	  nex.append(i+1);
@@ -1342,15 +1342,15 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 	  throw nex;
 	}
 
-	px[nx]   = cx ? -px[i]   : px[i];
-	py[nx]   = cy ? -py[i]   : py[i];
-	pz[nx]   = cz ? -pz[i]   : pz[i];
-	t1x[nx]  = cx ? -t1x[i]  : t1x[i];
-	t1y[nx]  = cy ? -t1y[i]  : t1y[i];
-	t1z[nx]  = cz ? -t1z[i]  : t1z[i];
-	t2x[nx]  = cx ? -t2x[i]  : t2x[i];
-	t2y[nx]  = cy ? -t2y[i]  : t2y[i];
-	t2z[nx]  = cz ? -t2z[i]  : t2z[i];
+	px[nx]   = flip_x ? -px[i]   : px[i];
+	py[nx]   = flip_y ? -py[i]   : py[i];
+	pz[nx]   = flip_z ? -pz[i]   : pz[i];
+	t1x[nx]  = flip_x ? -t1x[i]  : t1x[i];
+	t1y[nx]  = flip_y ? -t1y[i]  : t1y[i];
+	t1z[nx]  = flip_z ? -t1z[i]  : t1z[i];
+	t2x[nx]  = flip_x ? -t2x[i]  : t2x[i];
+	t2y[nx]  = flip_y ? -t2y[i]  : t2y[i];
+	t2z[nx]  = flip_z ? -t2z[i]  : t2z[i];
 	psalp[nx] = neg_psalp ? -psalp[i] : psalp[i];
 	pbi[nx]   = pbi[i];
       }

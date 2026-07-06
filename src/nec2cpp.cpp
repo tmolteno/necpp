@@ -94,6 +94,7 @@ int main( int argc, char **argv )
  		s_output.line(" Unknown exception");
 		exit(1);
 	}
+	return 0;
 }
 
 #include "c_geometry.h"
@@ -358,11 +359,9 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 		bool next_job = false; /* start next job (next structure) flag */
 		while ( ! next_job )
 		{
-			int itmp1;
-
 			/* main input section - standard read statement - jumps */
 			/* to appropriate section for specific parameter set up */
-			int parameter_count = readmn(input_fp, output_fp, ain, &itmp1, &itmp2, &itmp3, &itmp4,
+			readmn(input_fp, output_fp, ain, &itmp1, &itmp2, &itmp3, &itmp4,
 				&tmp1, &tmp2, &tmp3, &tmp4, &tmp5, &tmp6 );
 
 			/* If its an "XT" card, exit */

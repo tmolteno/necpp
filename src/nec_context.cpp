@@ -3202,7 +3202,7 @@ void nec_context::etmns_voltage_source( complex_array& e )
 }
 
 /*!\brief Incident plane wave, linearly polarized. */
-void nec_context::etmns_linear_wave( nec_float cth, nec_float sth, nec_float cph, nec_float sph,
+void nec_context::etmns_linear_wave( nec_float /*cth*/, nec_float /*sth*/, nec_float cph, nec_float sph,
     nec_float pxl, nec_float pyl, nec_float pzl, nec_float wx, nec_float wy, nec_float wz,
     nec_float qx, nec_float qy, nec_float qz, nec_complex rrv, nec_complex rrh,
     nec_float incident_amplitude, complex_array& e )
@@ -3283,7 +3283,7 @@ void nec_context::etmns_linear_wave( nec_float cth, nec_float sth, nec_float cph
 }
 
 /*!\brief Incident plane wave, elliptic polarization. */
-void nec_context::etmns_circular_wave( nec_float cth, nec_float sth, nec_float cph, nec_float sph,
+void nec_context::etmns_circular_wave( nec_float /*cth*/, nec_float /*sth*/, nec_float cph, nec_float sph,
     nec_float pxl, nec_float pyl, nec_float pzl, nec_float wx, nec_float wy, nec_float wz,
     nec_float qx, nec_float qy, nec_float qz, nec_complex rrv, nec_complex rrh,
     nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e )
@@ -3480,9 +3480,7 @@ void nec_context::etmns_current_source( nec_float p1, nec_float p2, nec_float p3
 void nec_context::etmns( nec_float p1, nec_float p2, nec_float p3, nec_float p4,
     nec_float p5, nec_float p6, nec_float incident_amplitude, enum excitation_type excite_type, complex_array& e )
 {
-  int n = m_geometry->n_segments;
-  int m = m_geometry->m;
-  ASSERT(neq == n+2*m);
+  ASSERT(neq == m_geometry->n_segments + 2*m_geometry->m);
   nqds=0;
   ASSERT(excite_type >= 0);
 
