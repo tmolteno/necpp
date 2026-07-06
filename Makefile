@@ -32,7 +32,7 @@ SRC_DIR   = src
 EIGEN_DIR = $(SRC_DIR)/eigen3
 BUILD_DIR = build/simple
 
-VERSION   = 2.1.0
+VERSION   = 2.1.1
 BUILD_DATE = $(shell date +"%Y-%m-%d")
 
 INCLUDES  = -I $(SRC_DIR) -isystem $(EIGEN_DIR) -I $(BUILD_DIR)

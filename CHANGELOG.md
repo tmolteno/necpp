@@ -1,4 +1,4 @@
-## Version 2.1.0
+## Version 2.1.1
 
 ### Breaking Changes
 * **Eigen is now mandatory** (but bundled in `src/eigen3/` — no external install needed). All `--with-eigen*` options removed.
@@ -58,6 +58,10 @@
 ### Code Quality
 * Fixed exception memory leak: throw-by-pointer → throw-by-value (55+ sites, 15 files)
 * Split 4 monolithic functions: netwk() 680→13, reflect() 391→30, connect_segments() 380→16, etmns() 331→55 (#107)
+* Fix ind1/ind2 copy-paste bug in nefld() and qdsrc() — corrupted EK params for connected segments
+* Fix current_vector overallocation: n+4*m → n+3*m (matches FORTRAN CUR(3*MAXSEG))
+* Fix patch-only geometry guard: np==0 → m==0 (np is unknowns, m is patch count)
+* Add 3 patch test cases: patch_plate, wire_over_patch, patch_near_field
 * Fix #109: wrong e-vector index for EX type-4 current source (n+3*patch → n+2*patch)
 * Fix efld() parameter name conflict: header used on_source_segment, implementation used not_on_source_segment
 * pragma once on all 26 headers (removes reserved-identifier UB)
