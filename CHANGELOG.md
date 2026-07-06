@@ -58,6 +58,7 @@
 ### Code Quality
 * Fixed exception memory leak: throw-by-pointer → throw-by-value (55+ sites, 15 files)
 * Split 4 monolithic functions: netwk() 680→13, reflect() 391→30, connect_segments() 380→16, etmns() 331→55 (#107)
+* Fix #109: wrong e-vector index for EX type-4 current source (n+3*patch → n+2*patch)
 * Fix efld() parameter name conflict: header used on_source_segment, implementation used not_on_source_segment
 * pragma once on all 26 headers (removes reserved-identifier UB)
 * 22 C-style casts converted to static_cast
