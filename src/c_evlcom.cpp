@@ -563,54 +563,52 @@ void c_evlcom::evlua( nec_complex *erv, nec_complex *ezv,
 	gshank(cp1,delta,ans,6,sum,0,bk,bk);
 	rmis=m_rho*(real(m_ck1)-m_ck2);
 	
-	bool jump = false;
-	if ( (rmis >= 2.*m_ck2) && (m_rho >= 1.e-10) )
-	{
-		if (m_zph >= 1.e-10)
-		{
-			bk=nec_complex(-m_zph,m_rho)*(m_ck1-cp3);
-			rmis = -real(bk)/fabs(imag(bk));
-			if (rmis > 4.*m_rho/m_zph)
-				jump = true;
-		}
-		
-		if ( false == jump )
-		{
-			/* integrate up between branch cuts, then to + infinity */
-			cp1=m_ck1- nec_complex(0.1,+0.2);
-			cp2=cp1+.2;
-			bk=nec_complex(0.,del);
-			gshank(cp1,bk,sum,6,ans,0,bk,bk);
-			m_contour_a=cp1;
-			m_contour_b=cp2;
-			rom1(6,ans,1);
-			for (int i = 0; i < 6; i++ )
-				ans[i] -= sum[i];
-			
-			gshank(cp3,bk,sum,6,ans,0,bk,bk);
-			gshank(cp2,delta2,ans,6,sum,0,bk,bk);
-		}
-		
-		jump = true;	
-	} /* if ( (rmis >= 2.*m_ck2) || (m_rho >= 1.e-10) ) */
-	else
+	bool jump;
+	if ( (rmis < 2.*m_ck2) || (m_rho < 1.e-10) )
+		jump = true;
+	else if ( m_zph < 1.e-10 )
 		jump = false;
-	
+	else
+	{
+		bk=nec_complex(-m_zph,m_rho)*(m_ck1-cp3);
+		rmis = -real(bk)/fabs(imag(bk));
+		if (rmis > 4.*m_rho/m_zph)
+			jump = true;
+		else
+			jump = false;
+	}
+
 	if ( false == jump )
+	{
+		/* integrate up between branch cuts, then to + infinity */
+		cp1=m_ck1- nec_complex(0.1,+0.2);
+		cp2=cp1+.2;
+		bk=nec_complex(0.,del);
+		gshank(cp1,bk,sum,6,ans,0,bk,bk);
+		m_contour_a=cp1;
+		m_contour_b=cp2;
+		rom1(6,ans,1);
+		for (int i = 0; i < 6; i++ )
+			ans[i] -= sum[i];
+
+		gshank(cp3,bk,sum,6,ans,0,bk,bk);
+		gshank(cp2,delta2,ans,6,sum,0,bk,bk);
+	}
+	else
 	{
 		/* integrate below branch points, then to + infinity */
 		for (int i = 0; i < 6; i++ )
 			sum[i] = -ans[i];
-		
+
 		rmis=real(m_ck1)*1.01;
 		if ( (m_ck2+1.) > rmis )
 			rmis=m_ck2+1.;
-		
+
 		bk=nec_complex(rmis,.99*imag(m_ck1));
 		delta=bk-cp3;
 		delta *= del/abs(delta);
 		gshank(cp3,delta,ans,6,sum,1,bk,delta2);
-	} /* if ( false == jump ) */
+	}
 	
 	ans[5] *= m_ck1;
 	
