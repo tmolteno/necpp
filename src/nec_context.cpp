@@ -4376,10 +4376,10 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
       int iprx = ipr-1;
     
       if ( -m_geometry->icon2[iprx] != ix )
-        ind1=2;
+        ind2=2;
       else
       {
-        ind1 = m_geometry->test_ek_approximation(i,iprx);
+        ind2 = m_geometry->test_ek_approximation(i,iprx);
       }
     } /* if ( ipr < 0 ) */
     else if ( ipr == 0 )
@@ -4400,9 +4400,9 @@ void nec_context::nefld( nec_float xob, nec_float yob, nec_float zob,
       else
       {
         if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
-          ind1=2;
+          ind2=2;
         else
-          ind1=0;
+          ind2=0;
       }
     } /* else */
   
@@ -5447,9 +5447,9 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
       ipr = -ipr;
       ipr--;
       if ( -m_geometry->icon2[ipr] != jp1 ) {
-        ind1=2;
+        ind2=2;
       } else {
-        ind1 = m_geometry->test_ek_approximation(j,ipr);
+        ind2 = m_geometry->test_ek_approximation(j,ipr);
       }
     } /* if ( ipr < 0 ) */
     else if ( ipr == 0 )
@@ -5466,9 +5466,9 @@ void nec_context::qdsrc( int is, nec_complex v, complex_array& e )
       } /* if ( ipr != j )*/
       else {
         if ( (cabj* cabj+ sabj* sabj) > 1.0e-8)
-          ind1=2;
+          ind2=2;
         else
-          ind1=0;
+          ind2=0;
       }
     } /* else */
   
