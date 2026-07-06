@@ -25,27 +25,15 @@
 void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
 void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
-/** \brief Built-in Gauss-Doolittle LU (reference implementation). */
+/** \brief Gauss-Doolittle LU (reference implementation). */
 void lu_decompose_ge(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
 void solve_ge( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
-
-/** \brief Eigen PartialPivLU wrapper (used internally by lu_decompose). */
-void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim);
-void solve_eigen( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim );
 
 
 void factrs(nec_output_file& s_output,  int64_t np, int64_t nrow, complex_array& a, int_array& ip );
 void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
   int64_t nrh, int64_t np, int64_t n, int64_t mp, int64_t m, int64_t nop, 
   complex_array& symmetry_array);
-
-
-/* Do some simple tests for integration convergence */
-
-void test(nec_float f1r, nec_float f2r, nec_float *tr, nec_float f1i,
-  nec_float f2i, nec_float *ti, nec_float dmin);
-
-nec_float test_simple( nec_float f1r, nec_float f2r, nec_float dmin );
 
 #ifdef NEC_ERROR_CHECK
 void to_octave(nec_complex& x);
@@ -54,4 +42,4 @@ void to_octave(nec_complex* a, int n, int ndim);
 void to_octave(complex_array& a, int n, int ndim);
 void to_octave(int* a, int n);
 void to_octave(int_array& a, int n);
-#endif /*  NEC_ERROR_CHECK */
+#endif

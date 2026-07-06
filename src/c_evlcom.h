@@ -61,3 +61,8 @@ private:
 	/*! \brief Flag to select Bessel or Hankel function form (was jh) */
 	bool m_bessel_flag;
 };
+
+/* Numerical integration convergence tests (used by Sommerfeld integration) */
+void test(nec_float f1r, nec_float f2r, nec_float *tr, nec_float f1i,
+  nec_float f2i, nec_float *ti, nec_float dmin);
+nec_float test_simple( nec_float f1r, nec_float f2r, nec_float dmin );

@@ -839,3 +839,45 @@ void hankel( nec_complex z, nec_complex *h0, nec_complex *h0p )
 }
 
 
+
+/* Numerical integration convergence tests used by Sommerfeld integration. */
+
+void test(
+        nec_float f1r, nec_float f2r, nec_float *tr,
+        nec_float f1i, nec_float f2i, nec_float *ti,
+        nec_float dmin )
+{
+    static nec_float _min_val = 1.0e-37;
+    
+    nec_float den = fabs( f2r);
+    nec_float temp_tr = fabs( f2i);
+    
+    if( den < temp_tr)
+        den = temp_tr;
+    if( den < dmin)
+        den = dmin;
+    
+    if( den < _min_val) {
+        *tr = 0.0;
+        *ti = 0.0;
+        return;
+    }
+    
+    *tr= fabs((f1r - f2r)/ den);
+    *ti= fabs((f1i - f2i)/ den); 
+}
+
+nec_float test_simple( nec_float f1r, nec_float f2r, nec_float dmin )
+{
+    static nec_float _min_val = 1.0e-37;
+    
+    nec_float den = fabs(f2r);
+    
+    if( den < dmin)
+        den = dmin;
+    if (den < _min_val)   {
+        return 0.0;
+    }
+    
+    return fabs((f1r - f2r) / den);    
+}

@@ -1,204 +1,11 @@
 /*
-    Copyright (C) 2004-2015    Timothy C.A. Molteno
-    
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
-    GNU General Public License for more details.
-    
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA    02111-1307    USA
-*/
+  NEC-2 matrix algebra: LU decomposition (Eigen PartialPivLU),
+  forward/back substitution, symmetry handling (factrs/solves),
+  matrix assembly helpers.
 
-/**
-
-Date: Wed Apr 10 1996 - 22:17:10 EDT
-
-Re: NEC benchmarks, and a way to speedup your code (maybe)
-
-In running benchmarks on different platforms with NEC codes of different
-origins, anomalous timings could result from the transposed (or not)
-storage of the matrix. This was discussed in the July 1995 ACES
-Newsletter. Since many NEC users probably did not see that, there will
-be versions of NEC around with and without this do-it-yourself change
-that can greatly speedup the solution. All codes sent out from LLNL
-since May 1995 have the matrix un-transposed for in-core solution.
-
-In NEC-2, 3 and 4 the matrix is stored in transposed form (column,row)
-for convenience in the out-of-core solution. Transposed storage is
-unnecessary when the matrix fits into RAM, and will slow down the matrix
-solution since inner loops in subroutines FACTR and SOLVE are changing
-the second index in the array. The difference between transposed and
-normal storage was not very large on older computers, but can be very
-significant on PCs and workstations that depend on cache storage. On a
-VAX 6330 the matrix-factor time with matrix transposed was slower than
-with normal storage by a factor of 1.2. However, on an Alpha 3000/400
-the factor was 2.4 and on a Mac 8100 it was 3.5 to 4.
-
-Fortunately it is easy to fix this problem if you have a FORTRAN
-compiler. Rather than changing the entire matrix fill and NGF, you can
-simply re-transpose the matrix at the beginning of subroutine FACTR.
-Instructions for doing this were given in the ACES Newsletter, but
-FACTR and SOLVE routines with the changes made are included below.
-These should just replace the same routines in NEC-2, 3 or 4 after the
-parameter MAXSEG has been set correctly.
-
-(A confusing factor if you are not used to archaic FORTRAN: 2*MAXSEG
-sets the size of the complex array D in COMMON/SCRATM/ in FACTR and
-SOLVE. COMMON/SCRATM/ is contained in several other routines in NEC,
-and the lengths must match. However, in subroutine RDPAT the array is
-real, so the dimension would be 4*MAXSEG. If the array in your FACTR
-and SOLVE has a number for a dimension, then MAXSEG should be half that
-number. If your code gets the dimension from an INCLUDE file, you
-should use that INCLUDE.)
-
-Re-transposing the matrix takes a little time, proportional to N**2,
-but saves time proportional to N**3. The amount of time wasted is
-negligible, and the risk of breaking something if you try to undo the
-transposed storage throughout the code is great. I do not know whether
-this change has gotten into the codes on ftp.netcom.com. At least for
-benchmarks it should be checked that any codes compared are the same,
-re-transposed for speed or not for "classic" NEC.
-
-Jerry Burke
-LLNL
-
-FACTR and SOLVE routines with matrix re-transposed:
-
-            SUBROUTINE FACTR (N,A,IP,NDIM)
-C
-C Purpose:
-C FACTR computes the LU decomposition of the matrix in A. The
-C algorithm is described on pages 411-416 OF A. Ralston--A First
-C Course in Numerical Analysis. Comments below refer to comments in
-C Ralston's text. (MATRIX TRANSPOSED.)
-C
-            PARAMETER (MAXSEG=300)
-            COMPLEX A,D,ARJ
-            DIMENSION A(NDIM,NDIM), IP(NDIM)
-            COMMON /SCRATM/ D(2*MAXSEG)
-            INTEGER R,RM1,RP1,PJ,PR
-C
-C Un-transpose the matrix for Gauss elimination
-C
-            DO 12 I=2,N
-                 DO 11 J=1,I-1
-                        ARJ=A(I,J)
-                        A(I,J)=A(J,I)
-                        A(J,I)=ARJ
-11 CONTINUE
-12 CONTINUE
-            IFLG=0
-            DO 9 R=1,N
-C
-C STEP 1
-C
-            DO 1 K=1,N
-            D(K)=A(K,R)
-1 CONTINUE
-C
-C STEPS 2 AND 3
-C
-            RM1=R-1
-            IF (RM1.LT.1) GO TO 4
-            DO 3 J=1,RM1
-            PJ=IP(J)
-            ARJ=D(PJ)
-            A(J,R)=ARJ
-            D(PJ)=D(J)
-            JP1=J+1
-            DO 2 I=JP1,N
-            D(I)=D(I)-A(I,J)*ARJ
-2 CONTINUE
-3 CONTINUE
-4 CONTINUE
-C
-C STEP 4
-C
-            DMAX=REAL(D(R)*CONJG(D(R)))
-            IP(R)=R
-            RP1=R+1
-            IF (RP1.GT.N) GO TO 6
-            DO 5 I=RP1,N
-            ELMAG=REAL(D(I)*CONJG(D(I)))
-            IF (ELMAG.LT.DMAX) GO TO 5
-            DMAX=ELMAG
-            IP(R)=I
-5 CONTINUE
-6 CONTINUE
-            IF (DMAX.LT.1.E-10) IFLG=1
-            PR=IP(R)
-            A(R,R)=D(PR)
-            D(PR)=D(R)
-C
-C STEP 5
-C
-            IF (RP1.GT.N) GO TO 8
-            ARJ=1./A(R,R)
-            DO 7 I=RP1,N
-            A(I,R)=D(I)*ARJ
-7 CONTINUE
-8 CONTINUE
-            IF (IFLG.EQ.0) GO TO 9
-            WRITE(3,10) R,DMAX
-            IFLG=0
-9 CONTINUE
-            RETURN
-C
-10 FORMAT (' FACTR: PIVOT(',I3,')=',1PE16.8)
-            END
-            SUBROUTINE SOLVE (N,A,IP,B,NDIM)
-C=======================================================================
-C (C) Copyright 1992
-C The Regents of the University of California. All rights reserved.
-C=======================================================================
-C
-C SOLVE solves the matrix equation LU*X=B where L is a unit
-C lower triangular matrix and U is an upper triangular matrix both
-C of which are stored in A. The RHS vector B is input and the
-C solution is returned through vector B.
-C
-            PARAMETER (MAXSEG=300)
-            COMPLEX A,B,Y,SUM
-            INTEGER PI
-            COMMON /SCRATM/ Y(2*MAXSEG)
-            DIMENSION A(NDIM,NDIM), IP(NDIM), B(NDIM)
-C
-C FORWARD SUBSTITUTION
-C
-            DO 3 I=1,N
-            PI=IP(I)
-            Y(I)=B(PI)
-            B(PI)=B(I)
-            IP1=I+1
-            IF (IP1.GT.N) GO TO 2
-            DO 1 J=IP1,N
-            B(J)=B(J)-A(J,I)*Y(I)
-1 CONTINUE
-2 CONTINUE
-3 CONTINUE
-C
-C BACKWARD SUBSTITUTION
-C
-            DO 6 K=1,N
-            I=N-K+1
-            SUM=(0.,0.)
-            IP1=I+1
-            IF (IP1.GT.N) GO TO 5
-            DO 4 J=IP1,N
-            SUM=SUM+A(I,J)*B(J)
-4 CONTINUE
-5 CONTINUE
-            B(I)=(Y(I)-SUM)/A(I,I)
-6 CONTINUE
-            RETURN
-            END
+  Matrix storage: column-major transposed (NEC convention).
+  LU uses Eigen::Map with OuterStride for zero-copy factorization.
+  Gauss-Doolittle reference implementation retained for testing.
 */
 #include "math_util.h"
 #include <iostream>
@@ -407,10 +214,10 @@ void solve_ge( int64_t n, complex_array& a, int_array& ip,
 /*! \brief Use Eigen PartialPivLU to perform LU decomposition.
     The input matrix a_in is in NEC column-major transposed format.
     On return, a_in contains L+U factors and ip contains 1-indexed pivots. */
-void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
+void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a_in, int_array& ip, int64_t ndim)
 {
     UNUSED(s_output);
-    DEBUG_TRACE("lu_decompose_eigen(" << n << "," << ndim << ")");
+    DEBUG_TRACE("lu_decompose(" << n << "," << ndim << ")");
     ASSERT(n <= ndim);
 
 #ifdef NEC_MATRIX_CHECK
@@ -444,7 +251,7 @@ void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a_i
     A_map = lu.matrixLU();
 
     /* Store Eigen's permutation indices in ip (1-based for compatibility).
-       solve_eigen will use these directly instead of the GE pivot format. */
+       solve will use these directly instead of the GE pivot format. */
     auto eigen_indices = lu.permutationP().indices();
     for (int64_t i = 0; i < n; i++) {
         ip[i] = static_cast<int32_t>(eigen_indices[i] + 1);
@@ -459,12 +266,12 @@ void lu_decompose_eigen(nec_output_file& s_output, int64_t n, complex_array& a_i
 }
     
 
-/* solve_eigen reconstructs Eigen PartialPivLU from stored LU and permutation,
+/* solve reconstructs Eigen PartialPivLU from stored LU and permutation,
    then solves via forward/back substitution. */
-void solve_eigen( int64_t n, complex_array& a, int_array& ip,
+void solve( int64_t n, complex_array& a, int_array& ip,
     complex_array& b, int64_t ndim )
 {
-    DEBUG_TRACE("solve_eigen(" << n << "," << ndim << ")");
+    DEBUG_TRACE("solve(" << n << "," << ndim << ")");
     
     using MatrixXcd = Eigen::Matrix<std::complex<nec_float>, Eigen::Dynamic, Eigen::Dynamic>;
     using VectorXcd = Eigen::Matrix<std::complex<nec_float>, Eigen::Dynamic, 1>;
@@ -498,18 +305,6 @@ void solve_eigen( int64_t n, complex_array& a, int_array& ip,
         rhs[i] = (z[i] - sum) / LU(i, i);
     }
 }
-
-
-void lu_decompose(nec_output_file& s_output, int64_t n, complex_array& a, int_array& ip, int64_t ndim)
-{
-    return lu_decompose_eigen(s_output, n, a, ip, ndim);
-}
-
-void solve( int64_t n, complex_array& a, int_array& ip, complex_array& b, int64_t ndim )
-{
-    return solve_eigen(n, a, ip, b, ndim);
-}
-
 /*-----------------------------------------------------------------------*/
 
 /** factrs
@@ -699,49 +494,3 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
     } /* for( ic = 0; ic < nrh; ic++ ) */
 }
 
-/*-----------------------------------------------------------------------*/
-/** \brief test for convergence in numerical integration */
-void test(
-        nec_float f1r, nec_float f2r, nec_float *tr,
-        nec_float f1i, nec_float f2i, nec_float *ti,
-        nec_float dmin )
-{
-    static nec_float _min_val = 1.0e-37;
-    
-    nec_float den = fabs( f2r);
-    nec_float temp_tr = fabs( f2i);
-    
-    if( den < temp_tr)
-        den = temp_tr;
-    if( den < dmin)
-        den = dmin;
-    
-    if( den < _min_val) {
-        *tr = 0.0;
-        *ti = 0.0;
-        return;
-    }
-    
-    *tr= fabs((f1r - f2r)/ den);
-    *ti= fabs((f1i - f2i)/ den); 
-}
-
-/**
-    Simpler test for convergence in numerical integration.
-    This tests only one number. It is a special case of the
-    test() function above.
-*/
-nec_float test_simple( nec_float f1r, nec_float f2r, nec_float dmin )
-{
-    static nec_float _min_val =    1.0e-37;
-    
-    nec_float den = fabs(f2r);
-    
-    if( den < dmin)
-        den = dmin;
-    if (den < _min_val)   {
-        return 0.0;
-    }
-    
-    return fabs((f1r - f2r) / den);    
-}
