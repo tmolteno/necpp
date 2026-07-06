@@ -4,7 +4,7 @@
 
 #include "misc.h"
 
-#include <stdio.h>
+#include <iostream>
 #include <cctype>
 
 using namespace std;
@@ -18,15 +18,14 @@ using namespace std;
 
 void usage(void)
 {
-  fprintf( stderr,
-      "usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]"
+  cerr << "usage: nec2++ [-i<input-file-name>] [-o<output-file-name>]"
       "\n       -g: print maximum gain to stdout."
       "\n       -b: Perform NEC++ Benchmark."
       "\n       -s: print result summary to standard output."
       "\n       -c: print results in comma-separated-value (CSV) format,"
       "\n           this options is used in conjunction with (-s) above."
       "\n       -h: print this usage information and exit."
-      "\n       -v: print nec2++ version number and exit.\n");
+      "\n       -v: print nec2++ version number and exit.\n";
 
 } /* end of usage() */
 
@@ -34,7 +33,13 @@ void usage(void)
 /*------------------------------------------------------------------------*/
 /* Returns process time (user+system) BUT in _msec_ */
 
-#ifndef _WIN32
+#if defined(__EMSCRIPTEN__)
+/* WASM stub: no process-timing syscalls available */
+void secnds( nec_float *x)
+{
+	*x = 0.0;
+}
+#elif !defined(_WIN32)
 #include <sys/times.h>
 #include <unistd.h>
 void secnds( nec_float *x)

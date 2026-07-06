@@ -17,6 +17,7 @@
 */
 #include "nec_output.h"
 #include "nec_exception.h"
+#include <iostream>
 #include <string>
 #include <sstream>
 
@@ -62,7 +63,7 @@ void nec_output_file::do_output(const char* str)
 	
 	fprintf(m_output_fp, "%s", str);
 	if (m_error_mode)
-		fprintf(stderr, "%s", str);
+		std::cerr << str;
 }
 
 void nec_output_file::endl(int n_lines)
@@ -121,7 +122,7 @@ void nec_output_file::integer(long in_integer)
 	
 	fprintf(m_output_fp,"%ld",in_integer);
 	if (m_error_mode)
-		fprintf(stderr,"%ld",in_integer);
+		std::cerr << in_integer;
 }
 
 void nec_output_file::real_out(int w, int p, nec_float f, bool sci)
@@ -142,7 +143,7 @@ void nec_output_file::real_out(int w, int p, nec_float f, bool sci)
 	
 	fprintf(m_output_fp,fmt,f);
 	if (m_error_mode)
-		fprintf(stderr,fmt,f);
+		std::cerr << f;
 }
 
 

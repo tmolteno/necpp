@@ -21,8 +21,14 @@ int readmn(FILE* input_fp, FILE* output_fp, char *gm, int *i1, int *i2,
 /* load_line() declaration */
 int load_line( char *buff, FILE *pfile );
 
+/* Stream-based readmn declaration */
+int readmn(std::istream& is,
+  char *gm, int *i1, int *i2, int *i3, int *i4,
+  nec_float *f1, nec_float *f2, nec_float *f3,
+  nec_float *f4, nec_float *f5, nec_float *f6);
+
 /*-----------------------------------------------------------------------*/
-/* Helper: parse a NEC card line string through readmn via fmemopen     */
+/* Helper: parse a NEC card line string through readmn via istringstream */
 
 struct ParsedCard {
     std::string mnemonic;
@@ -32,20 +38,13 @@ struct ParsedCard {
 };
 
 ParsedCard parse_card_line(const std::string& line) {
-    /* Write the line to a temp file for readmn to consume */
-    FILE* in  = fmemopen((void*)line.c_str(), line.size(), "r");
-    FILE* out = fmemopen(nullptr, 0, "w");  /* discard output */
-    REQUIRE(in  != nullptr);
-    REQUIRE(out != nullptr);
+    std::istringstream iss(line);
 
     char gm[3] = {};
     int  i1=0, i2=0, i3=0, i4=0;
     nec_float f1=0, f2=0, f3=0, f4=0, f5=0, f6=0;
 
-    int n = readmn(in, out, gm, &i1, &i2, &i3, &i4, &f1, &f2, &f3, &f4, &f5, &f6);
-
-    fclose(in);
-    fclose(out);
+    int n = readmn(iss, gm, &i1, &i2, &i3, &i4, &f1, &f2, &f3, &f4, &f5, &f6);
 
     ParsedCard c;
     c.mnemonic = std::string(gm, 2);
@@ -162,25 +161,22 @@ TEST_CASE("All 21 NEC card mnemonics are in the atst table", "[parser_dispatch]"
 /* Tests: load_line() comment handling                                  */
 
 TEST_CASE("load_line skips '#' comment lines", "[load_line]") {
-    const char* input = "# This is a comment\nCM Test\n";
-    FILE* f = fmemopen((void*)input, strlen(input), "r");
+    std::string input = "# This is a comment\nCM Test\n";
+    std::istringstream iss(input);
     char buf[256];
-    int eof = load_line(buf, f);
+    int eof = load_line(buf, iss);
     REQUIRE(eof != EOF);
     REQUIRE(strncmp(buf, "CM", 2) == 0);
-    fclose(f);
 }
 
 TEST_CASE("load_line handles inline ' comment (4nec2 compat)", "[load_line]") {
-    const char* input = "FR 0 1 0 0 300.0 0.0 ' inline comment\n";
-    FILE* f = fmemopen((void*)input, strlen(input), "r");
+    std::string input = "FR 0 1 0 0 300.0 0.0 ' inline comment\n";
+    std::istringstream iss(input);
     char buf[256];
-    int eof = load_line(buf, f);
+    int eof = load_line(buf, iss);
     REQUIRE(eof != EOF);
-    /* The line should be truncated at the ' */
     REQUIRE(std::string(buf).find("inline") == std::string::npos);
     REQUIRE(strncmp(buf, "FR", 2) == 0);
-    fclose(f);
 }
 
 /*-----------------------------------------------------------------------*/

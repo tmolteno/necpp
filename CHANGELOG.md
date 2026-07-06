@@ -1,3 +1,12 @@
+## Version 2.1.2
+
+### Modernization
+* All `fprintf(stderr, ...)` replaced with `std::cerr` (misc.cpp, nec2cpp.cpp, nec_output.cpp)
+* `#ifndef _WIN32` guards broadened to `#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)` for signal handlers
+* `secnds()` gets an `__EMSCRIPTEN__` stub returning 0.0 (no process-timing syscalls in WASM)
+* WASM build target (`make wasm`) using Emscripten with `src/nec_wasm.cpp` C-API wrapper
+  * Exports: `nec_create_context`, `nec_delete_context`, `nec_process_input`, `nec_get_output`, `nec_get_output_length`
+
 ## Version 2.1.1
 
 ### Breaking Changes

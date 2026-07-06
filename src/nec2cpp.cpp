@@ -40,6 +40,7 @@
 #include "nec_exception.h"
 #include <signal.h>
 #include <cstdlib>
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -47,7 +48,7 @@ using namespace std;
 
 #include "nec_context.h"
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 /* Signal handler */
 static void sig_handler( int signal );
 #endif
@@ -147,7 +148,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	extern char *optarg;
 	int option;
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 	/*** signal handler related code ***/
 	/* new and old actions for sigaction() */
 	struct sigaction sa_new, sa_old;
@@ -232,8 +233,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	/*** open input file ***/
 	if ( input_filename == "" )
 	{
-		string mesg = "nec2++: -i input_filename is required. Use input_filename \"-\" for stdin.\n";
-		fprintf( stderr, "%s", mesg.c_str() );
+		cerr << "nec2++: -i input_filename is required. Use input_filename \"-\" for stdin.\n";
 		exit(-1);
 	}
 	else if ( input_filename == "-" )
@@ -438,9 +438,44 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 
 
 /*-----------------------------------------------------------------------*/
-/*!\brief Read a line and fill in the parameter values.
+/*!\brief Read a line and fill in the parameter values (stream version).
 \return The number of parameters read
 */
+int readmn(std::istream& is,
+	char *gm, int *i1, int *i2, int *i3, int *i4,
+	nec_float *f1, nec_float *f2, nec_float *f3,
+	nec_float *f4, nec_float *f5, nec_float *f6 )
+{
+	char line_buf[134];
+
+	int eof = load_line( line_buf, is );
+	int line_length = static_cast<int>(strlen( line_buf ));
+
+	if ( line_length < 2 )
+	{
+		if (EOF == eof) {
+			memcpy( gm, "EN", 2 );
+			return 0;
+		}
+		return -1;
+	}
+
+	strncpy( gm, line_buf, 2 );
+	gm[2] = '\0';
+
+	if ( line_length == 2 ) {
+		*i1 = *i2 = *i3 = *i4 = 0;
+		*f1 = *f2 = *f3 = *f4 = *f5 = *f6 = 0.0;
+		return 0;
+	}
+	nec_card card = parse_nec_card(line_buf);
+	*i1 = card.i[0]; *i2 = card.i[1]; *i3 = card.i[2]; *i4 = card.i[3];
+	*f1 = card.f[0]; *f2 = card.f[1]; *f3 = card.f[2];
+	*f4 = card.f[3]; *f5 = card.f[4]; *f6 = card.f[5];
+	return card.parameter_count;
+}
+
+/* FILE* version: delegates to stream version after reading the line. */
 int readmn(FILE* input_fp, FILE* output_fp,
 	char *gm, int *i1, int *i2, int *i3, int *i4,
 	nec_float *f1, nec_float *f2, nec_float *f3,
@@ -467,51 +502,43 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	gm[2] = '\0';
 
 	if ( strcmp( gm, "XT" ) == 0 ) {
-		fprintf( stderr, "\nnec2++: Exiting after an \"XT\" command in read_geometry_card()\n" );
+		cerr << "\nnec2++: Exiting after an \"XT\" command in read_geometry_card()\n";
 		fprintf( output_fp, "\n\n  nec2++: Exiting after an \"XT\" command in read_geometry_card()" );
 		exit(0);
 	}
 
-	    /* Delegate to string-based parser for integer/float extraction */
-	    if ( line_length == 2 ) {
-	        *i1 = *i2 = *i3 = *i4 = 0;
-	        *f1 = *f2 = *f3 = *f4 = *f5 = *f6 = 0.0;
-	        return 0;
-	    }
-	    nec_card card = parse_nec_card(line_buf);
-	*i1 = card.i[0]; *i2 = card.i[1]; *i3 = card.i[2]; *i4 = card.i[3];
-	*f1 = card.f[0]; *f2 = card.f[1]; *f3 = card.f[2];
-	*f4 = card.f[3]; *f5 = card.f[4]; *f6 = card.f[5];
-	return card.parameter_count;
+	/* Delegate to stream version for parsing */
+	std::istringstream iss(line_buf);
+	return readmn(iss, gm, i1, i2, i3, i4, f1, f2, f3, f4, f5, f6);
 }
 
 
 /*-----------------------------------------------------------------------*/
 
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 static void sig_handler(int signal )
 {
 	switch( signal )
 	{
 		case SIGINT :
-			fprintf(stderr, "nec2++: exiting via user interrupt" );
+			cerr << "nec2++: exiting via user interrupt";
 			exit( signal );
 
 		case SIGSEGV :
-			fprintf(stderr, "nec2++: segmentation fault" );
+			cerr << "nec2++: segmentation fault";
 			exit( signal );
 
 		case SIGFPE :
-			fprintf(stderr, "nec2++: floating point exception" );
+			cerr << "nec2++: floating point exception";
 			exit( signal );
 
 		case SIGABRT :
-			fprintf(stderr, "nec2++: abort signal received" );
+			cerr << "nec2++: abort signal received";
 			exit( signal );
 
 		case SIGTERM :
-			fprintf(stderr, "nec2++: termination request received" );
+			cerr << "nec2++: termination request received";
 			exit( signal );
 	}
 }
