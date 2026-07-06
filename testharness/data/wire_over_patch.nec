@@ -1,0 +1,15 @@
+CM Wire + patches: a half-wave dipole over a patch plate
+CM Tests interaction between wire segments and surface patches
+CE
+GW 1 9 0 0 0.1 0 0 0.35 0.001
+SP 0 0  0.15  0.15  0.0  90.0  0.0  0.05
+SP 0 0 -0.15  0.15  0.0  90.0  0.0  0.05
+SP 0 0 -0.15 -0.15  0.0  90.0  0.0  0.05
+SP 0 0  0.15 -0.15  0.0  90.0  0.0  0.05
+GE 0
+EK
+FR 0 1 0 0 300.0
+EX 0 1 1 0 1.0 0.0
+GN -1
+RP 0 19 37 1000 0.0 0.0 10.0 10.0
+EN

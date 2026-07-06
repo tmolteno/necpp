@@ -1,0 +1,14 @@
+CM Patch-only test: 4 flat square patches forming a plate at z=0
+CM Uses EX type-4 current source (no wires needed for excitation)
+CM Tests patch-only geometry with no wire segments
+CE
+SP 0 0  0.05  0.05  0.0  90.0  0.0  0.05
+SP 0 0 -0.05  0.05  0.0  90.0  0.0  0.05
+SP 0 0 -0.05 -0.05  0.0  90.0  0.0  0.05
+SP 0 0  0.05 -0.05  0.0  90.0  0.0  0.05
+GE 0
+FR 0 1 0 0 300.0
+EX 4 0 0 0 0.0 0.0 0.0 90.0 0.0 1.0
+GN -1
+RP 0 1 1 1000 0.0 0.0 0.0 0.0
+EN

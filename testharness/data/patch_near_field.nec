@@ -1,0 +1,13 @@
+CM Near-field test with patches: wire + 2 patches, NE card
+CM Tests near-field computation with mixed wire/patch geometry
+CE
+GW 1 5 0 0 0.05 0 0 0.15 0.001
+SP 0 0  0.1  0.1  0.0  90.0  0.0  0.02
+SP 0 0 -0.1 -0.1  0.0  90.0  0.0  0.02
+GE 0
+EK
+FR 0 1 0 0 300.0
+EX 0 1 1 0 1.0 0.0
+GN -1
+NE 0 1 1 5 0.0 0.0 0.0 0.0 0.1 0.0
+EN
