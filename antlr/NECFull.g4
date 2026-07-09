@@ -49,7 +49,7 @@ gcCard  : GC  INT? INT? fnum fnum fnum;
 gxCard  : GX  INT INT;
 grCard  : GR  INT INT;
 gsCard  : GS  INT? INT? fnum;
-geCard  : GE  INT INT?;
+geCard  : GE  INT? INT?;
 gmCard  : GM  INT INT fnum fnum fnum fnum fnum fnum fnum;
 spCard  : SP  INT INT fnum fnum fnum fnum fnum fnum scCard*;
 smCard  : SM  INT INT fnum fnum fnum fnum fnum fnum scCard*;

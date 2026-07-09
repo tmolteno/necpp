@@ -242,10 +242,21 @@ public:
   antlrcpp::Any visitRpCard(NECFullParser::RpCardContext* ctx) override { dispatch_labeled("RP", {ctx->i}, ctx->INT(), ctx->fnum()); return nullptr; }
   antlrcpp::Any visitNxCard(NECFullParser::NxCardContext* ctx) override { dispatch_ints("NX", {}); return nullptr; }
   antlrcpp::Any visitPtCard(NECFullParser::PtCardContext* ctx) override { dispatch_ints("PT", ctx->INT()); return nullptr; }
-  antlrcpp::Any visitKhCard(NECFullParser::KhCardContext* ctx) override { dispatch("KH", {}, ctx->fnum()); return nullptr; }
+  antlrcpp::Any visitKhCard(NECFullParser::KhCardContext* ctx) override {
+    // KH has a single fnum field (RKH, in wavelengths) -> ctx->fnum() is a pointer.
+    nec_card card;
+    card.mnemonic = "KH";
+    if (auto* fc = ctx->fnum()) {
+      auto* t = fc->INT();
+      if (!t) t = fc->REAL();
+      if (t) { card.f[0] = std::stod(t->getText()); card.parameter_count++; }
+    }
+    if (auto* h = find_handler("KH")) h->dispatch(*nec, card);
+    return nullptr;
+  }
   antlrcpp::Any visitNeCard(NECFullParser::NeCardContext* ctx) override { dispatch("NE", ctx->INT(), ctx->fnum()); return nullptr; }
   antlrcpp::Any visitNhCard(NECFullParser::NhCardContext* ctx) override { dispatch("NH", ctx->INT(), ctx->fnum()); return nullptr; }
-  antlrcpp::Any visitPqCard(NECFullParser::PqCardContext* ctx) override { dispatch("PQ", ctx->INT(), ctx->fnum()); return nullptr; }
+  antlrcpp::Any visitPqCard(NECFullParser::PqCardContext* ctx) override { dispatch_ints("PQ", ctx->INT()); return nullptr; }
   antlrcpp::Any visitEkCard(NECFullParser::EkCardContext* ctx) override { dispatch_single("EK", ctx->INT()); return nullptr; }
   antlrcpp::Any visitCpCard(NECFullParser::CpCardContext* ctx) override { dispatch_ints("CP", ctx->INT()); return nullptr; }
   antlrcpp::Any visitPlCard(NECFullParser::PlCardContext* ctx) override { dispatch_ints("PL", ctx->INT()); return nullptr; }
