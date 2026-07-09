@@ -105,21 +105,24 @@ install: nec2++
 	install -d $(DESTDIR)/usr/local/bin
 	install nec2++ $(DESTDIR)/usr/local/bin/
 
-# --- WASM target (requires Emscripten: emcc) ---
-# Build with:  make wasm EMCC=emcc
-EMCC ?= emcc
+# --- WASM target (requires Docker) ---
+# Build with:  make wasm
+WASM_IMAGE = emscripten/emsdk:4.0.7
+WASM_DOCKER = docker run --rm --user $(shell id -u):$(shell id -g) \
+                -v $(shell pwd):/src -w /src $(WASM_IMAGE) emcc
 WASM_EXPORTS = '["_nec_create_context","_nec_delete_context","_nec_process_input","_nec_get_output","_nec_get_output_length","_nec_free"]'
 WASM_RUNTIME  = '["ccall","cwrap","UTF8ToString","lengthBytesUTF8"]'
 
-wasm: $(LIB_OBJS) $(SRC_DIR)/nec_wasm.cpp
-	$(EMCC) -std=c++17 -O2 $(INCLUDES) \
+wasm: $(BUILD_DIR)/config.h
+	$(WASM_DOCKER) -std=c++17 -O2 $(INCLUDES) \
 		-s WASM=1 \
 		-s EXPORTED_FUNCTIONS=$(WASM_EXPORTS) \
 		-s EXPORTED_RUNTIME_METHODS=$(WASM_RUNTIME) \
 		-s ALLOW_MEMORY_GROWTH=1 \
 		--no-entry \
 		-o nec2pp.js \
-		$(SRC_DIR)/nec_wasm.cpp $(SRC_DIR)/XGetopt.cpp $(LIB_OBJS) -lstdc++
+		$(SRC_DIR)/nec_wasm.cpp $(SRC_DIR)/XGetopt.cpp \
+		$(LIB_SRCS:%=$(SRC_DIR)/%.cpp)
 	@echo "WASM build complete: nec2pp.js + nec2pp.wasm"
 
 .PHONY: all clean install test wasm

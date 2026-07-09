@@ -10,6 +10,7 @@
  */
 
 #include "nec_context.h"
+#include "c_geometry.h"
 #include "nec_exception.h"
 
 #include <string>
