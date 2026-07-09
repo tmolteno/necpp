@@ -12,12 +12,14 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <memory>
 #include <string>
 
 #include "antlr4-runtime.h"
 #include "NECFullLexer.h"
 #include "NECFullParser.h"
+#include "nec_error_listener.h"
 #include "nec_visitor.h"
 
 #include "nec_context.h"
@@ -30,28 +32,44 @@ int main(int argc, char* argv[]) {
   std::string input_file;
   if (argc > 1) input_file = argv[1];
 
+  // Read entire file into a string (needed for error listener source lookup)
+  std::string source;
   std::unique_ptr<CharStream> input;
   if (input_file.empty()) {
-    input.reset(new ANTLRInputStream(std::cin));
+    std::string line;
+    while (std::getline(std::cin, line))
+      source += line + "\n";
+    input.reset(new ANTLRInputStream(source));
   } else {
     std::ifstream f(input_file);
     if (!f.is_open()) {
       std::cerr << "Cannot open: " << input_file << std::endl;
       return 1;
     }
-    input.reset(new ANTLRInputStream(f));
+    std::ostringstream ss;
+    ss << f.rdbuf();
+    source = ss.str();
+    input.reset(new ANTLRInputStream(source));
   }
 
   NECFullLexer lexer(input.get());
   CommonTokenStream tokens(&lexer);
   NECFullParser parser(&tokens);
 
+  // Custom error listener with source-line lookup
+  auto* err = new NecErrorListener(
+      input_file.empty() ? "<stdin>" : input_file);
+  err->setSource(source);
+  lexer.removeErrorListeners();
+  lexer.addErrorListener(err);
+  parser.removeErrorListeners();
+  parser.addErrorListener(err);
+
   nec_context context;
   nec_output_file s_output;
   nec_output_flags s_output_flags;
   context.set_output(s_output, s_output_flags);
 
-  // Use the context's internal geometry — program cards reference it.
   c_geometry* geo = context.get_geometry();
   geo->set_context(&context);
 
@@ -59,8 +77,8 @@ int main(int argc, char* argv[]) {
     auto* tree = parser.necFile();
 
     if (parser.getNumberOfSyntaxErrors() > 0) {
-      std::cerr << "Parse failed with " << parser.getNumberOfSyntaxErrors()
-                << " errors." << std::endl;
+      std::cerr << parser.getNumberOfSyntaxErrors()
+                << " parse error(s)." << std::endl;
       return 1;
     }
 

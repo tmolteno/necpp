@@ -40,7 +40,7 @@ docker run $DOCKER_OPTS "$IMAGE" \
     ../src/electromag.cpp ../src/c_evlcom.cpp ../src/c_plot_card.cpp \
     ../src/nec_structure_currents.cpp ../src/XGetopt.cpp \
     build/nec2cpp.o \
-    -lantlr4-runtime -lm -lstdc++ \
+    -l:libantlr4-runtime.a -lm -lstdc++ \
     -o nec_parse
 
 echo "=== Build complete: ./nec_parse ==="

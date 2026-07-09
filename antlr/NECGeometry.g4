@@ -62,7 +62,7 @@ NUMBER
 fragment DIGIT : [0-9];
 
 NEWLINE      : '\r'? '\n';
-WS           : [ \t]+ -> skip;
+WS           : [ \t,]+ -> skip;
 
 // CM/CE comment lines — skip
 COMMENT_LINE : ('C'|'c') ('M'|'m'|'E'|'e') ~[\r\n]* NEWLINE -> skip;
