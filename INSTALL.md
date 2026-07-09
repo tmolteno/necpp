@@ -17,27 +17,6 @@ Options:
     make DEBUG=1        # bounds-checked debug build
     make TYPECHECK=1    # typesafe integer checking
 
-## Autotools Build (traditional)
-
-### Pre-requisites
-
-On Debian or a derivative, you can install the build tools with:
-
-    aptitude install g++ make automake autoconf libtool
-
-### Installation Steps
-
-  1. Install the autoconf and libtool packages.
-     On Debian:  `aptitude install automake autoconf libtool`
-
-  2. Generate the `./configure` script:
-        `make -f Makefile.git`
-
-  3. Configure, build, and install:
-        `./configure`
-        `make -j 4`
-        `sudo make install`
-
 ## macOS Notes
 
 If you see a linker error like "file was built for archive which is not the
@@ -57,7 +36,7 @@ To use necpp in an Xcode project:
 2. Add `src/eigen3/` to your header search paths (`-I src/eigen3`).
 3. Create a minimal `config.h`:
    ```c
-   #define VERSION "2.0.0"
+   #define VERSION "2.1.1"
    #define BUILD_DATE "unknown"
    ```
 4. Set C++ Language Dialect to C++17.
@@ -69,11 +48,6 @@ For best performance, compile with optimizations tuned to your CPU:
 
     make CXXFLAGS="-std=c++17 -O3 -march=native -Wall -Wextra -Wshadow"
 
-With autotools:
-
-    ./configure CXXFLAGS="-O3 -march=native"
-    make
-
 ## About Eigen
 
 Nec2++ 2.0.0+ uses **Eigen 3.4.0** (bundled in `src/eigen3/`) for all linear
@@ -83,20 +57,28 @@ or BLAS installation is required. The old `--with-eigen`, `--with-lapack`, and
 
 ## Building for Windows
 
-The MinGW toolset (a free compiler for Windows based on GCC) can be used to
-compile nec2++ for windows operating systems. This is easily done from a
-command line (cygwin shell is best).
+### Cross-compiling with MinGW
 
-  1. ./configure --host=i586-mingw32msvc
-  2. make
-  3. The executable nec2++.exe can now be found in the src subdirectory.
+Cross-compile from Linux using the MinGW toolchain:
 
-### Compiling with Visual Studio 2013
+    sudo apt install g++-mingw-w64-x86-64      # Debian/Ubuntu
+    make CXX=x86_64-w64-mingw32-g++
+
+The executable `nec2++.exe` will be built in the project root.
+
+Older 32-bit MinGW:
+
+    make CXX=i686-w64-mingw32-g++
+
+### Compiling with Visual Studio
 
 NEC2++ has been tested with Microsoft Visual Studio 2013.
-Step-by-step instructions
+A solution and project files are provided in the `win32/nec2++/` directory.
+Open `nec2++.sln` in Visual Studio and build.
 
-* Build the project inside the win32 subdirectory with Visual Studio 2103.
+To use necpp as a library in Visual Studio, add the `.cpp` and `.h` files
+from `src/` (except `nec2cpp.cpp`), add `src/eigen3/` to your include paths,
+and link with `libm`.
 
 ## Notes for embedding in other projects
 
