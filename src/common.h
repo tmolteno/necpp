@@ -32,7 +32,7 @@ typedef std::complex<nec_float> nec_complex;
 
 /* Version information */
 #ifndef nec_build_date
-  #define nec_build_date BUILD_DATE
+  #define nec_build_date NECPP_BUILD_DATE
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
@@ -42,7 +42,7 @@ typedef std::complex<nec_float> nec_complex;
 #endif
 
 #ifndef build_version
-  #define nec_version VERSION " [" nec_build_date "]"
+  #define nec_version NECPP_VERSION " [" nec_build_date "]"
 #else
   #define nec_version build_version " [" nec_build_date "]"
 #endif

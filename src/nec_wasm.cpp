@@ -2,7 +2,7 @@
  * WASM wrapper for nec2++ — exposes a minimal C API for Emscripten builds.
  *
  * Build with:
- *   emcc -std=c++17 -O2 -I src -isystem src/eigen3 -I build/simple \
+ *   emcc -std=c++17 -O2 -I src -isystem src/eigen -I build/simple \
  *        -s WASM=1 -s EXPORTED_FUNCTIONS='[\"_nec_create_context\",\"_nec_delete_context\",\"_nec_process_input\",\"_nec_get_output\",\"_nec_get_output_length\",\"_nec_free\"]' \
  *        -s EXPORTED_RUNTIME_METHODS='[\"ccall\",\"cwrap\",\"UTF8ToString\",\"lengthBytesUTF8\"]' \
  *        -s ALLOW_MEMORY_GROWTH=1 \

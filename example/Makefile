@@ -21,7 +21,7 @@
 #	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-# Eigen is bundled in ../src/eigen3/ — no external Eigen or LAPACK needed.
+# Eigen is bundled in ../src/eigen/ — no external Eigen or LAPACK needed.
 # Build with:  make test_cpp
 
 all: test_cpp
@@ -46,7 +46,7 @@ NECPP_OBJS = $(NECPP_SRC:.cpp=.o)
 CPP_SRC  = test_cpp.cpp
 CPP_OBJS = $(CPP_SRC:.cpp=.o)
 
-CXXFLAGS = -std=c++17 -I ../src/ -isystem ../src/eigen3 -I . -O2 -Wall
+CXXFLAGS = -std=c++17 -I ../src/ -isystem ../src/eigen -I . -O2 -Wall
 
 test_cpp: $(CONFIG_H) ${CPP_OBJS} ${NECPP_OBJS}
 	$(CXX) -o test_cpp ${CPP_OBJS} ${NECPP_OBJS} -lstdc++ -lm

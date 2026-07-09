@@ -1,81 +1,30 @@
-## Modern nec2++ grammar for antenna geometry.
+# ANTLR 4 Parser for NEC-2
 
-**DEPRECATED — this is experimental, abandoned code.** The ANTLR-based parser
-was a proof-of-concept and is far from complete. The production parser lives in
-`src/nec2cpp.cpp` and uses a simple `load_line()` + card dispatch approach.
+## Comparison with NEC-2 Standard (nec2prt3.pdf)
 
-If revived, it would need:
-- ANTLR 4 (ANTLR 2.x C++ target is discontinued)
-- Full card coverage (SP, GM, GR, NE, NH, KH, etc.)
-- Integration with the Eigen-backed math layer
+The ANTLR grammar uses free-form whitespace-separated fields (`NUM?`)
+rather than the fixed-width FORTRAN columns of the original NEC-2 spec.
+This is consistent with the production parser's `parse_nec_card()` in
+`src/nec_card_parser.h` — both treat blank fields as zero and accept
+space or comma separators.
 
----
+| NEC-2 Feature | Grammar Handling |
+|---|---|
+| Fixed-width fields (I2, I3, F10.5, etc.) | Free-form `NUM?` tokens |
+| Blank fields → 0 | Optional tokens → `dval(nullptr) = 0.0` in visitor |
+| CM/CE comment block before geometry | `CMT` lexer rule skips entire lines |
+| GW rad=0 signals mandatory GC taper | `_gw` state in `NecBuildVisitor` |
+| GE ends geometry, enters program section | `geCard` in `programCard` dispatch, calls `geometry_complete` |
+| SP/SM may chain multiple SC cards | Single `scCard?` — multi-patch chaining not yet implemented |
+| GF (NGF) card | Intentionally excluded (unsupported by necpp) |
+| XT debug card | Not included (production parser handles it separately) |
 
-Original README follows:
+## Building
 
-This is a parser for NEC antenna geometry files written for the ANTLR parser
-generator. At the moment it is rudimentary.
+```bash
+make        # generate, compile
+make test   # run test suite
+make clean  # remove generated files
+```
 
-The goal is to update the NEC parser to handle a more modern grammar, and
-to allow useful things like multi-line comments e.t.c.
-
-In addition, this will replace the terrible parser code that currently exists,
-and will hopefully catch errors like wires accidentally intersecting as
-at parse time.
-
-Requires ANTLR (legacy v2):
-
-    aptitude install libantlr-dev libantlr-java
-
-### Testing
-
-Just build in the current directory
-
-    make 
-    make test_clean
-    make test_all
-
-## New parser for NEC cards
-
-The grammar is in the file nec.g. This is an ANTLR grammar for the existing NEC2 card deck for describing
-antennas.
-
-
-## New Language
-
-The new language for nec++ will be more explicit and easy to read. It will also allow comments anywhere 
-inside the code. In addition it will not depend on whitespace to skip over missing parameters, and therefore
-will be far more robust.
-
-    /* This is a comment */
-    geometry {
-      w0 = wire(start=[1,2,3], end=[2,3,4], r=0.01, n=5);
-      w1 = wire(start=w0.end,  end=[2,3,5], r=0.01, n=5);
-      arc(origin=[0,1,2], arc_radius=1.0, r=0.01 );
-      helix();
-      patch();
-      scale(3.0);
-    }
-
-    ground {
-      type=PERFECT;
-    }
-
-    excitation {
-      type=VOLTAGE;
-      segment=w0.0; /* Segment indexing starts at 0 */
-      freq=range(start=1.575GHz, end=1.675GHz, n=5);
-      extended_thin_wire_kernel = false; /* default */
-    }
-        
-    radiation_pattern {
-      mode = "normal";
-      theta = range(start=0.0, end=180, n=30);
-      phi = range(start=0.0, end=90, n=30);
-    }
-
-    execute();
-
-Expression Syntax:
-
-    { id = } TYPE([param=expression]*) ;
+Requires Docker (no system ANTLR or C++ dependencies needed).

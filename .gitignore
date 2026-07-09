@@ -6,7 +6,6 @@
 *.exe
 *.so
 *.o
-*.lo
 *.la
 *.trs
 src/nec2++
@@ -45,27 +44,3 @@ build/
 *.outf
 *.swp
 *.diff
-
-# Autotools #
-#############
-Makefile
-Makefile.in
-aclocal.m4
-autom4te.cache/
-compile
-configure
-config.*
-depcomp
-install-sh
-libtool
-ltmain.sh
-# m4/
-missing
-src/.deps/
-src/.libs/
-stamp-h1
-necpp.pc
-
-html/*
-xml/*
-latex/*

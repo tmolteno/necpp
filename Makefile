@@ -29,11 +29,11 @@ ifdef TYPECHECK
 endif
 
 SRC_DIR   = src
-EIGEN_DIR = $(SRC_DIR)/eigen3
+EIGEN_DIR = $(SRC_DIR)/eigen
 BUILD_DIR = build/simple
 
-VERSION   = 2.1.1
-BUILD_DATE = $(shell date +"%Y-%m-%d")
+NECPP_VERSION   = 2.1.1
+NECPP_BUILD_DATE = $(shell date +"%Y-%m-%d")
 
 INCLUDES  = -I $(SRC_DIR) -isystem $(EIGEN_DIR) -I $(BUILD_DIR)
 
@@ -51,8 +51,8 @@ $(BUILD_DIR):
 $(BUILD_DIR)/config.h: | $(BUILD_DIR)
 	@echo '#ifndef CONFIG_H'           >  $@
 	@echo '#define CONFIG_H'           >> $@
-	@echo '#define VERSION "$(VERSION)"'       >> $@
-	@echo '#define BUILD_DATE "$(BUILD_DATE)"' >> $@
+	@echo '#define NECPP_VERSION "$(NECPP_VERSION)"'       >> $@
+	@echo '#define NECPP_BUILD_DATE "$(NECPP_BUILD_DATE)"' >> $@
 	@echo '#endif'                     >> $@
 
 # --- Compile .cpp -> .o ---

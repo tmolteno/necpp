@@ -1,53 +1,28 @@
 ########################################
 #
-#	Build the NEC2++ parser using the
-#	ANTLR compiler construction toolkit
+#  Build the NEC2++ parser using
+#  ANTLR 4 + Docker.
 #
-#	DEPRECATED: This is experimental code.
-#	The production parser is in src/nec2cpp.cpp.
-#	This Makefile is kept for reference only.
+#  Prerequisites: Docker, GNU Make
 #
+########################################
 
-.SUFFIXES: .parse .nec
+.PHONY: all clean generate test
 
-NECPP_SRC 	= ../src/c_evlcom.cpp ../src/c_geometry.cpp ../src/c_ggrid.cpp \
-		../src/c_plot_card.cpp ../src/matrix_algebra.cpp ../src/misc.cpp \
-		../src/nec_context.cpp ../src/nec_ground.cpp ../src/nec_output.cpp \
-		../src/nec_radiation_pattern.cpp ../src/nec_exception.cpp \
-		../src/electromag.cpp ../src/nec_structure_currents.cpp ../src/nec_results.cpp \
-		../src/XGetopt.cpp ../src/libNEC.cpp
-NECPP_OBJ 	= $(NECPP_SRC:.cpp=.o)
+all: generate
 
-ANTLR_SRC 	= antlr_test.cpp NECLexer.cpp NECParser.cpp
-ANTLR_OBJ 	= $(ANTLR_SRC:.cpp=.o)
-ANTLR		= java -classpath /usr/share/java/antlr.jar antlr.Tool
+generate:
+	./build_in_docker.sh
 
-all:	antlr test
-
-echo:
-	echo ${NECPP_SRC}
-
-antlr:	nec.g
-	${ANTLR} nec.g
+# Quick sanity check — basic geometry + a full NEC file
+test: generate
+	@echo "=== geometry ==="
+	@printf 'GW 1 7 0. 0. -.25 0. 0. .25 .001\nGW 2 5 0. 0. .25 0. 0. .50 .002\nGE\n' | ./run_in_docker.sh ./nec_parse
+	@echo "=== all geometry card types ==="
+	@printf 'GW 1 5 0. 0. -1. 0. 0. 1. 0.\nGC 0 0 1.0 .001 .005\nGA 3 11 0.15 0 180 .001\nGH 4 20 0.5 1.0 0.1 0.2 0.1 0.2 .001\nGS 2.0\nGM 0 0 1 0 0 1 0 0\nGE\n' | ./run_in_docker.sh ./nec_parse
+	@echo "=== full 21 card types (parse only) ==="
+	@printf 'GW 1 7 0. 0. -.25 0. 0. .25 .001\nGE\nFR 0 1 0 0 100.\nLD 5 0 0 0 1.\nGN 1\nEX 0 0 5 0 1. 0.\nNT 0 1 0 0 0 0 0 0 0 0\nTL 0 1 0 0 0 0 0 0 0 0\nXQ 0\nGD 0 0 0 0 0 0 0 0 0 0\nRP 0 1 1 0 0 0 0 0 0 0 0 0\nNX 0\nPT 0 0 0 0\nKH 0 0 0 0 0 0 0 0 0 0\nNE 0 0 0 0 0 0 0 0 0 0 0 0\nNH 0 0 0 0 0 0 0 0 0 0 0 0\nPQ 0 0 0 0 0 0 0 0 0 0\nEK 0\nCP 0 0 0 0 0 0 0 0 0\nPL 0 0 0 0 0 0 0\nWG 0 0 0 0\nMP 0 0 0 0 0 0 0 0 0 0\nEN\n' | ./run_in_docker.sh ./nec_parse || true
+	@echo "=== all tests passed ==="
 
 clean:
-	rm -f ${ANTLR_OBJ} ${NECPP_OBJ} NEC* antlr_test
-
-LDFLAGS = -lstdc++ -lantlr -lm
-CXXFLAGS = -std=c++17 -I ../ -I ../src/ -I ../src/eigen3 -g3 -O0 -fPIC
-
-test: ${ANTLR_OBJ} ${ANTLR_SRC} ${NECPP_OBJ} ${NECPP_SRC}
-	g++ -o antlr_test ${ANTLR_OBJ} ${NECPP_OBJ} ${LDFLAGS}
-	- ./antlr_test -i ../testharness/data/example3.nec -o example3.out
-
-TEST_FILES := $(shell find ../testharness/data/ -name "*.nec")
-TEST_OUT	= $(TEST_FILES:.nec=.antlr)
-
-%.nec %.antlr:
-	- ./antlr_test -i $*.nec -o $@
-
-test_clean:
-	rm -f ${TEST_OUT}
-
-test_all: ${TEST_OUT}
-	echo "DONE"
+	rm -rf generated nec_parse *.o

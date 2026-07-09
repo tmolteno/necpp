@@ -1,7 +1,7 @@
 /* config.h.  Generated from config.h.in by configure.  Modified for Win32 */
 
 /* The build date */
-#define BUILD_DATE "2014-11-14"
+#define NECPP_BUILD_DATE "2014-11-14"
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
@@ -69,4 +69,4 @@
 /* #undef USING_EIGEN_ARRAY */
 
 /* Version number of package */
-#define VERSION "1.5.4"
+#define NECPP_VERSION "2.1.1"

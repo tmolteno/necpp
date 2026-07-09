@@ -4,7 +4,7 @@
 	Including some pieces from additional work by
 		Jeroen Vreeken <pe1rxq@amsat.org>
 
-	Uses Eigen 3.4.0 (bundled in src/eigen3/) for linear algebra.
+	Uses Eigen 5.0.1 (bundled in src/eigen/) for linear algebra.
 	Build with: make -j4  (just g++ and make needed)
 */
 

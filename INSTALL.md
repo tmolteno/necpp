@@ -5,7 +5,7 @@ building from source code.
 
 ## Quick Build (no autotools needed)
 
-Eigen 3.4.0 is bundled in `src/eigen3/` — no external libraries required. Just a
+Eigen 5.0.1 is bundled in `src/eigen/` — no external libraries required. Just a
 C++17 compiler and `make`:
 
     sudo apt install g++ make      # Debian/Ubuntu
@@ -33,11 +33,11 @@ To use necpp in an Xcode project:
 
 1. Add all `.cpp` and `.h` files from `src/` to your project (except
    `nec2cpp.cpp` which contains its own `main()`).
-2. Add `src/eigen3/` to your header search paths (`-I src/eigen3`).
+2. Add `src/eigen/` to your header search paths (`-I src/eigen`).
 3. Create a minimal `config.h`:
    ```c
-   #define VERSION "2.1.1"
-   #define BUILD_DATE "unknown"
+   #define NECPP_VERSION "2.1.1"
+   #define NECPP_BUILD_DATE "unknown"
    ```
 4. Set C++ Language Dialect to C++17.
 5. Link with `-lm` (libm). No other external libraries are needed.
@@ -50,7 +50,7 @@ For best performance, compile with optimizations tuned to your CPU:
 
 ## About Eigen
 
-Nec2++ 2.0.0+ uses **Eigen 3.4.0** (bundled in `src/eigen3/`) for all linear
+Nec2++ 2.1.1+ uses **Eigen 5.0.1** (bundled in `src/eigen/`) for all linear
 algebra — safe arrays, 3-vectors, and LU decomposition. No external Eigen, LAPACK,
 or BLAS installation is required. The old `--with-eigen`, `--with-lapack`, and
 `--with-atlas` configure options have been removed.
@@ -77,7 +77,7 @@ A solution and project files are provided in the `win32/nec2++/` directory.
 Open `nec2++.sln` in Visual Studio and build.
 
 To use necpp as a library in Visual Studio, add the `.cpp` and `.h` files
-from `src/` (except `nec2cpp.cpp`), add `src/eigen3/` to your include paths,
+from `src/` (except `nec2cpp.cpp`), add `src/eigen/` to your include paths,
 and link with `libm`.
 
 ## Notes for embedding in other projects
@@ -89,4 +89,4 @@ are intentionally header-only and should be included directly:
 * `math_util.h` — math constants and the `nec_3vector` class
 * `nec_wire.h` — wire intersection geometry
 * `safe_array.h` — bounds-checked array template
-* `src/eigen3/` — bundled Eigen 3.4.0 headers (include via `-I src/eigen3`)
+* `src/eigen/` — bundled Eigen 5.0.1 headers (include via `-I src/eigen`)

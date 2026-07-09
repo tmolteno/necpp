@@ -1,3 +1,9 @@
-NEC*.*
+NEC*.cpp
+NEC*.h
+NEC*.tokens
+NEC*.interp
 *.out
 antlr_test
+generated/
+geometry_parse
+nec_parse
