@@ -58,19 +58,60 @@ gaCard  : GA  INT INT fnum fnum fnum fnum;
 ghCard  : GH  INT INT fnum fnum fnum fnum fnum fnum fnum;
 
 // ---- Program cards -----------------------------------------------------
-//   Field order follows parse_nec_card():  4 INT then 6 floats.
-//   Cards with fewer fields omit trailing optional positions.
+//   Field requirements are taken from NEC-2 Part 3 (nec2prt3.pdf).
+//   A field shown without '?' is REQUIRED by the manual; optional / blank
+//   fields carry '?'.  Where the first integer selects a mode that changes
+//   the field layout, semantic predicates gate the alternatives (EX card).
+//   Blank fields that sit *between* meaningful fields are kept as positional
+//   '?' placeholders so zero-filled fixed-format files still parse; trailing
+//   blank fields are omitted.
 
-frCard  : FR  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
-ldCard  : LD  INT? INT? INT? INT? fnum? fnum? fnum?;
-gnCard  : GN  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
-// EX — excitation.  Field layout depends on excitation type (first INT).
-//   0: voltage source      EX 0  tag seg flag  v_real v_imag [norm]
-//   1: linear wave         EX 1  tid t2  t3    f1 f2 f3 f4 [f5 f6]
-//   2: right-hand circular EX 2  tid t2  t3    f1 f2 f3 f4 f5 f6
-//   3: left-hand circular  EX 3  tid t2  t3    f1 f2 f3 f4 f5 f6
-//   4: current source      EX 4  tid t2  t3    f1 f2 f3 f4 f5 f6
-//   5: voltage discrete    EX 5  tag seg flag  v_real v_imag [norm]
+// FR — Frequency.  I1=IFRQ (0 linear, 1 multiplicative); I2=NFRQ (blank -> 1);
+//   I3, I4 blank; F1=FMHZ (MHz, required); F2=DELFRQ (step / multiplier).
+frCard  : FR INT INT? INT? INT? fnum fnum?;
+
+// LD — Loading.  I1=LDTYP selects the load type and the float meaning.
+//   -1  short / nullify all loads (rest of card blank)
+//    0  series  RLC (ohms, H, F)            — each of F1,F2,F3 "if none, blank"
+//    1  parallel RLC (ohms, H, F)           — each of F1,F2,F3 "if none, blank"
+//    2  series  RLC per metre               — each of F1,F2,F3 "if none, blank"
+//    3  parallel RLC per metre              — each of F1,F2,F3 "if none, blank"
+//    4  resistance + reactance (ohms)       — F1=R, F2=X
+//    5  wire conductivity (mhos/metre)      — F1 only
+ldCard
+  : LD i=INT
+    ( {std::stoi($i.text) == -1}?
+    | {std::stoi($i.text) >= 0 && std::stoi($i.text) <= 3}?
+      INT? INT? INT? fnum? fnum? fnum?
+    | {std::stoi($i.text) == 4}?
+      INT? INT? INT? fnum fnum
+    | {std::stoi($i.text) == 5}?
+      INT? INT? INT? fnum
+    )
+  ;
+
+// GN — Ground parameters.  I1=IPERF selects the ground model.
+//   -1  nullify ground / free space (rest of card blank)
+//    0  finite ground, reflection-coefficient approximation
+//    1  perfectly conducting ground (rest of card blank)
+//    2  finite ground, Sommerfeld/Norton method
+//   For 0/2: I2=NRADL (radial-wire count); I3,I4 blank;
+//            F1=EPSE, F2=SIG required; F3..F6 = screen / 2nd-medium params.
+gnCard
+  : GN i=INT
+    ( {std::stoi($i.text) == -1 || std::stoi($i.text) == 1}?
+    | {std::stoi($i.text) == 0 || std::stoi($i.text) == 2}?
+      INT? INT? INT? fnum fnum fnum? fnum? fnum? fnum?
+    )
+  ;
+
+// EX — Excitation.  Field layout depends on excitation type (I1).
+//   0: voltage source (applied-E)  tag seg flag  v_r v_i [norm]
+//   1: linear plane wave           nTH nPH flag  th ph eta dth [dph] [pol]
+//   2: right-hand circular wave    nTH nPH flag  th ph eta dth dph pol
+//   3: left-hand circular wave     nTH nPH flag  th ph eta dth dph pol
+//   4: elementary current source   –  –  flag    x y z alpha beta moment
+//   5: voltage source (slope disc.) tag seg flag  v_r v_i [norm]
 exCard
   :  EX  i=INT
      ( {std::stoi($i.text) == 0 || std::stoi($i.text) == 5}?
@@ -81,23 +122,89 @@ exCard
        INT INT INT fnum fnum fnum fnum fnum fnum
      )
   ;
-ntCard  : NT  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
-tlCard  : TL  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
-xqCard  : XQ  INT?;
-gdCard  : GD  fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum?;
-rpCard  : RP  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum?;
-nxCard  : NX  INT?;
-ptCard  : PT  INT? INT? INT? INT?;
-khCard  : KH  fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum?;
-neCard  : NE  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum?;
-nhCard  : NH  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum? fnum? fnum?;
-pqCard  : PQ  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
-ekCard  : EK  INT?;
-cpCard  : CP  INT? INT? INT? INT? INT? INT? INT? INT? INT?;
-plCard  : PL  INT? INT? INT? INT? INT? INT? INT?;
-enCard  : EN  INT?;
-wgCard  : WG  INT? INT? INT? INT?;
-mpCard  : MP  INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
+
+// NT — Two-port network (short-circuit admittance matrix).  I1,I2 = port 1
+//   (tag, seg); I3,I4 = port 2.  I2 = -1 nullifies all NT/TL connections and
+//   leaves the rest of the card blank.  Otherwise F1..F6 = Re/Im of
+//   Y11, Y12, Y22 (mhos), all required.
+ntCard
+  : NT i1=INT i2=INT
+    ( {std::stoi($i2.text) == -1}?
+    | INT INT fnum fnum fnum fnum fnum fnum
+    )
+  ;
+
+// TL — Transmission line.  Integer fields as on NT.  F1 = characteristic
+//   impedance in ohms (negative -> crossed line, required); F2 = length
+//   (blank -> straight-line distance); F3..F6 = Re/Im shunt admittance at
+//   ends 1 and 2.
+tlCard  : TL INT INT INT INT fnum fnum? fnum? fnum? fnum? fnum?;
+
+// XQ — Execute.  I1: 0 none, 1 XZ cut, 2 YZ cut, 3 both.  Rest blank.
+xqCard  : XQ INT?;
+
+// GD — Additional (second-medium) ground parameters.  All integers blank.
+//   F1=epsr2, F2=sig2, F3=clt, F4=cht (all required); F5, F6 blank.
+gdCard  : GD fnum fnum fnum fnum;
+
+// RP — Radiation pattern.  I1=calc_mode (0 normal; 1 surface wave; 2 linear
+//   cliff; 3 circular cliff; 4 radial-wire screen; 5 screen+linear cliff;
+//   6 screen+circular cliff).  I2=NTH, I3=NPH (blank -> 1); I4=XNDA (blank,
+//   ignored when I1=1).  F1..F4 (theta0, phi0, dtheta, dphi) drive the sweep
+//   and are required.  In normal mode F5=RFLD and F6=GNOR are optional; for
+//   I1=1 the point is cylindrical (z, phi): F1..F4 become (z0, phi0, dz,
+//   dphi) and F5=rho is REQUIRED (>~1 wavelength).
+rpCard
+  : RP i=INT INT? INT? INT?
+    ( {std::stoi($i.text) == 1}?
+      fnum fnum fnum fnum fnum fnum?
+    | {std::stoi($i.text) != 1}?
+      fnum fnum fnum fnum fnum? fnum?
+    )
+  ;
+
+// NX — Next structure.  Rest of card blank.
+nxCard  : NX;
+
+// PT — Print control for wire currents.  I1=IPTFLG (-2 all [default if the
+//   card is omitted]; -1 suppress; 0 limited; 1 receiving pattern; 2 plus
+//   normalised; 3 normalised only).  I2=IPTAG, I3=IPTAGF, I4=IPTAGT select
+//   the segment range.
+ptCard  : PT INT INT? INT? INT?;
+
+// KH — Interaction approximation range.  F1=RKH (distance in wavelengths).
+khCard  : KH fnum;
+
+// NE/NH — Near electric / magnetic fields.  I1=NEAR (0 rectangular,
+//   1 spherical); I2,I3,I4 = point counts in the three coordinates
+//   (blank -> 1).  F1,F2,F3 = first field-point position (required);
+//   F4,F5,F6 = stepping increments.
+neCard  : NE INT INT? INT? INT? fnum fnum fnum fnum? fnum? fnum?;
+nhCard  : NH INT INT? INT? INT? fnum fnum fnum fnum? fnum? fnum?;
+
+// PQ — Print control for charge densities.  I1=IPTFLQ (-1 suppress [default];
+//   0/blank print).  I2,I3,I4 select the segment range as on PT.
+pqCard  : PQ INT? INT? INT? INT?;
+
+// EK — Extended thin-wire kernel.  I1: blank/0 use extended kernel;
+//   -1 return to standard kernel.  Rest blank.
+ekCard  : EK INT?;
+
+// CP — Maximum coupling between segment pairs.  I1=TAG1, I2=SEG1, I3=TAG2,
+//   I4=SEG2 (blank tag => following field is an absolute segment number).
+cpCard  : CP INT? INT? INT? INT?;
+
+// PL — Plot/output flags (not part of NEC-2 Part 3; output driver specific).
+plCard  : PL INT? INT? INT? INT? INT? INT? INT?;
+
+// EN — End of run.  No parameters.
+enCard  : EN;
+
+// WG — Write NGF file.  No parameters.
+wgCard  : WG;
+
+// MP — Medium parameters (not part of NEC-2 Part 3; nec2++/NEC-4 extension).
+mpCard  : MP INT? INT? INT? INT? fnum? fnum? fnum? fnum? fnum? fnum?;
 
 // ---- Lexer Rules ------------------------------------------------------
 

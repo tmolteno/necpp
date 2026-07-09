@@ -18,6 +18,7 @@
 #pragma once
 
 #include <cmath>
+#include <initializer_list>
 #include <string>
 #include <vector>
 #include "NECFullBaseVisitor.h"
@@ -97,6 +98,30 @@ public:
     std::vector<antlr4::tree::TerminalNode*> v;
     if (t) v.push_back(t);
     dispatch(mn, v, {});
+  }
+  // Dispatch a card whose grammar labels one or more leading INT fields
+  // (e.g. EX i=INT, NT i1=INT i2=INT).  In ANTLR 4 a labelled token is
+  // removed from ctx->INT(), so ctx->INT() returns the *remaining* integers;
+  // the labelled tokens are passed in `leading` to fill i[0], i[1], ...
+  void dispatch_labeled(const std::string& mn,
+                        std::initializer_list<antlr4::Token*> leading,
+                        const std::vector<antlr4::tree::TerminalNode*>& rest_ints,
+                        const std::vector<NECFullParser::FnumContext*>& fv) {
+    nec_card card;
+    card.mnemonic = mn;
+    size_t idx = 0;
+    for (auto* tok : leading) {
+      if (tok) { card.i[idx] = (int)std::stod(tok->getText()); card.parameter_count++; }
+      idx++;
+    }
+    for (size_t n = 0; idx < 4 && n < rest_ints.size(); n++, idx++) {
+      card.i[idx] = (int)std::stod(rest_ints[n]->getText()); card.parameter_count++;
+    }
+    for (size_t n = 0; n < 6 && n < fv.size(); n++) {
+      card.f[n] = std::stod(ftext(fv, n)); card.parameter_count++;
+    }
+    auto* h = find_handler(mn);
+    if (h) h->dispatch(*nec, card);
   }
 
   // ---- Geometry cards --------------------------------------------------
@@ -202,33 +227,20 @@ public:
   // ---- Program cards — dispatched via handler table --------------------
 
   antlrcpp::Any visitFrCard(NECFullParser::FrCardContext* ctx) override { dispatch("FR", ctx->INT(), ctx->fnum()); return nullptr; }
-  antlrcpp::Any visitLdCard(NECFullParser::LdCardContext* ctx) override { dispatch("LD", ctx->INT(), ctx->fnum()); return nullptr; }
-  antlrcpp::Any visitGnCard(NECFullParser::GnCardContext* ctx) override { dispatch("GN", ctx->INT(), ctx->fnum()); return nullptr; }
+  antlrcpp::Any visitLdCard(NECFullParser::LdCardContext* ctx) override { dispatch_labeled("LD", {ctx->i}, ctx->INT(), ctx->fnum()); return nullptr; }
+  antlrcpp::Any visitGnCard(NECFullParser::GnCardContext* ctx) override { dispatch_labeled("GN", {ctx->i}, ctx->INT(), ctx->fnum()); return nullptr; }
+  // EX, LD, GN, NT and RP label their mode integer in the grammar (i=INT),
+  // so ctx->i holds it and ctx->INT() returns the remaining integers.
   antlrcpp::Any visitExCard(NECFullParser::ExCardContext* ctx) override {
-    // EX has a labeled first INT (i=INT) in the grammar — dispatch manually.
-    // ctx->i is a Token*, not a TerminalNode*, so build the vector accordingly.
-    std::vector<antlr4::tree::TerminalNode*> iv;
-    // Synthetic TerminalNode wrapper isn't available; build card directly.
-    nec_card card;
-    card.mnemonic = "EX";
-    card.i[0] = (int)std::stod(ctx->i->getText());
-    card.parameter_count = 1;
-    auto int_rest = ctx->INT();
-    auto fv = ctx->fnum();
-    for (size_t n = 0; n < 3 && n < int_rest.size(); n++)
-      card.i[n+1] = (int)std::stod(int_rest[n]->getText()), card.parameter_count++;
-    for (size_t n = 0; n < 6 && n < fv.size(); n++)
-      card.f[n] = std::stod(ftext(fv, n)), card.parameter_count++;
-    auto* h = find_handler("EX");
-    if (h) h->dispatch(*nec, card);
+    dispatch_labeled("EX", {ctx->i}, ctx->INT(), ctx->fnum());
     return nullptr;
   }
-  antlrcpp::Any visitNtCard(NECFullParser::NtCardContext* ctx) override { dispatch("NT", ctx->INT(), ctx->fnum()); return nullptr; }
+  antlrcpp::Any visitNtCard(NECFullParser::NtCardContext* ctx) override { dispatch_labeled("NT", {ctx->i1, ctx->i2}, ctx->INT(), ctx->fnum()); return nullptr; }
   antlrcpp::Any visitTlCard(NECFullParser::TlCardContext* ctx) override { dispatch("TL", ctx->INT(), ctx->fnum()); return nullptr; }
   antlrcpp::Any visitXqCard(NECFullParser::XqCardContext* ctx) override { dispatch_single("XQ", ctx->INT()); return nullptr; }
   antlrcpp::Any visitGdCard(NECFullParser::GdCardContext* ctx) override { dispatch("GD", {}, ctx->fnum()); return nullptr; }
-  antlrcpp::Any visitRpCard(NECFullParser::RpCardContext* ctx) override { dispatch("RP", ctx->INT(), ctx->fnum()); return nullptr; }
-  antlrcpp::Any visitNxCard(NECFullParser::NxCardContext* ctx) override { dispatch_single("NX", ctx->INT()); return nullptr; }
+  antlrcpp::Any visitRpCard(NECFullParser::RpCardContext* ctx) override { dispatch_labeled("RP", {ctx->i}, ctx->INT(), ctx->fnum()); return nullptr; }
+  antlrcpp::Any visitNxCard(NECFullParser::NxCardContext* ctx) override { dispatch_ints("NX", {}); return nullptr; }
   antlrcpp::Any visitPtCard(NECFullParser::PtCardContext* ctx) override { dispatch_ints("PT", ctx->INT()); return nullptr; }
   antlrcpp::Any visitKhCard(NECFullParser::KhCardContext* ctx) override { dispatch("KH", {}, ctx->fnum()); return nullptr; }
   antlrcpp::Any visitNeCard(NECFullParser::NeCardContext* ctx) override { dispatch("NE", ctx->INT(), ctx->fnum()); return nullptr; }
@@ -237,8 +249,8 @@ public:
   antlrcpp::Any visitEkCard(NECFullParser::EkCardContext* ctx) override { dispatch_single("EK", ctx->INT()); return nullptr; }
   antlrcpp::Any visitCpCard(NECFullParser::CpCardContext* ctx) override { dispatch_ints("CP", ctx->INT()); return nullptr; }
   antlrcpp::Any visitPlCard(NECFullParser::PlCardContext* ctx) override { dispatch_ints("PL", ctx->INT()); return nullptr; }
-  antlrcpp::Any visitEnCard(NECFullParser::EnCardContext* ctx) override { dispatch_single("EN", ctx->INT()); return nullptr; }
-  antlrcpp::Any visitWgCard(NECFullParser::WgCardContext* ctx) override { dispatch_ints("WG", ctx->INT()); return nullptr; }
+  antlrcpp::Any visitEnCard(NECFullParser::EnCardContext* ctx) override { dispatch_ints("EN", {}); return nullptr; }
+  antlrcpp::Any visitWgCard(NECFullParser::WgCardContext* ctx) override { dispatch_ints("WG", {}); return nullptr; }
   antlrcpp::Any visitMpCard(NECFullParser::MpCardContext* ctx) override { dispatch("MP", ctx->INT(), ctx->fnum()); return nullptr; }
 
 private:
