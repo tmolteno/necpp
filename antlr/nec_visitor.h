@@ -100,21 +100,27 @@ public:
     dispatch(mn, v, {});
   }
   // Dispatch a card whose grammar labels one or more leading INT fields
-  // (e.g. EX i=INT, NT i1=INT i2=INT).  In ANTLR 4 a labelled token is
-  // removed from ctx->INT(), so ctx->INT() returns the *remaining* integers;
-  // the labelled tokens are passed in `leading` to fill i[0], i[1], ...
+  // (e.g. EX i=INT, NT i1=INT i2=INT).  The labelled tokens are passed in
+  // `leading` to fill i[0], i[1], ... and are also present at the front of
+  // `rest_ints`, because ANTLR 4's rule-context getter (getTokens) returns
+  // *all* tokens of a type — including labelled ones.  So we skip as many
+  // leading elements of rest_ints as there are labels to avoid consuming
+  // the mode integer twice (which would shift tag/seg and corrupt the card).
   void dispatch_labeled(const std::string& mn,
                         std::initializer_list<antlr4::Token*> leading,
                         const std::vector<antlr4::tree::TerminalNode*>& rest_ints,
                         const std::vector<NECFullParser::FnumContext*>& fv) {
     nec_card card;
     card.mnemonic = mn;
+    size_t n_labels = 0;
     size_t idx = 0;
     for (auto* tok : leading) {
       if (tok) { card.i[idx] = (int)std::stod(tok->getText()); card.parameter_count++; }
+      n_labels++;
       idx++;
     }
-    for (size_t n = 0; idx < 4 && n < rest_ints.size(); n++, idx++) {
+    // Skip the labelled tokens that also appear at the front of rest_ints.
+    for (size_t n = n_labels; idx < 4 && n < rest_ints.size(); n++, idx++) {
       card.i[idx] = (int)std::stod(rest_ints[n]->getText()); card.parameter_count++;
     }
     for (size_t n = 0; n < 6 && n < fv.size(); n++) {
@@ -177,6 +183,13 @@ public:
   antlrcpp::Any visitGeCard(NECFullParser::GeCardContext* ctx) override {
     auto v = ctx->INT();
     geo->geometry_complete(nec, v.empty() ? 0 : (int)std::stod(v[0]->getText()));
+    // Size the interaction buffers now, before any program card runs.
+    // RP/XQ dispatch below trigger simulate() during the walk, and
+    // simulate() indexes current_vector — which calc_prepare() allocates
+    // (nec_context.cpp).  Mirrors the geometry-only visitor
+    // (geometry_visitor.h) and the production driver flow
+    // (nec2cpp.cpp: parse_geometry -> calc_prepare -> cards).
+    nec->calc_prepare();
     return nullptr;
   }
   antlrcpp::Any visitGmCard(NECFullParser::GmCardContext* ctx) override {
