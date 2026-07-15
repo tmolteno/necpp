@@ -18,6 +18,23 @@ echo "=== Generating ANTLR 4 parser (full NEC) ==="
 docker run $DOCKER_OPTS "$IMAGE" \
   antlr4 -Dlanguage=Cpp -o generated -visitor NECFull.g4
 
+# Generate the build config header that common.h / nec2cpp.cpp require.
+# The main Makefile owns the canonical NECPP_VERSION; read it from there so
+# the two builds cannot drift apart. build/simple/config.h is included via
+# -I ../build/simple, and must define NECPP_VERSION and NECPP_BUILD_DATE
+# (the strings that common.h stitches into the nec_version literal).
+NECPP_VERSION=$(grep -E '^NECPP_VERSION[[:space:]]*=' ../Makefile | head -1 | sed -E 's/.*=[[:space:]]*//')
+NECPP_BUILD_DATE=$(date +"%Y-%m-%d")
+mkdir -p ../build/simple
+{
+  echo '#ifndef CONFIG_H'
+  echo '#define CONFIG_H'
+  echo "#define NECPP_VERSION \"${NECPP_VERSION}\""
+  echo "#define NECPP_BUILD_DATE \"${NECPP_BUILD_DATE}\""
+  echo '#endif'
+} > ../build/simple/config.h
+echo "  config.h: NECPP_VERSION=${NECPP_VERSION} NECPP_BUILD_DATE=${NECPP_BUILD_DATE}"
+
 echo "=== Compiling full NEC parser ==="
 # Compile nec2cpp.cpp separately with main() renamed
 mkdir -p build

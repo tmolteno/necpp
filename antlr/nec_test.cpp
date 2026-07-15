@@ -68,6 +68,13 @@ int main(int argc, char* argv[]) {
   nec_context context;
   nec_output_file s_output;
   nec_output_flags s_output_flags;
+  // Connect the output sink.  Must use set_file (a FILE*) rather than
+  // set_stream: nec_context::set_output caches m_output_fp via get_fp(),
+  // and the internal fast-print routines (nec_printf/integer/real_out)
+  // short-circuit when m_output_fp == NULL, dropping printf-style output.
+  // Without this, all simulation output (freq header, currents, radiation
+  // tables) is silently discarded.
+  s_output.set_file(stdout);
   context.set_output(s_output, s_output_flags);
 
   c_geometry* geo = context.get_geometry();
@@ -87,7 +94,13 @@ int main(int argc, char* argv[]) {
     visitor.geo = geo;
     tree->accept(&visitor);
 
-    context.calc_prepare();
+    // calc_prepare() ran inside visitGeCard (see nec_visitor.h), so the
+    // interaction buffers are sized before any program card was dispatched.
+    // Emit the accumulated structured results (radiation patterns, antenna
+    // input/impedance, near fields, currents) computed by RP/XQ/NE/NH/PT.
+    // nec_results::write() clears each result's write_file flag as it goes,
+    // so a single call here is correct and idempotent.
+    context.write_results(std::cout);
 
     std::cout << "Parsed successfully. Wires: " << visitor.nwire
               << ", Segments: " << geo->n_segments << std::endl;

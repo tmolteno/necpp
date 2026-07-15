@@ -106,16 +106,16 @@ gnCard
   ;
 
 // EX — Excitation.  Field layout depends on excitation type (I1).
-//   0: voltage source (applied-E)  tag seg flag  v_r v_i [norm]
+//   0: voltage source (applied-E)  tag seg flag  v_r [v_i] [norm]
 //   1: linear plane wave           nTH nPH flag  th ph eta dth [dph] [pol]
 //   2: right-hand circular wave    nTH nPH flag  th ph eta dth dph pol
 //   3: left-hand circular wave     nTH nPH flag  th ph eta dth dph pol
 //   4: elementary current source   –  –  flag    x y z alpha beta moment
-//   5: voltage source (slope disc.) tag seg flag  v_r v_i [norm]
+//   5: voltage source (slope disc.) tag seg flag  v_r [v_i] [norm]
 exCard
   :  EX  i=INT
      ( {std::stoi($i.text) == 0 || std::stoi($i.text) == 5}?
-       INT INT INT fnum fnum fnum?
+       INT INT INT fnum fnum? fnum?
      | {std::stoi($i.text) == 1}?
        INT INT INT fnum fnum fnum fnum fnum? fnum?
      | {std::stoi($i.text) >= 2 && std::stoi($i.text) <= 4}?
