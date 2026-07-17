@@ -28,6 +28,11 @@ test: generate
 	@echo "  output bytes: $$(wc -c < /tmp/nec_sim.out)"
 	@grep -q 'RADIATION PATTERN' /tmp/nec_sim.out && echo "  radiation-pattern table present"
 	@grep -q 'POWER BUDGET' /tmp/nec_sim.out && echo "  power-budget present"
+	@echo "=== CLI options (cxxopts) ==="
+	@./run_in_docker.sh ./nec_parse --help > /tmp/nec_help.out
+	@grep -q -- '--input' /tmp/nec_help.out && grep -q -- '--benchmark' /tmp/nec_help.out && echo "  --help lists --input and --benchmark"
+	@./run_in_docker.sh ./nec_parse --benchmark > /tmp/nec_bench.out
+	@grep -q "computer's score is" /tmp/nec_bench.out && echo "  --benchmark prints a score"
 	@echo "=== all tests passed ==="
 
 clean:
