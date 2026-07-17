@@ -7,12 +7,18 @@
 #
 ########################################
 
-.PHONY: all clean generate test
+.PHONY: all clean generate test release
 
 all: generate
 
 generate:
 	./build_in_docker.sh
+
+# Optimized build (O2, no debug symbols).  Produces the same nec_parse binary
+# but with full compiler optimisation — ~3-5x faster for benchmarks and
+# large simulations.
+release:
+	CXXFLAGS="-O2" ./build_in_docker.sh
 
 # Quick sanity check — basic geometry + a full NEC file.
 # All inputs conform to the field counts required by NEC-2 Part 3.

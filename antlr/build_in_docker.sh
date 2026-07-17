@@ -39,12 +39,12 @@ echo "=== Compiling full NEC parser ==="
 # Compile nec2cpp.cpp separately with main() renamed
 mkdir -p build
 docker run $DOCKER_OPTS "$IMAGE" \
-  g++ -std=c++17 -O0 -g \
+  g++ -std=c++17 ${CXXFLAGS:--O0 -g} \
     -I . -I ../src -isystem ../src/eigen -I ../build/simple \
     -Dmain=nec2cpp_main_renamed -c ../src/nec2cpp.cpp -o build/nec2cpp.o
 
 docker run $DOCKER_OPTS "$IMAGE" \
-  g++ -std=c++17 -O0 -g \
+  g++ -std=c++17 ${CXXFLAGS:--O0 -g} \
     -I generated -I . -I ../src -isystem ../src/eigen -I ../build/simple \
     -I /usr/include/antlr4-runtime \
     generated/NECFullLexer.cpp generated/NECFullParser.cpp \
