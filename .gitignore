@@ -6,17 +6,41 @@
 *.exe
 *.so
 *.o
+*.a
 *.la
 *.trs
-src/nec2++
-src/nec2diff
-src/test_manager
-src/necpp_test
 /nec2++
 /nec2diff
-build/
 nec2pp.js
 nec2pp.wasm
+# Legacy test binary name (pre-CMake era); kept ignored in case of stale trees.
+src/necpp_test
+src/test_manager
+
+# CMake build artifacts #
+#########################
+build/
+build-*/
+build-wasm/
+build-wasm-test/
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+CMakeError.log
+CMakeOutput.log
+install_manifest.txt
+_CPack_Packages/
+# CMake-generated build-system files inside source dirs (e.g. src/Makefile
+# produced by `cmake -B src`). Keep hand-written Makefiles in antlr/,
+# testharness/, example/ — they are not generated.
+src/Makefile
+
+
+# ANTLR generated artifacts (built in Docker) #
+###############################################
+antlr/generated/
+antlr/nec_parse
+antlr/build/
 
 # Packages #
 ############
@@ -30,6 +54,8 @@ nec2pp.wasm
 *.rar
 *.tar
 *.zip
+*.deb
+*.rpm
 
 # Logs and databases #
 ######################

@@ -31,7 +31,14 @@ A guide to [using nec2++ from python](http://astroelec.blogspot.co.nz/2015/05/mo
 
 ## Installation
 
-Instructions are in the file INSTALL.md.
+nec2++ builds with CMake (≥ 3.16) and a C++17 compiler — Eigen is bundled, so
+there are no external dependencies. The short version:
+
+    cmake -B build && cmake --build build -j4 && sudo cmake --install build
+
+Full instructions (debug builds, cross-compiling for Windows/macOS/WASM,
+packaging, and using the library via `find_package` or `pkg-config`) are in
+[INSTALL.md](INSTALL.md).
 
 ## Links
 

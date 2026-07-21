@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: necpp
+Description: NEC2++ antenna modelling library
+Version: @PROJECT_VERSION@
+URL: https://github.com/tmolteno/necpp
+Libs: -L${libdir} -lnecpp
+Libs.private: -lm
+Cflags: -I${includedir}/necpp

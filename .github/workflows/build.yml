@@ -8,26 +8,62 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build & test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Exercise the platforms INSTALL.md documents: Linux, macOS, Windows.
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++ make
+      - name: Install CMake (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake
+
+      # CMake is preinstalled on the GitHub Actions macOS and Windows runners.
+
+      - name: Configure
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: make -j$(nproc)
+        run: cmake --build build --config Release -j$(nproc) 2>/dev/null || cmake --build build --config Release -j2
+        shell: bash
 
       - name: Run unit tests
-        run: make test
+        run: ctest --test-dir build --build-config Release --output-on-failure
+        shell: bash
 
-      - name: Run simulation smoke test
+      - name: Simulation smoke test
+        shell: bash
         run: |
-          ./nec2++ -i testharness/data/herzian_dipole.nec -o /tmp/nec2_test_output.txt
-          grep -q "TOTAL RUN TIME" /tmp/nec2_test_output.txt && echo "Smoke test passed"
+          BIN="build/src/nec2++"
+          [ -f "$BIN" ] || BIN="build/src/Release/nec2++.exe"
+          [ -f "$BIN" ] || BIN="build/src/nec2++.exe"
+          "$BIN" -i testharness/data/herzian_dipole.nec -o smoke_output.txt
+          grep -q "TOTAL RUN TIME" smoke_output.txt && echo "Smoke test passed"
+
+  # Separate job: the WASM build (needs Docker, so Linux only).
+  wasm:
+    name: WASM build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build WASM via Emscripten Docker image
+        run: ./scripts/build_wasm_docker.sh
+
+      - name: Verify WASM artifacts
+        run: |
+          test -f nec2pp.js
+          test -f nec2pp.wasm
+          echo "WASM artifacts present: $(ls -la nec2pp.js nec2pp.wasm)"
