@@ -1,4 +1,5 @@
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 
 #include "nec_context.h"
 #include "nec_results.h"
@@ -6,9 +7,8 @@
 
 #include <iostream>
 
-#define REQUIRE_APPROX_EQUAL(a, b) { \
-  static nec_float eps = 3e-4; \
-  REQUIRE(std::abs(a - b) < eps); }
+#define REQUIRE_APPROX_EQUAL(a, b) \
+  REQUIRE(std::abs((a) - (b)) < 3e-4)
 
 TEST_CASE( "Example 1", "[example_1]") {
 
@@ -158,8 +158,8 @@ TEST_CASE( "Left-handed helix starts on +x axis", "[helix_handedness]") {
     geo->helix(1, 10, 0.1, -0.3, 0.2, 0.1, 0.2, 0.1, 0.001);
 
     // First segment should start on +x axis: x ≈ a1, y ≈ 0
-    REQUIRE(geo->x[0] == Approx(0.2).margin(1e-6));
-    REQUIRE(geo->y[0] == Approx(0.0).margin(1e-6));
+    REQUIRE(geo->x[0] == Catch::Approx(0.2).margin(1e-6));
+    REQUIRE(geo->y[0] == Catch::Approx(0.0).margin(1e-6));
 }
 
 TEST_CASE( "Flat spiral does not divide by zero", "[helix_flat_spiral]") {

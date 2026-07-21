@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 #include "matrix_algebra.h"
 #include "nec_output.h"
@@ -42,9 +42,8 @@ void matrix_setup(complex_array& A) {
   }
 }
 
-#define REQUIRE_APPROX_EQUAL(a, b) { \
-  static nec_float eps = 1e-4; \
-  REQUIRE(std::abs(a - b) < eps); }
+#define REQUIRE_APPROX_EQUAL(a, b) \
+  REQUIRE(std::abs((a) - (b)) < 1e-4)
 
 
 TEST_CASE( "LU Decomposition Gauss-Doolittle", "[lu_decompose_ge]") {

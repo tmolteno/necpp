@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 #include "nec2cpp.h"   /* for usage(), LINE_LEN */
 #include "nec_context.h"

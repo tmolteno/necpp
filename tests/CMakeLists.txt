@@ -1,31 +1,45 @@
 #####################################################################################
 #
-#   Catch2 unit tests for nec2++.
+#   Catch2 v3 unit tests for nec2++.
 #
-#   Mirrors the old Makefile `test` target: the library sources are recompiled
-#   with NEC_ERROR_CHECK=1, nec2cpp.cpp is pulled in with its main() renamed
-#   so the Catch runner owns main(), and the test sources are linked together.
+#   Catch2 is obtained via FetchContent at configure time (no vendored header).
+#   The library sources are compiled with NEC_ERROR_CHECK=1, and nec2cpp.cpp
+#   is linked with its main() renamed so Catch owns main().
 #
 #####################################################################################
 
-# The six test files the old Makefile compiled (see Makefile TEST_OBJS).
-# math_util_tb.cpp exists in src/ but was never part of the test runner —
-# leave it out to keep behaviour identical.
+include(FetchContent)
+
+# Catch2 v3 — downloaded at configure time, provides the test framework
+# and main() via Catch2::Catch2WithMain.
+FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        v3.7.1
+    GIT_SHALLOW    TRUE
+)
+# Suppress the "Catch2" project's find_package interference.
+set(CATCH_INSTALL_DOCS OFF CACHE BOOL "" FORCE)
+set(CATCH_INSTALL_HELPERS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(Catch2)
+
+# All 7 test files (including math_util_tb.cpp, which the old Makefile
+# excluded for historical reasons — it has a legitimate [nec_3vector] test).
 set(NECPP_TEST_SRCS
     ${CMAKE_SOURCE_DIR}/src/safe_array_tb.cpp
     ${CMAKE_SOURCE_DIR}/src/matrix_algebra_tb.cpp
     ${CMAKE_SOURCE_DIR}/src/c_geometry_tb.cpp
     ${CMAKE_SOURCE_DIR}/src/c_evlcom_tb.cpp
+    ${CMAKE_SOURCE_DIR}/src/math_util_tb.cpp
     ${CMAKE_SOURCE_DIR}/src/nec_context_tb.cpp
     ${CMAKE_SOURCE_DIR}/src/nec2cpp_tb.cpp
 )
 
-# Test runner = Catch main + test sources + nec2cpp.cpp (main renamed) + the
+# Test runner = Catch2 main + test sources + nec2cpp.cpp (main renamed) + the
 # library sources, all compiled under the bounds-checking defines. This matches
 # the old Makefile, which recompiled the whole library with -DNEC_ERROR_CHECK=1
 # rather than linking the production objects.
 add_executable(nec2++_tests
-    test_main.cpp
     ${NECPP_TEST_SRCS}
     ${CMAKE_SOURCE_DIR}/src/nec2cpp.cpp
     ${CMAKE_SOURCE_DIR}/src/XGetopt.cpp
@@ -49,34 +63,25 @@ add_executable(nec2++_tests
 target_include_directories(nec2++_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${NECPP_EIGEN_DIR}
-    ${CMAKE_BINARY_DIR})             # generated config.h + catch.hpp is in src/
+    ${CMAKE_BINARY_DIR})
 
 # Bounds checking on (matches the old Makefile TEST_CXXFLAGS).
 target_compile_definitions(nec2++_tests PRIVATE NEC_ERROR_CHECK=1)
 
-# Rename nec2cpp's main() so the Catch runner (in test_main.cpp) owns main().
-# This define must apply ONLY to nec2cpp.cpp — if it leaks into test_main.cpp
-# it renames Catch's own main() and the link fails with "undefined reference
-# to main". The old Makefile got this right by compiling test_main.cpp in a
-# separate step without the define; here we scope it with a source property.
+# Rename nec2cpp's main() so the Catch runner owns main().
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/nec2cpp.cpp PROPERTIES
     COMPILE_DEFINITIONS "main=nec2cpp_main_renamed")
 
-# nec2cpp.cpp defines objects that also exist in the explicit library sources
-# when main is renamed — allow the duplicates just like the old Makefile did.
-target_link_options(nec2++_tests PRIVATE
-    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wl,--allow-multiple-definition>)
+target_link_libraries(nec2++_tests PRIVATE
+    Catch2::Catch2WithMain
+    m)
 
-target_link_libraries(nec2++_tests PRIVATE m)
-
-# The same Catch tag filter the old Makefile passed on the command line.
-set(NECPP_TEST_TAGS
-    "[safe_array],[lu_decompose],[factrs_solves],[bessel],[card_handler],\
-[compat],[readmn],[load_line],[parser_dispatch],[helix],\
-[intersection_check],[false_intersection],[parse_nec_card]")
-
+# Run all test cases except [surface_patch], which is a pre-existing failure
+# (excluded from the old CTest tag filter since before the CMake migration).
+# The ~tag syntax is Catch2 v3's tag exclusion — all future test cases are
+# picked up automatically without maintaining a whitelist.
 add_test(NAME necpp_unit
-    COMMAND nec2++_tests ${NECPP_TEST_TAGS} -s)
+    COMMAND nec2++_tests "~[surface_patch]" -s)
 
 # Smoke test: run a real simulation through the binary and check it produced
 # the expected output marker.
