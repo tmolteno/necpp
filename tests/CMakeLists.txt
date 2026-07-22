@@ -68,11 +68,6 @@ target_include_directories(nec2++_tests PRIVATE
 
 # Bounds checking on (matches the old Makefile TEST_CXXFLAGS).
 target_compile_definitions(nec2++_tests PRIVATE NEC_ERROR_CHECK=1)
-# Silence MSVC C4996 deprecation warnings for fopen/strncpy (nec2cpp.cpp),
-# which are safe in their uses here and noisy in CI output.
-if(MSVC)
-    target_compile_definitions(nec2++_tests PRIVATE _CRT_SECURE_NO_WARNINGS)
-endif()
 
 # Rename nec2cpp's main() so the Catch runner owns main().
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/nec2cpp.cpp PROPERTIES

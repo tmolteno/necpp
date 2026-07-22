@@ -100,7 +100,7 @@ public:
         if (_len > 0)
           new_storage.head(_len) = _storage.head(_len);
         _storage.swap(new_storage);
-      } catch (std::bad_alloc& ba) {
+      } catch (const std::bad_alloc&) {
         throw nec_exception("Error: Out of Memory ");
       }
     }

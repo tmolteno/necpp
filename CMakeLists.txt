@@ -47,6 +47,13 @@ option(BUILD_SHARED_LIBS    "Also build a shared libnecpp in addition to the sta
 # Bundled Eigen is always used; there is no external-Eigen path.
 set(NECPP_EIGEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/eigen)
 
+# The codebase uses standard C functions (strncpy, fopen, sprintf, ...) that
+# are intentionally safe in their call sites here. MSVC deprecates them in
+# favor of the _s variants; silence the C4996 noise project-wide on MSVC.
+if(MSVC)
+    add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
 # Generate config.h from the template. Output lives in ${CMAKE_BINARY_DIR}
 # and is put on the include path by every target that needs it.
 configure_file(
