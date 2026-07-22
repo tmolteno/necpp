@@ -21,6 +21,12 @@ FetchContent_Declare(
 # Suppress the "Catch2" project's find_package interference.
 set(CATCH_INSTALL_DOCS OFF CACHE BOOL "" FORCE)
 set(CATCH_INSTALL_HELPERS OFF CACHE BOOL "" FORCE)
+# Build Catch2 STATIC regardless of the project's BUILD_SHARED_LIBS (which is
+# ON for libnecpp). A DLL Catch2 on Windows MSVC deadlocks the loader during
+# static init across the EXE<->DLL registry boundary (nec2++_tests hung 300s
+# with zero output). src/ is already configured by now, so necpp's own
+# shared/static choice is unaffected.
+set(BUILD_SHARED_LIBS OFF)
 FetchContent_MakeAvailable(Catch2)
 
 # All 7 test files (including math_util_tb.cpp, which the old Makefile
