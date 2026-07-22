@@ -1,6 +1,6 @@
 # TODO list for nec2++
 
-* Add remaining commands to the API for C, Ruby and Python.
+* Add remaining commands to the API for C and Python.
 * Test and make sure that the Somerfeld Ground code is working (compare outputs with the FORTRAN version)
 * Get CurrentInput comparison going with nec2diff
 

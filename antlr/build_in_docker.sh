@@ -19,20 +19,23 @@ docker run $DOCKER_OPTS "$IMAGE" \
   antlr4 -Dlanguage=Cpp -o generated -visitor NECFull.g4
 
 # Generate the build config header that common.h / nec2cpp.cpp require.
-# The main Makefile owns the canonical NECPP_VERSION; read it from there so
-# the two builds cannot drift apart. build/simple/config.h is included via
-# -I ../build/simple, and must define NECPP_VERSION and NECPP_BUILD_DATE
-# (the strings that common.h stitches into the nec_version literal).
-NECPP_VERSION=$(grep -E '^NECPP_VERSION[[:space:]]*=' ../Makefile | head -1 | sed -E 's/.*=[[:space:]]*//')
+# The canonical NECPP_VERSION lives in the top-level CMakeLists.txt
+# (project(necpp VERSION ...)); read it from there so the two builds cannot
+# drift apart. Written to ../build/config.h so the -I ../build flag used in
+# the g++ invocations below picks it up. The project() declaration spans two
+# lines, so tr flattens the file to one line before sed extracts the version.
+NECPP_VERSION=$(tr '\n' ' ' < ../CMakeLists.txt \
+  | sed -n 's/.*project(necpp[[:space:]]\{1,\}VERSION[[:space:]]\{1,\}\([0-9][0-9.]*\).*/\1/p' \
+  | head -1)
 NECPP_BUILD_DATE=$(date +"%Y-%m-%d")
-mkdir -p ../build/simple
+mkdir -p ../build
 {
   echo '#ifndef CONFIG_H'
   echo '#define CONFIG_H'
   echo "#define NECPP_VERSION \"${NECPP_VERSION}\""
   echo "#define NECPP_BUILD_DATE \"${NECPP_BUILD_DATE}\""
   echo '#endif'
-} > ../build/simple/config.h
+} > ../build/config.h
 echo "  config.h: NECPP_VERSION=${NECPP_VERSION} NECPP_BUILD_DATE=${NECPP_BUILD_DATE}"
 
 echo "=== Compiling full NEC parser ==="
@@ -40,12 +43,12 @@ echo "=== Compiling full NEC parser ==="
 mkdir -p build
 docker run $DOCKER_OPTS "$IMAGE" \
   g++ -std=c++17 ${CXXFLAGS:--O0 -g} \
-    -I . -I ../src -isystem ../src/eigen -I ../build/simple \
+    -I . -I ../src -isystem ../src/eigen -I ../build \
     -Dmain=nec2cpp_main_renamed -c ../src/nec2cpp.cpp -o build/nec2cpp.o
 
 docker run $DOCKER_OPTS "$IMAGE" \
   g++ -std=c++17 ${CXXFLAGS:--O0 -g} \
-    -I generated -I . -I ../src -isystem ../src/eigen -I ../build/simple \
+    -I generated -I . -I ../src -isystem ../src/eigen -I ../build \
     -I /usr/include/antlr4-runtime \
     generated/NECFullLexer.cpp generated/NECFullParser.cpp \
     generated/NECFullBaseVisitor.cpp \
