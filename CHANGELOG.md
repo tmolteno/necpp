@@ -1,4 +1,4 @@
-## Version 2.1.2
+## Version 2.2.0
 
 ### Modernization
 * All `fprintf(stderr, ...)` replaced with `std::cerr` (misc.cpp, nec2cpp.cpp, nec_output.cpp)
