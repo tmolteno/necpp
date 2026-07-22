@@ -217,6 +217,12 @@ install(FILES
     COMPONENT CLI OPTIONAL)
 
 # --- pkg-config file -------------------------------------------------------
+# Only Linux needs explicit -lm; macOS includes it in libc, Windows in the CRT.
+if(UNIX AND NOT APPLE)
+    set(NECPP_PC_MATH_LIB "-lm")
+else()
+    set(NECPP_PC_MATH_LIB "")
+endif()
 configure_file(
     ${CMAKE_SOURCE_DIR}/cmake/necpp.pc.in
     ${CMAKE_BINARY_DIR}/necpp.pc

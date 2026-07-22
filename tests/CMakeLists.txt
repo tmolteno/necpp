@@ -73,8 +73,10 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/src/nec2cpp.cpp PROPERTIES
     COMPILE_DEFINITIONS "main=nec2cpp_main_renamed")
 
 target_link_libraries(nec2++_tests PRIVATE
-    Catch2::Catch2WithMain
-    m)
+    Catch2::Catch2WithMain)
+if(UNIX AND NOT APPLE)
+    target_link_libraries(nec2++_tests PRIVATE m)
+endif()
 
 # Run all test cases except [surface_patch], which is a pre-existing failure
 # (excluded from the old CTest tag filter since before the CMake migration).

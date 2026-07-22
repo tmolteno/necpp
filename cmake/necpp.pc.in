@@ -8,5 +8,5 @@ Description: NEC2++ antenna modelling library
 Version: @PROJECT_VERSION@
 URL: https://github.com/tmolteno/necpp
 Libs: -L${libdir} -lnecpp
-Libs.private: -lm
+Libs.private: @NECPP_PC_MATH_LIB@
 Cflags: -I${includedir}/necpp
