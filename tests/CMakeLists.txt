@@ -43,6 +43,7 @@ add_executable(nec2++_tests
     ${NECPP_TEST_SRCS}
     ${CMAKE_SOURCE_DIR}/src/nec2cpp.cpp
     ${CMAKE_SOURCE_DIR}/src/XGetopt.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/win32_ci_guard.cpp
     ${CMAKE_SOURCE_DIR}/src/c_evlcom.cpp
     ${CMAKE_SOURCE_DIR}/src/c_geometry.cpp
     ${CMAKE_SOURCE_DIR}/src/c_ggrid.cpp
@@ -67,6 +68,11 @@ target_include_directories(nec2++_tests PRIVATE
 
 # Bounds checking on (matches the old Makefile TEST_CXXFLAGS).
 target_compile_definitions(nec2++_tests PRIVATE NEC_ERROR_CHECK=1)
+# Silence MSVC C4996 deprecation warnings for fopen/strncpy (nec2cpp.cpp),
+# which are safe in their uses here and noisy in CI output.
+if(MSVC)
+    target_compile_definitions(nec2++_tests PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()
 
 # Rename nec2cpp's main() so the Catch runner owns main().
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/nec2cpp.cpp PROPERTIES
@@ -84,6 +90,9 @@ endif()
 # picked up automatically without maintaining a whitelist.
 add_test(NAME necpp_unit
     COMMAND nec2++_tests "~[surface_patch]" -s)
+# Hard cap so a hung test fails fast (and CTest surfaces its output) instead of
+# blocking the CI runner for its full timeout ceiling.
+set_tests_properties(necpp_unit PROPERTIES TIMEOUT 300)
 
 # Smoke test: run a real simulation through the binary and check it produced
 # the expected output marker.

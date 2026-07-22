@@ -12,6 +12,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
+    # Hard backstop so a hung step/process never consumes the full 6-hour CI
+    # ceiling (seen on windows-latest before the CI guard was added).
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -37,7 +40,7 @@ jobs:
         shell: bash
 
       - name: Run unit tests
-        run: ctest --test-dir build --build-config Release --output-on-failure
+        run: ctest --test-dir build --build-config Release --output-on-failure --timeout 300
         shell: bash
 
       - name: Simulation smoke test
