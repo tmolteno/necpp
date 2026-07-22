@@ -2,7 +2,7 @@
 
 This is a free (GPL) electromagnetic simulation software compatable with NEC-2. It has been rewritten from the ground up.
 
-Nec2++ consists of a library that can be called from C++, C, python and Ruby, and so it can incorporated 
+Nec2++ consists of a library that can be called from C++, C, and python, and so it can incorporated 
 into other projects like GUI tools and automatic antenna optimization systems.
 
 There is also an executable necpp that can read antenna description files (like the original). 
@@ -11,7 +11,7 @@ Nec2++ is developed on Debian linux, but will work on a variety of other operati
 ## Features
 
 * NEC-2 syntax compatable.
-* C, C++, Python and Ruby libraries included. Ideal for antenna optimization.
+* C, C++, and Python libraries included. Ideal for antenna optimization.
 * Large designs can be simulated with tens of thousands of elements (to the limit of 64-bit address space)
 * Geometry error detection. Throws exceptions if wires intersect or lie too close to one another.
 * Simulate in different media (for example antennas in seawater) by modifying the dielectric properties.
