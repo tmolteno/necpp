@@ -2455,6 +2455,18 @@ void c_geometry::parse_geometry_card_line(const char* line_buf, char *gm,
       return;
     }
   }
+
+  /*
+   * Write the parsed fields back on normal loop exit. A card carrying more
+   * numeric fields than the two integers and seven reals this reader consumes
+   * leaves line_idx short of the terminator, so the in-loop end-of-string
+   * writes never fire; without this the caller's reused parse state retains the
+   * previous card's values.
+   */
+  *in_i1= integer_params[0]; *in_i2= integer_params[1];
+  *in_x1= real_params[0]; *in_y1= real_params[1]; *in_z1= real_params[2];
+  *in_x2= real_params[3]; *in_y2= real_params[4]; *in_z2= real_params[5];
+  *in_rad= real_params[6];
 }
 
 void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
