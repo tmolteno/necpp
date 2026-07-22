@@ -66,8 +66,13 @@ target_include_directories(necpp_obj
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${NECPP_EIGEN_DIR}
         ${CMAKE_BINARY_DIR})        # for generated config.h
-# Keep the warning flags the hand-written Makefile used.
-target_compile_options(necpp_obj PRIVATE -Wall -Wextra -Wshadow)
+# Warning flags. The old Makefile used -Wall -Wextra -Wshadow (GCC/Clang).
+# MSVC uses /W3 or /W4 instead; enable /W3 as a reasonable baseline.
+if(MSVC)
+    target_compile_options(necpp_obj PRIVATE /W3)
+else()
+    target_compile_options(necpp_obj PRIVATE -Wall -Wextra -Wshadow)
+endif()
 
 # --- Static library --------------------------------------------------------
 add_library(necpp_static STATIC $<TARGET_OBJECTS:necpp_obj>)
