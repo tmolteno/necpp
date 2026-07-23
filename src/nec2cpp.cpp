@@ -445,7 +445,7 @@ int readmn(std::istream& is,
 	nec_float *f1, nec_float *f2, nec_float *f3,
 	nec_float *f4, nec_float *f5, nec_float *f6 )
 {
-	char line_buf[134];
+	char line_buf[LINE_LEN+1];
 
 	int eof = load_line( line_buf, is );
 	int line_length = static_cast<int>(strlen( line_buf ));
@@ -480,7 +480,7 @@ int readmn(FILE* input_fp, FILE* output_fp,
 	nec_float *f1, nec_float *f2, nec_float *f3,
 	nec_float *f4, nec_float *f5, nec_float *f6 )
 {
-	char line_buf[134];
+	char line_buf[LINE_LEN+1];
 
 	int eof = load_line( line_buf, input_fp );
 	int line_length = static_cast<int>(strlen( line_buf ));

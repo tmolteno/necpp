@@ -78,7 +78,7 @@
 #define	LF	0x0a
 
 /* max length of a line read from input file */
-#define	LINE_LEN	132/* version of fortran source for the -v option */
+#define	LINE_LEN	512/* version of fortran source for the -v option */
 #define		version "nec2c v0.1"
 
 /* Function prototypes */
