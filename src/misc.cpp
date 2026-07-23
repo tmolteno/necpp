@@ -119,8 +119,19 @@ int load_line( char *buff, FILE *pfile )
 			buff[num_chr] = '\0';
 			eof = EOF;
 		}
-	} /* end of while( num_chr < max_chr ) */
-	
+	} /* end of while( num_chr < LINE_LEN ) */
+
+	/* drain any characters past LINE_LEN so an over-length line
+	 * cannot leak its tail into the next load_line read. Match the
+	 * fill loop's EOF convention (set eof, fall through) rather than
+	 * the single-quote drain's early return, so the buffer's mnemonic
+	 * is still capitalized/terminated and the caller sees EOF. */
+	while( (chr != CR) && (chr != LF) )
+		if( (chr = fgetc(pfile)) == EOF ) {
+			eof = EOF;
+			break;
+		}
+
 	/* Capitalize first two characters (mnemonics) */
 	    buff[0] = static_cast<char>(std::toupper(buff[0]));
 	    buff[1] = static_cast<char>(std::toupper(buff[1]));
@@ -172,6 +183,17 @@ int load_line( char *buff, std::istream& is )
 		if ( !is ) {
 			buff[num_chr] = '\0';
 			eof = EOF;
+		}
+	}
+
+	/* drain any characters past LINE_LEN so an over-length line
+	 * cannot leak its tail into the next load_line read. Match the
+	 * fill loop's EOF convention (set eof, fall through). */
+	while ( (chr != CR) && (chr != LF) ) {
+		chr = is.get();
+		if ( !is ) {
+			eof = EOF;
+			break;
 		}
 	}
 

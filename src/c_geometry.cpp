@@ -2475,7 +2475,7 @@ void c_geometry::read_geometry_card(FILE* input_fp,  char *gm,
   nec_float *in_x2, nec_float *in_y2, nec_float *in_z2,
   nec_float *in_rad )
 {
-  char line_buf[134];
+  char line_buf[LINE_LEN+1];
   load_line( line_buf, input_fp );
   parse_geometry_card_line(line_buf, gm, in_i1, in_i2, in_x1, in_y1, in_z1, in_x2, in_y2, in_z2, in_rad);
 }
@@ -2486,7 +2486,7 @@ void c_geometry::read_geometry_card(std::istream& is,  char *gm,
   nec_float *in_x2, nec_float *in_y2, nec_float *in_z2,
   nec_float *in_rad )
 {
-  char line_buf[134];
+  char line_buf[LINE_LEN+1];
   load_line( line_buf, is );
   parse_geometry_card_line(line_buf, gm, in_i1, in_i2, in_x1, in_y1, in_z1, in_x2, in_y2, in_z2, in_rad);
 }

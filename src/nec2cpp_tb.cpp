@@ -20,6 +20,7 @@ int readmn(FILE* input_fp, FILE* output_fp, char *gm, int *i1, int *i2,
 
 /* load_line() declaration */
 int load_line( char *buff, FILE *pfile );
+int load_line( char *buff, std::istream& is );
 
 /* Stream-based readmn declaration */
 int readmn(std::istream& is,
@@ -268,4 +269,84 @@ TEST_CASE("parse_nec_card matches old readmn for EX", "[compat]") {
     REQUIRE(c_new.i[3] == c_old.i[3]);
     for (int n = 0; n < 6; n++)
         REQUIRE(c_new.f[n] == c_old.f[n]);
+}
+
+/*-----------------------------------------------------------------------*/
+/* load_line(): over-length line handling.
+ *
+ * Regression coverage for the fix behind PR #118: a physical line longer
+ * than LINE_LEN must not leak its tail into the next load_line() read.
+ * The original fill loop stopped at LINE_LEN without consuming the rest of
+ * the line, so an over-length CM comment was truncated and its tail was
+ * returned by the next call as a spurious card, failing the CM/CE comment
+ * check even when the deck legitimately closed its comment block with CE.
+ */
+
+/* A CM line that exceeds LINE_LEN by a comfortable margin. Its exact
+ * content past the mnemonic is irrelevant to the bug; it only needs to be
+ * long enough to overflow the fill buffer. */
+static std::string make_long_comment_line() {
+    std::string s = "CM";
+    while (static_cast<int>(s.size()) < LINE_LEN + 64)
+        s += 'x';
+    return s;
+}
+
+TEST_CASE("load_line(FILE*) drains over-length CM, next line parses as CE",
+          "[load_line]") {
+    std::string long_cm = make_long_comment_line();
+    std::string deck = long_cm + "\nCE end of comment block\n";
+
+    /* Write to a temporary file (auto-removed on fclose). */
+    FILE* fp = std::tmpfile();
+    REQUIRE(fp != nullptr);
+    std::fputs(deck.c_str(), fp);
+    std::rewind(fp);
+
+    char buf[LINE_LEN + 1];
+
+    /* First read: the over-length CM. It must be recognized as CM and its
+     * tail must NOT bleed into the next read. */
+    REQUIRE(load_line(buf, fp) == 0);
+    REQUIRE(buf[0] == 'C');
+    REQUIRE(buf[1] == 'M');
+
+    /* Second read must be the CE line, not the leftover tail of the CM. */
+    REQUIRE(load_line(buf, fp) == 0);
+    REQUIRE(buf[0] == 'C');
+    REQUIRE(buf[1] == 'E');
+
+    std::fclose(fp);
+}
+
+TEST_CASE("load_line(istream) drains over-length CM, next line parses as CE",
+          "[load_line]") {
+    std::string long_cm = make_long_comment_line();
+    std::string deck = long_cm + "\nCE end of comment block\n";
+    std::istringstream is(deck);
+
+    char buf[LINE_LEN + 1];
+
+    REQUIRE(load_line(buf, is) == 0);
+    REQUIRE(buf[0] == 'C');
+    REQUIRE(buf[1] == 'M');
+
+    REQUIRE(load_line(buf, is) == 0);
+    REQUIRE(buf[0] == 'C');
+    REQUIRE(buf[1] == 'E');
+}
+
+TEST_CASE("load_line returns EOF when an over-length line is the last line",
+          "[load_line]") {
+    /* No trailing newline: the drain hits EOF mid-tail. The fill loop's
+     * convention is to set eof and fall through (not early-return), so the
+     * caller gets EOF on this same call. */
+    std::string long_cm = make_long_comment_line();   // no trailing '\n'
+    std::istringstream is(long_cm);
+
+    char buf[LINE_LEN + 1];
+    REQUIRE(load_line(buf, is) == EOF);
+    /* The mnemonic is still usable despite the overflow. */
+    REQUIRE(buf[0] == 'C');
+    REQUIRE(buf[1] == 'M');
 }
