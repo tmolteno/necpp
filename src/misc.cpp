@@ -120,7 +120,13 @@ int load_line( char *buff, FILE *pfile )
 			eof = EOF;
 		}
 	} /* end of while( num_chr < max_chr ) */
-	
+
+	/* drain any characters past LINE_LEN so an over-length line
+	 * cannot leak its tail into the next load_line read */
+	while( (chr != CR) && (chr != LF) )
+		if( (chr = fgetc(pfile)) == EOF )
+			break;
+
 	/* Capitalize first two characters (mnemonics) */
 	    buff[0] = static_cast<char>(std::toupper(buff[0]));
 	    buff[1] = static_cast<char>(std::toupper(buff[1]));
@@ -173,6 +179,13 @@ int load_line( char *buff, std::istream& is )
 			buff[num_chr] = '\0';
 			eof = EOF;
 		}
+	}
+
+	/* drain any characters past LINE_LEN so an over-length line
+	 * cannot leak its tail into the next load_line read */
+	while ( (chr != CR) && (chr != LF) ) {
+		chr = is.get();
+		if ( !is ) break;
 	}
 
 	buff[0] = static_cast<char>(std::toupper(buff[0]));
