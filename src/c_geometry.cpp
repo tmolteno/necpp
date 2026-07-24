@@ -1971,12 +1971,18 @@ void c_geometry::sc_card(int i2,
     default:
       throw nec_exception("PATCH DATA ERROR ns ", this->patch_type );
   }
-  patch( this->patch_type, i2, 
-          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2), 
+  /* The patch shape is conveyed by the ny argument (i2); nx must be 0 so
+     that patch() treats this as a single shaped patch rather than an
+     nx-by-ny grid (nx > 0 would expand each SC card into a grid of
+     patches, bloating the interaction matrix). This mirrors the
+     file-parser path (parse_sc_card), which calls
+     patch(st.card_int_1 = 0, st.card_int_2, ...). */
+  patch( 0, i2,
+          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2),
           this->patch_x2(0), this->patch_x2(1), this->patch_x2(2),
           this->patch_x3(0), this->patch_x3(1), this->patch_x3(2),
           this->patch_x4(0), this->patch_x4(1), this->patch_x4(2));
-  
+
   _prev_sc = true;
 }
 
@@ -2024,16 +2030,18 @@ void c_geometry::sc_multiple_card(int i2,
     default:
       throw nec_exception("PATCH DATA ERROR i2 = ", i2 );
   }
-  
-  patch( this->patch_type, i2, 
-          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2), 
+
+  /* See sc_card(): nx must be 0 to avoid patch() generating an nx-by-ny
+     grid of patches for each linked SC card in the patch string. */
+  patch( 0, i2,
+          this->patch_x1(0), this->patch_x1(1), this->patch_x1(2),
           this->patch_x2(0), this->patch_x2(1), this->patch_x2(2),
           this->patch_x3(0), this->patch_x3(1), this->patch_x3(2),
           this->patch_x4(0), this->patch_x4(1), this->patch_x4(2));
-  
+
   m_output->nec_printf( "\n"
           " %5d%c %10.5f %11.5f %11.5f %11.5f %11.5f %11.5f",
-          this->patch_type, ipt[i2], 
+          this->patch_type, ipt[i2],
           this->patch_x1(0), this->patch_x1(1), this->patch_x1(2),
           this->patch_x2(0), this->patch_x2(1), this->patch_x2(2));
 
