@@ -1,3 +1,8 @@
+## Version 2.2.1
+
+### Bug Fixes
+* Over-length input lines in `load_line` are now drained instead of truncating silently, with regression coverage
+
 ## Version 2.2.0
 
 ### Modernization
