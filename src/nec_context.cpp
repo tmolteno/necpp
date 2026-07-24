@@ -2111,7 +2111,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
       cmww( j, i1, in2, in_cm, nrow, in_cm, nrow,1);
 
     if ( im1 <= im2) {
-      complex_array temp = in_cm.segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
+      complex_array temp = in_cm.eigen_segment((ist-1)*nrow, in_cm.size() - ((ist-1)*nrow));
       cmws( j, im1, im2, temp, nrow, in_cm, nrow, 1);
       /* CMWS (J,IM1,IM2,CM(1,IST),NROW,CM,NROW,1) */
     }
@@ -2148,13 +2148,13 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
 
       if ( i1 <= in2) {
         int64_t tmp_n = (jst-1);
-        complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
+        complex_array temp = in_cm.eigen_segment(tmp_n, in_cm.size()-tmp_n);
         cmsw( jm1, jm2, i1, in2, temp, in_cm, 0, nrow, 1);
       }
 
       if ( im1 <= im2) {
         int64_t tmp_n = (jst-1)+(ist-1)*nrow;
-        complex_array temp = in_cm.segment(tmp_n, in_cm.size()-tmp_n);
+        complex_array temp = in_cm.eigen_segment(tmp_n, in_cm.size()-tmp_n);
         compute_matrix_ss( jm1, jm2, im1, im2, temp, nrow, 1);
       }
     }
@@ -2177,7 +2177,7 @@ void nec_context::cmset( int64_t nrow, complex_array& in_cm, nec_float rkhx) {
         scm[k] = in_cm[row_offset + ka];
       }
 
-      in_cm[row_offset + j] = scm.segment(0,nop).sum(); //scm.sum(0,nop);
+      in_cm[row_offset + j] = scm.eigen_segment(0,nop).sum(); //scm.sum(0,nop);
       
       for( int k = 1; k < nop; k++ ) {
         int ka = j+ k*npeq;
@@ -6819,14 +6819,14 @@ void nec_context::ffld(nec_float thet, nec_float phi,
   /* electric field components */
   roz= rozs;
   { // without ground 
-    complex_array temp = current_vector.segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
+    complex_array temp = current_vector.eigen_segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
     m_geometry->fflds(rox, roy, roz, temp, &ex, &ey, &ez);
   }
   if (ground.present())  {
     // with ground
     nec_complex tempx, tempy, tempz;
     
-    complex_array temp = current_vector.segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
+    complex_array temp = current_vector.eigen_segment(m_geometry->n_segments, current_vector.size()-m_geometry->n_segments);
     m_geometry->fflds(rox, roy, -roz, temp, &tempx, &tempy, &tempz);
   
     if (ground.type_perfect())  {
