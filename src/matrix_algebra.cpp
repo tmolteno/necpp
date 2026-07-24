@@ -330,8 +330,8 @@ void factrs(nec_output_file& s_output,    int64_t np, int64_t nrow, complex_arra
     for (int mode = 0; mode < num_symmetric_modes; mode++ ) {
         int64_t mode_offset = mode * np;
         
-        complex_array a_temp = a.segment(mode_offset, a.size()-mode_offset);
-        int_array ip_temp = ip.segment(mode_offset, ip.size()-mode_offset);
+        complex_array a_temp = a.eigen_segment(mode_offset, a.size()-mode_offset);
+        int_array ip_temp = ip.eigen_segment(mode_offset, ip.size()-mode_offset);
         
         lu_decompose(s_output,    np, a_temp, ip_temp, nrow );
     }
@@ -426,9 +426,9 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
 
         for (int64_t ic = 0; ic < nrh; ic++ ) {
             int64_t column_offset = ic*neq;
-            complex_array a_sub = a.segment(ia, a.size()-ia);
-            complex_array b_sub = b.segment(ia+column_offset, b.size() - (ia+column_offset) );
-            int_array ip_sub = ip.segment(ia, ip.size()-ia);
+            complex_array a_sub = a.eigen_segment(ia, a.size()-ia);
+            complex_array b_sub = b.eigen_segment(ia+column_offset, b.size() - (ia+column_offset) );
+            int_array ip_sub = ip.eigen_segment(ia, ip.size()-ia);
             solve( npeq, a_sub, ip_sub, b_sub, nrow );
         }
     } /* for( kk = 0; kk < nop; kk++ ) */
