@@ -1,6 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 
+#include "c_geometry.h"
 #include "libnecpp.h"
+#include <cmath>
 #include <iostream>
 
 void HANDLE_NEC(long x) { 
@@ -73,4 +76,53 @@ TEST_CASE( "Geometry", "[surface_patch]") {
     REQUIRE((nec_gain_max(nec, 0) - 10.3332 < 1E-4));
 
     nec_delete(nec);
+}
+
+TEST_CASE( "Flat-spiral helix (GH HL=0)", "[helix]") {
+    // PR #122: HL=0 selects a flat spiral — segments should form a spiral
+    // in the XY plane (z=0) with linearly interpolated radius, not collapse
+    // into a straight radial wire.
+    c_geometry geo;
+
+    int    tag_id        = 1;
+    int    segment_count = 30;
+    nec_float s          = 0.22;   // turn spacing (used for angular step: 2*pi/s)
+    nec_float hl         = 0.0;    // zero = flat spiral
+    nec_float a1         = 0.05;   // start X radius
+    nec_float b1         = 0.05;   // start Y radius
+    nec_float a2         = 0.15;   // end X radius
+    nec_float b2         = 0.15;   // end Y radius
+    nec_float rad        = 0.0025;
+
+    geo.helix(tag_id, segment_count, s, hl, a1, b1, a2, b2, rad);
+
+    REQUIRE( geo.n_segments == segment_count );
+
+    // All z coordinates must be zero (flat spiral in XY plane).
+    for (int i = 0; i < segment_count; i++) {
+        INFO( "Segment " << i );
+        REQUIRE( geo.z[i]  == 0.0 );
+        REQUIRE( geo.z2[i] == 0.0 );
+        REQUIRE( geo.segment_tags[i] == tag_id );
+        REQUIRE( geo.segment_radius[i] == rad );
+    }
+
+    // First segment starts at phi=0: x=a1*cos(0)=a1, y=b1*sin(0)=0.
+    REQUIRE( geo.x[0] == Catch::Approx(0.05).margin(1e-12) );
+    REQUIRE( geo.y[0] == Catch::Approx(0.0).margin(1e-12) );
+
+    // Verify the geometry is NOT a straight wire — if x or y were constant
+    // across all segments, the spiral degenerated into a radial line.
+    bool x_varies = false, y_varies = false;
+    for (int i = 1; i < segment_count && !(x_varies && y_varies); i++) {
+        if (std::fabs(geo.x[i] - geo.x[0]) > 1e-12) x_varies = true;
+        if (std::fabs(geo.y[i] - geo.y[0]) > 1e-12) y_varies = true;
+    }
+    REQUIRE( x_varies );
+    REQUIRE( y_varies );
+
+    // Final radius should be near a2/b2 (within a segment's interpolation step).
+    nec_float r_last = std::sqrt(geo.x[segment_count-1]*geo.x[segment_count-1]
+                               + geo.y[segment_count-1]*geo.y[segment_count-1]);
+    REQUIRE( r_last == Catch::Approx(0.15).margin(0.01) );
 }
