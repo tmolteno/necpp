@@ -1,5 +1,10 @@
 ## Version 2.3.0
 
+### Features
+* **int64_t segment/patch counts:** Upgraded `n_segments`, `np`, `m`, `mp`, and related loop counters and buffer sizes from `int` to `int64_t` throughout `c_geometry.hpp`, `c_geometry.cpp`, and `nec_context`.
+  This removes the ~2.1-billion segment/patch ceiling inherited from the Fortran era, enabling simulations at much larger scale.
+  Benchmark score is unchanged; all 47 test cases (530 assertions) continue to pass.
+
 ### Bug Fixes
 * **GH card flat spiral (HL=0):** Fixed inherited Fortran bug where a flat-spiral helix degenerated into a straight radial wire. A dedicated `HL=0` branch now advances rotation by segment angle and interpolates radius linearly, matching the independent `xnec2c` implementation (#122, @KJ7LNW)
 

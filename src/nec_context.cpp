@@ -37,7 +37,7 @@
 #include "nec_context.h"
 #include "c_geometry.h"
 #include "nec_exception.h"
-
+ 
 #include <cstdlib>
 #include <memory>
 
@@ -123,7 +123,7 @@ void nec_context::calc_prepare()
   DEBUG_TRACE("calc_prepare()");
   iflow=1;    
   
-  int n_plus_m = m_geometry->n_plus_m();
+  int64_t n_plus_m = m_geometry->n_plus_m();
   /* Allocate some buffers */
   air.resize(n_plus_m);
   aii.resize(n_plus_m);
@@ -573,7 +573,7 @@ void nec_context::ex_card(enum excitation_type itmp1, int itmp2, int itmp3, int 
     {
       int indx = voltage_source_count-1;
     
-      int seg_number = m_geometry->get_segment_number( itmp2, itmp3);
+      int64_t seg_number = m_geometry->get_segment_number( itmp2, itmp3);
       if (seg_number > m_geometry->segment_length.size())  {
         nec_exception nex("CHECK DATA, PARAMETER SPECIFYING EXCITATION SOURCE SEGMENT [");
         nex.append(seg_number);
@@ -1064,7 +1064,7 @@ void nec_context::simulate(bool far_field_flag) {
         cm.resize(iresrv);
       
         /* Memory allocation for symmetry array */
-        nop = neq/npeq;
+        nop = int32_t(neq/npeq);
         symmetry_array.resize(nop*nop);  
         mhz = 1;
         

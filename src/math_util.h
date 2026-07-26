@@ -30,6 +30,7 @@
 #include "safe_array.h"
 
 typedef safe_array<int32_t>    int_array;
+typedef safe_array<int64_t>    int64_array;
 typedef safe_array<nec_float>  real_array;
 typedef safe_array<nec_complex> complex_array;
 

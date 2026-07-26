@@ -828,7 +828,8 @@ public:
   complex_array vqd, vqds, source_voltage_array;
   
   /* common  /netcx/ */
-  int masym, neq, npeq, neq2, network_count, ntsol, nprint;
+  int masym, neq2, network_count, ntsol, nprint;
+  int64_t neq, npeq;
   int_array iseg1, iseg2, ntyp;
   real_array x11r, x11i, x12r;
   real_array x12i, x22r, x22i;

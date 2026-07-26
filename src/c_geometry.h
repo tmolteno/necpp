@@ -150,7 +150,7 @@ public:
   */
   int test_ek_approximation(int seg1, int seg2);
   
-  int get_segment_number( int in_tag, int m);
+  int64_t get_segment_number( int in_tag, int m);
 
   
   void frequency_scale(nec_float freq_mhz);
@@ -173,14 +173,14 @@ public:
           complex_array& scur, 
           nec_complex *in_ex, nec_complex *in_ey, nec_complex *in_ez );
           
-  int n_segments;	// The number of segments
-  int np;
+  int64_t n_segments;	// The number of segments
+  int64_t np;
   int_array segment_tags;
   real_array x, y, z, segment_length, segment_radius;
   real_array x2, y2, z2;
   real_array cab, sab, salp;
   
-  int m, mp;	// The number of patches
+  int64_t m, mp;	// The number of patches
   int m_ipsym;
   
   real_array t1x, t1y, t1z, t2x, t2y, t2z;	// t1, t2 basis co-ordinates?
@@ -193,10 +193,10 @@ public:
   int_array jco;
   real_array ax, bx, cx;
   
-  inline int n_plus_m(void) const {
+  inline int64_t n_plus_m(void) const {
     return n_segments + m;
   }
-  int n_plus_2m, n_plus_3m; /* n+m,n+2m,n+3m */
+  int64_t n_plus_2m, n_plus_3m; /* n+m,n+2m,n+3m */
 private:
   //	The geometry data measured in meters is stored in these arrays
   //	and the x,y,z,si,bi arrays are then scaled for each frequency
