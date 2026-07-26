@@ -85,12 +85,9 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(nec2++_tests PRIVATE m)
 endif()
 
-# Run all test cases except [surface_patch], which is a pre-existing failure
-# (excluded from the old CTest tag filter since before the CMake migration).
-# The ~tag syntax is Catch2 v3's tag exclusion — all future test cases are
-# picked up automatically without maintaining a whitelist.
+# Run all test cases.
 add_test(NAME necpp_unit
-    COMMAND nec2++_tests "~[surface_patch]" -s)
+    COMMAND nec2++_tests -s)
 # Hard cap so a hung test fails fast (and CTest surfaces its output) instead of
 # blocking the CI runner for its full timeout ceiling.
 set_tests_properties(necpp_unit PROPERTIES TIMEOUT 300)

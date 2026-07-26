@@ -47,14 +47,11 @@ packaging, and using the library via `find_package` or `pkg-config`) are in
 From the repository root:
 
 cmake -B build && cmake --build build
-./build/tests/nec2++_tests "~[surface_patch]" -s
+./build/tests/nec2++_tests -s
 
 Or via CTest:
 
 cd build && ctest
-
-Both commands exclude the `[surface_patch]` tag, which tracks a pre-existing
-bug.
 
 ### Regression test harness
 
