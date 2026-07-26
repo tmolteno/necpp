@@ -3,6 +3,16 @@
 ### Bug Fixes
 * **GH card flat spiral (HL=0):** Fixed inherited Fortran bug where a flat-spiral helix degenerated into a straight radial wire. A dedicated `HL=0` branch now advances rotation by segment angle and interpolates radius linearly, matching the independent `xnec2c` implementation (#122, @KJ7LNW)
 
+### Tests
+* Unit test for `c_geometry::helix()` HL=0 flat-spiral path — verifies all-z-zero, correct tags/radii, non-degenerate spiral geometry, and final-radius interpolation
+* Regression input (`testharness/data/gh_flat_spiral.nec`) exercising the GH HL=0 flat-spiral code path
+* Removed stale `[surface_patch]` Catch2 tag exclusion — the underlying bug was fixed in #120; all 47 test cases now pass (530 assertions)
+
+### Documentation
+* Updated `README.md` with Catch2/CTest instructions
+* Rewrote `testharness/README.md` for the CMake build system
+* Fixed `example/README.md` to use direct g++ commands instead of the removed Makefile targets
+
 ## Version 2.2.1
 
 ### Bug Fixes
