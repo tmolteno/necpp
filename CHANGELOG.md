@@ -1,3 +1,8 @@
+## Version 2.3.0
+
+### Bug Fixes
+* **GH card flat spiral (HL=0):** Fixed inherited Fortran bug where a flat-spiral helix degenerated into a straight radial wire. A dedicated `HL=0` branch now advances rotation by segment angle and interpolates radius linearly, matching the independent `xnec2c` implementation (#122, @KJ7LNW)
+
 ## Version 2.2.1
 
 ### Bug Fixes

@@ -1,0 +1,10 @@
+CM Flat spiral helix (GH HL=0, A2>A1)
+CM Tests the HL=0 flat-spiral path fixed in PR #122.
+CM Previously degenerated to a straight radial wire.
+CE
+GH 1 30 0.22 0.0 0.05 0.05 0.15 0.15 0.0025
+GE 0
+FR 0 1 0 0 300 0
+EX 0 1 15 0 1 0
+RP 0 19 37 1000 0 0 10 10
+EN
