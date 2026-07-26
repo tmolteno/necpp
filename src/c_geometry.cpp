@@ -802,6 +802,33 @@ void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl,
   z2.resize(n_segments);
   segment_radius.resize(n_segments);
   
+  /* A flat spiral (hl == 0) advances the rotation angle by segment index,
+   * independent of hl; the tapered helix path divides the radius by
+   * fabs(hl) and cannot form a spiral when hl is zero. */
+  if ( hl == 0.) {
+    nec_float phi= 0.;
+    nec_float dphi= 2.* pi()/ s;
+    nec_float da=( a1- a2)/ segment_count;
+    nec_float db=( b1- b2)/ segment_count;
+
+    for(int i = ist; i < n_segments; i++ ) {
+      segment_radius[i]= rad;
+      segment_tags[i]= tag_id;
+      z[i]= 0.;
+      z2[i]= 0.;
+
+      x[i]= a1* cos( phi);
+      y[i]= b1* sin( phi);
+      a1 -= da;
+      b1 -= db;
+      phi += dphi;
+      x2[i]= a1* cos( phi);
+      y2[i]= b1* sin( phi);
+    }
+
+    return;
+  }
+
   z[ist]=0.;
   for(int i = ist; i < n_segments; i++ ) {
     segment_radius[i]= rad;
@@ -824,24 +851,10 @@ void c_geometry::helix(int tag_id, int segment_count, nec_float s, nec_float hl,
       if ( b2 == 0.)
         b2= a2;
 
-      // Interpolate radius: use segment index when hl == 0,
-      // otherwise use z / fabs(hl) to avoid division by zero.
-      nec_float radius_frac;
-      if (hl == 0.)
-        radius_frac = nec_float(i - ist) / nec_float(segment_count - 1);
-      else
-        radius_frac = z[i] / fabs(hl);
-
-      x[i]=( a1+( a2- a1)* radius_frac)* cos(2.* pi()* z[i]/ s);
-      y[i]=( b1+( b2- b1)* radius_frac)* sin(2.* pi()* z[i]/ s);
-
-      if (hl == 0.)
-        radius_frac = nec_float(i - ist + 1) / nec_float(segment_count - 1);
-      else
-        radius_frac = z2[i] / fabs(hl);
-
-      x2[i]=( a1+( a2- a1)* radius_frac)* cos(2.* pi()* z2[i]/ s);
-      y2[i]=( b1+( b2- b1)* radius_frac)* sin(2.* pi()* z2[i]/ s);
+      x[i]=( a1+( a2- a1)* z[i]/ fabs(hl))* cos(2.* pi()* z[i]/ s);
+      y[i]=( b1+( b2- b1)* z[i]/ fabs(hl))* sin(2.* pi()* z[i]/ s);
+      x2[i]=( a1+( a2- a1)* z2[i]/ fabs(hl))* cos(2.* pi()* z2[i]/ s);
+      y2[i]=( b1+( b2- b1)* z2[i]/ fabs(hl))* sin(2.* pi()* z2[i]/ s);
     } /* if ( a2 == a1) */
 
     if ( hl < 0.) {
