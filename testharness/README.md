@@ -1,17 +1,39 @@
 # Testing nec2++
 
-First create a debug build using the build_debug.sh script
+## Quick start
 
-    sh build_debug.sh
+Build a debug binary, then run the regression harness against the reference
+engines:
 
-You may need to make distclean in the parent directory before this is done.
+```bash
+# 1. Build nec2++ and the nec2c reference engine
+cmake -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j$(nproc)
 
-Then
+# 2. Build nec2c (C reference)
+make -C c_src
 
-    make -f Makefile.test
+# 3. Symlink the binaries where the Makefile expects them
+ln -sf ../build/src/nec2++ ../src/nec2++
+ln -sf ../build/src/nec2diff ../src/nec2diff
 
-    ## Running a specific test
+# 4. Run all tests (default: herzian_dipole.nec)
+make
+```
 
-To run a particular test file
+## Running a specific test
 
-    make DO_TESTS=data/plane_wave_excitation.nec
+```bash
+make DO_TESTS=data/gh_flat_spiral.nec
+```
+
+## Adding a test
+
+Drop a `.nec` input file into `data/`. The harness will run it through
+`nec2++`, `nec2c`, and FORTRAN (if available), then diff the outputs with
+`nec2diff`.
+
+## Available test models
+
+The `data/` directory contains over 45 models covering dipoles, patches,
+helices, Sommerfeld ground, arrays, and more.

@@ -11,15 +11,16 @@ Tim Molteno <tim@physics.otago.ac.nz>
 
 There is an example file called 'example1.nec' that contains the traditional NEC2 cards. You can run this using nec2++ as follows
 
-    nec2++ -i example1.nec -o example1.out
+    ../build/src/nec2++ -i example1.nec -o example1.out
 
 ## C example
 
-This example requires that the libnecpp library is installed. This is done, either by installing the package in your distribution,
-or by compiling the source code (in the directory above this one)
+This example requires that the libnecpp library is installed. Build with:
 
-    make test_c
+    g++ -std=c++17 -I../src -I../src/eigen -I../build test_nec.c \
+        -L../build/src -lnecpp -o test_nec
 
 ## C++ example
 
-    make test_cpp
+    g++ -std=c++17 -I../src -I../src/eigen -I../build test_cpp.cpp \
+        -L../build/src -lnecpp -o test_cpp

@@ -40,6 +40,28 @@ Full instructions (debug builds, cross-compiling for Windows/macOS/WASM,
 packaging, and using the library via `find_package` or `pkg-config`) are in
 [INSTALL.md](INSTALL.md).
 
+## Testing
+
+### Unit tests (Catch2)
+
+From the repository root:
+
+cmake -B build && cmake --build build
+./build/tests/nec2++_tests "~[surface_patch]" -s
+
+Or via CTest:
+
+cd build && ctest
+
+Both commands exclude the `[surface_patch]` tag, which tracks a pre-existing
+bug.
+
+### Regression test harness
+
+The `testharness/` directory compares `nec2++` output against the `nec2c` (C)
+and FORTRAN reference engines. See
+[testharness/README.md](testharness/README.md) for setup and usage.
+
 ## Links
 
 * http://tmolteno.github.io/necpp/ Documentation
