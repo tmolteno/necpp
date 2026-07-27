@@ -1,3 +1,8 @@
+## Version 2.3.1
+
+### Bug Fixes
+* **Shared library not found after install:** On Linux, `cmake --install` now runs `ldconfig` to refresh the dynamic linker cache, fixing `nec2++: error while loading shared libraries: libnecpp.so.2: cannot open shared object file` right after a fresh `sudo cmake --install`. The step is a no-op on macOS/Windows and degrades gracefully when the install isn't privileged.
+
 ## Version 2.3.0
 
 ### Features
