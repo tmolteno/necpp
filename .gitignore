@@ -11,6 +11,11 @@
 *.trs
 /nec2++
 /nec2diff
+# CMake add_subdirectory(src) emits the CLI binaries into src/ for in-source
+# builds. Out-of-source builds land under build/ (ignored above). Match both
+# spots so neither tree shows stray binaries in git status.
+/src/nec2++
+/src/nec2diff
 nec2pp.js
 nec2pp.wasm
 # Legacy test binary name (pre-CMake era); kept ignored in case of stale trees.
