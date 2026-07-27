@@ -68,6 +68,30 @@ if(NECPP_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
+# --- Refresh the dynamic linker cache after install ------------------------
+# On Linux, a freshly installed libnecpp.so is invisible to the loader until
+# /etc/ld.so.cache is rebuilt. CMake's install step does not do this itself,
+# which is why `nec2++` fails with "cannot open shared object file" right
+# after `sudo cmake --install`. Running ldconfig here fixes that for the
+# common case (prefix under /usr/local, install run as root). It is a no-op
+# elsewhere and degrades gracefully if the caller lacks privileges.
+if(BUILD_SHARED_LIBS)
+    install(CODE "
+        if(UNIX AND NOT APPLE)
+            execute_process(
+                COMMAND \"\${CMAKE_COMMAND}\" -E echo
+                \"-- Refreshing dynamic linker cache (ldconfig)...\")
+            execute_process(
+                COMMAND ldconfig
+                RESULT_VARIABLE _necpp_ldconfig_result)
+            if(NOT _necpp_ldconfig_result EQUAL 0)
+                message(WARNING
+                    \"ldconfig exited with code \${_necpp_ldconfig_result}. \"
+                    \"Run 'sudo ldconfig' manually so libnecpp.so can be found at runtime.\")
+            endif()
+        endif()")
+endif()
+
 # --- pkg-config file -------------------------------------------------------
 # Generated alongside the build so downstream users of `pkg-config --cflags
 # --libs necpp` have a path to query. Installed by src/CMakeLists.txt.
