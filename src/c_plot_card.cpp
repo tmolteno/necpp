@@ -30,43 +30,37 @@ c_plot_card::c_plot_card()
 	p2 = 0;
 	p3 = 0;
 	p4 = 0;
-	
-	plot_fp = NULL;
 }
-	
+
 c_plot_card::c_plot_card(const c_plot_card& p)
 {
 	p1 = p.p1;
 	p2 = p.p2;
 	p3 = p.p3;
 	p4 = p.p4;
-	
+
 	plot_fp = p.plot_fp;
 }
-	
+
 c_plot_card::c_plot_card(int itmp1, int itmp2, int itmp3, int itmp4, string& filename)
 {
 	p1 = itmp1;
 	p2 = itmp2;
 	p3 = itmp3;
 	p4 = itmp4;
-	
-	plot_fp = NULL;
-	
+
 	/* Open plot file */
-	if ( (plot_fp = fopen(filename.c_str(), "w")) == NULL )
+	FILE* file = fopen(filename.c_str(), "w");
+	if (file == NULL)
 	{
 		throw 100;
 	}
+	plot_fp = std::shared_ptr<FILE>(file, fclose);
 }
 
-c_plot_card::~c_plot_card()
-{
-	if ( plot_fp != NULL )
-		fclose( plot_fp );
-}
+c_plot_card::~c_plot_card() = default;
 
-bool c_plot_card::is_valid()	const	{	return (NULL != plot_fp); 	}
+bool c_plot_card::is_valid()	const	{	return (nullptr != plot_fp); 	}
 
 bool c_plot_card::storing()	const	{	return (p1 != 0); 	}
 bool c_plot_card::currents()	const	{	return (p1 == 1); 	}
@@ -85,23 +79,23 @@ void c_plot_card::set_plot_real_imag_currents()
 
 void c_plot_card::plot_endl() const
 {
-	if (NULL == plot_fp)
+	if (nullptr == plot_fp)
 		throw 100;
 	
-	fprintf( plot_fp, "\n");
+	fprintf( plot_fp.get(), "\n");
 }
 
 void c_plot_card::plot_double(nec_float x) const
 {
-	if (NULL == plot_fp)
+	if (nullptr == plot_fp)
 		throw 100;
 	
-	fprintf( plot_fp, "%12.4E ", x );
+	fprintf( plot_fp.get(), "%12.4E ", x );
 }
 
 void c_plot_card::plot_complex(nec_complex x) const
 {
-	if (NULL == plot_fp)
+	if (nullptr == plot_fp)
 		throw 100;
 	
 	switch( p2 )
@@ -156,7 +150,7 @@ void c_plot_card::plot_segments(int i,
 	if (false == near_field())
 		return;
 		
-	fprintf( plot_fp, "%12.4E %12.4E %12.4E "
+	fprintf( plot_fp.get(), "%12.4E %12.4E %12.4E "
 		"%12.4E %12.4E %12.4E %12.4E %5d %5d %5d\n",
 		x[i],y[i],z[i],si[i],xw2,yw2,bi[i],icon1[i],i+1,icon2[i] );
 }
