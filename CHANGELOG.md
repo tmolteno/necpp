@@ -1,10 +1,18 @@
+## Version 2.3.2
+
+### Bug Fixes
+* **NE/NH cards: blank count parameters now default to 1 (NEC-2 Part 3).** The ANTLR grammar's `INT?` fields for NRX/NRY/NRZ produced 0 when left blank, causing `nfpat()` to be silently skipped (zero near-field output). The fix in `ne_nh_card()` bumps zero counts to 1 for both the ANTLR and legacy parse paths. A user supplying blank counts in a `.nec` file (e.g. `NE 0  100 100 0` with missing I2/I3/I4) will now correctly get a 1×1×1 grid instead of no output. PyNEC callers were unaffected because its Python bindings require explicit values for all 10 parameters.
+* **c_plot_card double-close:** Raw `FILE*` shared across copied plot cards caused duplicate `fclose()` on teardown. Replaced with `std::shared_ptr<FILE>` using `fclose` as the custom deleter (#123, @KJ7LNW).
+* **Average-only radiation pattern uninitialized read:** When `RP A=2` (average only), per-angle arrays are intentionally unpopulated, but the report loop read an uninitialized polarization index. Guarded with a named constant (#123, @KJ7LNW).
+
+### Tests
+* NE/NH near-field unit tests: explicit counts, multiple-point grid, blank-counts default-to-1, electric and magnetic field retrieval
+* Regression inputs: `near_field_electric.nec`, `near_field_magnetic.nec`
+
 ## Version 2.3.1
 
 ### Bug Fixes
 * **Shared library not found after install:** On Linux, `cmake --install` now runs `ldconfig` to refresh the dynamic linker cache.
-* **NE/NH cards: blank count parameters now default to 1 (NEC-2 Part 3).** The ANTLR grammar's `INT?` fields for NRX/NRY/NRZ produced 0 when left blank, causing `nfpat()` to be silently skipped (zero near-field output). The fix in `ne_nh_card()` bumps zero counts to 1 for both the ANTLR and legacy parse paths. A user supplying blank counts in a `.nec` file (e.g. `NE 0  100 100 0` with missing I2/I3/I4) will now correctly get a 1×1×1 grid instead of no output. PyNEC callers were unaffected because its Python bindings require explicit values for all 10 parameters.
-
-## Version 2.3.0
 
 ### Features
 * **int64_t segment/patch counts:** Upgraded `n_segments`, `np`, `m`, `mp`, and related loop counters and buffer sizes from `int` to `int64_t` throughout `c_geometry.hpp`, `c_geometry.cpp`, and `nec_context`.

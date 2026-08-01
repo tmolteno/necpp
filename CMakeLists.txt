@@ -14,7 +14,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(necpp
-    VERSION 2.3.1
+    VERSION 2.3.2
     DESCRIPTION "NEC2++ antenna modelling library and tools"
     HOMEPAGE_URL "https://github.com/tmolteno/necpp"
     LANGUAGES CXX)
