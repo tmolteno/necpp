@@ -1,7 +1,8 @@
 ## Version 2.3.1
 
 ### Bug Fixes
-* **Shared library not found after install:** On Linux, `cmake --install` now runs `ldconfig` to refresh the dynamic linker cache, fixing `nec2++: error while loading shared libraries: libnecpp.so.2: cannot open shared object file` right after a fresh `sudo cmake --install`. The step is a no-op on macOS/Windows and degrades gracefully when the install isn't privileged.
+* **Shared library not found after install:** On Linux, `cmake --install` now runs `ldconfig` to refresh the dynamic linker cache.
+* **NE/NH cards: blank count parameters now default to 1 (NEC-2 Part 3).** The ANTLR grammar's `INT?` fields for NRX/NRY/NRZ produced 0 when left blank, causing `nfpat()` to be silently skipped (zero near-field output). The fix in `ne_nh_card()` bumps zero counts to 1 for both the ANTLR and legacy parse paths. A user supplying blank counts in a `.nec` file (e.g. `NE 0  100 100 0` with missing I2/I3/I4) will now correctly get a 1×1×1 grid instead of no output. PyNEC callers were unaffected because its Python bindings require explicit values for all 10 parameters.
 
 ## Version 2.3.0
 

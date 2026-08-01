@@ -172,11 +172,11 @@ TEST_CASE( "NH card produces near-field results with explicit counts", "[near_fi
     nec_delete(nec);
 }
 
-TEST_CASE( "NE card with zero NRX/NRY/NRZ silently produces no results", "[near_field][bug]") {
-    // Bug: when I2/I3/I4 are zero (blank in grammar -> zero),
-    // ne_nh_card sets nrx=nry=nrz=0 and excitation_compute_near_field
-    // skips nfpat() because the product is 0.  The NEC-2 manual says
-    // blank counts default to 1, not 0.
+TEST_CASE( "NE card with zero NRX/NRY/NRZ defaults counts to 1", "[near_field]") {
+    // Per NEC-2 Part 3, blank count parameters default to 1.
+    // Zero values (from blank INT? fields in the ANTLR grammar,
+    // or from explicit zeros) are bumped to 1 in ne_nh_card(),
+    // so a near-field pattern is always produced.
     nec_context* nec = nec_create();
 
     HANDLE_NEC(nec_wire(nec, 0, 7, 0.0, 0.0, -0.25, 0.0, 0.0, 0.25, 0.001, 1.0, 1.0));
@@ -184,14 +184,12 @@ TEST_CASE( "NE card with zero NRX/NRY/NRZ silently produces no results", "[near_
     HANDLE_NEC(nec_fr_card(nec, 0, 1, 300.0, 0.0));
     HANDLE_NEC(nec_ex_card(nec, 0, 0, 4, 0, 1.0, 0.0, 0, 0, 0, 0));
 
-    // Zero counts -> product = 0 -> nfpat() skipped
+    // Zero counts -> bumped to 1 by ne_nh_card() default
     HANDLE_NEC(nec_ne_card(nec, 0, 0, 0, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
-    // When the bug is fixed, this should return a valid pattern.
-    // Until then, the result is nullptr.
     nec_near_field_pattern* nfp = nec->get_near_field_pattern(0);
-    WARN( "BUG: zero NRX/NRY/NRZ (blank defaults) should produce near-field results" );
-    CHECK( nfp != nullptr );
+    REQUIRE( nfp != nullptr );
+    REQUIRE( nfp->get_x().size() == 1 );
 
     nec_delete(nec);
 }

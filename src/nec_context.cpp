@@ -937,9 +937,15 @@ void nec_context::ne_nh_card(int in_nfeh, int itmp1, int itmp2, int itmp3, int i
   }
 
   m_near= itmp1;
-  nrx= itmp2;
-  nry= itmp3;
-  nrz= itmp4;
+
+  // NEC-2 Part 3: blank NRX/NRY/NRZ default to 1.  Zero points
+  // along any axis makes the product zero, which silently skips
+  // nfpat() in excitation_compute_near_field().  This caused a
+  // silent failure when the ANTLR grammar's optional INT? fields
+  // produced 0 for missing (blank) count parameters.
+  nrx= (itmp2 == 0) ? 1 : itmp2;
+  nry= (itmp3 == 0) ? 1 : itmp3;
+  nrz= (itmp4 == 0) ? 1 : itmp4;
   xnr= tmp1;
   ynr= tmp2;
   znr= tmp3;
