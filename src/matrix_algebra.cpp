@@ -398,7 +398,11 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
 
             /* transform matrix eq. rhs vector according to symmetry modes */
             for (int64_t i = 0; i < npeq; i++ ) {
-                nec_complex sum_normal(b[i+column_offset]);
+                /* Each image row below is seeded from this row's untransformed
+                   value, so hold it in scm[0] before the normalized sum
+                   overwrites b[i]. */
+                scm[0] = b[i+column_offset];
+                nec_complex sum_normal(scm[0]);
                 for (int64_t k = 1; k < nop; k++ ) {
                     int64_t ia= i+ k* npeq;
                     scm[k]= b[ia+column_offset];
@@ -441,7 +445,11 @@ void solves(complex_array& a, int_array& ip, complex_array& b, int64_t neq,
     for (int64_t ic = 0; ic < nrh; ic++ ) {
         int64_t column_offset = ic*neq;
         for (int64_t i = 0; i < npeq; i++ ) {
-            nec_complex sum_normal(b[i+column_offset]);
+            /* Each image row below is seeded from this row's untransformed
+               value, so hold it in scm[0] before the summed value overwrites
+               b[i]. */
+            scm[0] = b[i+column_offset];
+            nec_complex sum_normal(scm[0]);
             for (int64_t k = 1; k < nop; k++ ) {
                 int64_t ia= i+ k* npeq;
                 scm[k]= b[ia+column_offset];
