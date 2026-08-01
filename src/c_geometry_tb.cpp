@@ -2,6 +2,7 @@
 #include <catch2/catch_approx.hpp>
 
 #include "c_geometry.h"
+#include "nec_context.h"
 #include "libnecpp.h"
 #include <cmath>
 #include <iostream>
@@ -125,4 +126,91 @@ TEST_CASE( "Flat-spiral helix (GH HL=0)", "[helix]") {
     nec_float r_last = std::sqrt(geo.x[segment_count-1]*geo.x[segment_count-1]
                                + geo.y[segment_count-1]*geo.y[segment_count-1]);
     REQUIRE( r_last == Catch::Approx(0.15).margin(0.01) );
+}
+
+TEST_CASE( "NE card produces near-field results with explicit counts", "[near_field]") {
+    // Regression: NE with explicit NRX/NRY/NRZ = 1 must compute near fields.
+    nec_context* nec = nec_create();
+
+    // Simple dipole at 300 MHz
+    HANDLE_NEC(nec_wire(nec, 0, 7, 0.0, 0.0, -0.25, 0.0, 0.0, 0.25, 0.001, 1.0, 1.0));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
+    HANDLE_NEC(nec_fr_card(nec, 0, 1, 300.0, 0.0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 0, 4, 0, 1.0, 0.0, 0, 0, 0, 0));
+
+    // NE: rectangular, NRX=NRY=NRZ=1, single point at (1,0,0)
+    HANDLE_NEC(nec_ne_card(nec, 0, 1, 1, 1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+    nec_near_field_pattern* nfp = nec->get_near_field_pattern(0);
+    REQUIRE( nfp != nullptr );
+    REQUIRE( nfp->get_nfeh() == 0 );
+    REQUIRE( nfp->get_x().size() == 1 );
+    REQUIRE( nfp->get_y().size() == 1 );
+    REQUIRE( nfp->get_z().size() == 1 );
+
+    nec_delete(nec);
+}
+
+TEST_CASE( "NH card produces near-field results with explicit counts", "[near_field]") {
+    nec_context* nec = nec_create();
+
+    HANDLE_NEC(nec_wire(nec, 0, 7, 0.0, 0.0, -0.25, 0.0, 0.0, 0.25, 0.001, 1.0, 1.0));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
+    HANDLE_NEC(nec_fr_card(nec, 0, 1, 300.0, 0.0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 0, 4, 0, 1.0, 0.0, 0, 0, 0, 0));
+
+    // NH: rectangular, NRX=NRY=NRZ=1, single point at (1,0,0)
+    HANDLE_NEC(nec_nh_card(nec, 0, 1, 1, 1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+    nec_near_field_pattern* nfp = nec->get_near_field_pattern(0);
+    REQUIRE( nfp != nullptr );
+    REQUIRE( nfp->get_nfeh() == 1 );
+    REQUIRE( nfp->get_x().size() == 1 );
+    REQUIRE( nfp->get_y().size() == 1 );
+    REQUIRE( nfp->get_z().size() == 1 );
+
+    nec_delete(nec);
+}
+
+TEST_CASE( "NE card with zero NRX/NRY/NRZ silently produces no results", "[near_field][bug]") {
+    // Bug: when I2/I3/I4 are zero (blank in grammar -> zero),
+    // ne_nh_card sets nrx=nry=nrz=0 and excitation_compute_near_field
+    // skips nfpat() because the product is 0.  The NEC-2 manual says
+    // blank counts default to 1, not 0.
+    nec_context* nec = nec_create();
+
+    HANDLE_NEC(nec_wire(nec, 0, 7, 0.0, 0.0, -0.25, 0.0, 0.0, 0.25, 0.001, 1.0, 1.0));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
+    HANDLE_NEC(nec_fr_card(nec, 0, 1, 300.0, 0.0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 0, 4, 0, 1.0, 0.0, 0, 0, 0, 0));
+
+    // Zero counts -> product = 0 -> nfpat() skipped
+    HANDLE_NEC(nec_ne_card(nec, 0, 0, 0, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+    // When the bug is fixed, this should return a valid pattern.
+    // Until then, the result is nullptr.
+    nec_near_field_pattern* nfp = nec->get_near_field_pattern(0);
+    WARN( "BUG: zero NRX/NRY/NRZ (blank defaults) should produce near-field results" );
+    CHECK( nfp != nullptr );
+
+    nec_delete(nec);
+}
+
+TEST_CASE( "NE card with multiple near-field points", "[near_field]") {
+    // Verify a 2x3x1 grid (6 points) produces the correct number of results.
+    nec_context* nec = nec_create();
+
+    HANDLE_NEC(nec_wire(nec, 0, 7, 0.0, 0.0, -0.25, 0.0, 0.0, 0.25, 0.001, 1.0, 1.0));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
+    HANDLE_NEC(nec_fr_card(nec, 0, 1, 300.0, 0.0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 0, 4, 0, 1.0, 0.0, 0, 0, 0, 0));
+
+    // 2 points along X spaced 0.5m, 3 along Y spaced 0.1m, 1 along Z
+    HANDLE_NEC(nec_ne_card(nec, 0, 2, 3, 1, 0.0, -0.1, 1.0, 0.5, 0.1, 0.0));
+
+    nec_near_field_pattern* nfp = nec->get_near_field_pattern(0);
+    REQUIRE( nfp != nullptr );
+    REQUIRE( nfp->get_x().size() == 6 );
+
+    nec_delete(nec);
 }
