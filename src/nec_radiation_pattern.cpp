@@ -21,6 +21,10 @@
 #include "c_geometry.h"
 #include "nec_exception.h"
 
+namespace {
+constexpr int RP_POWER_AVERAGE_ONLY = 2;
+}
+
 int nec_radiation_pattern::get_index(int theta_index, int phi_index) const  {
   if (theta_index >= n_theta) 
     throw nec_exception("nec_radiation_pattern: Theta index too large");
@@ -131,7 +135,7 @@ void nec_radiation_pattern::write_to_file_aux(ostream& os)
 
   nec_float phi = m_phi_start- delta_phi;
 
-  for (int kph = 0; kph < n_phi; kph++ )  {
+  for (int kph = 0; (kph < n_phi) && (m_rp_power_average != RP_POWER_AVERAGE_ONLY); kph++ )  {
     phi += delta_phi;
     nec_float thet= m_theta_start- delta_theta;
     
@@ -383,7 +387,7 @@ void nec_radiation_pattern::analyze(nec_context* m_context)
             da *=.5;
           pint += tstor1 * da;
         
-          if ( m_rp_power_average == 2) // do not print the power gain values (just compute the average)
+          if ( m_rp_power_average == RP_POWER_AVERAGE_ONLY) // do not print the power gain values (just compute the average)
             continue;
         }
       

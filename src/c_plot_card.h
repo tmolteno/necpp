@@ -19,6 +19,7 @@
 
 
 #include "math_util.h"
+#include <memory>
 #include <string>
 #include <stdio.h>
 
@@ -87,5 +88,5 @@ public:
 		nec_float g_vert, nec_float g_horiz, nec_float g_tot);
 private:
 	int p1, p2, p3, p4;
-	FILE* plot_fp;
+	std::shared_ptr<FILE> plot_fp;
 };
