@@ -6439,14 +6439,17 @@ void nec_context::fblock( int nrow, int ncol, int64_t imax, int ipsym ) {
   int kk=1;
   symmetry_array[0]=cplx_10();
   
-  if ((2 == nop) || (4 == nop) || (8 == nop))
-      return;
-  int ka = nop / 2;
-  
-//   int k_power = 2;
-//   for( ka = 1; k_power != nop; ka++ )
-//     k_power *= 2;
-  
+  /* Plane symmetry admits two, four, or eight sections; the doubling below
+     cannot span the matrix for any other count. */
+  if ((2 != nop) && (4 != nop) && (8 != nop))
+      nec_stop("SYMMETRY ERROR - NOP: %d", nop );
+
+  /* Each pass doubles the width of the filled block, so the pass count is
+     log2(nop). */
+  int ka = 1;
+  for (int k_power = 2; k_power != nop; k_power *= 2)
+    ka++;
+
   for(int k = 0; k < ka; k++ )  {
     for(int i = 0; i < kk; i++ )  {
       for(int j = 0; j < kk; j++ )  {
