@@ -209,19 +209,27 @@ public:
   
   /****************** IMPEDANCE CHARACTERISTICS *********************/
   
-  /*! \brief Impedance: Real Part */
-  double get_impedance_real(int freq_index = 0)  {
+  /*! \brief Impedance: Real Part.
+      \param freq_index Frequency index (0 = first simulation).
+      \param feed_index  Feed index within that frequency (0 = first feed).
+      \return Real impedance in ohms, or -999.0 if no result exists. */
+  double get_impedance_real(int freq_index = 0, int feed_index = 0)  {
           nec_antenna_input* ipt = get_input_parameters(freq_index);
           if (NULL == ipt) return -999.0;
           vector<nec_complex>& imp(ipt->get_impedance());
-          return imp.back().real();
+          if (feed_index < 0 || (size_t)feed_index >= imp.size()) return -999.0;
+          return imp[feed_index].real();
   }
-  /*! \brief Impedance: Imaginary Part */
-  double get_impedance_imag(int freq_index = 0)  {
+  /*! \brief Impedance: Imaginary Part.
+      \param freq_index Frequency index (0 = first simulation).
+      \param feed_index  Feed index within that frequency (0 = first feed).
+      \return Imaginary impedance in ohms, or -999.0 if no result exists. */
+  double get_impedance_imag(int freq_index = 0, int feed_index = 0)  {
           nec_antenna_input* ipt = get_input_parameters(freq_index);
           if (NULL == ipt) return -999.0;  
           vector<nec_complex>& imp(ipt->get_impedance());
-          return imp.back().imag();
+          if (feed_index < 0 || (size_t)feed_index >= imp.size()) return -999.0;
+          return imp[feed_index].imag();
   }
           
   /*! \brief Get Antenna Input Parameter Results

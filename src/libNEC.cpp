@@ -151,6 +151,13 @@ double nec_impedance_imag(nec_context* in_context, int freq_index) {
   return in_context->get_impedance_imag(freq_index);
 }
 
+double nec_impedance_real_indexed(nec_context* in_context, int freq_index, int feed_index) {
+  return in_context->get_impedance_real(freq_index, feed_index);
+}
+double nec_impedance_imag_indexed(nec_context* in_context, int freq_index, int feed_index) {
+  return in_context->get_impedance_imag(freq_index, feed_index);
+}
+
 long nec_medium_parameters(nec_context* in_context, double permittivity, double permeability) {
   NEC_ERROR_HANDLE(in_context->medium_parameters(permittivity, permeability));
 }

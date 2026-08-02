@@ -596,6 +596,15 @@ double nec_impedance_real(nec_context* in_context, int freq_index);
  */
 double nec_impedance_imag(nec_context* in_context, int freq_index);
 
+/*! \brief Impedance: Real Part for a specific feed.
+    \param feed_index  Zero-based feed index within the frequency.
+    \return Real impedance in ohms, or -999.0 if no result exists. */
+double nec_impedance_real_indexed(nec_context* in_context, int freq_index, int feed_index);
+
+/*! \brief Impedance: Imaginary Part for a specific feed.
+    \param feed_index  Zero-based feed index within the frequency. */
+double nec_impedance_imag_indexed(nec_context* in_context, int freq_index, int feed_index);
+
 ///@}
 
 #ifdef __cplusplus

@@ -225,20 +225,28 @@ TEST_CASE( "GX one-plane symmetry produces finite impedance", "[symmetry]") {
     HANDLE_NEC(nec_gx_card(nec, 2, 100));
     HANDLE_NEC(nec_geometry_complete(nec, 0));
     HANDLE_NEC(nec_fr_card(nec, 0, 1, 299.7925, 0.0));
-    // Feed tags 2,3,4 first so tag 1 is last -> imp.back() returns tag 1's 65.7 Ω
+    // Feed all 4 tags (original + GX reflections) in natural order
+    HANDLE_NEC(nec_ex_card(nec, 0, 1, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_ex_card(nec, 0, 2, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_ex_card(nec, 0, 3, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_ex_card(nec, 0, 4, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
-    HANDLE_NEC(nec_ex_card(nec, 0, 1, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_rp_card(nec, 0, 1, 361, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
-    double zr = nec_impedance_real(nec, 0);
-    double zi = nec_impedance_imag(nec, 0);
-
-    // Tag 1 (last EX card -> imp.back()): 65.7 - j0.75 ohms
-    // Matches nec2c, nec2dx, nec2dxs, and xnec2c reference engines.
+    // Feed 0 (tag 1): 65.7 - j0.75 ohms
+    double zr = nec->get_impedance_real(0, 0);
+    double zi = nec->get_impedance_imag(0, 0);
     REQUIRE( zr == Catch::Approx(65.7).margin(0.5) );
     REQUIRE( zi == Catch::Approx(-0.75).margin(1.0) );
+
+    // Feed 1 (tag 2): 52.8 - j9.7 ohms
+    double zr1 = nec->get_impedance_real(0, 1);
+    double zi1 = nec->get_impedance_imag(0, 1);
+    REQUIRE( zr1 == Catch::Approx(52.8).margin(0.5) );
+    REQUIRE( zi1 == Catch::Approx(-9.7).margin(1.0) );
+
+    // Out-of-range feed index returns sentinel
+    double zr_bad = nec->get_impedance_real(0, 99);
+    REQUIRE( zr_bad == -999.0 );
 
     nec_delete(nec);
 }
