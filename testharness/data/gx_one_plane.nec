@@ -1,0 +1,15 @@
+CM 4 Vertical Dipoles, spaced 1/2 wl, fed in phase
+CM GX card: one symmetry plane (NOP=2). Tests solves() scratch-slot fix.
+CM Before: all feeds INF. After: matches all 4 reference engines.
+CE
+GW 1 11 -.75 0 -.245 -.75 0 .245 .001   
+GW 2 11 -.25 0 -.245 -.25 0 .245 .001   
+GX 2 100          
+GE 0           
+EX 0 1 6 00 1 0     
+EX 0 2 6 00 1 0     
+EX 0 4 6 00 1 0     
+EX 0 3 6 00 1 0    
+FR 0 1 0 0 299.7925 1     
+RP 0 1 361 1000 90 0 1.00000 1.00000   
+EN

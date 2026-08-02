@@ -212,3 +212,55 @@ TEST_CASE( "NE card with multiple near-field points", "[near_field]") {
 
     nec_delete(nec);
 }
+
+TEST_CASE( "GX one-plane symmetry produces finite impedance", "[symmetry]") {
+    // PR #124: GX cards produced INF impedance due to uninitialized scratch
+    // slot in solves(), inverted fblock() guard, and incomplete reflection.
+    // One wire, GX 2 100 -> reflect in X, tag increment 2, NOP=2.
+    nec_context* nec = nec_create();
+
+    HANDLE_NEC(nec_wire(nec, 1, 11, -0.75, 0.0, -0.245, -0.75, 0.0, 0.245, 0.001, 1.0, 1.0));
+    HANDLE_NEC(nec_wire(nec, 2, 11, -0.25, 0.0, -0.245, -0.25, 0.0, 0.245, 0.001, 1.0, 1.0));
+    // GX: tag_inc=2, planes=100 -> X only (ix=1, iy=0, iz=0 -> nop=2)
+    HANDLE_NEC(nec_gx_card(nec, 2, 100));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
+    HANDLE_NEC(nec_fr_card(nec, 0, 1, 299.7925, 0.0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 1, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
+    HANDLE_NEC(nec_rp_card(nec, 0, 1, 361, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+    double zr = nec_impedance_real(nec, 0);
+    double zi = nec_impedance_imag(nec, 0);
+
+    // Must be finite (not INF). Before the fix this returned INF.
+    REQUIRE( std::isfinite(zr) );
+    REQUIRE( std::isfinite(zi) );
+    // Expected: ~65-81 ohms finite (not INF). Before fix: INF.
+    REQUIRE( zr > 0.0 );
+    REQUIRE( zr < 1000.0 );
+
+    nec_delete(nec);
+}
+
+TEST_CASE( "GX three-plane symmetry produces correct impedance", "[symmetry]") {
+    // PR #124: three-plane symmetry (nop=8) was broken — fblock() had wrong
+    // pass count, reflect_plane() missed copies 4-7. GX 1 111 -> all planes.
+    nec_context* nec = nec_create();
+
+    HANDLE_NEC(nec_wire(nec, 1, 9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.35, 0.001, 1.0, 1.0));
+    // GX: tag_inc=1, planes=111 -> X,Y,Z (nop=8)
+    HANDLE_NEC(nec_gx_card(nec, 1, 111));
+    HANDLE_NEC(nec_geometry_complete(nec, 0));
+    HANDLE_NEC(nec_fr_card(nec, 0, 1, 299.8, 0.0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 1, 5, 0, 1.0, 0.0, 0, 0, 0, 0));
+    HANDLE_NEC(nec_rp_card(nec, 0, 1, 361, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
+
+    double zr = nec_impedance_real(nec, 0);
+    double zi = nec_impedance_imag(nec, 0);
+
+    REQUIRE( std::isfinite(zr) );
+    REQUIRE( std::isfinite(zi) );
+    // Expected: ~13.7 - j470 ohms (matches control deck and all ref engines)
+    REQUIRE( zr == Catch::Approx(13.7).margin(1.0) );
+
+    nec_delete(nec);
+}

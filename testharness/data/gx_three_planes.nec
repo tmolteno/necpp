@@ -1,0 +1,10 @@
+CM 3 symmetry planes, NOP=8. Tests fblock() pass-count + reflect_plane() copy fix.
+CM One wire under GX 111. Before: wrong impedance. After: matches control deck.
+CE
+GW 1 9 0.1 0.1 0.1 0.1 0.1 0.35 0.001
+GX 1 111
+GE 0
+EX 0 1 5 0 1 0
+FR 0 1 0 0 299.8 0
+RP 0 19 37 1000 0 0 10 10
+EN

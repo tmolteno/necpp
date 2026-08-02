@@ -1,3 +1,17 @@
+## Version 2.3.3
+
+### Bug Fixes
+* **GX plane symmetry (three defects fixed):** Structures using the `GX` card produced `INF` impedance, wrong currents, or unstable results due to three independent bugs (#124, @KJ7LNW):
+  - **`solves()` scratch slot:** The forward/backward mode transform read `scm[0]` before anything wrote it, hitting garbage on wire-only decks (masked on wire+patch by a bulk fill).
+  - **`fblock()` guard inverted:** Legal section counts (2, 4, 8) returned early leaving the coefficient table unpopulated; pass count was `nop/2` instead of `log2(nop)`, diverging at 8 sections.
+  - **Three-plane reflection missing copies:** Copy loop handled only 3 of 8 copies; copies 4-7 were written unreflected and the X plane was left out of the tag increment.
+  Cross-validated against `nec2c`, `nec2dx`, `nec2dxs`, and `xnec2c` over 1219 decks (46M points).
+
+### Tests
+* GX one-plane symmetry: finite impedance verification
+* GX three-plane symmetry: impedance matches control deck (13.7 Ω)
+* Regression inputs: `gx_one_plane.nec`, `gx_three_planes.nec`, `gx_three_planes_control.nec`
+
 ## Version 2.3.2
 
 ### Bug Fixes

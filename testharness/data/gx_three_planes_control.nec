@@ -1,0 +1,17 @@
+CM Control for gx_three_planes.nec — same 8 wires as GX 111 generates,
+CM written explicitly. NOP=1, symmetry path not entered.
+CM Must match gx_three_planes.nec impedance.
+CE
+GW 1 9 0.1 0.1 0.1 0.1 0.1 0.35 0.001
+GW 2 9 -0.1 0.1 0.1 -0.1 0.1 0.35 0.001
+GW 3 9 0.1 -0.1 0.1 0.1 -0.1 0.35 0.001
+GW 4 9 -0.1 -0.1 0.1 -0.1 -0.1 0.35 0.001
+GW 5 9 0.1 0.1 -0.1 0.1 0.1 -0.35 0.001
+GW 6 9 -0.1 0.1 -0.1 -0.1 0.1 -0.35 0.001
+GW 7 9 0.1 -0.1 -0.1 0.1 -0.1 -0.35 0.001
+GW 8 9 -0.1 -0.1 -0.1 -0.1 -0.1 -0.35 0.001
+GE 0
+EX 0 1 5 0 1 0
+FR 0 1 0 0 299.8 0
+RP 0 19 37 1000 0 0 10 10
+EN
