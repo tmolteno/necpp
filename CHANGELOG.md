@@ -1,5 +1,8 @@
 ## Version 2.3.3
 
+### Breaking Changes
+* **`get_impedance_real/imag` now accept `feed_index`:** Previously returned `imp.back()` (the *last* feed's impedance), which depended on EX card ordering and was unpredictable for multi-feed setups. Now returns `imp[feed_index]` with `feed_index` defaulting to 0 (first feed). Single-feed simulations are unaffected (`imp[0] == imp.back()`). Out-of-range indices return the sentinel value `-999.0`. New C API functions `nec_impedance_real_indexed()` and `nec_impedance_imag_indexed()` provide explicit indexed access. Doxygen documentation added to `nec_context.h` and the main page.
+
 ### Bug Fixes
 * **GX plane symmetry (three defects fixed):** Structures using the `GX` card produced `INF` impedance, wrong currents, or unstable results due to three independent bugs (#124, @KJ7LNW):
   - **`solves()` scratch slot:** The forward/backward mode transform read `scm[0]` before anything wrote it, hitting garbage on wire-only decks (masked on wire+patch by a bulk fill).

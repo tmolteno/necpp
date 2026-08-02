@@ -208,11 +208,37 @@ public:
   }
   
   /****************** IMPEDANCE CHARACTERISTICS *********************/
-  
-  /*! \brief Impedance: Real Part.
-      \param freq_index Frequency index (0 = first simulation).
-      \param feed_index  Feed index within that frequency (0 = first feed).
-      \return Real impedance in ohms, or -999.0 if no result exists. */
+
+  /*! \name Antenna Input Impedance
+   *
+   * Each call to nec_ex_card() or nec_fr_card() with a new frequency
+   * creates a feed.  Multiple feeds at the same frequency (e.g. phased
+   * arrays) are stored as separate entries within a single
+   * nec_antenna_input result; the \p feed_index selects among them.
+   *
+   * | Scenario                    | freq_index | feed_index |
+   * |-----------------------------|-----------|------------|
+   * | Single dipole               | 0         | 0          |
+   * | Two feeds, same frequency   | 0         | 0 or 1     |
+   * | Swept frequency, single feed| 0, 1, …   | 0          |
+   *
+   * If no result exists (no simulation run, missing feed, or
+   * out-of-range index) the sentinel value \c -999.0 is returned.
+   *
+   * Prior to v2.3.4 these methods returned imp.back() — the *last*
+   * feed's impedance — which depended on EX card ordering and was
+   * incorrect for multi-feed setups.  They now return imp[feed_index]
+   * with \p feed_index defaulting to 0 (the first feed).
+   *
+   * @{
+   */
+
+  /*! \brief Real part of the feed-point impedance.
+      \param freq_index Zero-based simulation index (0 = first frequency).
+      \param feed_index Zero-based feed index within that frequency
+                        (0 = first EX card at that frequency).
+      \return Resistance in ohms, or \c -999.0 if no result exists.
+      \see get_impedance_imag() */
   double get_impedance_real(int freq_index = 0, int feed_index = 0)  {
           nec_antenna_input* ipt = get_input_parameters(freq_index);
           if (NULL == ipt) return -999.0;
@@ -220,10 +246,11 @@ public:
           if (feed_index < 0 || (size_t)feed_index >= imp.size()) return -999.0;
           return imp[feed_index].real();
   }
-  /*! \brief Impedance: Imaginary Part.
-      \param freq_index Frequency index (0 = first simulation).
-      \param feed_index  Feed index within that frequency (0 = first feed).
-      \return Imaginary impedance in ohms, or -999.0 if no result exists. */
+  /*! \brief Imaginary part of the feed-point impedance.
+      \param freq_index Zero-based simulation index (0 = first frequency).
+      \param feed_index Zero-based feed index within that frequency.
+      \return Reactance in ohms, or \c -999.0 if no result exists.
+      \see get_impedance_real() */
   double get_impedance_imag(int freq_index = 0, int feed_index = 0)  {
           nec_antenna_input* ipt = get_input_parameters(freq_index);
           if (NULL == ipt) return -999.0;  
@@ -231,6 +258,8 @@ public:
           if (feed_index < 0 || (size_t)feed_index >= imp.size()) return -999.0;
           return imp[feed_index].imag();
   }
+
+  /*! @} */
           
   /*! \brief Get Antenna Input Parameter Results
   \param index The zero-based index for the result (simulations can return more than one set of results).

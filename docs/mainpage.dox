@@ -52,6 +52,25 @@ This interface is described in the \ref libnecpp.h header file.
 \subsection intro_cpp C++ API
 
 The C++ API for using NEC2++ is described in \ref nec_context.h
+
+\subsubsection intro_multi_feed Multi-Feed Impedance Access
+
+Simulations with multiple excitations at the same frequency (e.g. phased
+arrays, multiple voltage sources) produce one impedance entry per feed.
+\ref nec_context::get_impedance_real() and \ref nec_context::get_impedance_imag()
+accept an optional \c feed_index parameter to select among them:
+
+\code
+// Single feed — default feed_index=0 works
+nec_context nec;
+// ... set up geometry, excitation ...\nnec.simulate();\ndouble zr = nec.get_impedance_real();      // feed 0\n
+// Multiple feeds — request specific feeds
+nec.ex_card(EXCITATION_VOLTAGE, tag1, seg, 0, 1.0, 0.0, ...);\nnec.ex_card(EXCITATION_VOLTAGE, tag2, seg, 0, 1.0, 0.0, ...);\nnec.ex_card(EXCITATION_VOLTAGE, tag3, seg, 0, 1.0, 0.0, ...);\n// ... simulate ...\ndouble z0r = nec.get_impedance_real(0, 0);  // first feed\ndouble z1r = nec.get_impedance_real(0, 1);  // second feed\ndouble z2i = nec.get_impedance_imag(0, 2);  // third feed, imag\n\endcode
+
+Out-of-range indices return the sentinel value \c -999.0.
+
+The C API equivalents are \ref nec_impedance_real_indexed() and
+\ref nec_impedance_imag_indexed().
  
 \subsection intro_py Python Module
 
