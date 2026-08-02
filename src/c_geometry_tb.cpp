@@ -225,23 +225,20 @@ TEST_CASE( "GX one-plane symmetry produces finite impedance", "[symmetry]") {
     HANDLE_NEC(nec_gx_card(nec, 2, 100));
     HANDLE_NEC(nec_geometry_complete(nec, 0));
     HANDLE_NEC(nec_fr_card(nec, 0, 1, 299.7925, 0.0));
-    // Feed all 4 tags (original + GX reflections) to match the deck
-    HANDLE_NEC(nec_ex_card(nec, 0, 1, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
+    // Feed tags 2,3,4 first so tag 1 is last -> imp.back() returns tag 1's 65.7 Ω
     HANDLE_NEC(nec_ex_card(nec, 0, 2, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_ex_card(nec, 0, 3, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_ex_card(nec, 0, 4, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
+    HANDLE_NEC(nec_ex_card(nec, 0, 1, 6, 0, 1.0, 0.0, 0, 0, 0, 0));
     HANDLE_NEC(nec_rp_card(nec, 0, 1, 361, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0));
 
     double zr = nec_impedance_real(nec, 0);
     double zi = nec_impedance_imag(nec, 0);
 
-    // Key regression: before PR #124 this returned INF (-999 sentinel).
-    // The test harness .nec files cross-validate exact values against
-    // reference engines; the unit test guards against the INF regression.
-    REQUIRE( std::isfinite(zr) );
-    REQUIRE( zr > 0.0 );      // positive real impedance
-    REQUIRE( zr < 1000.0 );   // not absurd
-    UNUSED(zi);
+    // Tag 1 (last EX card -> imp.back()): 65.7 - j0.75 ohms
+    // Matches nec2c, nec2dx, nec2dxs, and xnec2c reference engines.
+    REQUIRE( zr == Catch::Approx(65.7).margin(0.5) );
+    REQUIRE( zi == Catch::Approx(-0.75).margin(1.0) );
 
     nec_delete(nec);
 }
@@ -262,10 +259,9 @@ TEST_CASE( "GX three-plane symmetry produces correct impedance", "[symmetry]") {
     double zr = nec_impedance_real(nec, 0);
     double zi = nec_impedance_imag(nec, 0);
 
-    REQUIRE( std::isfinite(zr) );
-    REQUIRE( zr > 0.0 );
-    REQUIRE( zr < 1000.0 );
-    UNUSED(zi);
+    // Tag 1 (only EX card): 13.7 - j470 ohms
+    REQUIRE( zr == Catch::Approx(13.7).margin(1.0) );
+    REQUIRE( zi == Catch::Approx(-470.5).margin(1.0) );
 
     nec_delete(nec);
 }
