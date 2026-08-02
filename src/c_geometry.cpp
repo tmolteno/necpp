@@ -1152,29 +1152,28 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 
   /* --- planar symmetry --- */
   /* sym_plane bits: 0 = negate X, 1 = negate Y, 2 = negate Z */
-  int mask = sym_plane;
-  bool neg_x = mask & 1;
-  bool neg_y = mask & 2;
-  bool neg_z = mask & 4;
-  int num_axes = (neg_x?1:0) + (neg_y?1:0) + (neg_z?1:0);
-  int num_copies = 1 << num_axes;   /* 2 for single axis, 4 for two axes */
-
   int64_t orig_n = n_segments;
   int64_t orig_m = m;
   int itx = tag_increment;
 
-  /* Axis priority: Z (bit 2) > Y (bit 1) > X (bit 0).
-     For two-axis combos, copy order is: original, axis1-neg, axis2-neg, both-neg.
-     Tag increments: +0, +itx, +2*itx, +3*itx. */
-  int axis1_mask = 0, axis2_mask = 0;
-  if ( neg_z ) { axis1_mask = 4; axis2_mask = neg_y ? 2 : (neg_x ? 1 : 0); }
-  else if ( neg_y ) { axis1_mask = 2; axis2_mask = neg_x ? 1 : 0; }
-  else if ( neg_x ) { axis1_mask = 1; }
+  /* Build copy masks in the Z, Y, X order used by sequential NEC-2
+     reflection passes. Each pass appends a reflected copy of every existing
+     combination. */
+  int copy_mask[8] = { 0 };
+  int num_copies = 1;
 
-  int tag_inc[4] = { 0, itx, 2*itx, 3*itx };
+  for ( int axis_mask = 4; axis_mask > 0; axis_mask >>= 1 )
+  {
+    if ( 0 == (sym_plane & axis_mask) )
+      continue;
 
-  /* Final tag_increment: X never doubles, Z and Y always double */
-  tag_increment = itx << ( (neg_z ? 1 : 0) + (neg_y ? 1 : 0) );
+    for ( int copy = 0; copy < num_copies; copy++ )
+      copy_mask[num_copies + copy] = copy_mask[copy] | axis_mask;
+
+    num_copies *= 2;
+  }
+
+  tag_increment = itx * num_copies;
 
   /* --- SEGMENTS --- */
   if ( orig_n > 0 )
@@ -1196,23 +1195,9 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
     for( int copy = 1; copy < num_copies; copy++ )
     {
       /* Determine which axes to negate for this copy */
-      bool flip_x = false, flip_y = false, flip_z = false;
-      if ( copy == 1 )
-      {
-	if ( axis1_mask == 4 ) flip_z = true;
-	else if ( axis1_mask == 2 ) flip_y = true;
-	else if ( axis1_mask == 1 ) flip_x = true;
-      }
-      else if ( copy == 2 )
-      {
-	if ( axis2_mask == 4 ) flip_z = true;
-	else if ( axis2_mask == 2 ) flip_y = true;
-	else if ( axis2_mask == 1 ) flip_x = true;
-      }
-      else if ( copy == 3 )
-      {
-	flip_x = neg_x; flip_y = neg_y; flip_z = neg_z;
-      }
+      bool flip_x = (0 != (copy_mask[copy] & 1));
+      bool flip_y = (0 != (copy_mask[copy] & 2));
+      bool flip_z = (0 != (copy_mask[copy] & 4));
 
       int64_t base = copy * orig_n;
 
@@ -1269,7 +1254,7 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 	if ( itagi == 0 )
 	  segment_tags[nx] = 0;
 	if ( itagi != 0 )
-	  segment_tags[nx] = itagi + tag_inc[copy];
+	  segment_tags[nx] = itagi + copy * itx;
 
 	segment_radius[nx] = segment_radius[i];
       }
@@ -1298,23 +1283,9 @@ void c_geometry::reflect_plane( int sym_plane, int& tag_increment )
 
     for( int copy = 1; copy < num_copies; copy++ )
     {
-      bool flip_x = false, flip_y = false, flip_z = false;
-      if ( copy == 1 )
-      {
-	if ( axis1_mask == 4 ) flip_z = true;
-	else if ( axis1_mask == 2 ) flip_y = true;
-	else if ( axis1_mask == 1 ) flip_x = true;
-      }
-      else if ( copy == 2 )
-      {
-	if ( axis2_mask == 4 ) flip_z = true;
-	else if ( axis2_mask == 2 ) flip_y = true;
-	else if ( axis2_mask == 1 ) flip_x = true;
-      }
-      else if ( copy == 3 )
-      {
-	flip_x = neg_x; flip_y = neg_y; flip_z = neg_z;
-      }
+      bool flip_x = (0 != (copy_mask[copy] & 1));
+      bool flip_y = (0 != (copy_mask[copy] & 2));
+      bool flip_z = (0 != (copy_mask[copy] & 4));
 
       int neg_count = (flip_x?1:0) + (flip_y?1:0) + (flip_z?1:0);
       bool neg_psalp = (neg_count % 2 == 1);
