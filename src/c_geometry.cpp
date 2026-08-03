@@ -25,7 +25,19 @@
 #include <cctype>
 #include <stdint.h>
 
-c_geometry::c_geometry() 
+/**
+ * geometry_field_separator - Determine whether a character separates fields
+ * @character: Character read from a geometry card
+ *
+ * Return: true for NEC commas, whitespace, and the line terminator.
+ */
+static bool geometry_field_separator(char character)
+{
+  return (std::isspace(static_cast<unsigned char>(character)) != 0) ||
+    (character == ',') || (character == '\0');
+}
+
+c_geometry::c_geometry()
     : patch_x1(0,0,0), patch_x2(0,0,0), patch_x3(0,0,0), patch_x4(0,0,0)  {
   n_segments = 0;
   np = 0;   // n_segments is the number of segments
@@ -2383,7 +2395,7 @@ void c_geometry::parse_geometry_card_line(const char* line_buf, char *gm,
     integer_params[i] = atoi( &line_buf[line_idx] );
 
     line_idx--;
-    while( (line_buf[++line_idx] != ' ') && (line_buf[line_idx] != ',') && (line_buf[line_idx] != '\0') )
+    while( !geometry_field_separator(line_buf[++line_idx]) )
     {
       if ( ((line_buf[line_idx] < '0') || (line_buf[line_idx] > '9')) &&
           (line_buf[line_idx] != '+') && (line_buf[line_idx] != '-') )
@@ -2419,7 +2431,7 @@ void c_geometry::parse_geometry_card_line(const char* line_buf, char *gm,
     real_params[i] = atof( &line_buf[line_idx] );
 
     line_idx--;
-    while( (line_buf[++line_idx] != ' ') && (line_buf[line_idx] != ',') && (line_buf[line_idx] != '\0') )
+    while( !geometry_field_separator(line_buf[++line_idx]) )
     {
       if ( ((line_buf[line_idx] < '0') || (line_buf[line_idx] > '9')) &&
         (line_buf[line_idx] != '.') && (line_buf[line_idx] != '+') &&
