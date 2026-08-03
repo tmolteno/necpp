@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <sstream>
 
@@ -334,6 +335,26 @@ TEST_CASE("load_line(istream) drains over-length CM, next line parses as CE",
     REQUIRE(load_line(buf, is) == 0);
     REQUIRE(buf[0] == 'C');
     REQUIRE(buf[1] == 'E');
+}
+
+TEST_CASE("geometry parser accepts tab-separated fields", "[geometry][parser]") {
+    // Build one valid wire deck with tabs delimiting every geometry field.
+    const char deck[] =
+        "GW\t1\t3\t0\t0\t0\t0\t0\t1\t0.001\n"
+        "GE\t0\n";
+    std::unique_ptr<FILE, decltype(&std::fclose)> input(
+        std::tmpfile(), &std::fclose);
+    REQUIRE(input != nullptr);
+    REQUIRE(std::fwrite(deck, 1, sizeof(deck) - 1, input.get()) ==
+        sizeof(deck) - 1);
+    std::rewind(input.get());
+
+    // Parse through the public file interface and retain the generated segments.
+    nec_context nec;
+    nec.initialize();
+    c_geometry* geometry = nec.get_geometry();
+    REQUIRE_NOTHROW(geometry->parse_geometry(&nec, input.get()));
+    REQUIRE(geometry->n_segments == 3);
 }
 
 TEST_CASE("load_line returns EOF when an over-length line is the last line",
