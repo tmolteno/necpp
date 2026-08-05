@@ -4956,10 +4956,27 @@ void nec_context::netwk_compute_inputs( complex_array& einc, netwk_state& st )
 
     if( st.ntsc != 0)
     {
+      /* The network rows are indexed in reverse order from the source
+         segments appended to ntsca by netwk_solve_and_check.  Every source
+         segment must be present; a miss indicates an internal inconsistency
+         in the network tables, so fail loudly rather than reading rhnx/cmn
+         out of bounds. */
       int j = 0;
+      bool found = false;
       for (j = 0; j < st.ntsc; j++ )
         if (st.ntsca[j] == segment_index+1)
+        {
+          found = true;
           break;
+        }
+
+      if ( ! found )
+      {
+        nec_exception nex("NETWORK DATA ERROR: SOURCE SEGMENT [");
+        nex.append(segment_index+1);
+        nex.append("] NOT FOUND IN NETWORK TABLE" );
+        throw nex;
+      }
 
       int row_index = st.ndimn - (j+1);
       int row_offset = row_index*st.ndimn;
