@@ -1,3 +1,8 @@
+## Version 2.3.5
+
+### Bug Fixes
+* **Network table lookup now fails loudly on a missing source segment:** `netwk_compute_inputs()` indexed the `ntsca`/`rhnx` arrays with an unguarded lookup. If a voltage-source segment was absent from the network node table (an internal inconsistency), the computed row index could go negative and read out of bounds. The lookup now throws a `nec_exception` (`NETWORK DATA ERROR: SOURCE SEGMENT [N] NOT FOUND IN NETWORK TABLE`) instead of performing the out-of-bounds read. No numeric behavior change for valid inputs — validated against the full unit suite (591 assertions) and the regression harness.
+
 ## Version 2.3.4
 
 ### Breaking Changes
