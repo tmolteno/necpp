@@ -95,6 +95,16 @@ std::vector<nec_wire> intersect(nec_wire& b)
 */
 	bool intersect(nec_3vector& b0)
 	{
+		return axis_distance(b0) <= radius;
+	}
+
+/*!\brief Measure how far a point lies from the wire axis
+\param b0 The point being measured.
+\return The distance from b0 to the nearest point of the axis, which is clamped
+	to the wire's own extent so a point beyond an end measures from that end.
+*/
+	nec_float axis_distance(const nec_3vector& b0) const
+	{
 		nec_float a0x = x0(0); nec_float a0y = x0(1); nec_float a0z = x0(2);
 		nec_float a1x = x1(0); nec_float a1y = x1(1); nec_float a1z = x1(2);
 		
@@ -159,9 +169,8 @@ print solution
   
   nec_3vector a_pt = parametrize(sa);
 	
-	if (distance(a_pt, b0) > radius) return false;
-	return true;
-	
+	return distance(a_pt, b0);
+
 }
 
 	bool similar(nec_wire& b)

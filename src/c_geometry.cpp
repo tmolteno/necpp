@@ -20,10 +20,24 @@
 
 #include "nec_context.h"
 #include "nec_exception.h"
+#include "nec_wire.h"
 
 #include <cstring>
 #include <cctype>
 #include <stdint.h>
+
+/*!\brief One final segment as the intersection sweep reads it.
+
+  Carries the segment's own index so the sorted sweep still names it, its final
+  geometry as a wire, its center, and the segments its two ends are joined to.
+*/
+struct segment_view {
+  int64_t index;
+  nec_wire body;
+  nec_3vector midpoint;
+  int64_t linked_start;
+  int64_t linked_end;
+};
 
 /**
  * geometry_field_separator - Determine whether a character separates fields
@@ -445,42 +459,14 @@ void c_geometry::parse_geometry_error(const geometry_parse_state& st)
   throw nec_exception("GEOMETRY DATA CARD ERROR");
 }
 
-#include "nec_wire.h"
 /**
-  We have finished with the geometry description, now connect 
+  We have finished with the geometry description, now connect
   things up.
 */
 void c_geometry::geometry_complete(nec_context* in_context, int gpflag)
 {
   if (0 == np + mp)
     throw nec_exception("Geometry has no wires or patches.");
-    
-  /* Check to see whether any wires intersect with one another */
-if (_check_intersections)
-{
-  for (size_t i=0; i<m_wires.size(); i++)
-  {
-    nec_wire a = m_wires[i];
-    for (size_t j=0; j<m_wires.size(); j++)
-    {
-      if (i > j)
-      {
-        nec_wire b = m_wires[j];
-        vector<nec_wire> wires = a.intersect(b);
-        if (wires.size() > 2)
-        {
-          nec_exception nex("GEOMETRY DATA ERROR -- WIRE #");
-          nex.append(j+1);
-          nex.append(" (TAG ID #"); nex.append(b.tag_id());
-          nex.append(") INTERSECTS WIRE #");
-          nex.append(i+1);
-          nex.append(" (TAG ID #"); nex.append(a.tag_id()); nex.append(")");
-          throw nex;
-        }
-      }
-    }
-  }
-}
 
 // now proceed and complete the geometry setup...
   // Check here that patches form a closed surfaceAntennaInput
@@ -565,6 +551,10 @@ if (_check_intersections)
       }
     } /* for( i = 0; i < n_segments; i++ ) */
   } /* if ( n_segments != 0) */
+
+  // Segment centers, lengths, direction cosines, and junction records are all
+  // final here, so the overlap rule is applied to the geometry the solver uses.
+  check_segment_intersections();
 
   if ( m != 0)
   {
@@ -677,67 +667,8 @@ void c_geometry::wire( int tag_id, int segment_count, nec_float xw1, nec_float y
     rd=1.0;
   }
   
-  /*
-  There is no restriction on the angle between two wires, but accuracy will be lost if the center of a segment falls within the
-  volume of the wire the segment connects to. The risk of this reduces as the angle between wires approaches 180 degrees.
-  
-  Wires which intersect away from their ends are not connected, but errors will occur if one wire occupies the space of another one. For accuracy, separate wire centers by several radii of the largest wire. 
-  */
-  // check that none of the existing wires intersect with the midpoint
-  // of the first and last segment
-  nec_3vector wire_start(xw1,yw1,zw1);
-  nec_3vector wire_end(xw2,yw2,zw2);
-  
-  if (_check_intersections)
-  {
-    nec_3vector seg_midpoint(wire_start + (dx/2)*delz);
-    nec_3vector end_seg_midpoint = wire_end - (dx*delz / 2);
-    /* Check to see whether any wires intersect with the segment_midpoint */
-    for (uint32_t i=0; i<m_wires.size(); i++)
-    {
-      nec_wire a = m_wires[i];
-      nec_3vector a_start = a.parametrize(0.0);
-      nec_3vector a_end = a.parametrize(1.0);
-
-      // Skip midpoint check if the new wire shares an endpoint with
-      // the existing wire — that's a connection, not an intersection.
-      bool shares_start = (a.distance(wire_start, a_start) < a.get_radius()) ||
-                          (a.distance(wire_start, a_end) < a.get_radius());
-      bool shares_end   = (a.distance(wire_end, a_start) < a.get_radius()) ||
-                          (a.distance(wire_end, a_end) < a.get_radius());
-
-      if (!shares_start && a.intersect(seg_midpoint))
-      {
-        nec_exception nex("GEOMETRY DATA ERROR -- FIRST SEGMENT MIDPOINT");
-        nex.append(" OF WIRE #");
-        nex.append(m_wires.size()+1);
-        nex.append(" (TAG ID #"); nex.append(tag_id);
-        nex.append(") INTERSECTS WIRE #");
-        nex.append(i+1);
-        nex.append(" (TAG ID #"); nex.append(a.tag_id()); nex.append(")");
-        
-        throw nex;
-      }
-      if (!shares_end && a.intersect(end_seg_midpoint))
-      {
-        nec_exception nex("GEOMETRY DATA ERROR -- LAST SEGMENT MIDPOINT");
-        nex.append(" OF WIRE #");
-        nex.append(m_wires.size()+1);
-        nex.append(" (TAG ID #"); nex.append(tag_id);
-        nex.append(") INTERSECTS WIRE #");
-        nex.append(i+1);
-        nex.append(" (TAG ID #"); nex.append(a.tag_id()); nex.append(")");
-        throw nex;
-      }
-    }
-  }
-  
-
   radz= rad;
   nec_3vector xs1(xw1,yw1,zw1);
-  nec_3vector x_end(xw2,yw2,zw2);
-
-  m_wires.push_back(nec_wire(xs1, x_end, rad, tag_id));
 
   for (int64_t i = istart; i < n_segments; i++ )
   {
@@ -1433,6 +1364,181 @@ void c_geometry::connect_segments( int ignd )
 }
 
 
+/*! \brief The separation below which two segment ends are one node.
+  \param a One end of the segment whose reach is being measured.
+  \param b The other end of that segment.
+  \return The contact threshold, scaled by the segment's own length.
+
+  NEC sizes the threshold from the segment it belongs to, so a long segment
+  tolerates a proportionally larger gap at its ends than a short one.
+*/
+static nec_float nec_contact_threshold(const nec_3vector& a, const nec_3vector& b)
+{
+  return norm(b - a) * SMIN;
+}
+
+/*! \brief Report whether two points are in contact.
+  \param a One point.
+  \param b The other point.
+  \param threshold The separation from nec_contact_threshold().
+  \return true when the points lie within the threshold of one another.
+*/
+static bool nec_points_contact(const nec_3vector& a, const nec_3vector& b,
+  nec_float threshold)
+{
+  return normL1(a - b) <= threshold;
+}
+
+
+/*! \brief Resolve one connection record to a segment index.
+  \param connection An icon1 or icon2 entry.
+  \return The zero-based index of the joined segment, or -1 when no segment is joined at that end.
+
+  NEC encodes a free end as zero, a segment or ground connection as a signed
+  one-based segment number, and a patch connection above PCHCON.
+*/
+static int64_t connected_segment_index(int32_t connection)
+{
+  int64_t magnitude = (connection < 0)
+    ? -static_cast<int64_t>(connection)
+    : static_cast<int64_t>(connection);
+  bool joins_segment = (0 != connection) && (magnitude <= PCHCON);
+  return joins_segment ? (magnitude - 1) : -1;
+}
+
+/*! \brief Report whether NEC recorded these two segments as sharing an end.
+  \param a One segment view.
+  \param b The other segment view.
+  \return true if either segment records the other at either of its ends.
+
+  build_connections() stops at the first contact found for each end, so a
+  junction of three or more segments is recorded as a chain rather than a
+  clique. Reading both ends of both segments covers every pair that chain
+  records.
+*/
+static bool segments_joined(const segment_view& a, const segment_view& b)
+{
+  return (a.linked_start == b.index) || (a.linked_end == b.index) ||
+    (b.linked_start == a.index) || (b.linked_end == a.index);
+}
+
+/*! \brief Report one segment center inside another segment.
+  \param inside The segment whose center falls within the other's volume.
+  \param container The segment whose volume contains that center.
+  \exception nec_exception* Always thrown, naming both segments.
+*/
+static void throw_segment_overlap(const segment_view& inside,
+  const segment_view& container)
+{
+  nec_exception nex("GEOMETRY DATA ERROR -- SEGMENT #");
+  nex.append(inside.index + 1);
+  nex.append(" (TAG ID #"); nex.append(inside.body.tag_id());
+  nex.append(") MIDPOINT LIES WITHIN SEGMENT #");
+  nex.append(container.index + 1);
+  nex.append(" (TAG ID #"); nex.append(container.body.tag_id());
+  nex.append(")");
+  throw nex;
+}
+
+/*! \brief Find the axis over which the structure spreads furthest.
+  \param views One view per final segment.
+  \return The coordinate index to sweep along.
+
+  Sweeping along this axis leaves the ordered window admitting the fewest
+  candidate pairs.
+*/
+static Eigen::Index widest_extent_axis(const std::vector<segment_view>& views)
+{
+  nec_3vector low = views[0].midpoint;
+  nec_3vector high = low;
+  for (size_t i = 1; i < views.size(); i++)
+  {
+    low = low.cwiseMin(views[i].midpoint);
+    high = high.cwiseMax(views[i].midpoint);
+  }
+
+  Eigen::Index axis = 0;
+  (high - low).maxCoeff(&axis);
+  return axis;
+}
+
+/*! \brief Throw on a segment center inside an unjoined segment.
+  \param views One view per final segment, reordered in place by the sweep.
+  \exception nec_exception* If two unconnected segments overlap.
+
+  A center inside another segment's volume lies within that segment's own reach
+  of its center, so ordering the views along one axis bounds the window of
+  candidate pairs by the widest reach in the structure.
+*/
+static void reject_overlapping_pairs(std::vector<segment_view>& views)
+{
+  nec_float reach_max = 0.0;
+  for (size_t i = 0; i < views.size(); i++)
+    reach_max = std::max(reach_max,
+      0.5 * views[i].body.length() + views[i].body.get_radius());
+
+  Eigen::Index axis = widest_extent_axis(views);
+  std::stable_sort(views.begin(), views.end(),
+    [axis](const segment_view& lhs, const segment_view& rhs) {
+      return lhs.midpoint(axis) < rhs.midpoint(axis);
+    });
+
+  for (size_t anchor = 0; anchor < views.size(); anchor++)
+  {
+    for (size_t probe = anchor + 1;
+      probe < views.size() &&
+        (views[probe].midpoint(axis) - views[anchor].midpoint(axis)) <= reach_max;
+      probe++)
+    {
+      // A recorded junction is a connection, not an overlap.
+      if (segments_joined(views[anchor], views[probe]))
+        continue;
+
+      if (views[probe].body.intersect(views[anchor].midpoint))
+        throw_segment_overlap(views[anchor], views[probe]);
+
+      if (views[anchor].body.intersect(views[probe].midpoint))
+        throw_segment_overlap(views[probe], views[anchor]);
+    }
+  }
+}
+
+/*
+There is no restriction on the angle between two wires, but accuracy will be lost if the center of a segment falls within the
+volume of the wire the segment connects to. The risk of this reduces as the angle between wires approaches 180 degrees.
+
+Wires which intersect away from their ends are not connected, but errors will occur if one wire occupies the space of another one. For accuracy, separate wire centers by several radii of the largest wire.
+*/
+void c_geometry::check_segment_intersections()
+{
+  if (false == _check_intersections)
+    return;
+
+  if (n_segments < 2)
+    return;
+
+  // NEC stores each final segment as a center, a length, and a direction, so
+  // the endpoints follow from a half-length step either side of the center.
+  std::vector<segment_view> views;
+  views.reserve(n_segments);
+  for (int64_t i = 0; i < n_segments; i++)
+  {
+    nec_3vector center(x[i], y[i], z[i]);
+    nec_3vector half_axis = nec_3vector(cab[i], sab[i], salp[i])
+      * (0.5 * segment_length[i]);
+
+    views.push_back(segment_view{
+      i,
+      nec_wire(center - half_axis, center + half_axis,
+        segment_radius[i], segment_tags[i]),
+      center,
+      connected_segment_index(icon1[i]),
+      connected_segment_index(icon2[i])});
+  }
+
+  reject_overlapping_pairs(views);
+}
+
 void c_geometry::build_connections( int ignd )
 {
   if ( ignd != 0) {
@@ -1474,8 +1580,8 @@ void c_geometry::build_connections( int ignd )
       
       nec_3vector v1(x[i], y[i], z[i]);
       nec_3vector v2(x2[i], y2[i], z2[i]);
-      nec_float slen = norm(v2 - v1) * SMIN;    
-      
+      nec_float slen = nec_contact_threshold(v1, v2);
+
       /* determine connection data for end 1 of segment. */
       bool segment_on_ground = false;
       if ( ignd > 0) {
@@ -1495,29 +1601,29 @@ void c_geometry::build_connections( int ignd )
     
       if ( false == segment_on_ground ) {
         int ic= i;
-        nec_float sep=0.0;
+        bool contact_found = false;
         for (int64_t j = 1; j < n_segments; j++) {
           ic++;
           if ( ic >= n_segments)
             ic=0;
-        
+
           nec_3vector vic(x[ic], y[ic], z[ic]);
-          sep = normL1(v1 - vic);
-          if ( sep <= slen) {
+          if ( nec_points_contact(v1, vic, slen) ) {
             icon1[i]= -(ic+1);
+            contact_found = true;
             break;
           }
-        
+
           nec_3vector v2ic(x2[ic], y2[ic], z2[ic]);
-          sep = normL1(v1 - v2ic);
-          if ( sep <= slen) {
+          if ( nec_points_contact(v1, v2ic, slen) ) {
             icon1[i]= (ic+1);
+            contact_found = true;
             break;
           }
-        
+
         } /* for( j = 1; j < n_segments; j++) */
-      
-        if ( ((iz > 0) || (icon1[i] <= PCHCON)) && (sep > slen) )
+
+        if ( ((iz > 0) || (icon1[i] <= PCHCON)) && (false == contact_found) )
           icon1[i]=0;
       
       } /* if ( ! jump ) */
@@ -1549,28 +1655,28 @@ void c_geometry::build_connections( int ignd )
       v1 = nec_3vector(x[i], y[i], z[i]);
       v2 = nec_3vector(x2[i], y2[i], z2[i]);
       int ic= i;
-      nec_float sep=0.0;
+      bool contact_found = false;
       for (int64_t j = 1; j < n_segments; j++ ) {
         ic++;
         if ( ic >= n_segments)
           ic=0;
-      
+
         nec_3vector vic(x[ic], y[ic], z[ic]);
-        sep = normL1(v2 - vic);
-        if (sep <= slen) {
+        if (nec_points_contact(v2, vic, slen)) {
           icon2[i]= (ic+1);
+          contact_found = true;
           break;
         }
-      
+
         nec_3vector v2ic(x2[ic], y2[ic], z2[ic]);
-        sep = normL1(v2 - v2ic);
-        if (sep <= slen) {
+        if (nec_points_contact(v2, v2ic, slen)) {
           icon2[i]= -(ic+1);
+          contact_found = true;
           break;
         }
       } /* for( j = 1; j < n_segments; j++ ) */
-    
-      if ( ((iz > 0) || (icon2[i] <= PCHCON)) && (sep > slen) )
+
+      if ( ((iz > 0) || (icon2[i] <= PCHCON)) && (false == contact_found) )
         icon2[i]=0;
     
     } /* for( i = 0; i < n_segments; i++ ) */

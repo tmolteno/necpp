@@ -27,7 +27,6 @@
 
 class nec_context;
 #include "nec_output.h"
-#include "nec_wire.h"
 
 
 
@@ -208,6 +207,13 @@ private:
   void divide_patch( int nx );
 
   void connect_segments( int ignd );
+
+  /*! \brief Reject geometry in which a segment center lies inside the volume of
+   *  a segment it is not connected to.
+   *  \exception nec_exception* If two unconnected segments overlap.
+   */
+  void check_segment_intersections();
+
   void build_connections( int ignd );
   void resolve_junctions();
 
@@ -232,8 +238,6 @@ private:
   	nec_context* m_context;
   	nec_output_file* m_output;
   	bool _check_intersections;
-
-  	std::vector<nec_wire> m_wires;
   
   void reflect_plane(int sym_plane, int& tag_increment);
 
