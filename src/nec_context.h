@@ -922,6 +922,11 @@ public:
 
 private:
 
+  /*! \brief Set once the ROM2 step-size explanation has been emitted, so this
+   *  context explains it one time rather than once per limited integration.
+   */
+  bool step_warning_issued;
+
   /*! \brief A private convenience function called by ne_card() and nh_card()
   */
   void ne_nh_card(int in_nfeh, int itmp1, int itmp2, int itmp3, int itmp4, nec_float tmp1, nec_float tmp2, nec_float tmp3, nec_float tmp4, nec_float tmp5, nec_float tmp6);

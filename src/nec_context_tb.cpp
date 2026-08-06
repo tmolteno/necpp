@@ -276,6 +276,73 @@ TEST_CASE( "Wire penetrating another away from any node is rejected", "[segment_
     REQUIRE_THROWS(nec.geometry_complete(0));
 }
 
+TEST_CASE( "Six wires meeting at one node are accepted", "[segment_junction]") {
+    // Ground plane vertical on a mast: four radials, a radiator, and the mast
+    // all contribute an end to the node at the origin. The connection record
+    // links those six ends as a cycle, so the radials are not adjacent to the
+    // mast in it, while every one of them is joined to it in the geometry.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 13, 0.0, 0.0, 0.0, -0.34, 0.0, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(1, 13, 0.0, 0.0, 0.0, 0.34, 0.0, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(1, 13, 0.0, 0.0, 0.0, 0.0, -0.34, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(1, 13, 0.0, 0.0, 0.0, 0.0, 0.34, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(2, 13, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0075, 1.0, 1.0);
+    geo->wire(3, 75, 0.0, 0.0, 0.0, 0.0, 0.0, -3.0, 0.025, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+    REQUIRE(geo->overlap_findings().empty());
+}
+
+TEST_CASE( "Legs meeting on the ground plane are accepted", "[segment_junction]") {
+    // Two legs leaving one point on the ground plane 45 degrees apart, each
+    // first center inside the other's volume and every later center clear of
+    // it. build_connections() records a ground contact rather than a neighbour
+    // at that end, so the junction is known from the coordinates alone.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 10, 0.0, 0.0, 0.0, 0.15307, 0.0, 0.36955, 0.02, 1.0, 1.0);
+    geo->wire(2, 10, 0.0, 0.0, 0.0, -0.15307, 0.0, 0.36955, 0.02, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(1));
+    REQUIRE(geo->overlap_findings().empty());
+}
+
+TEST_CASE( "Wire intruding past a shared node is rejected", "[segment_junction]") {
+    // A feed leaving the hub of a radial at 20 degrees. Its first center clears
+    // the radial segment it shares the hub with and comes to rest inside the
+    // next one along, which it meets at no node.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(2, 10, 0.0, 0.0, 0.0, 0.045, 0.0, 0.0, 0.003, 1.0, 1.0);
+    geo->wire(3, 5, 0.0, 0.0, 0.0, 0.07518, 0.0, 0.02736, 0.001, 1.0, 1.0);
+    REQUIRE_THROWS(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Warning policy records the overlap and continues", "[segment_junction]") {
+    // The geometry of the coincident-wire rejection, admitted under a policy
+    // that reports rather than rejects. Every center of one wire lies on the
+    // axis of the other, so both directions of every pair are recorded.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->set_intersection_fatal(false);
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    geo->wire(2, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+
+    REQUIRE(false == geo->overlap_findings().empty());
+    const nec_overlap_finding& first = geo->overlap_findings().front();
+    REQUIRE(first.inside_tag == 1);
+    REQUIRE(first.container_tag == 2);
+    REQUIRE(first.distance <= first.container_radius);
+}
+
 TEST_CASE( "Helix rejects invalid segment_count", "[helix]") {
     // Regression test for #48: helix with segment_count < 1 must throw
     // rather than silently returning with no wires.

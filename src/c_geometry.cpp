@@ -26,19 +26,6 @@
 #include <cctype>
 #include <stdint.h>
 
-/*!\brief One final segment as the intersection sweep reads it.
-
-  Carries the segment's own index so the sorted sweep still names it, its final
-  geometry as a wire, its center, and the segments its two ends are joined to.
-*/
-struct segment_view {
-  int64_t index;
-  nec_wire body;
-  nec_3vector midpoint;
-  int64_t linked_start;
-  int64_t linked_end;
-};
-
 /**
  * geometry_field_separator - Determine whether a character separates fields
  * @character: Character read from a geometry card
@@ -69,6 +56,7 @@ c_geometry::c_geometry()
   maxcon = 0;
   
   _check_intersections = true;
+  _overlap_is_fatal = true;
   
   m_context = NULL;
   m_output = NULL;
@@ -1390,71 +1378,84 @@ static bool nec_points_contact(const nec_3vector& a, const nec_3vector& b,
 }
 
 
-/*! \brief Resolve one connection record to a segment index.
-  \param connection An icon1 or icon2 entry.
-  \return The zero-based index of the joined segment, or -1 when no segment is joined at that end.
+/*! \brief One end of one segment, carried through the node partition sweep.
 
-  NEC encodes a free end as zero, a segment or ground connection as a signed
-  one-based segment number, and a patch connection above PCHCON.
+  The index numbers the ends of the whole structure, so end 1 of segment i is
+  2*i and end 2 is 2*i+1. That numbering survives the sort, which reorders the
+  ends without renaming them.
 */
-static int64_t connected_segment_index(int32_t connection)
-{
-  int64_t magnitude = (connection < 0)
-    ? -static_cast<int64_t>(connection)
-    : static_cast<int64_t>(connection);
-  bool joins_segment = (0 != connection) && (magnitude <= PCHCON);
-  return joins_segment ? (magnitude - 1) : -1;
-}
+struct segment_endpoint {
+  nec_3vector position;
+  int64_t index;
+  nec_float threshold;
+};
 
-/*! \brief Report whether NEC recorded these two segments as sharing an end.
-  \param a One segment view.
-  \param b The other segment view.
-  \return true if either segment records the other at either of its ends.
-
-  build_connections() stops at the first contact found for each end, so a
-  junction of three or more segments is recorded as a chain rather than a
-  clique. Reading both ends of both segments covers every pair that chain
-  records.
+/*! \brief The two node classes touched by one segment's ends.
 */
-static bool segments_joined(const segment_view& a, const segment_view& b)
-{
-  return (a.linked_start == b.index) || (a.linked_end == b.index) ||
-    (b.linked_start == a.index) || (b.linked_end == a.index);
-}
+struct segment_nodes {
+  int64_t first;
+  int64_t second;
+};
 
-/*! \brief Report one segment center inside another segment.
-  \param inside The segment whose center falls within the other's volume.
-  \param container The segment whose volume contains that center.
-  \exception nec_exception* Always thrown, naming both segments.
+/*! \brief The partition of every segment end into the node it belongs to.
+
+  build_connections() records at most one contact per segment end, so a node
+  where three or more ends meet is recorded as a cycle rather than as a clique
+  and pairs that are not adjacent in that cycle look unconnected. Classing the
+  ends geometrically recovers the clique: every end in contact with any other
+  end of its class belongs to that class, whatever order the connection record
+  happened to link them in.
 */
-static void throw_segment_overlap(const segment_view& inside,
-  const segment_view& container)
+class nec_node_partition
 {
-  nec_exception nex("GEOMETRY DATA ERROR -- SEGMENT #");
-  nex.append(inside.index + 1);
-  nex.append(" (TAG ID #"); nex.append(inside.body.tag_id());
-  nex.append(") MIDPOINT LIES WITHIN SEGMENT #");
-  nex.append(container.index + 1);
-  nex.append(" (TAG ID #"); nex.append(container.body.tag_id());
-  nex.append(")");
-  throw nex;
-}
+public:
+  nec_node_partition(std::vector<segment_endpoint>& endpoints, int64_t segment_count);
 
-/*! \brief Find the axis over which the structure spreads furthest.
-  \param views One view per final segment.
+  /*! \brief Report whether two segments meet at exactly one node.
+    \param segment_a One segment index.
+    \param segment_b The other segment index.
+    \return true when the two segments have one node class in common.
+
+    One node in common is a junction: the currents of both segments are
+    continuous through it, which bounds the error a center inside the joined
+    wire introduces. Two segments holding both nodes in common are not joined
+    end to end but laid one along the other, so their volumes coincide over
+    their whole length and the pair carries no such continuity.
+  */
+  bool shares_one_node(int64_t segment_a, int64_t segment_b) const;
+
+private:
+  int64_t root(int64_t endpoint_index) const;
+  void unite(int64_t lhs, int64_t rhs);
+
+  mutable std::vector<int64_t> m_parent;
+  std::vector<segment_nodes> m_segment_nodes;
+};
+
+/*! \brief One final segment, carried through the overlap sweep.
+*/
+struct segment_view {
+  int64_t index;
+  nec_wire body;
+  nec_3vector position;
+};
+
+/*! \brief Find the axis over which a set of positions spreads furthest.
+  \param items One view per segment, or one per segment end.
   \return The coordinate index to sweep along.
 
   Sweeping along this axis leaves the ordered window admitting the fewest
   candidate pairs.
 */
-static Eigen::Index widest_extent_axis(const std::vector<segment_view>& views)
+template <typename T>
+static Eigen::Index widest_extent_axis(const std::vector<T>& items)
 {
-  nec_3vector low = views[0].midpoint;
+  nec_3vector low = items[0].position;
   nec_3vector high = low;
-  for (size_t i = 1; i < views.size(); i++)
+  for (size_t i = 1; i < items.size(); i++)
   {
-    low = low.cwiseMin(views[i].midpoint);
-    high = high.cwiseMax(views[i].midpoint);
+    low = low.cwiseMin(items[i].position);
+    high = high.cwiseMax(items[i].position);
   }
 
   Eigen::Index axis = 0;
@@ -1462,15 +1463,151 @@ static Eigen::Index widest_extent_axis(const std::vector<segment_view>& views)
   return axis;
 }
 
-/*! \brief Throw on a segment center inside an unjoined segment.
+/*! \brief Order a set of positions along one coordinate axis.
+  \param items The views to reorder in place.
+  \param axis The coordinate index chosen by widest_extent_axis().
+*/
+template <typename T>
+static void sort_along_axis(std::vector<T>& items, Eigen::Index axis)
+{
+  std::stable_sort(items.begin(), items.end(),
+    [axis](const T& lhs, const T& rhs) {
+      return lhs.position(axis) < rhs.position(axis);
+    });
+}
+
+/*! \brief Class the ends of every final segment into the nodes they meet at.
+  \param endpoints Both ends of every segment, reordered by the sweep.
+  \param segment_count The number of final segments the ends belong to.
+*/
+nec_node_partition::nec_node_partition(std::vector<segment_endpoint>& endpoints,
+  int64_t segment_count)
+  : m_parent(endpoints.size()), m_segment_nodes(segment_count)
+{
+  for (size_t i = 0; i < m_parent.size(); i++)
+    m_parent[i] = int64_t(i);
+
+  nec_float threshold_max = 0.0;
+  for (size_t i = 0; i < endpoints.size(); i++)
+    threshold_max = std::max(threshold_max, endpoints[i].threshold);
+
+  Eigen::Index axis = widest_extent_axis(endpoints);
+  sort_along_axis(endpoints, axis);
+
+  // The connection rule measures a gap against the threshold of the segment
+  // whose end is under test, which makes it asymmetric. A node is a property
+  // shared by both ends, so the partition unites on the larger of the two
+  // thresholds: the symmetric closure of that relation.
+  //
+  // An axis gap already exceeds the L1 separation, so once the gap passes the
+  // widest threshold in the structure no later end in the order can touch this
+  // one.
+  for (size_t anchor = 0; anchor < endpoints.size(); anchor++)
+  {
+    for (size_t probe = anchor + 1;
+      probe < endpoints.size() &&
+        (endpoints[probe].position(axis) - endpoints[anchor].position(axis)) <= threshold_max;
+      probe++)
+    {
+      nec_float threshold = std::max(endpoints[anchor].threshold,
+        endpoints[probe].threshold);
+      if (nec_points_contact(endpoints[anchor].position, endpoints[probe].position,
+            threshold))
+        unite(endpoints[anchor].index, endpoints[probe].index);
+    }
+  }
+
+  for (int64_t i = 0; i < segment_count; i++)
+    m_segment_nodes[i] = segment_nodes{root(2*i), root(2*i + 1)};
+}
+
+/*! \brief The class representative of one segment end.
+  \param endpoint_index The structure-wide end number.
+  \return The end that names the class, compressing the path walked to reach it.
+*/
+int64_t nec_node_partition::root(int64_t endpoint_index) const
+{
+  int64_t node = endpoint_index;
+  while (m_parent[node] != node)
+  {
+    m_parent[node] = m_parent[m_parent[node]];
+    node = m_parent[node];
+  }
+  return node;
+}
+
+/*! \brief Merge the classes of two segment ends.
+  \param lhs One end.
+  \param rhs The other end.
+
+  Two ends already in one class name the same representative, and naming it
+  again leaves the class unchanged.
+*/
+void nec_node_partition::unite(int64_t lhs, int64_t rhs)
+{
+  m_parent[root(rhs)] = root(lhs);
+}
+
+bool nec_node_partition::shares_one_node(int64_t segment_a, int64_t segment_b) const
+{
+  const segment_nodes& a = m_segment_nodes[segment_a];
+  const segment_nodes& b = m_segment_nodes[segment_b];
+
+  int shared = int((a.first == b.first) || (a.first == b.second))
+    + int((a.second == b.first) || (a.second == b.second));
+
+  return 1 == shared;
+}
+
+/*! \brief Render one overlap finding as a diagnostic line.
+  \param prefix The severity the caller applies to the finding.
+  \param finding The measurement to render.
+  \return The rendered line, without a trailing newline.
+*/
+static std::string nec_overlap_message(const char* prefix,
+  const nec_overlap_finding& finding)
+{
+  char buffer[256];
+  snprintf(buffer, sizeof(buffer),
+    "%s -- SEGMENT #%lld (TAG ID #%d) MIDPOINT LIES WITHIN SEGMENT #%lld"
+    " (TAG ID #%d) AT DISTANCE %.5f RADIUS %.5f",
+    prefix,
+    (long long)(finding.inside_index + 1), finding.inside_tag,
+    (long long)(finding.container_index + 1), finding.container_tag,
+    finding.distance, finding.container_radius);
+  return std::string(buffer);
+}
+
+/*! \brief Record one segment center falling inside another segment's volume.
+  \param inside The segment whose center is measured.
+  \param container The segment whose volume the center is measured against.
+  \param findings Appended with the measurement when the center lies inside.
+*/
+static void append_overlap(const segment_view& inside, const segment_view& container,
+  std::vector<nec_overlap_finding>& findings)
+{
+  nec_float distance = container.body.axis_distance(inside.position);
+  if (distance > container.body.get_radius())
+    return;
+
+  findings.push_back(nec_overlap_finding{
+    inside.index, container.index,
+    inside.body.tag_id(), container.body.tag_id(),
+    distance, container.body.get_radius()});
+}
+
+/*! \brief Collect every segment center that lies inside an unjoined segment.
   \param views One view per final segment, reordered in place by the sweep.
-  \exception nec_exception* If two unconnected segments overlap.
+  \param nodes The node classing of the segment ends.
+  \param findings Appended with one record per violation.
 
   A center inside another segment's volume lies within that segment's own reach
   of its center, so ordering the views along one axis bounds the window of
   candidate pairs by the widest reach in the structure.
 */
-static void reject_overlapping_pairs(std::vector<segment_view>& views)
+static void collect_overlapping_pairs(std::vector<segment_view>& views,
+  const nec_node_partition& nodes,
+  std::vector<nec_overlap_finding>& findings)
 {
   nec_float reach_max = 0.0;
   for (size_t i = 0; i < views.size(); i++)
@@ -1478,27 +1615,21 @@ static void reject_overlapping_pairs(std::vector<segment_view>& views)
       0.5 * views[i].body.length() + views[i].body.get_radius());
 
   Eigen::Index axis = widest_extent_axis(views);
-  std::stable_sort(views.begin(), views.end(),
-    [axis](const segment_view& lhs, const segment_view& rhs) {
-      return lhs.midpoint(axis) < rhs.midpoint(axis);
-    });
+  sort_along_axis(views, axis);
 
   for (size_t anchor = 0; anchor < views.size(); anchor++)
   {
     for (size_t probe = anchor + 1;
       probe < views.size() &&
-        (views[probe].midpoint(axis) - views[anchor].midpoint(axis)) <= reach_max;
+        (views[probe].position(axis) - views[anchor].position(axis)) <= reach_max;
       probe++)
     {
-      // A recorded junction is a connection, not an overlap.
-      if (segments_joined(views[anchor], views[probe]))
+      // Segments meeting at one node are joined, not overlapping.
+      if (nodes.shares_one_node(views[anchor].index, views[probe].index))
         continue;
 
-      if (views[probe].body.intersect(views[anchor].midpoint))
-        throw_segment_overlap(views[anchor], views[probe]);
-
-      if (views[anchor].body.intersect(views[probe].midpoint))
-        throw_segment_overlap(views[probe], views[anchor]);
+      append_overlap(views[anchor], views[probe], findings);
+      append_overlap(views[probe], views[anchor], findings);
     }
   }
 }
@@ -1511,32 +1642,64 @@ Wires which intersect away from their ends are not connected, but errors will oc
 */
 void c_geometry::check_segment_intersections()
 {
+  m_overlap_findings.clear();
+
   if (false == _check_intersections)
     return;
 
   if (n_segments < 2)
     return;
 
+  collect_overlap_findings();
+
+  // A fatal policy rejects the geometry on its first finding; a warning policy
+  // reports every finding and leaves the geometry in place.
+  if (_overlap_is_fatal && false == m_overlap_findings.empty())
+    throw nec_exception(nec_overlap_message("GEOMETRY DATA ERROR",
+      m_overlap_findings.front()).c_str());
+  else
+  {
+    // A fatal policy reaches this loop only with nothing to report.
+    for (size_t i = 0; i < m_overlap_findings.size(); i++)
+      m_output->nec_printf("\n%s",
+        nec_overlap_message("GEOMETRY WARNING", m_overlap_findings[i]).c_str());
+  }
+}
+
+/*! \brief Measure every segment center against the volume of every segment it
+  does not meet at a node.
+
+  Appends one finding per violation to m_overlap_findings, which the caller has
+  already emptied.
+*/
+void c_geometry::collect_overlap_findings()
+{
   // NEC stores each final segment as a center, a length, and a direction, so
   // the endpoints follow from a half-length step either side of the center.
   std::vector<segment_view> views;
-  views.reserve(n_segments);
+  views.reserve(size_t(n_segments));
+  std::vector<segment_endpoint> endpoints;
+  endpoints.reserve(size_t(2 * n_segments));
   for (int64_t i = 0; i < n_segments; i++)
   {
     nec_3vector center(x[i], y[i], z[i]);
     nec_3vector half_axis = nec_3vector(cab[i], sab[i], salp[i])
       * (0.5 * segment_length[i]);
+    nec_3vector end_one = center - half_axis;
+    nec_3vector end_two = center + half_axis;
 
     views.push_back(segment_view{
       i,
-      nec_wire(center - half_axis, center + half_axis,
-        segment_radius[i], segment_tags[i]),
-      center,
-      connected_segment_index(icon1[i]),
-      connected_segment_index(icon2[i])});
+      nec_wire(end_one, end_two, segment_radius[i], segment_tags[i]),
+      center});
+
+    nec_float threshold = nec_contact_threshold(end_one, end_two);
+    endpoints.push_back(segment_endpoint{end_one, 2*i, threshold});
+    endpoints.push_back(segment_endpoint{end_two, 2*i + 1, threshold});
   }
 
-  reject_overlapping_pairs(views);
+  nec_node_partition nodes(endpoints, n_segments);
+  collect_overlapping_pairs(views, nodes, m_overlap_findings);
 }
 
 void c_geometry::build_connections( int ignd )
