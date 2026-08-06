@@ -24,6 +24,7 @@ void usage(void)
       "\n       -s: print result summary to standard output."
       "\n       -c: print results in comma-separated-value (CSV) format,"
       "\n           this options is used in conjunction with (-s) above."
+      "\n       -w: report a geometry overlap as a warning and continue."
       "\n       -h: print this usage information and exit."
       "\n       -v: print nec2++ version number and exit.\n";
 
