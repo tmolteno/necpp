@@ -211,6 +211,138 @@ TEST_CASE( "Optional intersection check bypass", "[intersection_check]") {
     REQUIRE_NOTHROW(nec.geometry_complete(0));
 }
 
+TEST_CASE( "Crossed wires sharing a node are accepted", "[segment_intersection]") {
+    // Turnstile geometry: two dipoles crossing at the origin, each contributing
+    // a segment end to the shared node. NEC-2 places no restriction on the angle
+    // between connected wires, and every segment center clears the crossing
+    // wire's volume by several radii.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 24, 0.0, 0.517, 0.0, 0.0, -0.517, 0.0, 0.006, 1.0, 1.0);
+    geo->wire(2, 24, -0.517, 0.0, 0.0, 0.517, 0.0, 0.0, 0.006, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Translated wire is tested at its final position", "[segment_intersection]") {
+    // Tower geometry: a leg is built from the ground up, translated by its own
+    // base height, and a second leg then fills the span it vacated. The two legs
+    // meet end to end and share no volume in the final segment arrays.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(3, 20, 1.249, 0.0, 0.0, 1.249, 0.0, 11.24, 0.05, 1.0, 1.0);
+    geo->move(0.0, 0.0, 0.0, 0.0, 0.0, 1.249, 0, 0, 0);
+    geo->wire(1, 3, 1.249, 0.0, 0.0, 1.249, 0.0, 1.249, 0.05, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Tapered wire is tested at its per-segment radius", "[segment_intersection]") {
+    // Biconical geometry: a tapered cone meeting a short centre segment. The
+    // cone's widest radius belongs to its far segment, and the segment actually
+    // adjoining the centre is thin enough to clear it.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 5, 0.0, 0.0, -1.7831, 0.0, 0.0, -0.1024, 0.1514, 1.0, 0.6399);
+    geo->wire(2, 1, 0.0, 0.0, -0.1024, 0.0, 0.0, 0.1024, 0.0254, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Coincident wires are rejected", "[segment_intersection]") {
+    // Two wires occupying the same space: every segment center of one lies on
+    // the axis of a segment of the other.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    geo->wire(2, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    REQUIRE_THROWS(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Wire penetrating another away from any node is rejected", "[segment_intersection]") {
+    // Two single-segment wires crossing at their centres, sharing no end, so the
+    // centre of each falls inside the volume of the other.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 1, -0.5, 0.0, 0.0, 0.5, 0.0, 0.0, 0.01, 1.0, 1.0);
+    geo->wire(2, 1, 0.0, -0.5, 0.0, 0.0, 0.5, 0.0, 0.01, 1.0, 1.0);
+    REQUIRE_THROWS(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Six wires meeting at one node are accepted", "[segment_junction]") {
+    // Ground plane vertical on a mast: four radials, a radiator, and the mast
+    // all contribute an end to the node at the origin. The connection record
+    // links those six ends as a cycle, so the radials are not adjacent to the
+    // mast in it, while every one of them is joined to it in the geometry.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 13, 0.0, 0.0, 0.0, -0.34, 0.0, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(1, 13, 0.0, 0.0, 0.0, 0.34, 0.0, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(1, 13, 0.0, 0.0, 0.0, 0.0, -0.34, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(1, 13, 0.0, 0.0, 0.0, 0.0, 0.34, -0.34, 0.0075, 1.0, 1.0);
+    geo->wire(2, 13, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0075, 1.0, 1.0);
+    geo->wire(3, 75, 0.0, 0.0, 0.0, 0.0, 0.0, -3.0, 0.025, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+    REQUIRE(geo->overlap_findings().empty());
+}
+
+TEST_CASE( "Legs meeting on the ground plane are accepted", "[segment_junction]") {
+    // Two legs leaving one point on the ground plane 45 degrees apart, each
+    // first center inside the other's volume and every later center clear of
+    // it. build_connections() records a ground contact rather than a neighbour
+    // at that end, so the junction is known from the coordinates alone.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 10, 0.0, 0.0, 0.0, 0.15307, 0.0, 0.36955, 0.02, 1.0, 1.0);
+    geo->wire(2, 10, 0.0, 0.0, 0.0, -0.15307, 0.0, 0.36955, 0.02, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(1));
+    REQUIRE(geo->overlap_findings().empty());
+}
+
+TEST_CASE( "Wire intruding past a shared node is rejected", "[segment_junction]") {
+    // A feed leaving the hub of a radial at 20 degrees. Its first center clears
+    // the radial segment it shares the hub with and comes to rest inside the
+    // next one along, which it meets at no node.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(2, 10, 0.0, 0.0, 0.0, 0.045, 0.0, 0.0, 0.003, 1.0, 1.0);
+    geo->wire(3, 5, 0.0, 0.0, 0.0, 0.07518, 0.0, 0.02736, 0.001, 1.0, 1.0);
+    REQUIRE_THROWS(nec.geometry_complete(0));
+}
+
+TEST_CASE( "Warning policy records the overlap and continues", "[segment_junction]") {
+    // The geometry of the coincident-wire rejection, admitted under a policy
+    // that reports rather than rejects. Every center of one wire lies on the
+    // axis of the other, so both directions of every pair are recorded.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->set_intersection_fatal(false);
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    geo->wire(2, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.001, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(0));
+
+    REQUIRE(false == geo->overlap_findings().empty());
+    const nec_overlap_finding& first = geo->overlap_findings().front();
+    REQUIRE(first.inside_tag == 1);
+    REQUIRE(first.container_tag == 2);
+    REQUIRE(first.distance <= first.container_radius);
+}
+
 TEST_CASE( "Helix rejects invalid segment_count", "[helix]") {
     // Regression test for #48: helix with segment_count < 1 must throw
     // rather than silently returning with no wires.

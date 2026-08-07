@@ -96,6 +96,8 @@ void nec_context::initialize() {
   iptaqf=0;
   iptaqt=0;
   
+  step_warning_issued = false;
+
   init_voltage_sources();
   m_geometry->set_context(this);
 }
@@ -5849,7 +5851,6 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   ASSERT(sum.size() == 9);
   
   bool recalculate_fields = true;
-  static bool step_warning_issued = false;
   
   int nts = 4, nx = 1, n = 9;
 

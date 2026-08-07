@@ -180,7 +180,7 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 	nec_context s_context;
 
 	/* process command line options */
-	while( (option = XGetopt(argc, argv, "i:o:hvscxgb") ) != -1 )
+	while( (option = XGetopt(argc, argv, "i:o:hvscxgbw") ) != -1 )
 	{
 		switch( option )
 		{
@@ -206,6 +206,10 @@ int nec_main( int argc, char **argv, nec_output_file& s_output )
 
 		case 'x': /* use XML result data */
 			s_context.set_results_format(RESULT_FORMAT_XML);
+			break;
+
+		case 'w': /* report a geometry overlap as a warning and continue */
+			s_context.get_geometry()->set_intersection_fatal(false);
 			break;
 
 		case 'h' : /* print usage and exit */

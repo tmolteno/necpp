@@ -27,9 +27,22 @@
 
 class nec_context;
 #include "nec_output.h"
-#include "nec_wire.h"
 
 
+/*! \brief One segment center found inside the volume of a segment that it does
+ *  not meet at a shared node.
+ *
+ *  The distance and the radius are the measurement that produced the finding,
+ *  so a caller can judge how far inside the conductor the center falls.
+ */
+struct nec_overlap_finding {
+  int64_t   inside_index;
+  int64_t   container_index;
+  int       inside_tag;
+  int       container_tag;
+  nec_float distance;
+  nec_float container_radius;
+};
 
 /*! \brief A Class describing the antenna geometry
  * \file c_geometry.h
@@ -134,6 +147,18 @@ public:
   	 */
   	void set_intersection_check(bool enable) { _check_intersections = enable; }
 
+  	/*! \brief Choose what an overlap finding does.
+  	 *  \param fatal true to reject the geometry on the first finding (the
+  	 *  default), false to record every finding and let the solve proceed.
+  	 */
+  	void set_intersection_fatal(bool fatal) { _overlap_is_fatal = fatal; }
+
+  	/*! \brief The overlap findings the last geometry check produced.
+  	 *  \return One record per segment center found inside the volume of a
+  	 *  segment it does not meet at a node.
+  	 */
+  	const std::vector<nec_overlap_finding>& overlap_findings() const { return m_overlap_findings; }
+
   	/*! \brief Geometry is complete
   	 *  \exception nec_exception* If there is an error with the geometry.
   	 */
@@ -208,6 +233,17 @@ private:
   void divide_patch( int nx );
 
   void connect_segments( int ignd );
+
+  /*! \brief Record every segment center that lies inside the volume of a
+   *  segment it is not connected to, then apply the overlap policy to the
+   *  findings.
+   *  \exception nec_exception* Under a fatal policy, if two unconnected
+   *  segments overlap.
+   */
+  void check_segment_intersections();
+
+  void collect_overlap_findings();
+
   void build_connections( int ignd );
   void resolve_junctions();
 
@@ -232,8 +268,8 @@ private:
   	nec_context* m_context;
   	nec_output_file* m_output;
   	bool _check_intersections;
-
-  	std::vector<nec_wire> m_wires;
+  	bool _overlap_is_fatal;
+  	std::vector<nec_overlap_finding> m_overlap_findings;
   
   void reflect_plane(int sym_plane, int& tag_increment);
 
