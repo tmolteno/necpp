@@ -4,6 +4,7 @@
 #include "nec_context.h"
 #include "nec_results.h"
 #include "c_geometry.h"
+#include "nec_wire.h"
 
 #include <iostream>
 
@@ -353,4 +354,23 @@ TEST_CASE( "Helix rejects invalid segment_count", "[helix]") {
     REQUIRE_THROWS(geo->helix(1, 0, 0.1, 0.1, 0.01, 0.01, 0.01, 0.01, 0.001));
     // Verify geometry has no segments from the failed helix
     REQUIRE(geo->n_segments == 0);
+}
+
+TEST_CASE( "axis_distance throws on a zero-length wire", "[wire]") {
+    // A wire with coincident endpoints has a squared-length denominator of
+    // zero in axis_distance(); it must throw rather than divide by zero
+    // (which would produce NaN and silently poison the overlap check).
+    nec_3vector p(1.0, 2.0, 3.0);
+    nec_wire degenerate(p, p, 0.001, 1);
+
+    nec_3vector q(0.0, 0.0, 0.0);
+    REQUIRE_THROWS(degenerate.axis_distance(q));
+
+    // A non-degenerate wire still yields a finite distance.
+    nec_3vector a(0.0, 0.0, 0.0);
+    nec_3vector b(1.0, 0.0, 0.0);
+    nec_wire unit(a, b, 0.001, 1);
+    nec_float d = unit.axis_distance(nec_3vector(0.5, 1.0, 0.0));
+    REQUIRE( std::isfinite(d) );
+    REQUIRE( d == Catch::Approx(1.0).margin(1e-12) );
 }

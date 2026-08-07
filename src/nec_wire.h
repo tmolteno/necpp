@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <vector>
 #include "math_util.h"
+#include "nec_exception.h"
 
 /*!\brief A class to handle properties of wires.
 */
@@ -107,71 +108,80 @@ std::vector<nec_wire> intersect(nec_wire& b)
 	{
 		nec_float a0x = x0(0); nec_float a0y = x0(1); nec_float a0z = x0(2);
 		nec_float a1x = x1(0); nec_float a1y = x1(1); nec_float a1z = x1(2);
-		
+			
 		nec_float b0x = b0(0); nec_float b0y = b0(1); nec_float b0z = b0(2);
-	/*
-#
-#	Do the expression for intersection of a cylinder and a point
-#
-#	aptitude install python-sympy
-#
-#
-from sympy import *
-from sympy.matrices import Matrix
+		/*
+	#
+	#	Do the expression for intersection of a cylinder and a point
+	#
+	#	aptitude install python-sympy
+	#
+	#
+	from sympy import *
+	from sympy.matrices import Matrix
 
-a0x = Symbol('a0x')
-a1x = Symbol('a1x')
-a0y = Symbol('a0y')
-a1y = Symbol('a1y')
-a0z = Symbol('a0z')
-a1z = Symbol('a1z')
+	a0x = Symbol('a0x')
+	a1x = Symbol('a1x')
+	a0y = Symbol('a0y')
+	a1y = Symbol('a1y')
+	a0z = Symbol('a0z')
+	a1z = Symbol('a1z')
 
-b0x = Symbol('b0x')
-b0y = Symbol('b0y')
-b0z = Symbol('b0z')
+	b0x = Symbol('b0x')
+	b0y = Symbol('b0y')
+	b0z = Symbol('b0z')
 
-a0 = Matrix([a0x,a0y,a0z])
-b0 = Matrix([b0x,b0y,b0z])
+	a0 = Matrix([a0x,a0y,a0z])
+	b0 = Matrix([b0x,b0y,b0z])
 
-a1 = Matrix([a1x,a1y,a1z])
+	a1 = Matrix([a1x,a1y,a1z])
 
-# Each wire is parametrized by sa and sb
-sa = Symbol('sa')
+	# Each wire is parametrized by sa and sb
+	sa = Symbol('sa')
 
-a = a0 + sa*(a1 - a0)
-b = b0
+	a = a0 + sa*(a1 - a0)
+	b = b0
 
-# Distance between the two wires is d2
-delta = (b-a)
-d2 = delta.dot(delta)
+	# Distance between the two wires is d2
+	delta = (b-a)
+	d2 = delta.dot(delta)
 
-print "Distance ="
-print_python(d2)
+	print "Distance ="
+	print_python(d2)
 
-# Closest point is the set of parameters (sa,sb) that minimize d2
-# subject to the constraint that sa and sb are in the range [0,1]
+	# Closest point is the set of parameters (sa,sb) that minimize d2
+	# subject to the constraint that sa and sb are in the range [0,1]
 
-eqn1 = diff(d2, sa)
+	eqn1 = diff(d2, sa)
 
-equations = [Eq(eqn1,0)]
-print "diff(d2,sa) = "
-print eqn1
+	equations = [Eq(eqn1,0)]
+	print "diff(d2,sa) = "
+	print eqn1
 
 
-solution = solve(equations,[sa])
+	solution = solve(equations,[sa])
 
-print solution
-*/
-	nec_float sa = (a1x*b0x + a1y*b0y + a1z*b0z - a0x*a1x - a0x*b0x - a0y*a1y - a0y*b0y - a0z*a1z - a0z*b0z + a0x*a0x + a0y*a0y + a0z*a0z)/
-	(-2.0*a0x*a1x - 2*a0y*a1y - 2.0*a0z*a1z + a0x*a0x + a0y*a0y + a0z*a0z + a1x*a1x + a1y*a1y + a1z*a1z);
-  if (sa < 0) sa = 0.0;
-  if (sa > 1.0) sa = 1.0;
-  
-  nec_3vector a_pt = parametrize(sa);
-	
-	return distance(a_pt, b0);
+	print solution
+	*/
 
-}
+		/* A degenerate wire with coincident endpoints has no axis to
+		   measure against: the squared-length denominator below would be
+		   zero and yield NaN. Fail loudly instead. */
+		nec_float sq_len =
+		  (a1x-a0x)*(a1x-a0x) + (a1y-a0y)*(a1y-a0y) + (a1z-a0z)*(a1z-a0z);
+		if (sq_len == 0.0)
+			throw nec_exception("nec_wire::axis_distance(): zero-length wire");
+
+		nec_float sa = (a1x*b0x + a1y*b0y + a1z*b0z - a0x*a1x - a0x*b0x - a0y*a1y - a0y*b0y - a0z*a1z - a0z*b0z + a0x*a0x + a0y*a0y + a0z*a0z)/
+		  sq_len;
+	  if (sa < 0) sa = 0.0;
+	  if (sa > 1.0) sa = 1.0;
+	  
+	  nec_3vector a_pt = parametrize(sa);
+			
+		return distance(a_pt, b0);
+
+	}
 
 	bool similar(nec_wire& b)
 	{
