@@ -1,0 +1,14 @@
+CM Sommerfeld ground 0.02 wavelengths up, where NEC-2 misses exact limits.
+CM Sigma is 1e10, so the half-space is a perfect conductor and this must
+CM match the same deck with GN 1: R = 0.9168 ohms, average power gain 1.9953.
+CM nec2++, nec2c and aegnec2 all give R = 1.759 ohms and gain 1.043 instead.
+CM Average power gain is exactly 2 for a lossless antenna over a perfect
+CM conductor, so 1.043 is radiating about half the power supplied.
+CE
+GW 1 11 -0.500000 0.000000 0.041091 0.500000 0.000000 0.041091 0.001000
+GE -1
+GN 2 0 0 0 13.000000 10000000000.000000
+EX 0 1 6 0 1.000000 0.000000
+FR 0 1 0 0 145.900000 0
+RP 0 19 37 1001 0.000 0.000 5.000 10.000
+EN
