@@ -22,7 +22,7 @@ def frequency_response
   for f in (1..30) do
     nec = Necpp.nec_create
     Necpp.nec_wire(nec, 1, 17, 0, 0, 2, 0, 0, 11, 0.1, 1, 1);
-    Necpp.nec_geometry_complete(nec, 1, 0);
+    Necpp.nec_geometry_complete(nec, 1);
     Necpp.nec_gn_card(nec, 1, 0, 0, 0, 0, 0, 0, 0);
     Necpp.nec_fr_card(nec, 0, 1, f, 0);
     Necpp.nec_ex_card(nec, 0, 0, 5, 0, 1.0, 0, 0, 0, 0, 0);
