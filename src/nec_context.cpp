@@ -5638,7 +5638,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
       WRITE(3,18)
       STOP
 */
-  int nts = 4, nx = 1;
+  int nts = 4, nx = 1, nma = 65536;
   const int n = 9;
   nec_float rx = 1e-4;
   nec_float dz = 0.0;
@@ -5666,7 +5666,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   complex_array t01(9), t10(9), t20(9), t11(9);
 
   /*! tolerance for hitting upper limit */
-  const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m());
+  const nec_float ep = _s/(1.0e4 * nma);
 
   /*! upper limit */
   const nec_float zend = ze - ep;
@@ -5846,7 +5846,7 @@ loop12:
       GO TO 5
 */
   nt=0;
-  if ( ns >= m_geometry->n_plus_m() )
+  if ( ns >= nma )
   {
     nec_error_mode em(m_output);
     m_output.string("ROM2 -- STEP SIZE LIMITED AT Z = ");
@@ -5894,7 +5894,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   
   bool recalculate_fields = true;
   
-  int nts = 4, nx = 1, n = 9;
+  int nts = 4, nx = 1, n = 9, nma = 65536;
 
   /*! subinterval size */
   nec_float dz=0.0;
@@ -5918,7 +5918,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
   }
   
   /*! tolerance for hitting upper limit */
-  const nec_float ep = _s/(1.0e4 * m_geometry->n_plus_m());
+  const nec_float ep = _s/(1.0e4 * nma);
 
   /*! upper limit */
   const nec_float zend = ze - ep;
@@ -6015,7 +6015,7 @@ void nec_context::rom2( nec_float a, nec_float b, complex_array& sum, nec_float 
     if ( tr > rx)
     {
       nt=0;
-      if ( ns <= m_geometry->n_plus_m() )
+      if ( ns <= nma )
       {
         // halve step size
         ns = ns*2;
