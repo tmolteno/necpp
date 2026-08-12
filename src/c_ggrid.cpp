@@ -40,18 +40,22 @@ void c_ggrid::interpolate( nec_float x, nec_float y, nec_complex *f1,
 {
     static const int nda[3] = {11,17,9}, ndpa[3] = {110, 85, 72};
 
-    bool recalculate = true;
+    /* A point below the cached region origin carries no valid index, so it
+       forces the coefficients to be rebuilt. */
+    bool jump = false;
 
-    if( (x >= m_ip_xs) && (y >= m_ip_ys) ) {
+    if( (x < m_ip_xs) || (y < m_ip_ys) ) {
+        jump = true;
+    } else {
         m_ip_ix = static_cast<int>((x - m_ip_xs) / m_ip_dx) + 1;
         m_ip_iy = static_cast<int>((y - m_ip_ys) / m_ip_dy) + 1;
-    } else {
-        /* if point lies in same 4 by 4 point region */
-        /* as previous point, old values are reused. */
-        if ( ((m_ip_ix >= m_ip_ixeg) && (m_ip_iy >= m_ip_iyeg)) &&
-             ((std::abs(m_ip_ix - m_ip_ixs) < 2) &&  (std::abs(m_ip_iy - m_ip_iys) < 2)) )
-            recalculate = false;
     }
+
+    /* if point lies in same 4 by 4 point region */
+    /* as previous point, old values are reused. */
+    bool recalculate = jump ||
+        (m_ip_ix < m_ip_ixeg) || (m_ip_iy < m_ip_iyeg) ||
+        (std::abs(m_ip_ix - m_ip_ixs) >= 2) || (std::abs(m_ip_iy - m_ip_iys) >= 2);
 
     if (true == recalculate) {
         /* determine correct grid and grid region */
