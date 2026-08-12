@@ -2975,7 +2975,7 @@ void nec_context::efld( nec_float xi, nec_float yi, nec_float zi, nec_float ai, 
   rhox= sabj* zij- salpr* yij;
   rhoy= salpr* xij- cabj* zij;
   rhoz= cabj* yij- sabj* xij;
-  rh = norm(rhox, rhoy, rhoz); // rhox* rhox+ rhoy* rhoy+ rhoz* rhoz;
+  rh = norm2(rhox, rhoy, rhoz);
   
   if ( rh <= 1.e-10) {
     xo= xi- ai* ysn;
