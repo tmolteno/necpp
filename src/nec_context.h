@@ -362,8 +362,14 @@ public:
   static nec_float benchmark();
   
   /*! \brief Signal the end of a geometry description.
-  
+
   This function prepares for a calculation by calling calc_prepare().
+
+  \param gpflag Native GE ground flag: 0 = no ground, 1 = image interpolation
+  (charge zero at base), -1 = zero current at the ground plane. The C API
+  constant NEC_GROUND_CONNECTION_ZERO_CURRENT (public value 2) maps to -1.
+  Both signed modes reject segments below or in the ground plane, and a
+  non-none connection without a ground model (GN card) fails in simulate().
   */
   void geometry_complete(int gpflag);
 

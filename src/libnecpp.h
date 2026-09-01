@@ -190,12 +190,33 @@ long nec_gm_card(nec_context* in_context, int itsi, int nrpt,
 long nec_gx_card(nec_context* in_context, int i1, int i2);
 
 
+/*! \brief Ground connection modes accepted by nec_geometry_complete() (GE card I1).
+
+  These are the stable public ABI values. NONE and IMAGE equal the native NEC
+  GE values; ZERO_CURRENT (2) maps to the native signed NEC value -1.
+
+  NEC-2 Part 3: a positive or negative I1 does not cause a ground to be
+  included in the calculation, it only modifies the geometry data as required
+  when a ground is present. The ground parameters must be specified on a GN
+  card following the geometry cards, and when I1 is nonzero no segment may
+  extend below the ground plane (X,Y plane) or lie in this plane (segments may
+  end on the ground plane, however).
+*/
+enum nec_ground_connection {
+  NEC_GROUND_CONNECTION_NONE = 0,        /*!< GE 0 - no ground plane is present. */
+  NEC_GROUND_CONNECTION_IMAGE = 1,       /*!< GE 1 - currents on segments touching the ground are interpolated to their images below the ground (charge at base is zero). */
+  NEC_GROUND_CONNECTION_ZERO_CURRENT = 2 /*!< GE -1 - currents on segments touching the ground go to zero at the ground. */
+};
+
 /*! \brief Indicate that the geometry is complete (GE card)
  * \param in_context The nec_context created with nec_create()
- * \param gpflag Geometry ground plain flag.
- *    \arg \c 0 - no ground plane is present.
- *    \arg \c 1 - Indicates a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents an segments touching the ground (x, Y plane) are interpolated to their images below the ground (charge at base is zero)
- *    \arg \c -1 - indicates a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, Thus, currents on segments touching the ground will go to zero at the ground. 
+ * \param gpflag Geometry ground plane flag, one of nec_ground_connection:
+ *    \arg \c NEC_GROUND_CONNECTION_NONE (0) - no ground plane is present.
+ *    \arg \c NEC_GROUND_CONNECTION_IMAGE (1) - a ground plane is present. Structure symmetry is modified as required, and the current expansion is modified so that the currents on segments touching the ground (X,Y plane) are interpolated to their images below the ground (charge at base is zero).
+ *    \arg \c NEC_GROUND_CONNECTION_ZERO_CURRENT (2) - a ground is present. Structure symmetry is modified as required. Current expansion, however, is not modified, thus currents on segments touching the ground will go to zero at the ground. The native GE flag -1 is used internally.
+ *  Both signed modes reject segments that extend below the ground plane or
+ *  lie in it, and a non-none connection without a ground model (GN card)
+ *  fails when the simulation is prepared.
    \copydoc error_return
  **/
 long nec_geometry_complete(nec_context* in_context, int gpflag);

@@ -79,6 +79,10 @@ long nec_gx_card(nec_context* in_context, int i1, int i2) {
 
 
 long nec_geometry_complete(nec_context* in_context, int gpflag) {
+  /* The public ABI value for the zero-current mode is 2 (see
+     nec_ground_connection); the native NEC GE flag is -1. */
+  if (gpflag == NEC_GROUND_CONNECTION_ZERO_CURRENT)
+    gpflag = -1;
   NEC_ERROR_HANDLE(in_context->geometry_complete(gpflag));
 }
 

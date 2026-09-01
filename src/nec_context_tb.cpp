@@ -311,6 +311,87 @@ TEST_CASE( "Legs meeting on the ground plane are accepted", "[segment_junction]"
     REQUIRE(geo->overlap_findings().empty());
 }
 
+TEST_CASE( "Both signed ground modes reject below-plane segments", "[ground][zero_current]") {
+    // NEC-2 Part 3: "When I1 is nonzero, no segment may extend below the
+    // ground plane (X,Y plane) or lie in this plane." The zero-current mode
+    // (GE -1) used to skip the checks that image mode (GE 1) applies.
+    for (int gpflag : {1, -1}) {
+      nec_context nec;
+      nec.initialize();
+
+      c_geometry* geo = nec.get_geometry();
+      geo->wire(1, 5, 0.0, 0.0, -0.5, 0.0, 0.0, 0.5, 0.001, 1.0, 1.0);
+      REQUIRE_THROWS(nec.geometry_complete(gpflag));
+    }
+}
+
+TEST_CASE( "Both signed ground modes reject segments lying in the plane", "[ground][zero_current]") {
+    // A segment whose axis lies in the ground plane is rejected in both
+    // signed modes, while one that merely ends on the plane is accepted.
+    for (int gpflag : {1, -1}) {
+      nec_context nec;
+      nec.initialize();
+
+      c_geometry* geo = nec.get_geometry();
+      geo->wire(1, 5, -0.5, 0.0, 0.0, 0.5, 0.0, 0.0, 0.001, 1.0, 1.0);
+      REQUIRE_THROWS(nec.geometry_complete(gpflag));
+    }
+}
+
+TEST_CASE( "GE -1 accepts a segment ending on the ground plane", "[ground][zero_current]") {
+    // The zero-current mode leaves a ground-touching end free (no image
+    // connection), so the current goes to zero there; the segment is valid.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.001, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(-1));
+    REQUIRE(geo->ground_connection() == -1);
+}
+
+TEST_CASE( "GE -1 accepts a horizontal wire close to the ground plane", "[ground][zero_current]") {
+    // NEC-2 Part 3: for a horizontal wire less than 1e-3 x its segment length
+    // above the ground, GE 1 connects every end to ground (or rejects the
+    // wire); GE -1 must accept it with the ends left free.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 5, -1.0, 0.0, 1.0e-4, 1.0, 0.0, 1.0e-4, 0.001, 1.0, 1.0);
+    REQUIRE_NOTHROW(nec.geometry_complete(-1));
+}
+
+TEST_CASE( "Ground connection without a ground model fails at simulate", "[ground][zero_current]") {
+    // NEC-2 Part 3: "A positive or negative value of I1 does not cause a
+    // ground to be included in the calculation... The ground parameters must
+    // be specified on a program control card following the geometry cards."
+    // Fail loudly instead of silently simulating free space.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.001, 1.0, 1.0);
+    nec.geometry_complete(1);
+
+    nec.ex_card(EXCITATION_VOLTAGE, 0, 5, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    REQUIRE_THROWS(nec.xq_card(0));
+}
+
+TEST_CASE( "Ground connection with a ground model simulates", "[ground][zero_current]") {
+    // The same geometry with a GN card (perfect ground) is a valid simulation.
+    nec_context nec;
+    nec.initialize();
+
+    c_geometry* geo = nec.get_geometry();
+    geo->wire(1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.001, 1.0, 1.0);
+    nec.geometry_complete(1);
+    nec.gn_card(1, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+    nec.ex_card(EXCITATION_VOLTAGE, 0, 5, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+    REQUIRE_NOTHROW(nec.xq_card(0));
+}
+
 TEST_CASE( "Wire intruding past a shared node is rejected", "[segment_junction]") {
     // A feed leaving the hub of a radial at 20 degrees. Its first center clears
     // the radial segment it shares the hub with and comes to rest inside the
