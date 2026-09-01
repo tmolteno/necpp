@@ -47,6 +47,7 @@ c_geometry::c_geometry()
   mp = 0;    // m is the number of patches
   
   m_ipsym = 0;
+  m_gpflag = 0;
   
   n_plus_2m = 0;
   n_plus_3m = 0;
@@ -453,6 +454,7 @@ void c_geometry::parse_geometry_error(const geometry_parse_state& st)
 */
 void c_geometry::geometry_complete(nec_context* in_context, int gpflag)
 {
+  m_gpflag = gpflag;
   if (0 == np + mp)
     throw nec_exception("Geometry has no wires or patches.");
 
@@ -1747,21 +1749,26 @@ void c_geometry::build_connections( int ignd )
 
       /* determine connection data for end 1 of segment. */
       bool segment_on_ground = false;
-      if ( ignd > 0) {
+      bool end1_in_plane = false;
+      if ( ignd != 0) { /* both signed ground modes validate against the plane */
         if ( zi1 <= -slen) {
           nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
           nex.append(iz);
           nex.append("EXTENDS BELOW GROUND");
           throw nex;
         }
-      
+
         if ( zi1 <= slen) {
-          icon1[i]= iz;
-          z[i]=0.;
-          segment_on_ground = true;  
+          end1_in_plane = true;
+          if ( ignd > 0) {
+            /* image mode: the end is connected to its image below the plane */
+            icon1[i]= iz;
+            z[i]=0.;
+            segment_on_ground = true;
+          }
         } /* if ( zi1 <= slen) */
-      } /* if ( ignd > 0) */
-    
+      } /* if ( ignd != 0) */
+
       if ( false == segment_on_ground ) {
         int ic= i;
         bool contact_found = false;
@@ -1788,31 +1795,44 @@ void c_geometry::build_connections( int ignd )
 
         if ( ((iz > 0) || (icon1[i] <= PCHCON)) && (false == contact_found) )
           icon1[i]=0;
-      
+
       } /* if ( ! jump ) */
-    
+
       /* determine connection data for end 2 of segment. */
-      if ( (ignd > 0) || segment_on_ground ) {
+      if ( ignd != 0) { /* both signed ground modes validate against the plane */
         if ( zi2 <= -slen) {
           nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
           nex.append(iz);
           nex.append("EXTENDS BELOW GROUND");
           throw nex;
         }
-      
+
         if ( zi2 <= slen) {
-          if ( icon1[i] == iz ) {
+          bool lies_in_plane = false;
+          if ( end1_in_plane ) {
+            /* Image mode snaps ends within the contact threshold onto the
+               plane, so both ends in the threshold band lie in it. Zero-
+               current mode keeps the NEC-2 Part 3 escape hatch for horizontal
+               wires closer than 1e-3 x segment length, so only a segment
+               with both ends exactly on the plane lies in it. */
+            lies_in_plane = (ignd > 0) || ((zi1 == 0.0) && (zi2 == 0.0));
+          }
+
+          if ( lies_in_plane ) {
             nec_exception nex("GEOMETRY DATA ERROR--SEGMENT ");
             nex.append(iz);
             nex.append("LIES IN GROUND PLANE");
             throw nex;
           }
-        
-          icon2[i]= iz;
-          z2[i]=0.;
-          continue;
-        } /* if ( zi2 <= slen) */  
-      } /* if ( ignd > 0) */
+
+          if ( ignd > 0) {
+            /* image mode: the end is connected to its image below the plane */
+            icon2[i]= iz;
+            z2[i]=0.;
+            continue;
+          }
+        } /* if ( zi2 <= slen) */
+      } /* if ( ignd != 0) */
     
       // re-initialize these vectors!
       v1 = nec_3vector(x[i], y[i], z[i]);

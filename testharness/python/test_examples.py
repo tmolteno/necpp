@@ -25,7 +25,10 @@ class TestDipoleGain(unittest.TestCase):
     EN    
     '''
     self.handle_nec(nec_wire(nec, 0, 7, 0., 0., .75, 0., 0., 1.25, .001, 1.0, 1.0))
-    self.handle_nec(nec_geometry_complete(nec, 1))
+    # Free-space dipole (deck comment: plain "GE", no GN card follows); a
+    # non-none ground connection without a ground model now fails at
+    # simulate, so the geometry must be completed with flag 0.
+    self.handle_nec(nec_geometry_complete(nec, 0))
     self.handle_nec(nec_ex_card(nec, 0, 0, 4,0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0))
     self.handle_nec(nec_xq_card(nec, 0))
     self.handle_nec(nec_ld_card(nec, 0, 0, 4, 4, 10., 3.000E-09, 5.300E-11))

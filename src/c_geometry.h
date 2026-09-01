@@ -163,6 +163,11 @@ public:
   	 *  \exception nec_exception* If there is an error with the geometry.
   	 */
   	void geometry_complete(nec_context* m_context, int gpflag);
+
+  	/*! \brief The native GE ground flag (0, 1 or -1) the geometry was
+  	 *  completed with.
+  	 */
+  	int ground_connection() const { return m_gpflag; }
   
   
   
@@ -207,6 +212,7 @@ public:
   
   int64_t m, mp;	// The number of patches
   int m_ipsym;
+  int m_gpflag;	// Native GE ground flag (0, 1 or -1) from geometry_complete()
   
   real_array t1x, t1y, t1z, t2x, t2y, t2z;	// t1, t2 basis co-ordinates?
   real_array px, py, pz, pbi, psalp;			// patch data

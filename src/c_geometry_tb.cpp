@@ -273,3 +273,23 @@ TEST_CASE( "GX three-plane symmetry produces correct impedance", "[symmetry]") {
 
     nec_delete(nec);
 }
+
+TEST_CASE( "nec_geometry_complete maps public value 2 to native GE -1", "[ground][zero_current][c_api]") {
+    // The stable public ABI value for the zero-current mode is 2
+    // (NEC_GROUND_CONNECTION_ZERO_CURRENT); the native geometry must receive
+    // the signed NEC value -1, so the below-plane and in-plane rejections of
+    // GE -1 apply and the recorded connection is -1.
+    nec_context* nec = nec_create();
+
+    // A segment extending below the plane: rejected under public value 2.
+    HANDLE_NEC(nec_wire(nec, 1, 5, 0.0, 0.0, -0.5, 0.0, 0.0, 0.5, 0.001, 1.0, 1.0));
+    REQUIRE( nec_geometry_complete(nec, NEC_GROUND_CONNECTION_ZERO_CURRENT) != 0 );
+    nec_delete(nec);
+
+    // A valid zero-current geometry records the native flag -1.
+    nec = nec_create();
+    HANDLE_NEC(nec_wire(nec, 1, 5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.001, 1.0, 1.0));
+    HANDLE_NEC(nec_geometry_complete(nec, NEC_GROUND_CONNECTION_ZERO_CURRENT));
+    REQUIRE( nec->get_geometry()->ground_connection() == -1 );
+    nec_delete(nec);
+}
