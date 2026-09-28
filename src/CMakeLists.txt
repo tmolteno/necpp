@@ -149,9 +149,15 @@ if(NECPP_BUILD_WASM)
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${NECPP_EIGEN_DIR}
         ${CMAKE_BINARY_DIR})
+    # Emscripten disables exception catching by default. nec_context throws to
+    # unwind a finished solve, so without this the catch is elided and every
+    # completed run escapes as an uncaught error. Needed at compile, not just
+    # link: the link flag cannot restore a catch already dropped.
+    target_compile_options(nec2pp_wasm PRIVATE -fexceptions)
     # Flags carried verbatim from the old Makefile wasm target.
     target_link_options(nec2pp_wasm PRIVATE
         -sWASM=1
+        -fexceptions
         "-sEXPORTED_FUNCTIONS=[\"_nec_create_context\",\"_nec_delete_context\",\"_nec_process_input\",\"_nec_get_output\",\"_nec_get_output_length\",\"_nec_free\"]"
         "-sEXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\",\"UTF8ToString\",\"lengthBytesUTF8\"]"
         -sALLOW_MEMORY_GROWTH=1
