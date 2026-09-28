@@ -70,3 +70,6 @@ jobs:
           test -f nec2pp.js
           test -f nec2pp.wasm
           echo "WASM artifacts present: $(ls -la nec2pp.js nec2pp.wasm)"
+
+      - name: WASM runtime smoke test
+        run: node tests/wasm_smoke.js nec2pp.js
