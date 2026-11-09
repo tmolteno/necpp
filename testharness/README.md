@@ -37,3 +37,18 @@ Drop a `.nec` input file into `data/`. The harness will run it through
 
 The `data/` directory contains over 45 models covering dipoles, patches,
 helices, Sommerfeld ground, arrays, and more.
+
+### Known-limitation decks
+
+Some decks document behavior rather than assert correctness, so their
+output files record what every engine currently produces:
+
+- `sommerfeld_near_ground.nec` — a horizontal half-wave dipole 0.02
+  wavelengths above a `GN 2` ground with sigma 1e10 S/m (an effectively
+  perfect half-space). Over a true perfect conductor (`GN 1`) the same
+  antenna gives R = 0.9168 ohms and average power gain 1.9953 (the lossless
+  limit is 2), but every SOMNEC-derived engine — nec2++, nec2c and the
+  original Fortran — returns R ≈ 1.759 ohms and gain ≈ 1.043 there. This
+  is a shared NEC-2 Sommerfeld limitation near ground, not a translation
+  bug (PR #137). Compare against the `GN 1` variant of the deck to see the
+  gap.
