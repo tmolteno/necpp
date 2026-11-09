@@ -1,0 +1,12 @@
+CM Issue 139 regression: monopole + radial screen over Sommerfeld ground (normal wire order)
+CE
+GW 1 13 0 0 0.2 0 0 12.2 0.025
+GW 2 20 0 0 0.2 20 0 0.2 0.001
+GW 3 20 0 0 0.2 0 20 0.2 0.001
+GE 1
+GN 2,0,0,0,13.,.005
+LD 5 0 0 0 58000000 0 0
+EX 0 1 1 0 1 0
+FR 0 1 0 0 2.7 0
+RP 0 2 1 1001 0 0 89.5 0
+EN
