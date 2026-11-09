@@ -40,10 +40,12 @@ using namespace std;
 
 int main(int argc, char** argv) {
 
-  if (argc < 2) {
-    cout << "Usage: nec2diff fila, file b" << endl;
+  if (argc < 3) {
+    cout << "Usage: nec2diff file_a file_b" << endl;
+    return 1;
   }
-  cout << "NecDiff 0.12" << endl;
+
+  cout << "NecDiff 0.13" << endl;
 
   string file1(argv[1]);
   string file2(argv[2]);
@@ -51,17 +53,20 @@ int main(int argc, char** argv) {
   cout << "File1: " << file1 << endl;
   cout << "File2: " << file2 << endl;
 
+  bool same = true;
+
   {
     AntennaInput ai1(file1);
     AntennaInput ai2(file2);
 
     cout << "AntennaInput Difference = " << ai1.difference(ai2) << endl;
     if (!ai1.equalto(ai2)) {
+      same = false;
       cerr << file1 << "::" << file2;
       cerr << ". Input Parameters Different " << ai1.difference(ai2) <<  endl;
     }
   }
-  
+
   // Compare Power Budget
 
   {
@@ -70,9 +75,9 @@ int main(int argc, char** argv) {
 
     cout << "PowerBudget Difference = " << r1.difference(r2) << endl;
     if (!r1.equalto(r2)) {
+      same = false;
       cerr << file1 << "::" << file2;
       cerr << ". Power Budgets Different " << r1.difference(r2) << endl;
-      // return 1;
     }
   }
 
@@ -83,13 +88,13 @@ int main(int argc, char** argv) {
 
     cout << "RadiationInput Difference = " << r1.difference(r2) << endl;
     if (!r1.equalto(r2)) {
+      same = false;
       cerr << file1 << "::" << file2;
       cerr << ". Radiation Patterns Different " << r1.difference(r2) << endl;
-      // return 1;
     }
   }
-  
-  return 0;
+
+  return same ? 0 : 1;
 }
 
 

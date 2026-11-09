@@ -6,10 +6,15 @@ antennas using the Method of Moments.
 
 .SH SYNOPSIS
 .B nec2diff
+.I file_a file_b
 
 .SH DESCRIPTION
 .B nec2diff
 evaluates differences between 2 result files given as parameters.
+
+.SH EXIT STATUS
+nec2diff returns 0 if no differences were found, and 1 if the files differ.
+With fewer than two arguments it prints a usage line and returns 1.
 
 .SH AUTHOR
 nec2diff was written by Tim Molteno <tim@physics.otago.ac.nz>
