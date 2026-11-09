@@ -36,7 +36,9 @@ using namespace std;
    before the step-level tolerance binds. Measured to cut ~1.5% of saoa()
    integrand evaluations per Sommerfeld table with byte-identical output on
    every testharness deck and unchanged agreement with the nec2c/FORTRAN
-   references. */
+   references. The companion change that raised gshank()'s denm floor was
+   reverted (see the denm assignment below) after it broke convergence on
+   decks with wires close to the ground. */
 #define CRIT_H	1.1E-4
 #define	PTP	.6283185308
 #define NTS	4
@@ -181,12 +183,15 @@ void c_evlcom::gshank( nec_complex start, nec_complex dela, nec_complex* sum,
 				den=amg;		
 		} /* for ( i = 0; i < nans; i++ ) */
 		
-		/* Convergence floor for the Shanks test (issue #131 item 3): the
-		   increment is judged against max(|q2|*CRIT_H, denm); at 2.e-1 of
-		   the largest accelerated term the loop stops once the increment
-		   has stalled relative to the tail, instead of chasing entries
-		   orders of magnitude smaller than the answer. */
-		denm=2.e-1*den*CRIT_H;
+		/* Convergence floor for the Shanks test: the increment is judged
+		   against max(|q2|*CRIT_H, denm) with denm at 1.e-3 of the largest
+		   accelerated term. Issue #131 item 3 initially raised this floor
+		   to 2.e-1, which lets gshank() return while the integrand is still
+		   converging; the resulting errors in the Sommerfeld tables make
+		   rom2()'s Romberg test (rx = 1e-4) unreachable for decks with
+		   wires close to the ground (e.g. elevated radial screens), so the
+		   integration grinds at the subdivision cap indefinitely. */
+		denm=1.e-3*den*CRIT_H;
 		jm=intx-3;
 		if (jm < 1)
 			jm = 1;

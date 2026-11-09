@@ -1,0 +1,8 @@
+CM Short (capacitive) 20 m dipole in free space
+CE
+GW 1 21 0 -4.5 0 0 4.5 0 0.001
+GE 0
+EX 0 1 11 0 1 0
+FR 0 1 0 0 14.2 0
+RP 0 1 3 1000 90 0 0 45
+EN

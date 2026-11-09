@@ -100,3 +100,11 @@ add_test(NAME necpp_smoke_hertzian_dipole
         -DNEC2PP=$<TARGET_FILE:nec2++>
         -DINPUT=${CMAKE_SOURCE_DIR}/testharness/data/herzian_dipole.nec
         -P ${CMAKE_CURRENT_SOURCE_DIR}/smoke_test.cmake)
+
+# nec2diff behaviour regression (issue #138): negative-value comparison,
+# finite sign-flip differences, exit statuses and the argc guard.
+add_test(NAME necpp_nec2diff_issue138
+    COMMAND ${CMAKE_COMMAND}
+        -DNEC2DIFF=$<TARGET_FILE:nec2diff>
+        -DDATA_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data/issue138
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/nec2diff_test.cmake)

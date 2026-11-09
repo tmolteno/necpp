@@ -506,3 +506,82 @@ TEST_CASE( "EX type-4 source on a patch centroid zeroes that patch", "[etmns][cu
     REQUIRE(std::real(c1) == Catch::Approx(6.9547e-05).margin(1e-7));
     REQUIRE(std::imag(c1) == Catch::Approx(-1.5977e-05).margin(1e-7));
 }
+
+// ---------------------------------------------------------------------------
+// Issue #139: Sommerfeld interpolation produced wire-order-dependent results.
+//
+// A 12 m monopole with an explicit radial screen 0.2 m above a Sommerfeld
+// ground (GN 2, epsr 13, sig 0.005) is built twice: once in natural wire
+// order and once with the wire cards reversed. The antenna input impedance,
+// accepted power and radiation pattern must not depend on the insertion
+// order.
+//
+// This deck also guards the gshank() Shanks-tail convergence floor: when it
+// was loosened (issue #131 item 3), the Sommerfeld tables degraded enough
+// that rom2() could never meet its Romberg test for this geometry and the
+// simulation ground on at the subdivision cap indefinitely. A regression
+// there shows up as this test hitting the ctest timeout.
+// ---------------------------------------------------------------------------
+namespace {
+	struct issue139_wire {
+		int tag, segments;
+		double x1, y1, z1, x2, y2, z2, radius;
+	};
+
+	void issue139_run(bool reverse_wires,
+		nec_complex& impedance, double& accepted_power, double& horizon_gain_db) {
+		issue139_wire wires[] = {
+			{ 1, 13, 0.0, 0.0, 0.2, 0.0, 0.0, 12.2, 0.025 },
+			{ 2, 20, 0.0, 0.0, 0.2, 20.0, 0.0, 0.2, 0.001 },
+			{ 3, 20, 0.0, 0.0, 0.2, 0.0, 20.0, 0.2, 0.001 },
+		};
+
+		nec_context nec;
+		nec.initialize();
+		c_geometry* geo = nec.get_geometry();
+		for (int i = 0; i < 3; i++) {
+			const issue139_wire& w = wires[reverse_wires ? 2 - i : i];
+			geo->wire(w.tag, w.segments, w.x1, w.y1, w.z1, w.x2, w.y2, w.z2,
+				w.radius, 1.0, 1.0);
+		}
+		nec.geometry_complete(1);
+		nec.gn_card(2, 0, 13.0, 0.005, 0.0, 0.0, 0.0, 0.0);
+		nec.ld_card(5, 0, 0, 0, 58.0e6, 0, 0);
+		nec.fr_card(0, 1, 2.7, 0.0);
+		nec.ex_card(EXCITATION_VOLTAGE, 1, 1, 0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+		nec.rp_card(0, 2, 1, 1, 0, 0, 0, 0.0, 0.0, 89.5, 0.0, 0.0, 0.0);
+
+		impedance = nec_complex(nec.get_impedance_real(0), nec.get_impedance_imag(0));
+		accepted_power = 0.0;
+		nec_antenna_input* ai = nec.get_input_parameters(0);
+		for (unsigned k = 0; k < ai->get_power().size(); k++)
+			accepted_power += ai->get_power()[k];
+
+		nec_radiation_pattern* rp = nec.get_radiation_pattern(0);
+		// theta = 0 is the symmetry null (gain floor sentinel); the 89.5
+		// degree sample (index 1) is the meaningful order-invariance probe.
+		horizon_gain_db = rp->get_gain_tot()[1];
+	}
+}
+
+TEST_CASE("Wire insertion order does not change Sommerfeld-ground results", "[issue139][sommerfeld]") {
+	nec_complex z_forward(0.0, 0.0), z_reverse(0.0, 0.0);
+	double p_forward = 0.0, p_reverse = 0.0;
+	double g_forward = 0.0, g_reverse = 0.0;
+
+	issue139_run(false, z_forward, p_forward, g_forward);
+	issue139_run(true, z_reverse, p_reverse, g_reverse);
+
+	// Reference values (cross-validated against the nec2c reference engine,
+	// which prints 1.3906E+01 -4.4584E+02 for this deck).
+	REQUIRE(std::real(z_forward) == Catch::Approx(13.906).margin(1e-2));
+	REQUIRE(std::imag(z_forward) == Catch::Approx(-445.84).margin(1e-1));
+
+	// Order invariance: the two runs share identical arithmetic up to the
+	// segment numbering, so the comparison can be tight.
+	REQUIRE(std::abs(z_forward - z_reverse)
+		<= 1e-8 * std::max(std::abs(z_forward), std::abs(z_reverse)));
+	REQUIRE(std::abs(p_forward - p_reverse)
+		<= 1e-8 * std::max(std::abs(p_forward), std::abs(p_reverse)));
+	REQUIRE(std::abs(g_forward - g_reverse) < 1e-6);
+}

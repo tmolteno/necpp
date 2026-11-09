@@ -19,23 +19,24 @@
 
 #include "math_util.h"
 
+#include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
+/* Relative difference of two values, normalised by the larger magnitude.
+   The scale test must use magnitudes: comparing signed values against the
+   1e-8 floor treats any two negative numbers as "effectively zero". */
 nec_float diff(nec_float a, nec_float b)
 {
 	if (a == b)
 		return 0;
-	if ((a < 1e-8) && (b < 1e-8))
+
+	nec_float scale = std::max(std::fabs(a), std::fabs(b));
+	if (scale < 1e-8)
 		return 0;
 
-	nec_float sub = a - b;
-	nec_float sum = a + b;
-	
-	nec_float ret = sub*sub;
-	if ((a != 0) && (b != 0))
-		ret /= sum*sum;
-	ret = sqrt(ret);
+	nec_float ret = std::fabs(a - b) / scale;
 	if (ret > 1e-2)
 	{
 		cout << "    diff(" << a << "," << b << ") = " << ret << endl;
@@ -47,16 +48,12 @@ nec_float diff(nec_complex a, nec_complex b)
 {
 	if (a == b)
 		return 0;
-	if ((abs(a) < 1e-8) && (abs(b) < 1e-8))
+
+	nec_float scale = std::max(abs(a), abs(b));
+	if (scale < 1e-8)
 		return 0;
 
-	nec_float ret = norm(a - b);
-	nec_float sum = norm(a + b);
-	
-	if (sum != 0)
-		ret /= sum;
-		
-	ret = sqrt(ret);
+	nec_float ret = abs(a - b) / scale;
 	if (ret > 1e-2)
 	{
 		stringstream ss;
